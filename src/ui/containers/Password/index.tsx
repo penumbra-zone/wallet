@@ -12,12 +12,14 @@ import Button from '@mui/material/Button';
 
 type PasswordProps = {
   password: string;
+  isWrongPass: boolean;
   handleSubmitPassword: () => void;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const Password: React.FC<PasswordProps> = ({
   password,
+  isWrongPass,
   handleChange,
   handleSubmitPassword,
 }) => {
@@ -59,6 +61,7 @@ export const Password: React.FC<PasswordProps> = ({
           label="Password"
         />
       </FormControl>
+      {isWrongPass && <Typography sx={{ fontSize: '14px', color: 'red' }}>Wrong password</Typography>}
       <Button
         variant="contained"
         disabled={!password}

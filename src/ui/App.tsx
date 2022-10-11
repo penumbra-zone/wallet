@@ -24,6 +24,7 @@ export const App: React.FC<AppProps> = observer(({ background }) => {
     locked,
     vault,
     password: pass,
+    isWrongPass,
   } = background.state;
   const {
     lock,
@@ -46,6 +47,7 @@ export const App: React.FC<AppProps> = observer(({ background }) => {
     locked,
     vault,
     password: pass,
+    isWrongPass,
   });
 
   useEffect(() => {
@@ -57,8 +59,9 @@ export const App: React.FC<AppProps> = observer(({ background }) => {
   useEffect(() => {
     if (!mnemonic) return;
     const spendKey = generateSpendKey(mnemonic);
-    console.log({ spendKey });
   }, [mnemonic]);
+
+
 
   const handleChangeStep = (step: Steps) => () => setStep(step);
 
@@ -67,7 +70,7 @@ export const App: React.FC<AppProps> = observer(({ background }) => {
 
   const handleSubmitPassword = () => {
     initialized ? unlock(password) : initVault(password);
-    setStep(3);
+    // setStep(3);
   };
 
   return (
@@ -80,20 +83,21 @@ export const App: React.FC<AppProps> = observer(({ background }) => {
       {/* {!initialized && (
         <CreateOrRecoveryWallet handleChangeStep={handleChangeStep(2)} />
       )} */}
-      {!pass && (
+      {locked && (
         <Password
           password={password}
           handleChange={handleChangePassword}
           handleSubmitPassword={handleSubmitPassword}
+          isWrongPass={isWrongPass}
         />
       )}
-      {mnemonic && step === 3 && (
+      {/* {mnemonic && step === 3 && (
         <GenerateSeedPhrase
           mnemonic={mnemonic}
           handleChangeStep={handleChangeStep(4)}
         />
       )}
-      {step === 4 && mnemonic && <CheckSeedPhrase mnemonic={mnemonic} />}
+      {step === 4 && mnemonic && <CheckSeedPhrase mnemonic={mnemonic} />} */}
     </Box>
   );
 });

@@ -46,7 +46,7 @@ export function promiseToCb(fn, context) {
       callback = () => {};
     }
     fn.apply(context, args)
-      .then((result) => setImmediate(callback, null, result))
-      .catch((error) => setImmediate(callback, error));
+      // .then((result) => setImmediate(callback, null, result))
+      // .catch((error) => setImmediate(callback, error));
   };
 }

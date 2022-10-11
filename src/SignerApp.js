@@ -8,9 +8,9 @@ export class SignerApp {
   constructor(initState = {}) {
     this.store = observable.object({
       password: null,
-      vault: initState.vault,
-      // vault: 'werwere',
+      vault: initState.store.vault,
       messages: [],
+      isWrongPass: false,
 
       //Computed properties. Можно провести аналогию с view в бд
       get locked() {
@@ -51,8 +51,13 @@ export class SignerApp {
 
   @action
   unlock(password) {
-    this._checkPassword(password);
-    this.store.password = password;
+    const isCheckedPass = this._checkPassword(password);
+    if (!isCheckedPass) {
+      this.store.isWrongPass = true;
+    } else {
+      this.store.password = password;
+      this.store.isWrongPass = false;
+    }
   }
 
   @action
@@ -147,6 +152,7 @@ export class SignerApp {
       //TODO delete vault and pass
       vault: this.store.vault,
       password: this.store.password,
+      isWrongPass: this.store.isWrongPass,
     };
   }
 
@@ -201,7 +207,7 @@ export class SignerApp {
 
   // private
   _checkPassword(password) {
-    SignerApp._decryptVault(this.store.vault, password);
+    return SignerApp._decryptVault(this.store.vault, password);
   }
 
   _checkLocked() {
@@ -223,6 +229,7 @@ export class SignerApp {
       const jsonString = decrypt(str, pass);
       return JSON.parse(jsonString);
     } catch (e) {
+      return false;
       throw new Error('Wrong password');
     }
   }

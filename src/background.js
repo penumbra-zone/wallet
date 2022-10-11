@@ -10,8 +10,7 @@ const IDLE_INTERVAL = 30;
 setupApp();
 
 async function setupApp() {
-  const initState = await loadState(store);
-  console.log({ initState });
+  const initState = await loadState();
   const app = new SignerApp(initState);
 
   if (DEV_MODE) {
