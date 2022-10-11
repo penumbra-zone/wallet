@@ -12,14 +12,14 @@ import Button from '@mui/material/Button';
 
 type PasswordProps = {
   password: string;
-  handleChangeStep: () => void;
+  handleSubmitPassword: () => void;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const Password: React.FC<PasswordProps> = ({
   password,
   handleChange,
-  handleChangeStep,
+  handleSubmitPassword,
 }) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -62,7 +62,7 @@ export const Password: React.FC<PasswordProps> = ({
       <Button
         variant="contained"
         disabled={!password}
-        onClick={handleChangeStep}
+        onClick={handleSubmitPassword}
       >
         Submit
       </Button>

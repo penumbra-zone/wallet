@@ -17,11 +17,36 @@ type AppProps = {
 };
 
 export const App: React.FC<AppProps> = observer(({ background }) => {
-  // const { keys, messages, initialized, locked, vault, password } = background.state;
-  // const { lock, unlock,addKey,removeKey,initVault,deleteVault, approve,reject } = background;
+  const {
+    keys,
+    messages,
+    initialized,
+    locked,
+    vault,
+    password: pass,
+  } = background.state;
+  const {
+    lock,
+    unlock,
+    addKey,
+    removeKey,
+    initVault,
+    deleteVault,
+    approve,
+    reject,
+  } = background;
   const [step, setStep] = useState<Steps>(1);
   const [password, setPassword] = useState<string>('');
   const [mnemonic, setMnemonic] = useState<string | null>(null);
+
+  console.log({
+    keys,
+    messages,
+    initialized,
+    locked,
+    vault,
+    password: pass,
+  });
 
   useEffect(() => {
     if (!password || step !== 3) return;
@@ -40,6 +65,11 @@ export const App: React.FC<AppProps> = observer(({ background }) => {
   const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) =>
     setPassword(event.target.value);
 
+  const handleSubmitPassword = () => {
+    initialized ? unlock(password) : initVault(password);
+    setStep(3);
+  };
+
   return (
     <Box
       sx={{
@@ -47,14 +77,14 @@ export const App: React.FC<AppProps> = observer(({ background }) => {
         width: '100%',
       }}
     >
-      {step === 1 && (
+      {/* {!initialized && (
         <CreateOrRecoveryWallet handleChangeStep={handleChangeStep(2)} />
-      )}
-      {step === 2 && (
+      )} */}
+      {!pass && (
         <Password
           password={password}
           handleChange={handleChangePassword}
-          handleChangeStep={handleChangeStep(3)}
+          handleSubmitPassword={handleSubmitPassword}
         />
       )}
       {mnemonic && step === 3 && (

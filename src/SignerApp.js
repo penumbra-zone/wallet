@@ -9,6 +9,7 @@ export class SignerApp {
     this.store = observable.object({
       password: null,
       vault: initState.vault,
+      // vault: 'werwere',
       messages: [],
 
       //Computed properties. Можно провести аналогию с view в бд
@@ -143,6 +144,7 @@ export class SignerApp {
       messages: this.store.newMessages,
       initialized: this.store.initialized,
       locked: this.store.locked,
+      //TODO delete vault and pass
       vault: this.store.vault,
       password: this.store.password,
     };
