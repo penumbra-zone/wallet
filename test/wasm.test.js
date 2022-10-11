@@ -1,4 +1,4 @@
-import v from 'penumbra-web-assembly';
+import { generateSpendKey } from 'penumbra-web-assembly';
 
 var assert = require('assert');
 // import { generateSpendKey } from 'penumbra-web-assembly';
@@ -8,7 +8,7 @@ describe('Spend key', function() {
   describe('generate spending key', function() {
     it('should succesful generated spending key from seed', function() {
       let seed = getSeedPhrase();
-      let spendKey = v.generateSpendKey(getSeedPhrase());
+      let spendKey = generateSpendKey(getSeedPhrase());
     });
   });
 });
