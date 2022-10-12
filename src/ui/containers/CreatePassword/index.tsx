@@ -9,8 +9,6 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { useNavigate } from 'react-router-dom';
-import { routes } from '../../../utils';
 import { getSeedPhrase } from '../../../utils/getSeedPhrase';
 
 type CreatePasswordProps = {
@@ -20,9 +18,7 @@ type CreatePasswordProps = {
 export const CreatePassword: React.FC<CreatePasswordProps> = ({
   background,
 }) => {
-  const navigate = useNavigate();
-
-  const { isWrongPass, initialized, keys } = background.state;
+  const { isWrongPass, initialized } = background.state;
   const { unlock, initVault } = background;
 
   const [password, setPassword] = useState<string>('');
@@ -38,10 +34,8 @@ export const CreatePassword: React.FC<CreatePasswordProps> = ({
       unlock(password);
     } else {
       const mnemonic = getSeedPhrase();
-
       initVault(password, mnemonic);
     }
-    navigate(keys[1] ? routes.HOME : routes.INITIALIZE_SEED_PHRASE);
   };
 
   return (

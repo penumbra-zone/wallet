@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react';
 import { useEffect } from 'react';
-
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { routes } from '../utils';
 import {
   CreatePassword,
@@ -17,34 +16,26 @@ type AppProps = {
 
 export const App: React.FC<AppProps> = observer(({ background }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { keys, initialized, locked, isWrongPass } = background.state;
   const { unlock, initVault, addKey } = background;
-  console.log({ location });
 
-  //firstly - redirect to /select-action
   useEffect(() => {
     if (initialized === undefined) return;
-    if (!initialized) {
-      return navigate(routes.INITIALIZE_SELECT_ACTION);
+    if (!initialized) return navigate(routes.INITIALIZE_SELECT_ACTION);
+    else {
+      if (locked) return navigate(routes.INITIALIZE_CREATE_PASSWORD);
+      else {
+        if (keys[1]) return navigate(routes.HOME);
+        else return navigate(routes.INITIALIZE_SEED_PHRASE);
+      }
     }
-  }, [initialized]);
-
-  useEffect(() => {
-    if (locked === undefined || !initialized) return;
-    if (locked) {
-      return navigate(routes.INITIALIZE_CREATE_PASSWORD);
-    } else {
-      return navigate(keys[1] ? routes.HOME : routes.INITIALIZE_SEED_PHRASE);
-    }
-  }, [locked, initialized, keys]);
-  console.log({ initialized });
+  }, [initialized, locked, keys]);
 
   if (locked === undefined) return <></>;
 
   return (
     <Routes>
-      <Route path={routes.HOME} element={<Main />} />
+      <Route path={routes.HOME} element={<Main background={background} />} />
       <Route
         path={routes.INITIALIZE_SELECT_ACTION}
         element={<SelectAction />}

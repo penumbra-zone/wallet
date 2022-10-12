@@ -2,7 +2,10 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useEffect, useMemo, useState } from 'react';
 import Button from '@mui/material/Button';
-import { generateSpendKey } from 'penumbra-web-assembly';
+import {
+  generate_spend_key,
+  get_full_viewing_key,
+} from 'penumbra-web-assembly';
 
 const shuffle = (array: string[]) => {
   var currentIndex = array.length,
@@ -53,9 +56,9 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({
   };
 
   const handleSubmit = () => {
-    const spendKey = generateSpendKey(keys[0].mnemonic);
-    console.log(spendKey);
-    addKey([{ spendKey }]);
+    const spendKey = generate_spend_key(keys[0].mnemonic);
+    const fvk = get_full_viewing_key(spendKey);
+    addKey([{ spendKey, fvk }]);
   };
   const shufleMnemonic = useMemo(() => {
     return shuffle(keys[0].mnemonic.split(' '));

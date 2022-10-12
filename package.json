@@ -21,7 +21,7 @@
     "dnode": "^1.2.2",
     "mobx": "^6.6.2",
     "mobx-react": "^7.5.3",
-    "penumbra-web-assembly": "^0.34.0-spendgenerate",
+    "penumbra-web-assembly": "^0.34.1-getFVK",
     "post-message-stream": "^3.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
