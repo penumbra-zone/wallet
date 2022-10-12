@@ -2,14 +2,12 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 
-type GenerateSeedPhraseProps = {
-  mnemonic: string;
-  handleNext: () => void;
+type SeedPhraseProps = {
+  background: any;
 };
-export const GenerateSeedPhrase: React.FC<GenerateSeedPhraseProps> = ({
-  mnemonic,
-  handleNext,
-}) => {
+export const SeedPhrase: React.FC<SeedPhraseProps> = ({ background }) => {
+  const { keys } = background.state;
+
   return (
     <Box
       sx={{
@@ -36,12 +34,10 @@ export const GenerateSeedPhrase: React.FC<GenerateSeedPhraseProps> = ({
         }}
       >
         <Typography sx={{ fontSize: '18px', textAlign: 'center' }}>
-          {mnemonic}
+          {keys[0] ? keys[0].mnemonic : ''}
         </Typography>
       </Box>
-      <Button variant="contained" onClick={handleNext}>
-        Next
-      </Button>
+      <Button variant="contained">Next</Button>
     </Box>
   );
 };

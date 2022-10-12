@@ -9,25 +9,40 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
+import { routes } from '../../../utils';
+import { getSeedPhrase } from '../../../utils/getSeedPhrase';
 
-type PasswordProps = {
-  password: string;
-  isWrongPass: boolean;
-  isInitialize: boolean;
-  handleSubmitPassword: () => void;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+type CreatePasswordProps = {
+  background: any;
 };
 
-export const Password: React.FC<PasswordProps> = ({
-  password,
-  isWrongPass,
-  isInitialize,
-  handleChange,
-  handleSubmitPassword,
+export const CreatePassword: React.FC<CreatePasswordProps> = ({
+  background,
 }) => {
+  const navigate = useNavigate();
+
+  const { isWrongPass, initialized, keys } = background.state;
+  const { unlock, initVault } = background;
+
+  const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleClickShowPassword = () => setShowPassword((state) => !state);
+
+  const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setPassword(event.target.value);
+
+  const handleSubmitPassword = () => {
+    if (initialized) {
+      unlock(password);
+    } else {
+      const mnemonic = getSeedPhrase();
+
+      initVault(password, mnemonic);
+    }
+    navigate(keys[1] ? routes.HOME : routes.INITIALIZE_SEED_PHRASE);
+  };
 
   return (
     <Box
@@ -42,7 +57,7 @@ export const Password: React.FC<PasswordProps> = ({
       }}
     >
       <Typography sx={{ fontSize: '18px' }}>
-        {isInitialize ? 'Enter password' : 'Create password'}
+        {initialized ? 'Enter password' : 'Create password'}
       </Typography>
       <FormControl sx={{ width: '100%', marginY: '10px' }} variant="outlined">
         <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
@@ -50,7 +65,7 @@ export const Password: React.FC<PasswordProps> = ({
           id="outlined-adornment-password"
           type={showPassword ? 'text' : 'password'}
           value={password}
-          onChange={handleChange}
+          onChange={handleChangePassword}
           endAdornment={
             <InputAdornment position="end">
               <IconButton

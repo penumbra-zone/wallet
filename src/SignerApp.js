@@ -35,12 +35,9 @@ export class SignerApp {
   // actions
 
   @action
-  initVault(password) {
-    const mnemonic = getSeedPhrase();
-    this.store.vault = SignerApp._encryptVault(
-      [{ data: mnemonic, numberOfAccounts: 1 }],
-      password
-    );
+  initVault(password, mnemonic) {
+    console.log({ mnemonic, password });
+    this.store.vault = SignerApp._encryptVault([{ mnemonic }], password);
     this.store.password = password;
   }
 
@@ -166,7 +163,8 @@ export class SignerApp {
       lock: async () => this.lock(),
       unlock: async (password) => this.unlock(password),
 
-      initVault: async (password) => this.initVault(password),
+      initVault: async (password, mnemonic) =>
+        this.initVault(password, mnemonic),
       deleteVault: async () => this.deleteVault(),
 
       approve: async (id, keyIndex) => this.approve(id, keyIndex),

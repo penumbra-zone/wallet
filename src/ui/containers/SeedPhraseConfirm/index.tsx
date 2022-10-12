@@ -4,12 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Button from '@mui/material/Button';
 import { generateSpendKey } from 'penumbra-web-assembly';
 
-type CheckSeedPhraseProps = {
-  mnemonic: string;
-  addKey: (key: any) => void;
-};
-
-function shuffle(array: string[]) {
+const shuffle = (array: string[]) => {
   var currentIndex = array.length,
     temporaryValue,
     randomIndex;
@@ -24,22 +19,28 @@ function shuffle(array: string[]) {
   }
 
   return array;
-}
+};
 
-export const CheckSeedPhrase: React.FC<CheckSeedPhraseProps> = ({
-  mnemonic,
-  addKey,
+type SeedPhraseConfirmProps = {
+  background: any;
+};
+
+export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({
+  background,
 }) => {
+  const { keys } = background.state;
+  const { addKey } = background;
+
   const [disabledBtn, setDisabledBtn] = useState<boolean>(true);
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
 
   useEffect(() => {
     const stringSelectedWords = selectedWords.join(' ');
 
-    stringSelectedWords === mnemonic
+    stringSelectedWords === keys[0].mnemonic
       ? setDisabledBtn(false)
       : setDisabledBtn(true);
-  }, [selectedWords, mnemonic]);
+  }, [selectedWords, keys[0].mnemonic]);
 
   const addWord = (word: string) => () => {
     if (selectedWords.includes(word)) return;
@@ -52,14 +53,13 @@ export const CheckSeedPhrase: React.FC<CheckSeedPhraseProps> = ({
   };
 
   const handleSubmit = () => {
-    const spendKey = generateSpendKey(mnemonic);
+    const spendKey = generateSpendKey(keys[0].mnemonic);
     console.log(spendKey);
     addKey([{ spendKey }]);
-    
   };
   const shufleMnemonic = useMemo(() => {
-    return shuffle(mnemonic.split(' '));
-  }, [mnemonic]);
+    return shuffle(keys[0].mnemonic.split(' '));
+  }, [keys[0].mnemonic]);
 
   return (
     <Box

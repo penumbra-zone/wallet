@@ -1,15 +1,13 @@
-import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { routes } from '../../../utils';
 
-type CreateOrRecoveryWalletProps = {
-  handleChangeStep: () => void;
-};
+export const SelectAction: React.FC<{}> = () => {
+  const navigate = useNavigate();
 
-export const CreateOrRecoveryWallet: React.FC<CreateOrRecoveryWalletProps> = ({
-  handleChangeStep,
-}) => {
+  const handleNavigate = (link: string) => () => navigate(link);
   return (
     <Box
       sx={{
@@ -34,12 +32,16 @@ export const CreateOrRecoveryWallet: React.FC<CreateOrRecoveryWalletProps> = ({
       >
         <Button
           variant="contained"
-          onClick={handleChangeStep}
           sx={{ marginRight: '2.5px' }}
+          onClick={handleNavigate(routes.INITIALIZE_CREATE_PASSWORD)}
         >
           Create new wallet
         </Button>
-        <Button variant="outlined" sx={{ marginLeft: '2.5px' }}>
+        <Button
+          variant="outlined"
+          sx={{ marginLeft: '2.5px' }}
+          onClick={handleNavigate(routes.INITIALIZE_IMPORT_SEED)}
+        >
           Wallet recovery
         </Button>
       </Box>
