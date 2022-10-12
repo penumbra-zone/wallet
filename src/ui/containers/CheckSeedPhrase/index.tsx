@@ -1,10 +1,12 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Button from '@mui/material/Button';
+import { generateSpendKey } from 'penumbra-web-assembly';
 
 type CheckSeedPhraseProps = {
   mnemonic: string;
+  addKey: (key: any) => void;
 };
 
 function shuffle(array: string[]) {
@@ -26,6 +28,7 @@ function shuffle(array: string[]) {
 
 export const CheckSeedPhrase: React.FC<CheckSeedPhraseProps> = ({
   mnemonic,
+  addKey,
 }) => {
   const [disabledBtn, setDisabledBtn] = useState<boolean>(true);
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
@@ -47,6 +50,16 @@ export const CheckSeedPhrase: React.FC<CheckSeedPhraseProps> = ({
     const withoutWord = selectedWords.filter((i) => i !== word);
     setSelectedWords(withoutWord);
   };
+
+  const handleSubmit = () => {
+    const spendKey = generateSpendKey(mnemonic);
+    console.log(spendKey);
+    addKey([{ spendKey }]);
+    
+  };
+  const shufleMnemonic = useMemo(() => {
+    return shuffle(mnemonic.split(' '));
+  }, [mnemonic]);
 
   return (
     <Box
@@ -113,12 +126,12 @@ export const CheckSeedPhrase: React.FC<CheckSeedPhraseProps> = ({
           alignItems: 'flex-start',
         }}
       >
-        {shuffle(mnemonic.split(' ')).map((i) => {
+        {shufleMnemonic.map((i) => {
           return (
             <Box
               key={i}
               sx={{
-                flex: '0 0 25%',
+                flex: '0 0 20%',
                 textAlign: 'center',
                 border: '1px solid black',
                 padding: '2px',
@@ -137,6 +150,7 @@ export const CheckSeedPhrase: React.FC<CheckSeedPhraseProps> = ({
         variant="contained"
         disabled={disabledBtn}
         sx={{ marginTop: '10px' }}
+        onClick={handleSubmit}
       >
         Submit
       </Button>

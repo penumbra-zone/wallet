@@ -1,77 +1,28 @@
 import { observer } from 'mobx-react';
 import { Box } from '@mui/material';
-import { useEffect, useState } from 'react';
-import {
-  CheckSeedPhrase,
-  CreateOrRecoveryWallet,
-  GenerateSeedPhrase,
-  Password,
-} from './containers';
-import { getSeedPhrase } from '../utils/getSeedPhrase';
-import { generateSpendKey } from 'penumbra-web-assembly';
-
-type Steps = 1 | 2 | 3 | 4;
+import { useState } from 'react';
+import { CheckSeedPhrase, GenerateSeedPhrase, Password } from './containers';
+import Typography from '@mui/material/Typography';
 
 type AppProps = {
   background: any;
 };
 
 export const App: React.FC<AppProps> = observer(({ background }) => {
-  const {
-    keys,
-    messages,
-    initialized,
-    locked,
-    vault,
-    password: pass,
-    isWrongPass,
-  } = background.state;
-  const {
-    lock,
-    unlock,
-    addKey,
-    removeKey,
-    initVault,
-    deleteVault,
-    approve,
-    reject,
-  } = background;
-  const [step, setStep] = useState<Steps>(1);
+  const { keys, initialized, locked, isWrongPass } = background.state;
+  const { unlock, initVault, addKey } = background;
   const [password, setPassword] = useState<string>('');
-  const [mnemonic, setMnemonic] = useState<string | null>(null);
-
-  console.log({
-    keys,
-    messages,
-    initialized,
-    locked,
-    vault,
-    password: pass,
-    isWrongPass,
-  });
-
-  useEffect(() => {
-    if (!password || step !== 3) return;
-    const mnemonic = getSeedPhrase();
-    setMnemonic(mnemonic);
-  }, [password, step]);
-
-  useEffect(() => {
-    if (!mnemonic) return;
-    const spendKey = generateSpendKey(mnemonic);
-  }, [mnemonic]);
-
-
-
-  const handleChangeStep = (step: Steps) => () => setStep(step);
+  const [isCheckSeed, setIsCheckSeed] = useState<boolean>(false);
 
   const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) =>
     setPassword(event.target.value);
 
-  const handleSubmitPassword = () => {
+  const handleSubmitPassword = () =>
     initialized ? unlock(password) : initVault(password);
-    // setStep(3);
-  };
+
+  const handleNext = () => setIsCheckSeed(true);
+
+  if (locked === undefined) return <></>;
 
   return (
     <Box
@@ -80,24 +31,43 @@ export const App: React.FC<AppProps> = observer(({ background }) => {
         width: '100%',
       }}
     >
-      {/* {!initialized && (
-        <CreateOrRecoveryWallet handleChangeStep={handleChangeStep(2)} />
-      )} */}
-      {locked && (
+      {locked ? (
         <Password
           password={password}
           handleChange={handleChangePassword}
           handleSubmitPassword={handleSubmitPassword}
           isWrongPass={isWrongPass}
+          isInitialize={initialized}
         />
+      ) : (
+        <>
+          {!keys[1] ? (
+            <>
+              {!isCheckSeed ? (
+                <GenerateSeedPhrase
+                  mnemonic={keys[0].data}
+                  handleNext={handleNext}
+                />
+              ) : (
+                <CheckSeedPhrase mnemonic={keys[0].data} addKey={addKey} />
+              )}
+            </>
+          ) : (
+            <Box sx={{ width: '100px' }}>
+              <Typography sx={{ fontSize: '24px' }}>
+                SpendingKey:{' '}
+                {`${keys[1].spendKey[0]}${keys[1].spendKey[1]}${
+                  keys[1].spendKey[2]
+                }${keys[1].spendKey[3]}...${
+                  keys[1].spendKey[keys[1].spendKey.length - 3]
+                }${keys[1].spendKey[keys[1].spendKey.length - 2]}${
+                  keys[1].spendKey[keys[1].spendKey.length - 1]
+                }`}
+              </Typography>
+            </Box>
+          )}
+        </>
       )}
-      {/* {mnemonic && step === 3 && (
-        <GenerateSeedPhrase
-          mnemonic={mnemonic}
-          handleChangeStep={handleChangeStep(4)}
-        />
-      )}
-      {step === 4 && mnemonic && <CheckSeedPhrase mnemonic={mnemonic} />} */}
     </Box>
   );
 });

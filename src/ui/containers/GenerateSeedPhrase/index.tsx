@@ -4,16 +4,16 @@ import Button from '@mui/material/Button';
 
 type GenerateSeedPhraseProps = {
   mnemonic: string;
-  handleChangeStep: () => void;
+  handleNext: () => void;
 };
 export const GenerateSeedPhrase: React.FC<GenerateSeedPhraseProps> = ({
   mnemonic,
-  handleChangeStep,
+  handleNext,
 }) => {
   return (
     <Box
       sx={{
-        width: '100%',
+        width: '95%',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
@@ -39,7 +39,7 @@ export const GenerateSeedPhrase: React.FC<GenerateSeedPhraseProps> = ({
           {mnemonic}
         </Typography>
       </Box>
-      <Button variant="contained" onClick={handleChangeStep}>
+      <Button variant="contained" onClick={handleNext}>
         Next
       </Button>
     </Box>

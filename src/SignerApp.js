@@ -3,12 +3,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { signTx } from '@waves/waves-transactions';
 import { setupDnode } from './utils/setupDnode';
 import { decrypt, encrypt } from './utils/cryptoUtils';
+import { getSeedPhrase } from './utils/getSeedPhrase';
 
 export class SignerApp {
   constructor(initState = {}) {
     this.store = observable.object({
       password: null,
-      vault: initState.store.vault,
+      vault: initState?.store?.vault || null,
       messages: [],
       isWrongPass: false,
 
@@ -35,7 +36,11 @@ export class SignerApp {
 
   @action
   initVault(password) {
-    this.store.vault = SignerApp._encryptVault([], password);
+    const mnemonic = getSeedPhrase();
+    this.store.vault = SignerApp._encryptVault(
+      [{ data: mnemonic, numberOfAccounts: 1 }],
+      password
+    );
     this.store.password = password;
   }
 
@@ -149,9 +154,6 @@ export class SignerApp {
       messages: this.store.newMessages,
       initialized: this.store.initialized,
       locked: this.store.locked,
-      //TODO delete vault and pass
-      vault: this.store.vault,
-      password: this.store.password,
       isWrongPass: this.store.isWrongPass,
     };
   }

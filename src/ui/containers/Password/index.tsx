@@ -13,6 +13,7 @@ import Button from '@mui/material/Button';
 type PasswordProps = {
   password: string;
   isWrongPass: boolean;
+  isInitialize: boolean;
   handleSubmitPassword: () => void;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
@@ -20,6 +21,7 @@ type PasswordProps = {
 export const Password: React.FC<PasswordProps> = ({
   password,
   isWrongPass,
+  isInitialize,
   handleChange,
   handleSubmitPassword,
 }) => {
@@ -39,7 +41,9 @@ export const Password: React.FC<PasswordProps> = ({
         paddingX: '5px',
       }}
     >
-      <Typography sx={{ fontSize: '18px' }}>Create password</Typography>
+      <Typography sx={{ fontSize: '18px' }}>
+        {isInitialize ? 'Enter password' : 'Create password'}
+      </Typography>
       <FormControl sx={{ width: '100%', marginY: '10px' }} variant="outlined">
         <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
         <OutlinedInput
@@ -61,7 +65,11 @@ export const Password: React.FC<PasswordProps> = ({
           label="Password"
         />
       </FormControl>
-      {isWrongPass && <Typography sx={{ fontSize: '14px', color: 'red' }}>Wrong password</Typography>}
+      {isWrongPass && (
+        <Typography sx={{ fontSize: '14px', color: 'red' }}>
+          Wrong password
+        </Typography>
+      )}
       <Button
         variant="contained"
         disabled={!password}
