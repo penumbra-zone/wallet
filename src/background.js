@@ -3,6 +3,7 @@ import { extensionApi } from './utils/extensionApi';
 import { PortStream } from './utils/PortStream';
 import { SignerApp } from './SignerApp';
 import { loadState, saveState } from './utils/localStorage';
+import { getCompactBlockRange } from './utils';
 
 const DEV_MODE = process.env.NODE_ENV !== 'production';
 const IDLE_INTERVAL = 30;
@@ -56,4 +57,5 @@ async function setupApp() {
       app.connectPopup(portStream);
     }
   }
+  getCompactBlockRange();
 }

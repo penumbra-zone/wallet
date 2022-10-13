@@ -11,6 +11,6 @@ export const loadState = () => {
 };
 
 
-export const saveState = (store) => {
+export const saveState = (store: any) => {
   extensionApi.storage.local.set({ store });
 };
