@@ -57,5 +57,6 @@ async function setupApp() {
       app.connectPopup(portStream);
     }
   }
+
   getCompactBlockRange();
 }

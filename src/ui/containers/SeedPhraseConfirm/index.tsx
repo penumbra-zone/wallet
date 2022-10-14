@@ -151,7 +151,8 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({
       </Box>
       <Button
         variant="contained"
-        disabled={disabledBtn}
+        // TODO unCommit
+        // disabled={disabledBtn}
         sx={{ marginTop: '10px' }}
         onClick={handleSubmit}
       >

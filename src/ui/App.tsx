@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import { useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { routes } from '../utils';
+import { getAssets, getChainParams, routes } from '../utils';
 import {
   CreatePassword,
   Main,
@@ -30,6 +30,13 @@ export const App: React.FC<AppProps> = observer(({ background }) => {
       }
     }
   }, [initialized, locked, keys]);
+
+  useEffect(() => {
+    if (keys[1]) {
+      getAssets();
+      getChainParams();
+    }
+  }, [keys]);
 
   if (locked === undefined) return <></>;
 
