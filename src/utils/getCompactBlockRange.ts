@@ -48,6 +48,7 @@ export const scanBlock = (compactBlock: CompactBlock) => {
 
             try {
 
+                // TODO replace hardcode string with FVK from local storage
                 let decryptedNote = decrypt_note("penumbrafullviewingkey1lsl0y4d2d8xxhh33yppkw06whdszn7h2w55swtxaqzadej6lmsqzg9aygg0jz896zy3huf9vldeqvxr5vtx2ddltj7r46gulfw33yqqyr5ghl",
                     toHexString(notePayload.payload?.encryptedNote),
                     toHexString(notePayload.payload?.ephemeralKey));
