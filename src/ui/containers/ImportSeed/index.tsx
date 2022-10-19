@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -9,20 +8,21 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { getSeedPhrase } from '../../../utils/getSeedPhrase';
+import { useState } from 'react';
+import {
+  generate_spend_key,
+  get_full_viewing_key,
+} from 'penumbra-web-assembly';
 import { BackgroundType } from '../../../types';
 
-type CreatePasswordProps = {
+type ImportSeedProps = {
   background: BackgroundType;
 };
 
-export const CreatePassword: React.FC<CreatePasswordProps> = ({
-  background,
-}) => {
-  const { isWrongPass, initialized } = background.state;
-  const { unlock, initVault } = background;
-
+export const ImportSeed: React.FC<ImportSeedProps> = ({ background }) => {
+  const { initVault, addKey } = background;
   const [password, setPassword] = useState<string>('');
+  const [seedPhrase, setSeedPhrase] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleClickShowPassword = () => setShowPassword((state) => !state);
@@ -30,13 +30,14 @@ export const CreatePassword: React.FC<CreatePasswordProps> = ({
   const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) =>
     setPassword(event.target.value);
 
-  const handleSubmitPassword = () => {
-    if (initialized) {
-      unlock(password);
-    } else {
-      const mnemonic = getSeedPhrase();
-      initVault(password, mnemonic);
-    }
+  const handleChangeSeed = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setSeedPhrase(event.target.value);
+
+  const handleImport = () => {
+    initVault(password, seedPhrase);
+    const spendKey = generate_spend_key(seedPhrase);
+    const fvk = get_full_viewing_key(spendKey);
+    addKey([{ spendKey, fvk }]);
   };
 
   return (
@@ -51,9 +52,7 @@ export const CreatePassword: React.FC<CreatePasswordProps> = ({
         paddingX: '5px',
       }}
     >
-      <Typography sx={{ fontSize: '18px' }}>
-        {initialized ? 'Enter password' : 'Create password'}
-      </Typography>
+      <Typography sx={{ fontSize: '18px' }}>Import Wallet</Typography>
       <FormControl sx={{ width: '100%', marginY: '10px' }} variant="outlined">
         <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
         <OutlinedInput
@@ -75,17 +74,24 @@ export const CreatePassword: React.FC<CreatePasswordProps> = ({
           label="Password"
         />
       </FormControl>
-      {isWrongPass && (
-        <Typography sx={{ fontSize: '14px', color: 'red' }}>
-          Wrong password
-        </Typography>
-      )}
+      <FormControl sx={{ width: '100%', marginY: '10px' }} variant="outlined">
+        <InputLabel htmlFor="outlined-adornment-mnemonic">
+          Seed Phrase
+        </InputLabel>
+        <OutlinedInput
+          id="outlined-adornment-mnemonic"
+          type="text"
+          value={seedPhrase}
+          onChange={handleChangeSeed}
+          label="Seed phrase"
+        />
+      </FormControl>
       <Button
         variant="contained"
-        disabled={!password}
-        onClick={handleSubmitPassword}
+        disabled={!password || !seedPhrase}
+        onClick={handleImport}
       >
-        Submit
+        Import
       </Button>
     </Box>
   );

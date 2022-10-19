@@ -36,7 +36,6 @@ export class SignerApp {
 
   @action
   initVault(password, mnemonic) {
-    console.log({ mnemonic, password });
     this.store.vault = SignerApp._encryptVault([{ mnemonic }], password);
     this.store.password = password;
   }

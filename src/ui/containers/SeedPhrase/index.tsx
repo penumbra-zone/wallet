@@ -3,9 +3,10 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '../../../utils';
+import { BackgroundType } from '../../../types';
 
 type SeedPhraseProps = {
-  background: any;
+  background: BackgroundType;
 };
 export const SeedPhrase: React.FC<SeedPhraseProps> = ({ background }) => {
   const navigate = useNavigate();

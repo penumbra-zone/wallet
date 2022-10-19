@@ -1,8 +1,9 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { BackgroundType } from '../../../types';
 
 type MainProps = {
-  background: any;
+  background: BackgroundType;
 };
 
 export const Main: React.FC<MainProps> = ({ background }) => {

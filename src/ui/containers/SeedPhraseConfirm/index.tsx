@@ -6,6 +6,7 @@ import {
   generate_spend_key,
   get_full_viewing_key,
 } from 'penumbra-web-assembly';
+import { BackgroundType } from '../../../types';
 
 const shuffle = (array: string[]) => {
   var currentIndex = array.length,
@@ -25,7 +26,7 @@ const shuffle = (array: string[]) => {
 };
 
 type SeedPhraseConfirmProps = {
-  background: any;
+  background: BackgroundType;
 };
 
 export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({
