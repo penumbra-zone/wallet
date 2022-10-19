@@ -15,6 +15,8 @@ import {
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
 import IndexedDb from './IndexedDb';
 
+const CHAIN_ID = 'penumbra-testnet-chaldene';
+
 const transport = createGrpcWebTransport({
   baseUrl: 'http://testnet.penumbra.zone:8080',
 });
@@ -23,7 +25,7 @@ const client = createPromiseClient(ObliviousQuery, transport);
 
 export const getAssets = async () => {
   const assetsRequest = new AssetListRequest();
-  assetsRequest.chainId = 'penumbra-testnet-autonoe';
+  assetsRequest.chainId = CHAIN_ID;
 
   const res: KnownAssets = await client.assetList(assetsRequest);
   const newRes = res.assets.map((asset) => ({
@@ -38,7 +40,7 @@ export const getAssets = async () => {
 
 export const getChainParams = async () => {
   const chainParameters = new ChainParamsRequest();
-  chainParameters.chainId = 'penumbra-testnet-autonoe';
+  chainParameters.chainId = CHAIN_ID;
 
   const res: ChainParameters = await client.chainParameters(chainParameters);
 
@@ -51,7 +53,7 @@ export const getCompactBlockRange = async () => {
   const startHeight = await extensionApi.storage.local.get('startHeight');
 
   const compactBlockRangeRequest = new CompactBlockRangeRequest();
-  compactBlockRangeRequest.chainId = 'penumbra-testnet-autonoe';
+  compactBlockRangeRequest.chainId = CHAIN_ID;
   compactBlockRangeRequest.startHeight = Number(startHeight.startHeight)
     ? BigInt(startHeight.startHeight)
     : BigInt(1);
