@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react';
 import { useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
+import { BackgroundType } from '../types';
 import { getAssets, getChainParams, routes } from '../utils';
 import {
   CreatePassword,
@@ -12,7 +13,7 @@ import {
 } from './containers';
 
 type AppProps = {
-  background: any;
+  background: BackgroundType;
 };
 
 export const App: React.FC<AppProps> = observer(({ background }) => {

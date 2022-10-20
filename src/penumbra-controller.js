@@ -3,9 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { signTx } from '@waves/waves-transactions';
 import { setupDnode } from './utils/setupDnode';
 import { decrypt, encrypt } from './utils/cryptoUtils';
-import { getSeedPhrase } from './utils/getSeedPhrase';
 
-export class SignerApp {
+export class PenumbraController {
   constructor(initState = {}) {
     this.store = observable.object({
       password: null,
@@ -21,7 +20,7 @@ export class SignerApp {
         if (this.locked) {
           return [];
         }
-        return SignerApp._decryptVault(this.vault, this.password);
+        return PenumbraController._decryptVault(this.vault, this.password);
       },
       get initialized() {
         return this.vault != null;
@@ -36,7 +35,10 @@ export class SignerApp {
 
   @action
   initVault(password, mnemonic) {
-    this.store.vault = SignerApp._encryptVault([{ mnemonic }], password);
+    this.store.vault = PenumbraController._encryptVault(
+      [{ mnemonic }],
+      password
+    );
     this.store.password = password;
   }
 
@@ -64,7 +66,7 @@ export class SignerApp {
   @action
   addKey(key) {
     this._checkLocked();
-    this.store.vault = SignerApp._encryptVault(
+    this.store.vault = PenumbraController._encryptVault(
       this.store.keys.concat(key),
       this.store.password
     );
@@ -73,7 +75,7 @@ export class SignerApp {
   @action
   removeKey(index) {
     this._checkLocked();
-    this.store.vault = SignerApp._encryptVault(
+    this.store.vault = PenumbraController._encryptVault(
       [...this.store.keys.slice(0, index), ...this.store.keys.slice(index + 1)],
       this.store.password
     );
@@ -206,7 +208,7 @@ export class SignerApp {
 
   // private
   _checkPassword(password) {
-    return SignerApp._decryptVault(this.store.vault, password);
+    return PenumbraController._decryptVault(this.store.vault, password);
   }
 
   _checkLocked() {
@@ -229,7 +231,6 @@ export class SignerApp {
       return JSON.parse(jsonString);
     } catch (e) {
       return false;
-      throw new Error('Wrong password');
     }
   }
 }

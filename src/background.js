@@ -1,7 +1,7 @@
 import { reaction } from 'mobx';
 import { extensionApi } from './utils/extensionApi';
 import { PortStream } from './utils/PortStream';
-import { SignerApp } from './SignerApp';
+import { PenumbraController } from './penumbra-controller';
 import { loadState, saveState } from './utils/localStorage';
 import { getCompactBlockRange } from './utils';
 
@@ -12,7 +12,7 @@ setupApp();
 
 async function setupApp() {
   const initState = await loadState();
-  const app = new SignerApp(initState);
+  const app = new PenumbraController(initState);
 
   if (DEV_MODE) {
     global.app = app;
