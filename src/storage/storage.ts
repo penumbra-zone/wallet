@@ -1,0 +1,207 @@
+import ObservableStore from 'obs-store';
+import pump from 'pump';
+import asStream from 'obs-store/lib/asStream';
+import debounceStream from 'debounce-stream';
+import log from 'loglevel';
+import { createStreamSink, extension } from '../lib';
+
+export type StorageLocalState = {
+  WalletController: {
+    vault: string | undefined;
+  };
+};
+
+export type StorageSessionState = {
+  memo?: Record<string, string | null>;
+  password?: string | null | undefined;
+};
+
+export class ExtensionStorage {
+  private _state: Partial<StorageLocalState> | undefined;
+  private _initState: StorageLocalState | undefined;
+  private _initSession: StorageSessionState | undefined;
+
+  async create() {
+    this._initState = await this.get();
+    this._initSession = await this.getSession();
+  }
+
+  getInitState<
+    K extends keyof StorageLocalState,
+    F extends keyof StorageLocalState
+  >(
+    defaults: Pick<StorageLocalState, K> | StorageLocalState,
+    forced?: Pick<StorageLocalState, F> | StorageLocalState
+  ): Pick<StorageLocalState, K>;
+  getInitState<T extends Record<string, unknown>>(defaults: T, forced?: T): T;
+  getInitState(
+    defaults: Record<string, unknown>,
+    forced?: Record<string, unknown>
+  ) {
+    const defaultsInitState = Object.keys(defaults).reduce(
+      (acc, key) =>
+        Object.prototype.hasOwnProperty.call(this._initState, key)
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            { ...acc, [key]: (this._initState as any)[key] }
+          : acc,
+      {}
+    );
+
+    const initState = { ...defaults, ...defaultsInitState, ...(forced || {}) };
+    this._state = { ...this._state, ...initState };
+    return initState;
+  }
+
+  getInitSession() {
+    return this._initSession;
+  }
+
+  async clear() {
+    const storageState = extension.storage.local;
+
+    const keysToRemove =
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      (Object.keys(this._initState!) as Array<keyof StorageLocalState>).reduce<
+        string[]
+      >(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        (acc, key) => (this._state![key] ? acc : [...acc, key]),
+        []
+      );
+    await this._remove(storageState, keysToRemove);
+  }
+
+  subscribe(store: ObservableStore<unknown>) {
+    pump(
+      asStream(store),
+      debounceStream(200),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      createStreamSink(async (state: any) => {
+        if (!state) {
+          throw new Error('Updated state is missing');
+        }
+
+        try {
+          await this.set(
+            Object.entries(state).reduce(
+              (acc, [key, value]) => ({
+                ...acc,
+                [key]: value === undefined ? null : value,
+              }),
+              {}
+            ) as StorageLocalState
+          );
+        } catch (err) {
+          // log error so we dont break the pipeline
+          log.error('error setting state in local store:', err);
+        }
+      }),
+      (error) => {
+        log.error('Persistence pipeline failed', error);
+      }
+    );
+  }
+
+  getState<K extends keyof StorageLocalState>(
+    keys?: K | K[]
+  ): Pick<StorageLocalState, K> {
+    if (!keys) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return this._state as any;
+    }
+
+    if (typeof keys === 'string') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion
+      return { [keys]: this._state![keys] } as any;
+    }
+
+    return keys.reduce(
+      (acc, key) =>
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        this._state![key] ? { ...acc, [key]: this._state![key] } : acc,
+      {}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ) as any;
+  }
+
+  async get<K extends keyof StorageLocalState>(
+    keys?: K | K[]
+  ): Promise<Pick<StorageLocalState, K>> {
+    const storageState = extension.storage.local;
+    return (await this._get(storageState, keys)) as any;
+  }
+
+  private async getSession(
+    keys?: string | string[]
+  ): Promise<StorageSessionState> {
+    const storageState = extension.storage.session;
+
+    if (!storageState) return {};
+    return await this._get(storageState, keys);
+  }
+
+  async set(state: StorageLocalState) {
+    const storageState = extension.storage.local;
+    this._state = { ...this._state, ...state };
+
+    return this._set(storageState, state as any);
+  }
+
+  async setSession(state: StorageSessionState) {
+    const storageState = extension.storage.session;
+
+    if (!storageState) return;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this._set(storageState, state as any);
+  }
+
+  removeState(keys: string | string[]) {
+    const state = this._state;
+    if (state) {
+      if (typeof keys === 'string') {
+        if (keys in state) {
+          delete state[keys as keyof typeof state];
+        }
+      } else {
+        keys.forEach((key) => {
+          if (key in state) {
+            delete state[key as keyof typeof state];
+          }
+        });
+      }
+    }
+  }
+
+  private _get(
+    storageState: chrome.storage.StorageArea,
+    keys?: string | string[]
+  ): Promise<Record<string, unknown>> {
+    return new Promise((resolve, reject) => {
+      storageState.get(keys, (result) => {
+        const err = extension.runtime.lastError;
+        err ? reject(err) : resolve(result);
+      });
+    });
+  }
+
+  private _set(
+    storageState: chrome.storage.StorageArea,
+    state: Record<string, unknown>
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      storageState.set(state, () => {
+        const err = extension.runtime.lastError;
+        err ? reject(err) : resolve();
+      });
+    });
+  }
+
+  private async _remove(
+    storageState: chrome.storage.StorageArea,
+    keys: string | string[]
+  ) {
+    this.removeState(keys);
+    await storageState.remove(keys);
+  }
+}

@@ -1,0 +1,33 @@
+import { NetworkName } from '../networks';
+
+export interface SeedWalletInput {
+  name: string;
+  network: NetworkName;
+  networkCode: string;
+  seed: string;
+}
+
+export interface EncodedSeedWalletInput {
+  encodedSeed: string;
+  name: string;
+  network: NetworkName;
+  networkCode: string;
+}
+
+export type CreateWalletInput =
+  | ({ type: 'seed' } & SeedWalletInput)
+  | ({ type: 'encodedSeed' } & EncodedSeedWalletInput);
+
+export type WalletPrivateData = {
+  address: string;
+  name: string;
+  network: NetworkName;
+  networkCode: string;
+  publicKey: string;
+} & (
+  | { type: 'seed'; seed: string }
+  | { type: 'encodedSeed'; encodedSeed: string }
+);
+
+export type WalletPrivateDataOfType<T extends WalletPrivateData['type']> =
+  Extract<WalletPrivateData, { type: T }>;

@@ -2,7 +2,7 @@ import { action, observable, reaction } from 'mobx';
 import { v4 as uuidv4 } from 'uuid';
 import { signTx } from '@waves/waves-transactions';
 import { setupDnode } from './utils/setupDnode';
-import { decrypt, encrypt } from './utils/cryptoUtils';
+import { decryptSeed, encryptSeed } from './utils/cryptoUtils';
 
 export class PenumbraController {
   constructor(initState = {}) {
@@ -219,7 +219,7 @@ export class PenumbraController {
 
   static _encryptVault(obj, pass) {
     const jsonString = JSON.stringify(obj);
-    return encrypt(jsonString, pass);
+    return encryptSeed(jsonString, pass);
   }
 
   static _decryptVault(str, pass) {
@@ -227,7 +227,7 @@ export class PenumbraController {
       throw new Error('Vault not initialized');
     }
     try {
-      const jsonString = decrypt(str, pass);
+      const jsonString = decryptSeed(str, pass);
       return JSON.parse(jsonString);
     } catch (e) {
       return false;

@@ -12,7 +12,8 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
+    "noImplicitAny": false,
+    "strict":false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
@@ -21,9 +22,13 @@
     "isolatedModules": false,
     "noEmit": false,
     "jsx": "react-jsx",
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "types": [
+      "chrome",
+      "firefox-webext-browser"
+    ]
   },
   "include": [
     "src"
-  ]
+, "types/obs-store.d.ts"  ]
 }
