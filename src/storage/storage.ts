@@ -6,6 +6,8 @@ import log from 'loglevel';
 import { createStreamSink, extension } from '../lib';
 
 export type StorageLocalState = {
+  selectedAccount: any | undefined;
+  initialized: boolean | null;
   WalletController: {
     vault: string | undefined;
   };

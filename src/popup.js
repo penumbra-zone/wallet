@@ -1,8 +1,9 @@
 import {observable} from 'mobx'
 import {extensionApi} from "./utils/extensionApi";
-import {PortStream} from "./utils/PortStream";
+
 import {cbToPromise, setupDnode, transformMethods} from "./utils/setupDnode";
-import {initApp} from "./ui/index";
+import {initApp} from "./ui/ui";
+import { PortStream } from './lib/portStream';
 
 const DEV_MODE = process.env.NODE_ENV !== 'production';
 

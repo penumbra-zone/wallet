@@ -1,6 +1,7 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = () => {
   const mode = process.env.NODE_ENV || 'development';
@@ -10,10 +11,11 @@ module.exports = () => {
   return {
     mode,
     entry: {
-      popup: path.resolve(SOURCE_FOLDER, 'popup.js'),
-      background: path.resolve(SOURCE_FOLDER, 'background.js'),
-      contentscript: path.resolve(SOURCE_FOLDER, 'contentscript.js'),
-      inpage: path.resolve(SOURCE_FOLDER, 'inpage.js'),
+      ui: path.resolve(SOURCE_FOLDER, 'ui/ui'),
+      'accounts/ui': path.resolve(SOURCE_FOLDER, 'accounts/ui'),
+      background: path.resolve(SOURCE_FOLDER, 'background.ts'),
+      contentscript: path.resolve(SOURCE_FOLDER, 'contentscript.ts'),
+      inpage: path.resolve(SOURCE_FOLDER, 'inpage.ts'),
     },
     output: {
       filename: '[name].js',
@@ -21,6 +23,18 @@ module.exports = () => {
       publicPath: './',
     },
     devtool: 'inline-source-map',
+    optimization: {
+      splitChunks: {
+        cacheGroups: {
+          commons: {
+            name: 'commons',
+            test: /.js$/,
+            maxSize: 4000000,
+            chunks: (chunk) => ['ui', 'accounts/ui'].includes(chunk.name),
+          },
+        },
+      },
+    },
     resolve: {
       extensions: [
         '.ts',
@@ -55,6 +69,20 @@ module.exports = () => {
             to: DIST_FOLDER,
           },
         ],
+      }),
+      new HtmlWebpackPlugin({
+        title: 'Keeper Wallet',
+        filename: 'accounts.html',
+        template: path.resolve(SOURCE_FOLDER, 'accounts.html'),
+        hash: true,
+        chunks: ['commons', 'accounts/ui'],
+      }),
+      new HtmlWebpackPlugin({
+        title: 'Keeper Wallet',
+        filename: 'popup.html',
+        template: path.resolve(SOURCE_FOLDER, 'popup.html'),
+        hash: true,
+        chunks: ['commons', 'ui'],
       }),
       new webpack.ProvidePlugin({
         process: 'process/browser',
