@@ -1,4 +1,5 @@
-import { NetworkName } from '../networks';
+import { NetworkName } from '../controllers';
+
 
 export type WalletAccount = {
   address: string;

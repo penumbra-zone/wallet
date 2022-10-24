@@ -24,7 +24,10 @@
     }
   ],
   "permissions": [
+    "alarms",
     "storage",
+    "unlimitedStorage",
+    "clipboardWrite",
     "idle"
   ],
   "web_accessible_resources": [

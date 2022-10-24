@@ -80,10 +80,10 @@ background: any
     }
   }
 
-//   async updateIdle() {
-//     this.updatedByUser = true;
-//     this._updateIdle();
-//   }
+  async updateIdle() {
+    this.updatedByUser = true;
+    this._updateIdle();
+  }
 
 //   async setIdleOptions(options: { type: string }) {
 //     try {
@@ -818,27 +818,27 @@ background: any
 //     }
 //   }
 
-//   async _updateIdle() {
-//     const now = Date.now();
+  async _updateIdle() {
+    const now = Date.now();
 
-//     if (this._tmr != null) {
-//       clearTimeout(this._tmr);
-//     }
+    if (this._tmr != null) {
+      clearTimeout(this._tmr);
+    }
 
-//     this._tmr = setTimeout(() => this._updateIdle(), 4000);
+    this._tmr = setTimeout(() => this._updateIdle(), 4000);
 
-//     if (!this.updatedByUser || now - this._lastUpdateIdle < 4000) {
-//       return null;
-//     }
+    if (!this.updatedByUser || now - this._lastUpdateIdle < 4000) {
+      return null;
+    }
 
-//     this.updatedByUser = false;
-//     this._lastUpdateIdle = now;
-//     await this.initPromise;
-//     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-//     await this._connect!();
-//     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-//     return this.background!.updateIdle();
-//   }
+    this.updatedByUser = false;
+    this._lastUpdateIdle = now;
+    await this.initPromise;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    await this._connect!();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return this.background!.updateIdle();
+  }
 }
 
 export default new Background();

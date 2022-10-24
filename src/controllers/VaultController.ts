@@ -50,10 +50,17 @@ export class VaultController {
     }
   }
 
-  init(password: string){
-    this.wallet.initVault(password)
+  init(password: string) {
+    this.wallet.initVault(password);
 
-     this.locked = false;
-     this.initialized = true;
+    this.locked = false;
+    this.initialized = true;
+  }
+
+  lock() {
+    this.wallet.lock();
+    // this.identity.lock();
+
+    this.locked = true;
   }
 }

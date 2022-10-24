@@ -1,4 +1,5 @@
-import { NetworkName } from '../networks';
+import { NetworkName } from '../controllers';
+
 
 export interface SeedWalletInput {
   name: string;

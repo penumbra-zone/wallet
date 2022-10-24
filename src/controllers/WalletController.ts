@@ -1,5 +1,5 @@
+import EventEmitter from 'events';
 import ObservableStore from 'obs-store';
-import { EventEmitter } from 'stream';
 import { ExtensionStorage } from '../storage';
 import { encryptSeed, decryptSeed } from '../utils';
 import {
@@ -81,5 +81,10 @@ export class WalletController extends EventEmitter {
   _setPassword(password: string | null) {
     this.password = password;
     this._setSession({ password });
+  }
+
+  lock() {
+    this._setPassword(null);
+    this.wallets = [];
   }
 }

@@ -1,7 +1,13 @@
 import EventEmitter from 'events';
 import { v4 as uuidv4 } from 'uuid';
+import {
+  IdleController,
+  VaultController,
+  WalletController,
+} from './controllers';
 import { extension, PortStream, setupDnode, TabsManager } from './lib';
 import { ExtensionStorage, StorageLocalState } from './storage';
+import { KEEPERWALLET_DEBUG } from './ui/appConfig';
 
 const bgPromise = setupBackgroundService();
 
@@ -27,6 +33,12 @@ async function setupBackgroundService() {
     extensionStorage,
   });
 
+  // global access to service on debug
+  if (KEEPERWALLET_DEBUG) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (global as any).background = backgroundService;
+  }
+
   const tabsManager = new TabsManager({ extensionStorage });
   backgroundService.on('Show tab', async (url, name) => {
     backgroundService.emit('closePopupWindow');
@@ -38,9 +50,28 @@ async function setupBackgroundService() {
 
 class BackgroundService extends EventEmitter {
   extensionStorage;
+  idleController;
+  vaultController;
+  walletController;
+  networkController;
   constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
     super();
     this.extensionStorage = extensionStorage;
+
+    this.networkController=  new Net
+
+    this.walletController = new WalletController({
+      extensionStorage: this.extensionStorage,
+    });
+    this.vaultController = new VaultController({
+      extensionStorage: this.extensionStorage,
+      wallet: this.walletController,
+    });
+
+    this.idleController = new IdleController({
+      extensionStorage: this.extensionStorage,
+      vaultController: this.vaultController,
+    });
   }
 
   setupPageConnection(remotePort: chrome.runtime.Port) {
@@ -56,8 +87,6 @@ class BackgroundService extends EventEmitter {
       inpageApi,
       'inpageApi'
     );
-
-    console.log({ sender });
   }
 
   setupUiConnection(remotePort: chrome.runtime.Port) {
@@ -79,12 +108,13 @@ class BackgroundService extends EventEmitter {
     return {
       getState: async <K extends keyof StorageLocalState>(params?: K[]) =>
         this.getState(params),
+      updateIdle: async () => this.idleController.update(),
+
       showTab: async (url: string, name: string) => {
         this.emit('Show tab', url, name);
       },
     };
   }
-
   getInpageApi(origin: string, connectionId: string) {
     return {
       publicState: async () => {

@@ -1,15 +1,15 @@
 import { useEffect, useRef } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAccountsSelector } from '../accounts';
+import { selectState } from './redux';
 
 export const RootAccounts = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const initialized = useAccountsSelector(
-    (state: any) => state.state?.initialized
-  );
-  const locked = useAccountsSelector((state: any) => state.state?.locked);
+  const state = useAccountsSelector(selectState);
+
+  console.log({ state });
 
   const currentNetwork = useAccountsSelector(
     (state: any) => state.currentNetwork
@@ -24,14 +24,22 @@ export const RootAccounts = () => {
     prevNetworkRef.current = currentNetwork;
   }, [currentNetwork, navigate]);
 
-  if (!initialized && location.pathname !== '/init-vault') {
+  if (!state?.initialized && location.pathname !== '/init-vault') {
     return <div>Welcome</div>;
   }
 
-  if (initialized && locked && location.pathname !== '/forgot-password') {
+  if (
+    state?.initialized &&
+    state?.locked &&
+    location.pathname !== '/forgot-password'
+  ) {
     return <div>Login</div>;
   }
-  if (initialized && !locked && location.pathname === '/forgot-password') {
+  if (
+    state?.initialized &&
+    !state?.locked &&
+    location.pathname === '/forgot-password'
+  ) {
     return <Navigate to="/" />;
   }
 

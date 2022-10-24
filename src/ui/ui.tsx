@@ -1,7 +1,3 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { App } from './App';
-import { BrowserRouter } from 'react-router-dom';
 import {
   cbToPromise,
   extension,
@@ -9,25 +5,33 @@ import {
   setupDnode,
   transformMethods,
 } from '../lib';
-import backgroundService, { BackgroundUiApi } from './services/Background';
-
-import { createUiStore } from './store';
-import { Provider } from 'react-redux';
+import backgroundService, {
+  BackgroundGetStateResult,
+  BackgroundUiApi,
+} from './services/Background';
 
 startUi();
 
 async function startUi() {
-  const store = createUiStore({
-    version: extension.runtime.getManifest().version,
+  console.log('asdasd');
+
+  extension.storage.onChanged.addListener(async (changes, area) => {
+    console.log(area);
+
+    if (area !== 'local') {
+      return;
+    }
+
+    const stateChanges: Partial<Record<string, unknown>> &
+      Partial<BackgroundGetStateResult> = await backgroundService.getState([
+      'initialized',
+      'locked',
+    ]);
+
+    for (const key in changes) {
+      stateChanges[key] = changes[key].newValue;
+    }
   });
-  const root = ReactDOM.createRoot(
-    document.getElementById('app-content') as HTMLElement
-  );
-  root.render(
-    <Provider store={store}>
-      <div>asdasda</div>
-    </Provider>
-  );
 
   const emitterApi = {
     closePopupWindow: async () => {
@@ -60,6 +64,7 @@ async function startUi() {
       });
     });
   };
+
   const background = await connect();
 
   const [state] = await Promise.all([background.getState()]);
@@ -67,4 +72,11 @@ async function startUi() {
   if (!state.initialized) {
     background.showTab(window.location.origin + '/accounts.html', 'accounts');
   }
+
+  backgroundService.init(background);
+
+  document.addEventListener('mousemove', () => backgroundService.updateIdle());
+  document.addEventListener('keyup', () => backgroundService.updateIdle());
+  document.addEventListener('mousedown', () => backgroundService.updateIdle());
+  document.addEventListener('focus', () => backgroundService.updateIdle());
 }

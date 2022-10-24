@@ -3,14 +3,29 @@ import pump from 'pump';
 import asStream from 'obs-store/lib/asStream';
 import debounceStream from 'debounce-stream';
 import log from 'loglevel';
-import { createStreamSink, extension } from '../lib';
+import { createStreamSink, DEFAULT_LEGACY_CONFIG, extension } from '../lib';
+import { NetworkName } from '../controllers';
 
 export type StorageLocalState = {
   selectedAccount: any | undefined;
   initialized: boolean | null;
+  locked: boolean | null;
+  blacklist: string[];
+  config: {
+    networks: typeof DEFAULT_LEGACY_CONFIG.NETWORKS;
+    network_config: typeof DEFAULT_LEGACY_CONFIG.NETWORK_CONFIG;
+    messages_config: typeof DEFAULT_LEGACY_CONFIG.MESSAGES_CONFIG;
+    pack_config: typeof DEFAULT_LEGACY_CONFIG.PACK_CONFIG;
+    idle: typeof DEFAULT_LEGACY_CONFIG.IDLE;
+  };
+  lastUpdateIdle: number;
+  currentNetwork: NetworkName;
+  customCodes: Record<NetworkName, string | null | undefined>;
+  customNodes: Record<NetworkName, string | null | undefined>;
   WalletController: {
     vault: string | undefined;
   };
+  whitelist: string[];
 };
 
 export type StorageSessionState = {

@@ -1,4 +1,5 @@
-import { NetworkName } from '../networks';
+
+import { NetworkName } from '../controllers';
 import { WalletAccount } from '../preferences';
 import { WalletPrivateDataOfType } from './types';
 import { Wallet } from './wallet';
