@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -8,32 +9,33 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { useState } from 'react';
-import { useAppDispatch } from '../../../accounts';
-import { createAccount } from '../../redux';
+import { getSeedPhrase } from '../../../utils/getSeedPhrase';
+import { BackgroundType } from '../../../types';
 import Background from '../../services/Background';
 
-type ImportSeedProps = {};
+type LoginProps = {};
 
-export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
-  const dispatch = useAppDispatch();
+export const Login: React.FC<LoginProps> = ({}) => {
+  // const { isWrongPass, isInitialized } = background.state;
+  // const { unlock, initVault } = background;
 
   const [password, setPassword] = useState<string>('');
-  const [seed, setSeed] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean>(false);
 
   const handleClickShowPassword = () => setShowPassword((state) => !state);
 
   const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) =>
     setPassword(event.target.value);
 
-  const handleChangeSeed = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setSeed(event.target.value);
-
-  const handleSubmit = async () => {
-    await Background.initVault(password);
-    await dispatch(createAccount({ seed, type: 'seed', name: 'Wallet 1' }));
+  const handleSubmitPassword = async () => {
+    try {
+      await Background.unlock(password);
+    } catch {
+      setIsError(true);
+    }
   };
+
   return (
     <Box
       sx={{
@@ -46,7 +48,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
         paddingX: '5px',
       }}
     >
-      <Typography sx={{ fontSize: '18px' }}>Import Wallet</Typography>
+      <Typography sx={{ fontSize: '18px' }}>Enter password</Typography>
       <FormControl sx={{ width: '100%', marginY: '10px' }} variant="outlined">
         <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
         <OutlinedInput
@@ -68,24 +70,17 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
           label="Password"
         />
       </FormControl>
-      <FormControl sx={{ width: '100%', marginY: '10px' }} variant="outlined">
-        <InputLabel htmlFor="outlined-adornment-mnemonic">
-          Seed Phrase
-        </InputLabel>
-        <OutlinedInput
-          id="outlined-adornment-mnemonic"
-          type="text"
-          value={seed}
-          onChange={handleChangeSeed}
-          label="Seed phrase"
-        />
-      </FormControl>
+      {isError && (
+        <Typography sx={{ fontSize: '14px', color: 'red' }}>
+          Wrong password
+        </Typography>
+      )}
       <Button
         variant="contained"
-        disabled={!password || !seed}
-        onClick={handleSubmit}
+        disabled={!password}
+        onClick={handleSubmitPassword}
       >
-        Import
+        Submit
       </Button>
     </Box>
   );

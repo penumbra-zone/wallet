@@ -7,10 +7,10 @@ export type BackgroundType = {
   reject: (id: string) => void;
   removeKey: (index: number) => void;
   state: {
-    initialized: boolean;
+    isInitialized: boolean;
     isWrongPass: boolean;
     keys: any[];
-    locked: boolean;
+    isLocked: boolean;
   };
   unlock: (password: string) => void;
 };

@@ -2,12 +2,16 @@ import EventEmitter from 'events';
 import { v4 as uuidv4 } from 'uuid';
 import {
   IdleController,
+  NetworkController,
+  PreferencesController,
+  RemoteConfigController,
   VaultController,
   WalletController,
 } from './controllers';
 import { extension, PortStream, setupDnode, TabsManager } from './lib';
 import { ExtensionStorage, StorageLocalState } from './storage';
 import { KEEPERWALLET_DEBUG } from './ui/appConfig';
+import { CreateWalletInput, ISeedWalletInput } from './wallets';
 
 const bgPromise = setupBackgroundService();
 
@@ -54,19 +58,36 @@ class BackgroundService extends EventEmitter {
   vaultController;
   walletController;
   networkController;
+  remoteConfigController;
+  preferencesController;
+
   constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
     super();
     this.extensionStorage = extensionStorage;
 
-    this.networkController=  new Net
+    this.remoteConfigController = new RemoteConfigController({
+      extensionStorage: this.extensionStorage,
+    });
+
+    this.networkController = new NetworkController({
+      extensionStorage: this.extensionStorage,
+      getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
+      getNetworks: () => this.remoteConfigController.getNetworks(),
+    });
+
+    this.preferencesController = new PreferencesController({
+      extensionStorage: this.extensionStorage,
+    });
 
     this.walletController = new WalletController({
       extensionStorage: this.extensionStorage,
     });
+    
     this.vaultController = new VaultController({
       extensionStorage: this.extensionStorage,
       wallet: this.walletController,
     });
+
 
     this.idleController = new IdleController({
       extensionStorage: this.extensionStorage,
@@ -109,10 +130,18 @@ class BackgroundService extends EventEmitter {
       getState: async <K extends keyof StorageLocalState>(params?: K[]) =>
         this.getState(params),
       updateIdle: async () => this.idleController.update(),
-
+      getNetworks: async () => this.networkController.getNetworks(),
       showTab: async (url: string, name: string) => {
         this.emit('Show tab', url, name);
       },
+      initVault: async (password: string) => {
+        this.vaultController.init(password);
+      },
+      unlock: async (password: string) => this.vaultController.unlock(password),
+      addWallet: async (account: CreateWalletInput) =>
+        this.walletController.addWallet(account),
+      selectAccount: async (lastAccount: ISeedWalletInput) =>
+        this.preferencesController.selectAccount(lastAccount),
     };
   }
   getInpageApi(origin: string, connectionId: string) {
@@ -131,7 +160,7 @@ class BackgroundService extends EventEmitter {
 
   _publicState(originReq: string) {
     let account;
-    const { selectedAccount, initialized, locked } = this.getState();
+    const { selectedAccount, isInitialized, isLocked } = this.getState();
     if (selectedAccount) {
       account = {
         ...selectedAccount,
@@ -140,8 +169,8 @@ class BackgroundService extends EventEmitter {
     }
     return {
       version: extension.runtime.getManifest().version,
-      initialized,
-      locked,
+      isInitialized,
+      isLocked,
       account,
     };
   }

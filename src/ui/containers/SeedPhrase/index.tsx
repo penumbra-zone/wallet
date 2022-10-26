@@ -2,16 +2,31 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
-import { routes } from '../../../utils';
-import { BackgroundType } from '../../../types';
+import { routesPath } from '../../../utils';
+import { useEffect } from 'react';
+import { getSeedPhrase } from '../../../utils/getSeedPhrase';
+import { useAccountsSelector, useAppDispatch } from '../../../accounts';
+import { localStateActions, selectNewAccount } from '../../redux';
 
-type SeedPhraseProps = {
-  background: BackgroundType;
-};
-export const SeedPhrase: React.FC<SeedPhraseProps> = ({ background }) => {
+type SeedPhraseProps = {};
+
+export const SeedPhrase: React.FC<SeedPhraseProps> = ({}) => {
   const navigate = useNavigate();
-  const { keys } = background.state;
-  const handleNext = () => navigate(routes.INITIALIZE_SEED_PHRASE_CONFIRM);
+  const dispatch = useAppDispatch();
+  const newAccount = useAccountsSelector(selectNewAccount);
+  const handleNext = () => navigate(routesPath.CONFIRM_SEED_PHRASE);
+
+  useEffect(() => {
+    const seed = getSeedPhrase();
+
+    dispatch(
+      localStateActions.setNewAccount({
+        seed,
+        type: 'seed',
+      })
+    );
+  }, []);
+
   return (
     <Box
       sx={{
@@ -38,7 +53,7 @@ export const SeedPhrase: React.FC<SeedPhraseProps> = ({ background }) => {
         }}
       >
         <Typography sx={{ fontSize: '18px', textAlign: 'center' }}>
-          {keys[0] ? keys[0].mnemonic : ''}
+          {newAccount.seed}
         </Typography>
       </Box>
       <Button variant="contained" onClick={handleNext}>

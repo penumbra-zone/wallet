@@ -5,10 +5,8 @@ export function createWallet(input: CreateWalletInput) {
   switch (input.type) {
     case 'seed':
       return new SeedWallet({
-        name: input.name,
-        network: input.network,
-        networkCode: input.networkCode,
         seed: input.seed,
+        name: input.name
       });
     case 'encodedSeed':
       return;

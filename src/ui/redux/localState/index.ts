@@ -1,12 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { AccountsStore } from '../../../accounts';
 import { AccountsState } from '../../../accounts/rootReducer';
 
 type Init = {
   loading: boolean;
   newAccount: {
-    seed: '';
+    seed: string;
     type: 'seed';
+    name: string;
   };
 };
 
@@ -15,6 +15,7 @@ const init: Init = {
   newAccount: {
     seed: '',
     type: 'seed',
+    name: 'Wallet 1',
   },
 };
 
@@ -22,9 +23,12 @@ const localState = createSlice({
   name: 'localState',
   initialState: init,
   reducers: {
-    setLoading: (state, action) => ({
+    setNewAccount: (state, action) => ({
       ...state,
-      invoice: action.payload,
+      newAccount: {
+        ...state.newAccount,
+        ...action.payload,
+      },
     }),
   },
 });
@@ -32,11 +36,6 @@ const localState = createSlice({
 export const localStateActions = localState.actions;
 
 export default localState.reducer;
-const { setLoading } = localStateActions;
 
-export const changeLoading =
-  (loading: boolean) => async (dispatch: AccountsStore['dispatch']) => {
-    setLoading(loading);
-  };
-
-export const selectLoading = (state: AccountsState) => state.localState.loading;
+export const selectNewAccount = (state: AccountsState) =>
+  state.localState.newAccount;

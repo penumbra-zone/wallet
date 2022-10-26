@@ -2,7 +2,7 @@ import Button from '@mui/material/Button';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { routes } from '../../../utils';
+import { routesPath } from '../../../utils';
 
 export const SelectAction: React.FC<{}> = () => {
   const navigate = useNavigate();
@@ -33,14 +33,14 @@ export const SelectAction: React.FC<{}> = () => {
         <Button
           variant="contained"
           sx={{ marginRight: '2.5px' }}
-          onClick={handleNavigate(routes.INITIALIZE_CREATE_PASSWORD)}
+          onClick={handleNavigate(routesPath.CREATE_PASSWORD)}
         >
           Create new wallet
         </Button>
         <Button
           variant="outlined"
           sx={{ marginLeft: '2.5px' }}
-          onClick={handleNavigate(routes.INITIALIZE_IMPORT_SEED)}
+          onClick={handleNavigate(routesPath.IMPORT_SEED_PHRASE)}
         >
           Wallet recovery
         </Button>

@@ -5,3 +5,8 @@ export * from './SeedPhraseConfirm';
 export * from './Main';
 export * from './ImportSeed';
 export * from './ErrorPage';
+export * from './Welcome';
+export * from './Login';
+export * from './Rules';
+export * from './SeedPharseRules';
+export * from './CreateSuccess';

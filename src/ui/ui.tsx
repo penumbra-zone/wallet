@@ -13,19 +13,15 @@ import backgroundService, {
 startUi();
 
 async function startUi() {
-  console.log('asdasd');
-
   extension.storage.onChanged.addListener(async (changes, area) => {
-    console.log(area);
-
     if (area !== 'local') {
       return;
     }
 
     const stateChanges: Partial<Record<string, unknown>> &
       Partial<BackgroundGetStateResult> = await backgroundService.getState([
-      'initialized',
-      'locked',
+      'isInitialized',
+      'isLocked',
     ]);
 
     for (const key in changes) {
@@ -69,9 +65,9 @@ async function startUi() {
 
   const [state] = await Promise.all([background.getState()]);
 
-  if (!state.initialized) {
-    background.showTab(window.location.origin + '/accounts.html', 'accounts');
-  }
+  // if (!state.isInitialized) {
+  background.showTab(window.location.origin + '/accounts.html', 'accounts');
+  // }
 
   backgroundService.init(background);
 

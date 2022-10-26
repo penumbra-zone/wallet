@@ -1,12 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AccountsState } from '../../../accounts/rootReducer';
 
-type Init = null | {
-  initialized: boolean | undefined;
-  locked: boolean;
+type Init = {
+  isInitialized: boolean | undefined;
+  isLocked: boolean;
 };
 
-const init: Init = null;
+const init: Init = {
+  isInitialized: false,
+  isLocked: false,
+};
 
 const state = createSlice({
   name: 'localState',
@@ -23,11 +26,5 @@ export const stateActions = state.actions;
 
 export default state.reducer;
 const {} = stateActions;
-
-// export const updateAppState =
-//   (initialized: boolean, locked: boolean) =>
-//   (dispatch: AccountsStore['dispatch']) => {
-//     dispatch(setAppState({ initialized, locked }));
-//   };
 
 export const selectState = (s: AccountsState) => s.state;

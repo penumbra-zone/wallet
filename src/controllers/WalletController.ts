@@ -28,7 +28,6 @@ export class WalletController extends EventEmitter {
   private password: string | null | undefined;
   private _setSession;
   private wallets: Array<Wallet<WalletPrivateData>>;
-  private trashControl;
 
   constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
     super();
@@ -47,14 +46,38 @@ export class WalletController extends EventEmitter {
   }
 
   initVault(password: string) {
-    if (!password || typeof password !== 'undefined') {
+    if (!password || typeof password !== 'string') {
       throw new Error('Password is needed to init vault');
     }
 
-    // (this.wallets || []).forEach((wallet) => this._walletToTrash(wallet));
     this._setPassword(password);
     this.wallets = [];
     this._saveWallets();
+  }
+
+  unlock(password: string) {
+    this._restoreWallets(password);
+    this._setPassword(password);
+  }
+
+  addWallet(options: CreateWalletInput) {
+    if (this.wallets.length >= 1) {
+      throw new Error('You should have only 1 wallet');
+    }
+    const wallet = this._createWallet({ ...options });
+
+    this.wallets.push(wallet);
+    this._saveWallets();
+    return wallet.getAccount();
+  }
+
+  getAccounts() {
+    return this.wallets.map((wallet) => wallet.getAccount());
+  }
+
+  lock() {
+    this._setPassword(null);
+    this.wallets = [];
   }
 
   _restoreWallets(password: string | null | undefined) {
@@ -81,10 +104,5 @@ export class WalletController extends EventEmitter {
   _setPassword(password: string | null) {
     this.password = password;
     this._setSession({ password });
-  }
-
-  lock() {
-    this._setPassword(null);
-    this.wallets = [];
   }
 }

@@ -2,11 +2,10 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useEffect, useMemo, useState } from 'react';
 import Button from '@mui/material/Button';
-import {
-  generate_spend_key,
-  get_full_viewing_key,
-} from 'penumbra-web-assembly';
-import { BackgroundType } from '../../../types';
+import { useAccountsSelector, useAppDispatch } from '../../../accounts';
+import { createAccount, selectNewAccount } from '../../redux';
+import { useNavigate } from 'react-router-dom';
+import { routesPath } from '../../../utils';
 
 const shuffle = (array: string[]) => {
   var currentIndex = array.length,
@@ -25,26 +24,25 @@ const shuffle = (array: string[]) => {
   return array;
 };
 
-type SeedPhraseConfirmProps = {
-  background: BackgroundType;
-};
+type SeedPhraseConfirmProps = {};
 
-export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({
-  background,
-}) => {
-  const { keys } = background.state;
-  const { addKey } = background;
+export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const [disabledBtn, setDisabledBtn] = useState<boolean>(true);
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
 
+  const newAccount = useAccountsSelector(selectNewAccount);
+
   useEffect(() => {
+    if (!newAccount.seed) return;
     const stringSelectedWords = selectedWords.join(' ');
 
-    stringSelectedWords === keys[0].mnemonic
+    stringSelectedWords === newAccount.seed
       ? setDisabledBtn(false)
       : setDisabledBtn(true);
-  }, [selectedWords, keys[0].mnemonic]);
+  }, [selectedWords, newAccount.seed]);
 
   const addWord = (word: string) => () => {
     if (selectedWords.includes(word)) return;
@@ -56,14 +54,11 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({
     setSelectedWords(withoutWord);
   };
 
-  const handleSubmit = () => {
-    const spendKey = generate_spend_key(keys[0].mnemonic);
-    const fvk = get_full_viewing_key(spendKey);
-    addKey([{ spendKey, fvk }]);
-  };
+  const handleSubmit = async () => await dispatch(createAccount(newAccount));
+
   const shufleMnemonic = useMemo(() => {
-    return shuffle(keys[0].mnemonic.split(' '));
-  }, [keys[0].mnemonic]);
+    return shuffle(newAccount.seed.split(' '));
+  }, [newAccount.seed]);
 
   return (
     <Box

@@ -16,8 +16,8 @@ export class VaultController {
   }) {
     this.store = new ObservableStore(
       extensionStorage.getInitState(
-        { locked: null, inititalized: null },
-        { locked: !extensionStorage.getInitSession().password }
+        { isLocked: null, isInitialized: null },
+        { isLocked: !extensionStorage.getInitSession().password }
       )
     );
     extensionStorage.subscribe(this.store);
@@ -26,41 +26,47 @@ export class VaultController {
 
     const { vault } = wallet.store.getState().WalletController;
     if (vault) {
-      this.store.updateState({ initialized: true });
+      this.store.updateState({ isInitialized: true });
     }
   }
 
-  private get locked() {
-    return this.store.getState().locked;
+  private get isLocked() {
+    return this.store.getState().isLocked;
   }
 
-  private set locked(value) {
-    if (this.locked !== value) {
-      this.store.updateState({ locked: value });
+  private set isLocked(value) {
+    if (this.isLocked !== value) {
+      this.store.updateState({ isLocked: value });
     }
   }
 
-  private get initialized() {
-    return this.store.getState().initialized;
+  private get isInitialized() {
+    return this.store.getState().isInitialized;
   }
 
-  private set initialized(value) {
-    if (this.initialized !== value) {
-      this.store.updateState({ initialized: value });
+  private set isInitialized(value) {
+    if (this.isInitialized !== value) {
+      this.store.updateState({ isInitialized: value });
     }
   }
 
   init(password: string) {
     this.wallet.initVault(password);
 
-    this.locked = false;
-    this.initialized = true;
+    this.isLocked = false;
+    this.isInitialized = true;
   }
 
   lock() {
     this.wallet.lock();
     // this.identity.lock();
 
-    this.locked = true;
+    this.isLocked = true;
+  }
+
+  unlock(password: string) {
+    this.wallet.unlock(password);
+
+    this.isLocked = false;
   }
 }

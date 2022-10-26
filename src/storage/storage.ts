@@ -5,11 +5,12 @@ import debounceStream from 'debounce-stream';
 import log from 'loglevel';
 import { createStreamSink, DEFAULT_LEGACY_CONFIG, extension } from '../lib';
 import { NetworkName } from '../controllers';
+import { WalletAccount } from '../preferences';
 
 export type StorageLocalState = {
-  selectedAccount: any | undefined;
-  initialized: boolean | null;
-  locked: boolean | null;
+  selectedAccount: WalletAccount | undefined;
+  isInitialized: boolean | null;
+  isLocked: boolean | null;
   blacklist: string[];
   config: {
     networks: typeof DEFAULT_LEGACY_CONFIG.NETWORKS;

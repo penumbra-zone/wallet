@@ -13,16 +13,16 @@ export class PenumbraController {
       isWrongPass: false,
 
       //Computed properties. Можно провести аналогию с view в бд
-      get locked() {
+      get isLocked() {
         return this.password == null;
       },
       get keys() {
-        if (this.locked) {
+        if (this.isLocked) {
           return [];
         }
         return PenumbraController._decryptVault(this.vault, this.password);
       },
-      get initialized() {
+      get isInitialized() {
         return this.vault != null;
       },
       get newMessages() {
@@ -150,8 +150,8 @@ export class PenumbraController {
     return {
       keys: this.store.keys,
       messages: this.store.newMessages,
-      initialized: this.store.initialized,
-      locked: this.store.locked,
+      isInitialized: this.store.isInitialized,
+      isLocked: this.store.isLocked,
       isWrongPass: this.store.isWrongPass,
     };
   }
@@ -212,7 +212,7 @@ export class PenumbraController {
   }
 
   _checkLocked() {
-    if (this.store.locked) {
+    if (this.store.isLocked) {
       throw new Error('App is locked');
     }
   }

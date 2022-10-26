@@ -1,5 +1,4 @@
 import ReactDOM from 'react-dom/client';
-import { Provider } from 'react-redux';
 import {
   cbToPromise,
   extension,
@@ -15,6 +14,7 @@ import backgroundService, {
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { routes } from './routes';
 import { createUpdateState } from './updateState';
+import { Provider } from 'react-redux';
 
 startUi();
 
@@ -30,8 +30,8 @@ async function startUi() {
 
     const stateChanges: Partial<Record<string, unknown>> &
       Partial<BackgroundGetStateResult> = await backgroundService.getState([
-      'initialized',
-      'locked',
+      'isInitialized',
+      'isLocked',
     ]);
 
     for (const key in changes) {
@@ -76,8 +76,12 @@ async function startUi() {
 
   const background = await connect();
 
-  const [state] = await Promise.all([background.getState()]);
-  console.log({ state });
+  const [state, networks] = await Promise.all([
+    background.getState(),
+    background.getNetworks(),
+  ]);
+
+  updateState({ ...state, networks });
 
   backgroundService.init(background);
 

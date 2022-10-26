@@ -1,5 +1,18 @@
 import { RouteObject } from 'react-router-dom';
-import { RootAccounts } from '../ui/RootAccounts';
+import {
+  CreatePassword,
+  CreateSuccess,
+  ImportSeed,
+  Login,
+  Rules,
+  SeedPharseRules,
+  SeedPhrase,
+  SeedPhraseConfirm,
+  SelectAction,
+  Welcome,
+} from '../ui/containers';
+import { RootAccounts } from './RootAccounts';
+import { routesPath } from '../utils';
 
 export const routes: RouteObject[] = [
   {
@@ -7,9 +20,46 @@ export const routes: RouteObject[] = [
 
     children: [
       {
-        path: '/',
-        element: <div>route /</div>,
+        path: routesPath.HOME,
+        element: <>Account</>,
       },
+      {
+        path: routesPath.WELCOME,
+        element: <Welcome />,
+      },
+      {
+        path: routesPath.RULES,
+        element: <Rules />,
+      },
+      {
+        path: routesPath.SELECT_ACTION,
+        element: <SelectAction />,
+      },
+      {
+        path: routesPath.CREATE_PASSWORD,
+        element: <CreatePassword />,
+      },
+      {
+        path: routesPath.SEED_PHRASE_RULES,
+        element: <SeedPharseRules />,
+      },
+      {
+        path: routesPath.SEED_PHRASE,
+        element: <SeedPhrase />,
+      },
+      {
+        path: routesPath.CONFIRM_SEED_PHRASE,
+        element: <SeedPhraseConfirm />,
+      },
+      {
+        path: routesPath.LOGIN,
+        element: <Login />,
+      },
+      {
+        path: routesPath.IMPORT_SEED_PHRASE,
+        element: <ImportSeed />,
+      },
+      {},
     ],
   },
 ];
