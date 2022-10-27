@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* fonts */
+@font-face {
+    font-family: "Faktum Bold";
+    src: local("Faktum Bold"),
+        url("/src/assets/fonts/Faktum-Bold.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Faktum Medium";
+    src: local("Faktum Medium"),
+        url("/src/assets/fonts/Faktum-Medium.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Faktum SemiBold";
+    src: local("Faktum SemiBold"),
+        url("/src/assets/fonts/Faktum-SemiBold.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Devanagari Sangam Regular";
+    src: local("Devanagari Sangam Regular"),
+        url("/src/assets/fonts/Devanagari-Sangam-Regular.ttf") format("truetype");
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+ul[class],
+ol[class] {
+    padding: 0;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+ul[class],
+ol[class],
+li,
+figure,
+figcaption,
+blockquote,
+dl,
+dd {
+    margin: 0;
+}
+
+body {
+    min-height: 100vh;
+    scroll-behavior: smooth;
+    text-rendering: optimizeSpeed;
+    line-height: 1.5;
+    color: #ffffff;
+    background-color: #000000;
+}
+
+ul[class],
+ol[class] {
+    list-style: none;
+}
+
+a:not([class]) {
+    text-decoration-skip-ink: auto;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+article>*+* {
+    margin-top: 1em;
+}
+
+input,
+button,
+textarea,
+select {
+    font: inherit;
+}
+
+/* font styles */
+
+.h1 {
+    font-family: 'Faktum SemiBold';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 36px;
+}
+
+.h2 {
+    font-family: 'Faktum SemiBold';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 26px;
+}
+
+.h1_ext {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 30px;
+}
+
+
+.text_ext {
+    font-family: "Faktum Bold";
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.text_button {
+    font-family: "Faktum Bold";
+    font-style: normal;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 22px;
+}
+
+.text_numbers {
+    font-family: "Faktum Medium";
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 30px;
+}
+
+.text_body {
+    font-family: 'Devanagari Sangam Regular';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 22px;
+}
+
+/* colors */
+
+.button_gradient {
+    background: linear-gradient(90deg, rgba(139, 228, 217, 0.6) 0%, rgba(255, 144, 47, 0.5) 111.15%)
+}
+
+.button_gradient_disabled{
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
+    linear-gradient(90deg, rgba(139, 228, 217, 0.6) 0%, rgba(255, 144, 47, 0.5) 111.15%);
+}

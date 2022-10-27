@@ -2,6 +2,7 @@ const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const svgToMiniDataURI = require('mini-svg-data-uri');
 
 module.exports = () => {
   const mode = process.env.NODE_ENV || 'development';
@@ -105,6 +106,33 @@ module.exports = () => {
           test: /\.(jsx?)$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
+        },
+        {
+          test: /\.css$/i,
+          include: path.resolve(SOURCE_FOLDER),
+          use: ['style-loader', 'css-loader', 'postcss-loader'],
+        },
+        {
+          test: /\.svg$/,
+          type: 'asset',
+          generator: {
+            filename: 'assets/img/[name].[ext]',
+            dataUrl: (content) => svgToMiniDataURI(content.toString()),
+          },
+        },
+        {
+          test: /\.(png|jpe?g|gif)$/,
+          type: 'asset/resource',
+          generator: {
+            filename: 'assets/img/[name][ext]',
+          },
+        },
+        {
+          test: /\.(woff2?|ttf)$/,
+          type: 'asset/resource',
+          generator: {
+            filename: 'assets/fonts/[name][ext]',
+          },
         },
       ],
     },

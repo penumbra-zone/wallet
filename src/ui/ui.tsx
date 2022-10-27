@@ -9,6 +9,7 @@ import backgroundService, {
   BackgroundGetStateResult,
   BackgroundUiApi,
 } from './services/Background';
+import './main.css';
 
 startUi();
 

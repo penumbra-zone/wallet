@@ -15,6 +15,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { routes } from './routes';
 import { createUpdateState } from './updateState';
 import { Provider } from 'react-redux';
+import '../ui/main.css';
 
 startUi();
 

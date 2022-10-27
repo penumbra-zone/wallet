@@ -14,8 +14,8 @@ export const RootAccounts = () => {
 
   useEffect(() => {
     if (selectedAccount.name) return navigate(routesPath.HOME);
-
-    if (!state.isInitialized) return navigate(routesPath.WELCOME);
+    //TODO change to routesPath.WELCOME
+    if (!state.isInitialized) return navigate(routesPath.SELECT_ACTION);
     if (state.isInitialized && !state.isLocked)
       return navigate(routesPath.SEED_PHRASE);
     if (state.isInitialized && state.isLocked)
