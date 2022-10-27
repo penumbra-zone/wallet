@@ -16,7 +16,7 @@ import {
 import IndexedDb from './IndexedDb';
 import {decrypt_note} from "penumbra-web-assembly";
 
-const CHAIN_ID = 'penumbra-testnet-chaldene';
+const CHAIN_ID = 'penumbra-testnet-eirene';
 
 const transport = createGrpcWebTransport({
   baseUrl: 'http://testnet.penumbra.zone:8080',
@@ -75,7 +75,7 @@ export const getCompactBlockRange = async () => {
   }
 };
 
-export const scanBlock = (compactBlock: CompactBlock) => {
+export const scanBlock = async (compactBlock: CompactBlock) => {
   console.log("Handle block with height " + compactBlock.height)
   if (requireScanning(compactBlock)) {
     for (const notePayload of compactBlock.notePayloads) {
@@ -87,8 +87,9 @@ export const scanBlock = (compactBlock: CompactBlock) => {
             toHexString(notePayload.payload?.ephemeralKey));
         console.log("decrypted note: ", decryptedNote)
 
-        // TODO save notes
-
+        const indexedDb = new IndexedDb('notes');
+        await indexedDb.createObjectStore(['notes'], 'note_commitment');
+        await indexedDb.putBulkValue('notes', decryptedNote);
       } catch (e) {
         console.error(e)
       }
