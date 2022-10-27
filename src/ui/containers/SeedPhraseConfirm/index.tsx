@@ -1,11 +1,7 @@
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import { useEffect, useMemo, useState } from 'react';
-import Button from '@mui/material/Button';
 import { useAccountsSelector, useAppDispatch } from '../../../accounts';
 import { createAccount, selectNewAccount } from '../../redux';
 import { useNavigate } from 'react-router-dom';
-import { routesPath } from '../../../utils';
 
 const shuffle = (array: string[]) => {
   var currentIndex = array.length,
@@ -61,99 +57,32 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
   }, [newAccount.seed]);
 
   return (
-    <Box
-      component="form"
-      noValidate
-      autoComplete="off"
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        paddingX: '5px',
-      }}
-    >
-      <Typography sx={{ fontSize: '24px' }}>
-        Confirm your secret backup phrase
-      </Typography>
-      <Typography sx={{ fontSize: '14px' }}>
-        Choose each phrase to make sure it is correct.
-      </Typography>
-      <Box
-        sx={{
-          minHeight: '180px',
-          width: '100%',
-          border: '1px solid black',
-          borderRadius: '5px',
-          marginY: '10px',
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'flex-start',
-            padding: '4px',
-          }}
-        >
+    <div>
+      <p>Confirm your secret backup phrase</p>
+      <p>Choose each phrase to make sure it is correct.</p>
+      <div>
+        <div>
           {selectedWords.map((i) => {
             return (
-              <Box
-                key={i}
-                sx={{
-                  flex: '0 0 25%',
-                  textAlign: 'center',
-                  border: '1px solid black',
-                  padding: '2px',
-                  borderRadius: '5px',
-                  fontSize: '14px',
-                }}
-                onClick={deleteWord(i)}
-              >
-                <Box>{i}</Box>
-              </Box>
+              <div key={i} onClick={deleteWord(i)}>
+                <p>{i}</p>
+              </div>
             );
           })}
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          width: '100%',
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'flex-start',
-        }}
-      >
+        </div>
+      </div>
+      <div>
         {shufleMnemonic.map((i) => {
           return (
-            <Box
-              key={i}
-              sx={{
-                flex: '0 0 20%',
-                textAlign: 'center',
-                border: '1px solid black',
-                padding: '2px',
-                borderRadius: '5px',
-                fontSize: '14px',
-                background: selectedWords.includes(i) ? '#42a5f5' : '',
-              }}
-              onClick={addWord(i)}
-            >
+            <p key={i} onClick={addWord(i)}>
               {i}
-            </Box>
+            </p>
           );
         })}
-      </Box>
-      <Button
-        variant="contained"
-        // TODO unCommit
-        // disabled={disabledBtn}
-        sx={{ marginTop: '10px' }}
-        onClick={handleSubmit}
-      >
+      </div>
+      <button disabled={disabledBtn} onClick={handleSubmit}>
         Submit
-      </Button>
-    </Box>
+      </button>
+    </div>
   );
 };

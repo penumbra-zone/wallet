@@ -8,12 +8,13 @@ import {
   ChainParamsRequest,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
 import { ObliviousQuery } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_connectweb';
-import { extensionApi } from './extensionApi';
+
 import {
   KnownAssets,
   ChainParameters,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
 import IndexedDb from './IndexedDb';
+import { extension } from '../lib';
 
 const CHAIN_ID = 'penumbra-testnet-chaldene';
 
@@ -50,7 +51,7 @@ export const getChainParams = async () => {
 };
 
 export const getCompactBlockRange = async () => {
-  const startHeight = await extensionApi.storage.local.get('startHeight');
+  const startHeight = await extension.storage.local.get('startHeight');
 
   const compactBlockRangeRequest = new CompactBlockRangeRequest();
   compactBlockRangeRequest.chainId = CHAIN_ID;
@@ -63,7 +64,7 @@ export const getCompactBlockRange = async () => {
     for await (const response of client.compactBlockRange(
       compactBlockRangeRequest
     )) {
-      extensionApi.storage.local.set({ startHeight: Number(response.height) });
+      extension.storage.local.set({ startHeight: Number(response.height) });
     }
   } catch (error) {
     console.log(error);

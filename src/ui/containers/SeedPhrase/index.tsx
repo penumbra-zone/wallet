@@ -1,6 +1,3 @@
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { routesPath } from '../../../utils';
 import { useEffect } from 'react';
@@ -28,37 +25,12 @@ export const SeedPhrase: React.FC<SeedPhraseProps> = ({}) => {
   }, []);
 
   return (
-    <Box
-      sx={{
-        width: '95%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        paddingX: '5px',
-      }}
-    >
-      <Typography sx={{ fontSize: '28px', color: 'red' }}>
-        Please save this!!!
-      </Typography>
-      <Box
-        sx={{
-          width: '100%',
-          maxWidth: 500,
-          border: '1px solid black',
-          padding: '2px',
-          borderRadius: '5px',
-          marginY: '15px',
-        }}
-      >
-        <Typography sx={{ fontSize: '18px', textAlign: 'center' }}>
-          {newAccount.seed}
-        </Typography>
-      </Box>
-      <Button variant="contained" onClick={handleNext}>
-        Next
-      </Button>
-    </Box>
+    <div>
+      <p>Please save this!!!</p>
+      <div>
+        <p>{newAccount.seed}</p>
+      </div>
+      <button onClick={handleNext}>Next</button>
+    </div>
   );
 };
