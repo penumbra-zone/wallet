@@ -2,6 +2,13 @@ import { useState } from 'react';
 
 import Background from '../../services/Background';
 import { useAppDispatch } from '../../../accounts';
+import {
+  Button,
+  CheckBox,
+  ChevronLeftIcon,
+  Input,
+  Logo,
+} from '../../components';
 
 type CreatePasswordProps = {};
 
@@ -18,7 +25,54 @@ export const CreatePassword: React.FC<CreatePasswordProps> = ({}) => {
   const handleSubmitPassword = async () => Background.initVault(password);
 
   return (
-    <></>
+    <div className="w-[100%] flex items-center justify-center">
+      <div className="w-[400px] flex flex-col items-center justify-center">
+        <div className="self-start">
+          <Button
+            mode="icon_transparent"
+            onClick={() => console.log('asd')}
+            title="Back"
+            iconLeft={<ChevronLeftIcon stroke="#E0E0E0" />}
+          />
+        </div>
+        <p className="h1 mt-[40px] mb-[24px]">First time on Penumbra?</p>
+        <div className="w-[100%]">
+          <Input
+            label="New Password"
+            placeholder="Password"
+            helperText="Password is not long enough"
+            isError={!!password}
+            value={password}
+            onChange={handleChangePassword}
+            type="password"
+          />
+        </div>
+        <div className="w-[100%]">
+          <Input
+            label="Confirm password"
+            placeholder="Confirm password"
+            helperText="Password is not long enough"
+            isError={!!password}
+            value={password}
+            onChange={handleChangePassword}
+            type="password"
+          />
+        </div>
+        <p className="text_body text-light_grey text-left self-start mb-[16px]">
+          Must be at least 8 characters
+        </p>
+        <div className="self-start mb-[40px]">
+          <CheckBox label="I have read the terms of use and agree to them" />
+        </div>
+        <div className="w-[100%]">
+          <Button
+            title="Create"
+            mode="gradient"
+            onClick={handleSubmitPassword}
+          />
+        </div>
+      </div>
+    </div>
     // <Box
     //   sx={{
     //     width: '100%',

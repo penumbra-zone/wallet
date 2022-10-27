@@ -10,3 +10,4 @@ export * from './Login';
 export * from './Rules';
 export * from './SeedPharseRules';
 export * from './CreateSuccess';
+export * from './RootWrapperAccount';

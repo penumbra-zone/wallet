@@ -15,7 +15,7 @@ export const Welcome = () => {
         <p className="text_body text-light_grey">
           Connecting you to Penumbra and the decentralized web...
         </p>
-        <p className="text_body text-light_grey mt-[6px] mb-[42px]">
+        <p className="text_body text-light_grey mt-[6px] mb-[40px]">
           We're glad to see you.
         </p>
         <div className="w-[192px]">

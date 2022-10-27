@@ -8,9 +8,11 @@ module.exports = {
           DEFAULT: '#000000',
           0.25: 'rgba(0, 0, 0, 0.25)',
           0.2: 'rgba(0, 0, 0, 0.2)',
+          0.1: 'rgba(0, 0, 0, 0.1)',
         },
         white: {
           DEFAULT: '#FFFFFF',
+          0.3:"rgba(255, 255, 255, 0.3)"
         },
         dark_grey: {
           DEFAULT: '#282626',

@@ -3,18 +3,19 @@ import img from '../../../assets/img/logo.png';
 
 type LogoProps = {
   size: 'big' | 'medium' | 'small';
+  className?: string
 };
 
-export const Logo: React.FC<LogoProps> = ({ size }) => {
+export const Logo: React.FC<LogoProps> = ({ size, className }) => {
   const cn = useMemo(() => {
     if (size === 'small') {
-      return 'w-[96px]';
+      return `w-[96px] ${className}`;
     } else if (size === 'big') {
-      return 'w-[400px]';
+      return `w-[400px] ${className}`;
     } else if (size === 'medium') {
-      return 'w-[192px]';
+      return `w-[192px] ${className}`;
     }
-  }, [size]);
+  }, [size, className]);
 
   return <img src={img} alt="penumbra log" className={`${cn} object-cover`} />;
 };

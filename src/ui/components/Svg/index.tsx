@@ -30,7 +30,7 @@ export const DowmloadSvg = () => {
       />
     </svg>
   );
-}
+};
 
 export const PlusSvg = () => {
   return (
@@ -57,5 +57,41 @@ export const PlusSvg = () => {
       />
     </svg>
   );
-}
+};
 
+export const ChevronLeftIcon = (props) => {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M15 18L9 12L15 6"
+        stroke={props.stroke || 'white'}
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+};
+
+export const CheckSvg = () => {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M22.5 6.41L10.5 18.41L5 12.91L6.41 11.5L10.5 15.58L21.09 5L22.5 6.41Z"
+        fill="white"
+      />
+    </svg>
+  );
+}

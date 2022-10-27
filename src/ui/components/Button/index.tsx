@@ -3,8 +3,9 @@ import React, { ReactElement, useMemo } from 'react';
 type ButtonProps = {
   title: string | ReactElement;
   disabled?: boolean;
-  mode: 'gradient';
+  mode: 'gradient' | 'icon_transparent';
   className?: string;
+  iconLeft?: JSX.Element;
   onClick: () => void;
 };
 
@@ -13,18 +14,21 @@ export const Button: React.FC<ButtonProps> = ({
   title,
   disabled,
   className,
+  iconLeft,
   onClick,
 }) => {
   const cn = useMemo(() => {
     if (mode === 'gradient' && !disabled) {
       return `w-[100%] button_gradient text-white text_button py-[15px] rounded-[15px] 
-       hover:shadow-button_shadow
+      
        ${className}`;
     }
     if (mode === 'gradient' && disabled) {
-      return `w-[100%] button_gradient_disabled text-white text_button py-[15px] rounded-[15px] 
+      return `w-[100%] button_gradient_disabled text-white-0.3 text_button py-[15px] rounded-[15px] 
        ${className}`;
     }
+
+    
 
     //  hover:border-[2px] hover:border-solid hover:border-turquoise_hover
     //    disabled:bg-purple disabled:text-dark_purple disabled:border-purple
@@ -52,8 +56,20 @@ export const Button: React.FC<ButtonProps> = ({
     // }
   }, [className, mode, disabled]);
 
+  if (mode === 'icon_transparent')
+    return (
+      <button
+        disabled={disabled}
+        onClick={onClick}
+        className="flex text_button items-center text-light_grey"
+      >
+        <span>{iconLeft}</span>
+        <span>{title}</span>
+      </button>
+    );
+
   return (
-    <button disabled={disabled} onClick={onClick} className={`${cn}  z-[2]`}>
+    <button disabled={disabled} onClick={onClick} className={`${cn}`}>
       {title}
     </button>
   );

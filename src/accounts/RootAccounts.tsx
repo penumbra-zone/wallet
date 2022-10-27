@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useAccountsSelector } from '.';
 import { routesPath } from '../utils';
 import { selectSelectedAccount, selectState } from '../ui/redux';
+import { RootWrapperAccount } from '../ui/containers';
 
 export const RootAccounts = () => {
   const navigate = useNavigate();
@@ -11,16 +12,19 @@ export const RootAccounts = () => {
   const appState = useAccountsSelector((s) => s);
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
 
-
   useEffect(() => {
     if (selectedAccount.name) return navigate(routesPath.HOME);
     //TODO change to routesPath.WELCOME
-    if (!state.isInitialized) return navigate(routesPath.SELECT_ACTION);
+    if (!state.isInitialized) return navigate(routesPath.CREATE_PASSWORD);
     if (state.isInitialized && !state.isLocked)
       return navigate(routesPath.SEED_PHRASE);
     if (state.isInitialized && state.isLocked)
       return navigate(routesPath.LOGIN);
-  }, [state.isInitialized,state.isLocked, selectedAccount]);
+  }, [state.isInitialized, state.isLocked, selectedAccount]);
 
-  return <Outlet />;
+  return (
+    <RootWrapperAccount>
+      <Outlet />
+    </RootWrapperAccount>
+  );
 };

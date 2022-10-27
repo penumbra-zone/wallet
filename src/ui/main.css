@@ -150,10 +150,35 @@ select {
 /* colors */
 
 .button_gradient {
-    background: linear-gradient(90deg, rgba(139, 228, 217, 0.6) 0%, rgba(255, 144, 47, 0.5) 111.15%)
+    background-size: 300% 300%;
+    background-image: linear-gradient(to right, rgba(139, 228, 217, 0.6) 0%, rgba(255, 144, 47, 0.5) 50%, rgba(139, 228, 217, 0.6) 100%);
+    transition: 0.5s;
 }
 
-.button_gradient_disabled{
+.button_gradient:hover {
+    background-position: right center;
+}
+
+.button_gradient_disabled {
     background: linear-gradient(0deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
-    linear-gradient(90deg, rgba(139, 228, 217, 0.6) 0%, rgba(255, 144, 47, 0.5) 111.15%);
+        linear-gradient(90deg, rgba(139, 228, 217, 0.6) 0%, rgba(255, 144, 47, 0.5) 111.15%);
+}
+
+.input_default_border {
+    background: linear-gradient(180deg, rgba(139, 228, 217, 0.15) 0%, rgba(255, 144, 47, 0.15) 100%)
+}
+
+.input_typing_bg {
+    background: linear-gradient(90deg, rgba(139, 228, 217, 0.05) 0%, rgba(255, 144, 47, 0.05) 100%);
+}
+
+
+.checkbox {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
 }
