@@ -15,7 +15,7 @@ export const RootAccounts = () => {
   
     if (selectedAccount.name) return navigate(routesPath.HOME);
     //TODO change to routesPath.WELCOME
-    if (!state.isInitialized) return navigate(routesPath.WELCOME);
+    if (!state.isInitialized) return navigate(routesPath.IMPORT_SEED_PHRASE);
     if (state.isInitialized && !state.isLocked)
       return navigate(routesPath.SEED_PHRASE_RULES);
     if (state.isInitialized && state.isLocked)

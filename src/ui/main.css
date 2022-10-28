@@ -186,3 +186,108 @@ select {
     white-space: nowrap;
     width: 1px;
 }
+
+/* select */
+
+.custom_select__control {
+    background-color: #141212 !important;
+    border: none !important;
+    border: 0 !important;
+    border-radius: 15px !important;
+    box-shadow: none !important;
+    height: 50px !important;
+}
+
+.custom_select__control--menu-is-open {}
+
+.custom_select__control--menu-is-open .custom_select__dropdown-indicator svg {
+    fill: #FFFFFF;
+    transform: rotate(180deg) !important;
+    transition: 0.3s ease transform !important;
+}
+
+.custom_select__dropdown-indicator svg {
+    transform: rotate(0deg) !important;
+    transition: 0.3s ease transform !important;
+}
+
+.custom_select__value-container {
+    padding: 0 !important;
+    padding-left: 20px !important;
+    cursor: text !important;
+}
+
+.custom_select__input-container {
+    color: #FFFFFF !important;
+    font-family: 'Devanagari Sangam Regular' !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    font-size: 15px !important;
+    line-height: 22px !important;
+}
+
+.custom_select__input-container::placeholder {}
+
+.custom_select__indicator-separator {
+    display: none !important;
+}
+
+.custom_select__indicator {
+    color: #FFFFFF !important;
+}
+
+.custom_select__indicator:hover {
+    color: #999aa5 !important;
+}
+
+.custom_select__single-value {
+    color: #FFFFFF !important;
+    font-family: 'Devanagari Sangam Regular' !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    font-size: 15px !important;
+    line-height: 22px !important;
+
+}
+
+
+.custom_select__placeholder {
+    font-family: 'Devanagari Sangam Regular' !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    font-size: 15px !important;
+    line-height: 22px !important;
+}
+
+.custom_select__menu {
+    background-color: #141212 !important;
+    color: #FFFFFF !important;
+    /* animation: scaleIn 0.35s ease-in-out; */
+}
+
+.custom_select__option {
+    cursor: pointer !important;
+    font-family: 'Devanagari Sangam Regular' !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    font-size: 15px !important;
+    line-height: 22px !important;
+}
+
+.custom_select__option--is-focused {
+    background-color: #282626 !important;
+}
+
+.custom_select__option--is-selected {
+    background-color: #282626 !important;
+}
+
+.custom_select-container div {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.custom_select-container:hover,
+.custom_select-container--menu-is-open {
+    border-color: #ced4da !important;
+}
