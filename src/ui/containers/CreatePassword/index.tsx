@@ -1,28 +1,59 @@
 import { useState } from 'react';
-
 import Background from '../../services/Background';
-import { useAppDispatch } from '../../../accounts';
 import {
   Button,
   CheckBox,
   ChevronLeftIcon,
   Input,
-  Logo,
+  PasswordRules,
 } from '../../components';
+import { useNavigate } from 'react-router-dom';
+import {
+  PasswordValidatorsType,
+  routesPath,
+  validatePassword,
+} from '../../../utils';
 
 type CreatePasswordProps = {};
 
 export const CreatePassword: React.FC<CreatePasswordProps> = ({}) => {
-  const dispatch = useAppDispatch();
-  const [password, setPassword] = useState<string>('');
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const navigate = useNavigate();
 
-  const handleClickShowPassword = () => setShowPassword((state) => !state);
+  const [password, setPassword] = useState<{
+    newPass: string;
+    confirmPass: string;
+  }>({
+    newPass: '',
+    confirmPass: '',
+  });
+  const [isValidate, setIsValidate] = useState<PasswordValidatorsType>(
+    {} as PasswordValidatorsType
+  );
+  const [isChecked, setIsChecked] = useState<boolean>(false);
 
-  const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setPassword(event.target.value);
+  const handleChangePassword =
+    (type: 'newPass' | 'confirmPass') =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setPassword((state) => ({
+        ...state,
+        [type]: event.target.value,
+      }));
+      if (type === 'newPass') {
+        const validators = validatePassword(event.target.value);
+        setIsValidate((state) => ({
+          ...state,
+          ...validators,
+        }));
+      }
+    };
 
-  const handleSubmitPassword = async () => Background.initVault(password);
+  const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setIsChecked(e.target.checked);
+
+  const handleSubmitPassword = async () =>
+    Background.initVault(password.newPass);
+
+  const handleBack = () => navigate(routesPath.SELECT_ACTION);
 
   return (
     <div className="w-[100%] flex items-center justify-center">
@@ -30,94 +61,60 @@ export const CreatePassword: React.FC<CreatePasswordProps> = ({}) => {
         <div className="self-start">
           <Button
             mode="icon_transparent"
-            onClick={() => console.log('asd')}
+            onClick={handleBack}
             title="Back"
             iconLeft={<ChevronLeftIcon stroke="#E0E0E0" />}
           />
         </div>
-        <p className="h1 mt-[40px] mb-[24px]">First time on Penumbra?</p>
-        <div className="w-[100%]">
+        <p className="h1 mt-[40px] mb-[24px]">Create password</p>
+        <div className="w-[100%] mb-[24px]">
           <Input
             label="New Password"
             placeholder="Password"
-            helperText="Password is not long enough"
-            isError={!!password}
-            value={password}
-            onChange={handleChangePassword}
-            type="password"
+            isError={Object.values(isValidate).includes(false)}
+            value={password.newPass}
+            onChange={handleChangePassword('newPass')}
+            customType="password"
           />
         </div>
-        <div className="w-[100%]">
+        <div className="w-[100%] mb-[24px]">
           <Input
             label="Confirm password"
             placeholder="Confirm password"
-            helperText="Password is not long enough"
-            isError={!!password}
-            value={password}
-            onChange={handleChangePassword}
-            type="password"
+            value={password.confirmPass}
+            onChange={handleChangePassword('confirmPass')}
+            isError={
+              password.confirmPass
+                ? password.confirmPass !== password.newPass
+                : false
+            }
+            customType="password"
           />
         </div>
-        <p className="text_body text-light_grey text-left self-start mb-[16px]">
-          Must be at least 8 characters
-        </p>
-        <div className="self-start mb-[40px]">
-          <CheckBox label="I have read the terms of use and agree to them" />
+        <PasswordRules password={password.newPass} validates={isValidate} />
+        <div className="self-start mb-[40px] mt-[16px]">
+          <CheckBox
+            label="I have read the terms of use and agree to them"
+            onChange={handleChangeCheck}
+            checked={isChecked}
+          />
         </div>
-        <div className="w-[100%]">
+        <div className="w-[100%] mb-[30px]">
           <Button
             title="Create"
             mode="gradient"
+            disabled={
+              !(
+                Boolean(Object.values(isValidate).length) &&
+                !Object.values(isValidate).includes(false) &&
+                password.confirmPass === password.newPass &&
+                isChecked
+              )
+            }
             onClick={handleSubmitPassword}
           />
         </div>
       </div>
     </div>
-    // <Box
-    //   sx={{
-    //     width: '100%',
-    //     height: '100%',
-    //     display: 'flex',
-    //     flexDirection: 'column',
-    //     alignItems: 'flex-start',
-    //     justifyContent: 'center',
-    //     paddingX: '5px',
-    //   }}
-    // >
-    //   <Typography sx={{ fontSize: '18px' }}>Create password</Typography>
-    //   <FormControl sx={{ width: '100%', marginY: '10px' }} variant="outlined">
-    //     <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-    //     <OutlinedInput
-    //       id="outlined-adornment-password"
-    //       type={showPassword ? 'text' : 'password'}
-    //       value={password}
-    //       onChange={handleChangePassword}
-    //       endAdornment={
-    //         <InputAdornment position="end">
-    //           <IconButton
-    //             aria-label="toggle password visibility"
-    //             onClick={handleClickShowPassword}
-    //             edge="end"
-    //           >
-    //             {showPassword ? <VisibilityOff /> : <Visibility />}
-    //           </IconButton>
-    //         </InputAdornment>
-    //       }
-    //       label="Password"
-    //     />
-    //   </FormControl>
-    //   {false && (
-    //     <Typography sx={{ fontSize: '14px', color: 'red' }}>
-    //       Wrong password
-    //     </Typography>
-    //   )}
-    //   <Button
-    //     variant="contained"
-    //     disabled={!password}
-    //     onClick={handleSubmitPassword}
-    //   >
-    //     Submit
-    //   </Button>
-    // </Box>
   );
 };

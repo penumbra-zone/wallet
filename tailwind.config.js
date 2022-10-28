@@ -12,7 +12,7 @@ module.exports = {
         },
         white: {
           DEFAULT: '#FFFFFF',
-          0.3:"rgba(255, 255, 255, 0.3)"
+          0.3: 'rgba(255, 255, 255, 0.3)',
         },
         dark_grey: {
           DEFAULT: '#282626',
@@ -24,7 +24,10 @@ module.exports = {
           DEFAULT: '#141212',
         },
         red: {
-          DEFAULT: 'red',
+          DEFAULT: '#870606',
+        },
+        green: {
+          DEFAULT: '#368E00',
         },
       },
       boxShadow: {
