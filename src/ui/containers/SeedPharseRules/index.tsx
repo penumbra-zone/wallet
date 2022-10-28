@@ -50,6 +50,7 @@ export const SeedPharseRules = () => {
   ];
 
   const handleStart = () => navigate(routesPath.SEED_PHRASE);
+  
   return (
     <div className="w-[100%] flex flex-col items-center justify-center">
       <p className="h1 mb-[16px]">Protect your wallet</p>

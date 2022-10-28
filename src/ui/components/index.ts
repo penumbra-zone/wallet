@@ -5,3 +5,5 @@ export * from './Svg';
 export * from './Input';
 export * from './CheckBox';
 export * from './PasswordRules';
+
+export * from './forms/CreatePasswordForm';
