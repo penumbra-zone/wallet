@@ -3,7 +3,7 @@ import React, { ReactElement, useMemo } from 'react';
 type ButtonProps = {
   title: string | ReactElement;
   disabled?: boolean;
-  mode: 'gradient' | 'icon_transparent';
+  mode: 'gradient' | 'icon_transparent' | 'transparent';
   className?: string;
   iconLeft?: JSX.Element;
   onClick: () => void;
@@ -18,17 +18,16 @@ export const Button: React.FC<ButtonProps> = ({
   onClick,
 }) => {
   const cn = useMemo(() => {
-    if (mode === 'gradient' && !disabled) {
-      return `w-[100%] button_gradient text-white text_button py-[15px] rounded-[15px] 
-      
-       ${className}`;
-    }
-    if (mode === 'gradient' && disabled) {
-      return `w-[100%] button_gradient_disabled text-white-0.3 text_button py-[15px] rounded-[15px] 
-       ${className}`;
-    }
-
+    if (mode === 'gradient' && !disabled) 
+      return `w-[100%] button_gradient text-white text_button py-[14px] rounded-[15px] ${className}`;
     
+    if (mode === 'gradient' && disabled)
+      return `w-[100%] button_gradient_disabled text-white-0.3 text_button py-[14px] rounded-[15px] ${className}`;
+
+    if (mode === 'transparent')
+      return `w-[100%] bg-brown  text-white text_button border-[1px] border-solid border-dark_grey py-[14px] rounded-[15px]
+      hover:bg-gradient-to-r hover:from-[rgba(139,228,217,0.15)]  hover:to-[rgba(255,144,47,0.15]
+      ${className}`;
 
     //  hover:border-[2px] hover:border-solid hover:border-turquoise_hover
     //    disabled:bg-purple disabled:text-dark_purple disabled:border-purple

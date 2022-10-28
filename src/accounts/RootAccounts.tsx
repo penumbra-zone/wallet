@@ -9,7 +9,6 @@ export const RootAccounts = () => {
   const navigate = useNavigate();
 
   const state = useAccountsSelector(selectState);
-  const appState = useAccountsSelector((s) => s);
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
 
   useEffect(() => {
@@ -17,7 +16,7 @@ export const RootAccounts = () => {
     //TODO change to routesPath.WELCOME
     if (!state.isInitialized) return navigate(routesPath.WELCOME);
     if (state.isInitialized && !state.isLocked)
-      return navigate(routesPath.SEED_PHRASE_RULES);
+      return navigate(routesPath.CONFIRM_SEED_PHRASE);
     if (state.isInitialized && state.isLocked)
       return navigate(routesPath.LOGIN);
   }, [state.isInitialized, state.isLocked, selectedAccount]);

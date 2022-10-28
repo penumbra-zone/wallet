@@ -1,7 +1,6 @@
 import { RouteObject } from 'react-router-dom';
 import {
   CreatePassword,
-  CreateSuccess,
   ImportSeed,
   Login,
   Rules,
