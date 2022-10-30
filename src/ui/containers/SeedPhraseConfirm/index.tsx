@@ -66,6 +66,8 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
   });
 
   const newAccount = useAccountsSelector(selectNewAccount);
+  console.log({ newAccount });
+  
 
   useEffect(() => {
     setIsError({
@@ -75,7 +77,7 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
     });
   }, [words]);
 
-  const handleBack = () => navigate(routesPath.SEED_PHRASE_RULES);
+  const handleBack = () => navigate(routesPath.SEED_PHRASE);
   const handleSubmit = async () => await dispatch(createAccount(newAccount));
 
   const handleChangeWords =
@@ -105,7 +107,11 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
         </p>
         <div className="w-[100%] mb-[12px]">
           <Input
-            label={`#${random.r1 + 1}`}
+            label={
+              <p className="text_body">{`#${
+                random.r1 + 1 < 10 ? `0${random.r1 + 1}` : random.r1 + 1
+              }`}</p>
+            }
             isError={words.first ? !isError.first : false}
             value={words.first}
             onChange={handleChangeWords('first')}
@@ -113,7 +119,11 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
         </div>
         <div className="w-[100%] mb-[12px]">
           <Input
-            label={`#${random.r2 + 1}`}
+            label={
+              <p className="text_body">
+                {`#${random.r2 + 1 < 10 ? `0${random.r2 + 1}` : random.r2 + 1}`}
+              </p>
+            }
             isError={words.second ? !isError.second : false}
             value={words.second}
             onChange={handleChangeWords('second')}
@@ -121,7 +131,11 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
         </div>
         <div className="w-[100%]">
           <Input
-            label={`#${random.r3 + 1}`}
+            label={
+              <p className="text_body">{`#${
+                random.r3 + 1 < 10 ? `0${random.r3 + 1}` : random.r3 + 1
+              }`}</p>
+            }
             isError={words.third ? !isError.third : false}
             value={words.third}
             onChange={handleChangeWords('third')}

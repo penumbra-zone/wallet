@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react';
+import { ReactElement, useRef, useState } from 'react';
 import { CloseEyeSvg, OpenEyeSvg } from '../Svg';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLElement> {
-  label: string;
+  label: string | ReactElement;
   isError?: boolean;
   helperText?: string;
   customType?: 'password' | 'text';

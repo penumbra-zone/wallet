@@ -1,5 +1,9 @@
 import { Ref, useCallback, useEffect, useRef, useState } from 'react';
-import SelectComponent, { MultiValue, SingleValue } from 'react-select';
+import SelectComponent, {
+  MultiValue,
+  SingleValue,
+  createFilter,
+} from 'react-select';
 
 export type OptionType = {
   value: string;
@@ -12,7 +16,8 @@ type SelectPropsType = {
   isLoading?: boolean;
   placeholder?: string;
   options: OptionType[];
-  initialValue?: string[] | string;
+  initialValue?: string;
+  handleChange?: (value: string) => void;
 };
 
 export const Select: React.FC<SelectPropsType> = ({
@@ -22,10 +27,13 @@ export const Select: React.FC<SelectPropsType> = ({
   placeholder,
   initialValue,
   fieldName = '1',
+  handleChange,
+  ...props
 }) => {
-  const [values, setValues] = useState<string[] | string | null>(null);
+  const [values, setValues] = useState<string | null>(null);
   const [isFocus, setFocus] = useState(false);
   const inputRef = useRef<any>(null);
+
   //add initailValue
   useEffect(() => {
     if (!initialValue) return;
@@ -40,7 +48,10 @@ export const Select: React.FC<SelectPropsType> = ({
 
   const changeHandler = (
     newValue: MultiValue<string | OptionType> | SingleValue<string | OptionType>
-  ) => setValues((newValue as OptionType).value);
+  ) => {
+    setValues((newValue as OptionType).value);
+    handleChange((newValue as OptionType).value);
+  };
 
   const containerHandler = () => {
     inputRef.current?.focus();
@@ -51,7 +62,7 @@ export const Select: React.FC<SelectPropsType> = ({
 
   return (
     <div>
-      <p className="h2">{label}</p>
+      <p className="text _body">{label}</p>
       <div
         onClick={containerHandler}
         className={`w-[100%] h-[52px] rounded-[15px] flex items-center justify-center mt-[8px] rounded-[15px]
@@ -78,6 +89,10 @@ export const Select: React.FC<SelectPropsType> = ({
             isLoading={isLoading}
             placeholder="  "
             onBlur={inputBlurHandler}
+            filterOption={createFilter({
+              matchFrom: 'start',
+            })}
+            {...props}
           />
         </div>
       </div>
