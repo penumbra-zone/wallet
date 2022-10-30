@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { AccountsStore } from '../../../accounts';
 import { AccountsState } from '../../../accounts/rootReducer';
 import Background from '../../services/Background';
 
@@ -11,10 +10,12 @@ type CreateAccountInput = {
 
 type Init = {
   selectedAccount: CreateAccountInput;
+  isRedirectToAccountPage: boolean;
 };
 
 const init: Init = {
   selectedAccount: {} as CreateAccountInput,
+  isRedirectToAccountPage: true,
 };
 
 const accounts = createSlice({
@@ -24,6 +25,10 @@ const accounts = createSlice({
     setSelectedAccount: (state, action) => ({
       ...state,
       selectedAccount: action.payload,
+    }),
+    setRedirectAccountPage: (state, action) => ({
+      ...state,
+      isRedirectToAccountPage: action.payload,
     }),
   },
 });
@@ -35,7 +40,6 @@ const { setSelectedAccount } = accountsActions;
 
 export function createAccount(account: CreateAccountInput) {
   return async (dispatch) => {
-    
     const lastAccount = await Background.addWallet({
       ...account,
     });
@@ -47,3 +51,5 @@ export function createAccount(account: CreateAccountInput) {
 
 export const selectSelectedAccount = (state: AccountsState) =>
   state.accounts.selectedAccount;
+export const selectRedirectToAccountPage = (state: AccountsState) =>
+  state.accounts.isRedirectToAccountPage;

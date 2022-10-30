@@ -9,6 +9,7 @@ module.exports = {
           0.25: 'rgba(0, 0, 0, 0.25)',
           0.2: 'rgba(0, 0, 0, 0.2)',
           0.1: 'rgba(0, 0, 0, 0.1)',
+          0.7: 'rgba(0, 0, 0, 0.7)',
         },
         white: {
           DEFAULT: '#FFFFFF',
@@ -25,6 +26,9 @@ module.exports = {
         },
         red: {
           DEFAULT: '#870606',
+        },
+        light_brown: {
+          DEFAULT: '#524B4B',
         },
         green: {
           DEFAULT: '#368E00',

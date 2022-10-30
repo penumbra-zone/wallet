@@ -5,5 +5,11 @@ export * from './Svg';
 export * from './Input';
 export * from './CheckBox';
 export * from './PasswordRules';
-export * from './forms/CreatePasswordForm';
 export * from './Select';
+export * from './ModalWrapper';
+
+//modals
+export * from './modals/SuccessCreateModal';
+
+//forms
+export * from './forms/CreatePasswordForm';

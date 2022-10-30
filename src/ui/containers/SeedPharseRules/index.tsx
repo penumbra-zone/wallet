@@ -1,9 +1,18 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../../../accounts';
 import { routesPath } from '../../../utils';
 import { Button } from '../../components';
+import { accountsActions } from '../../redux';
 
 export const SeedPharseRules = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  //logic to show popup after create
+  useEffect(() => {
+    dispatch(accountsActions.setRedirectAccountPage(false));
+  }, []);
 
   const tips = [
     {
@@ -18,7 +27,7 @@ export const SeedPharseRules = () => {
     {
       header: 'How do I store my recovery passphrase?',
       children: (
-        <div className='ml-[36px]'>
+        <div className="ml-[36px]">
           <div className="text_body text-light_grey mb-[2px] flex items-center">
             <span className="w-[4px] h-[4px] li_gradient mr-[8px] rounded-[50%]"></span>
             <p>Save to password manager.</p>
@@ -50,7 +59,7 @@ export const SeedPharseRules = () => {
   ];
 
   const handleStart = () => navigate(routesPath.SEED_PHRASE);
-  
+
   return (
     <div className="w-[100%] flex flex-col items-center justify-center">
       <p className="h1 mb-[16px]">Protect your wallet</p>
