@@ -5,6 +5,7 @@ import { getSeedPhrase } from '../../../utils/getSeedPhrase';
 import { useAccountsSelector, useAppDispatch } from '../../../accounts';
 import { localStateActions, selectNewAccount } from '../../redux';
 import { Button, ChevronLeftIcon } from '../../components';
+import toast from 'react-hot-toast';
 
 type SeedPhraseProps = {};
 
@@ -29,13 +30,12 @@ export const SeedPhrase: React.FC<SeedPhraseProps> = ({}) => {
 
   if (!newAccount.seed) return <></>;
 
-    const copyToClipboard = () => {
-      
-      navigator.clipboard.writeText(newAccount.seed);
-      // toast.success('Copied to clipboard', {
-      //   position: 'bottom-right',
-      // });
-    };
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(newAccount.seed);
+    toast.success('Success copied!', {
+      position: 'top-right',
+    });
+  };
 
   return (
     <div className="w-[100%] flex items-center justify-center">

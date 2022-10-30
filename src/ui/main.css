@@ -159,6 +159,7 @@ select {
     background-position: right center;
 }
 
+
 .button_gradient_disabled {
     background: linear-gradient(0deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
         linear-gradient(90deg, rgba(139, 228, 217, 0.6) 0%, rgba(255, 144, 47, 0.5) 111.15%);

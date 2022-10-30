@@ -4,7 +4,12 @@ import { CheckSvg } from '../Svg';
 
 export const CheckBox: React.FC<InputProps> = (props) => {
   return (
-    <label className="flex items-center cursor-pointer">
+    <label
+      className="flex items-center cursor-pointer"
+      role="button"
+      tabIndex={0}
+      onKeyDown={props.onKeyDown}
+    >
       <input type="checkbox" className="checkbox" {...props} />
       <div
         className={`flex items-center justify-center w-[30px] h-[30px] rounded-[5px] 

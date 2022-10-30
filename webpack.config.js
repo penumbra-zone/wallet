@@ -72,14 +72,14 @@ module.exports = () => {
         ],
       }),
       new HtmlWebpackPlugin({
-        title: 'Keeper Wallet',
+        title: 'Penumbra Wallet',
         filename: 'accounts.html',
         template: path.resolve(SOURCE_FOLDER, 'accounts.html'),
         hash: true,
         chunks: ['commons', 'accounts/ui'],
       }),
       new HtmlWebpackPlugin({
-        title: 'Keeper Wallet',
+        title: 'Penumbra Wallet',
         filename: 'popup.html',
         template: path.resolve(SOURCE_FOLDER, 'popup.html'),
         hash: true,

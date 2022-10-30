@@ -1,1 +1,1 @@
-export const KEEPERWALLET_DEBUG = process.env.NODE_ENV !== 'production';
+export const PENUMBRAWALLET_DEBUG = process.env.NODE_ENV !== 'production';

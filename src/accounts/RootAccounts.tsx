@@ -8,6 +8,7 @@ import {
   selectState,
 } from '../ui/redux';
 import { RootWrapperAccount } from '../ui/containers';
+import { Toaster } from 'react-hot-toast';
 
 export const RootAccounts = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ export const RootAccounts = () => {
 
   return (
     <RootWrapperAccount>
+      <Toaster />
       <Outlet />
     </RootWrapperAccount>
   );

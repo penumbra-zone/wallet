@@ -45,6 +45,12 @@ export const CreatePasswordForm: React.FC<CreatePasswordFormProps> = ({
   const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>) =>
     setIsChecked(e.target.checked);
 
+  const handleKeyPressCheckBox = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      setIsChecked((state) => !state);
+    }
+  };
+
   return (
     <div>
       <div className="w-[100%] mb-[24px]">
@@ -77,6 +83,7 @@ export const CreatePasswordForm: React.FC<CreatePasswordFormProps> = ({
           label="I have read the terms of use and agree to them"
           onChange={handleChangeCheck}
           checked={isChecked}
+          onKeyDown={handleKeyPressCheckBox}
         />
       </div>
       <div className="w-[100%] mb-[30px]">

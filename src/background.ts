@@ -10,7 +10,7 @@ import {
 } from './controllers';
 import { extension, PortStream, setupDnode, TabsManager } from './lib';
 import { ExtensionStorage, StorageLocalState } from './storage';
-import { KEEPERWALLET_DEBUG } from './ui/appConfig';
+import { PENUMBRAWALLET_DEBUG } from './ui/appConfig';
 import { CreateWalletInput, ISeedWalletInput } from './wallets';
 
 const bgPromise = setupBackgroundService();
@@ -38,7 +38,7 @@ async function setupBackgroundService() {
   });
 
   // global access to service on debug
-  if (KEEPERWALLET_DEBUG) {
+  if (PENUMBRAWALLET_DEBUG) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global as any).background = backgroundService;
   }

@@ -1,22 +1,7 @@
-// import { CognitoUser } from 'amazon-cognito-identity-js';
-// import { SwapVendor } from 'swap/constants';
-// import { AuthChallenge, IdentityUser } from 'controllers/IdentityController';
-// import { SwapAssetsParams, SwapAssetsResult } from 'controllers/SwapController';
-// import { IgnoreErrorsContext, KEEPERWALLET_DEBUG } from '../../constants';
-// import type { __BackgroundUiApiDirect } from 'background';
-// import { UiState } from 'ui/reducers/updateState';
-// import { IMoneyLike } from 'ui/utils/converters';
-// import type { StorageLocalState } from '../../storage/storage';
-// import { NetworkName } from 'networks/types';
-// import { AssetDetail } from 'assets/types';
-// import { MessageInputOfType } from 'messages/types';
-// import { CreateWalletInput } from 'wallets/types';
-// import { PreferencesAccount } from 'preferences/types';
-
 import { __BackgroundUiApiDirect } from '../../background';
 import { StorageLocalState } from '../../storage';
 import { CreateWalletInput, ISeedWalletInput } from '../../wallets';
-import { KEEPERWALLET_DEBUG } from '../appConfig';
+import { PENUMBRAWALLET_DEBUG } from '../appConfig';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function prepareErrorMessage(err: any) {
@@ -53,7 +38,7 @@ class Background {
     this.background = background;
 
     // global access to service on debug
-    if (KEEPERWALLET_DEBUG) {
+    if (PENUMBRAWALLET_DEBUG) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (global as any).background = background;
     }
