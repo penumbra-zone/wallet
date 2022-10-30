@@ -77,8 +77,13 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
               iconLeft={<ChevronLeftIcon stroke="#E0E0E0" />}
             />
           </div>
-          <p className="h1 mt-[40px] mb-[24px]">
+          <p className="h1 mt-[40px] mb-[16px]">
             Import wallet with recovery passphrase
+          </p>
+          <p className="text _body text-light_grey mb-[40px] w-[calc(75%-16px)]">
+            Only the first account in this wallet is automatically loaded. To
+            add additional accounts, after completing this process, click on the
+            drop-down menu and then select «Create Account».
           </p>
           <div className="flex flex-wrap gap-y-[8px] gap-x-[16px]">
             {selects.map((i) => (

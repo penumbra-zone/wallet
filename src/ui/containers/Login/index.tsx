@@ -1,22 +1,17 @@
 import { useState } from 'react';
-import { getSeedPhrase } from '../../../utils/getSeedPhrase';
-import { BackgroundType } from '../../../types';
+import { Button, Input } from '../../components';
 import Background from '../../services/Background';
 
 type LoginProps = {};
 
 export const Login: React.FC<LoginProps> = ({}) => {
-  // const { isWrongPass, isInitialized } = background.state;
-  // const { unlock, initVault } = background;
-
   const [password, setPassword] = useState<string>('');
-  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
 
-  const handleClickShowPassword = () => setShowPassword((state) => !state);
-
-  const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) =>
+  const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
+    setIsError(false);
+  };
 
   const handleSubmitPassword = async () => {
     try {
@@ -26,52 +21,35 @@ export const Login: React.FC<LoginProps> = ({}) => {
     }
   };
 
-  return (<></>
-    // <Box
-    //   sx={{
-    //     width: '100%',
-    //     height: '100%',
-    //     display: 'flex',
-    //     flexDirection: 'column',
-    //     alignItems: 'flex-start',
-    //     justifyContent: 'center',
-    //     paddingX: '5px',
-    //   }}
-    // >
-    //   <Typography sx={{ fontSize: '18px' }}>Enter password</Typography>
-    //   <FormControl sx={{ width: '100%', marginY: '10px' }} variant="outlined">
-    //     <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-    //     <OutlinedInput
-    //       id="outlined-adornment-password"
-    //       type={showPassword ? 'text' : 'password'}
-    //       value={password}
-    //       onChange={handleChangePassword}
-    //       endAdornment={
-    //         <InputAdornment position="end">
-    //           <IconButton
-    //             aria-label="toggle password visibility"
-    //             onClick={handleClickShowPassword}
-    //             edge="end"
-    //           >
-    //             {showPassword ? <VisibilityOff /> : <Visibility />}
-    //           </IconButton>
-    //         </InputAdornment>
-    //       }
-    //       label="Password"
-    //     />
-    //   </FormControl>
-    //   {isError && (
-    //     <Typography sx={{ fontSize: '14px', color: 'red' }}>
-    //       Wrong password
-    //     </Typography>
-    //   )}
-    //   <Button
-    //     variant="contained"
-    //     disabled={!password}
-    //     onClick={handleSubmitPassword}
-    //   >
-    //     Submit
-    //   </Button>
-    // </Box>
+  return (
+    <div className="w-[100%] flex items-center justify-center">
+      <div className="w-[400px] flex flex-col items-center justify-center">
+        <p className="h1">Welcome back!</p>
+        <p className="text _body text-light_grey mb-[40px] mt-[16px]">
+          A decentralized network awaits
+        </p>
+        <div className="w-[100%] mb-[24px]">
+          <Input
+            label="New Password"
+            placeholder="Password"
+            isError={isError}
+            helperText="Incorrect password"
+            value={password}
+            onChange={handleChangePassword}
+            customType="password"
+          />
+        </div>
+        <div className="w-[100%] mb-[60px] mt-[40px]">
+          <Button
+            title="Unlock"
+            mode="gradient"
+            onClick={handleSubmitPassword}
+          />
+        </div>
+        <p className="text _body text-light_grey">
+          Need help? Contact Penumbra support
+        </p>
+      </div>
+    </div>
   );
 };

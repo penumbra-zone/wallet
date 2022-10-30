@@ -33,8 +33,11 @@ function makeRandoms(notThis) {
   if (notThis < randoms.length) {
     removeArrayItem(notThis);
   }
+  const randomArr = [makeRandom(), makeRandom(), makeRandom()].sort(
+    (a, b) => a - b
+  );
 
-  return { r1: makeRandom(), r2: makeRandom(), r3: makeRandom() };
+  return { r1: randomArr[0], r2: randomArr[1], r3: randomArr[2] };
 }
 
 export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {

@@ -18,10 +18,10 @@ export const RootAccounts = () => {
 
   useEffect(() => {
     if (!isRedirect) return;
-    
+
     if (selectedAccount.name && isRedirect) return navigate(routesPath.HOME);
 
-    if (!state.isInitialized) return navigate(routesPath.IMPORT_SEED_PHRASE);
+    if (!state.isInitialized) return navigate(routesPath.WELCOME);
     if (state.isInitialized && !state.isLocked)
       return navigate(routesPath.SEED_PHRASE_RULES);
     if (state.isInitialized && state.isLocked)
