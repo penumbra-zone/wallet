@@ -44,6 +44,7 @@ export const Login: React.FC<LoginProps> = ({}) => {
             title="Unlock"
             mode="gradient"
             onClick={handleSubmitPassword}
+            disabled={!password}
           />
         </div>
         <p className="text _body text-light_grey">

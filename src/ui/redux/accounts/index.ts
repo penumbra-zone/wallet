@@ -6,6 +6,7 @@ type CreateAccountInput = {
   type: 'seed';
   name: string;
   seed: string;
+  addressByIndex: string
 };
 
 type Init = {

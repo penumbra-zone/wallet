@@ -22,7 +22,7 @@
     "loglevel": "^1.8.0",
     "obj-multiplex": "^1.0.0",
     "obs-store": "^4.0.3",
-    "penumbra-web-assembly": "^0.34.1-getFVK",
+    "penumbra-web-assembly": "^0.34.2-getAddressByIndex",
     "post-message-stream": "^3.0.0",
     "pump": "^3.0.0",
     "ramda": "^0.28.0",

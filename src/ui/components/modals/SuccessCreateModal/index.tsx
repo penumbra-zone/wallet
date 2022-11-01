@@ -4,7 +4,7 @@ import { Button } from '../../Button';
 import { Logo } from '../../Logo';
 import { ModalWrapper } from '../../ModalWrapper';
 
-type SuccessCreateModalProps = {
+export type SuccessCreateModalProps = {
   show: boolean;
   onClose: () => void;
 };

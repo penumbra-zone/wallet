@@ -3,6 +3,7 @@ import {
   CreatePassword,
   ImportSeed,
   Login,
+  Main,
   Rules,
   SeedPharseRules,
   SeedPhrase,
@@ -20,7 +21,7 @@ export const routes: RouteObject[] = [
     children: [
       {
         path: routesPath.HOME,
-        element: <>Account</>,
+        element: <Main />,
       },
       {
         path: routesPath.WELCOME,

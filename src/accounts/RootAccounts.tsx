@@ -16,11 +16,14 @@ export const RootAccounts = () => {
   const state = useAccountsSelector(selectState);
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
   const isRedirect = useAccountsSelector(selectRedirectToAccountPage);
+  const s = useAccountsSelector((s) => s);
+  console.log(s);
 
   useEffect(() => {
     if (!isRedirect) return;
 
-    if (selectedAccount.name && isRedirect) return navigate(routesPath.HOME);
+    if (selectedAccount.name && isRedirect && !state.isLocked)
+      return navigate(routesPath.HOME);
 
     if (!state.isInitialized) return navigate(routesPath.WELCOME);
     if (state.isInitialized && !state.isLocked)

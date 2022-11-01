@@ -84,7 +84,7 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
 
   const handleBack = () => navigate(routesPath.SEED_PHRASE);
   const handleSubmit = async () => {
-    await dispatch(createAccount(newAccount));
+    await dispatch(createAccount(newAccount as any));
     setIsShowModal(true);
   };
 

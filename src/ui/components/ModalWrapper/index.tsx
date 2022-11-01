@@ -6,6 +6,7 @@ type ModalWrapperPropsType = {
   onClose: () => void;
   className?: string;
   children: React.ReactElement;
+  position?: 'center' | 'top_right';
 };
 
 export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
@@ -13,6 +14,7 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
   onClose,
   children,
   className,
+  position = 'center',
 }) => {
   const [_document, setDocument] = useState<Document | null>(null);
 
@@ -25,25 +27,23 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
 
   const modalContent = show ? (
     <div
-      className="top-[0] w-[100%] h-[100vh] fixed bg-background-0.7 overflow-y-hidden z-150 "
+      className="top-[0] w-[100%] h-[100vh] fixed bg-background-0.7 overflow-y-hidden z-150"
       onClick={onClose}
     >
-      <div className={`w-[100%] h-[90vh] flex items-center justify-center `}>
+      <div className="flex items-center justify-center">
         <div
-          className={`bg-brown ${className} rounded-[15px]  p-[30px]`}
-          onClick={stopPropagation}
+          className={`w-[816px] h-[90vh] flex ${
+            position === 'center'
+              ? 'items-center justify-center'
+              : 'items-start justify-end mt-[100px]'
+          }`}
         >
-          {/* <div className="relative">
-            <div
-              className="cursor-pointer absolute right-[-2px] top-[-8px]"
-              onClick={onClose}
-              role="button"
-              tabIndex={0}
-            >
-              sadas
-            </div>
-          </div> */}
-          {children}
+          <div
+            className={`bg-brown rounded-[15px] p-[30px] ${className}`}
+            onClick={stopPropagation}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </div>

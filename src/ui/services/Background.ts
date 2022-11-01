@@ -261,17 +261,17 @@ class Background {
   //     }
   //   }
 
-  //   async lock(): Promise<void> {
-  //     try {
-  //       await this.initPromise;
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       await this._connect!();
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       return await this.background!.lock();
-  //     } catch (err) {
-  //       throw new Error(prepareErrorMessage(err));
-  //     }
-  //   }
+    async lock(): Promise<void> {
+      try {
+        await this.initPromise;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await this._connect!();
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return await this.background!.lock();
+      } catch (err) {
+        throw new Error(prepareErrorMessage(err));
+      }
+    }
 
   async unlock(password: string): Promise<void> {
     try {

@@ -11,7 +11,7 @@ export const SelectAction: React.FC<{}> = () => {
       <p className="h1 mb-[40px]">First time on Penumbra?</p>
       <div className="flex w-[100%]">
         <ActionBox
-          icon={<DowmloadSvg />}
+          icon={<DowmloadSvg stroke="#E0E0E0" />}
           header="No, I already have a recovery passphrase"
           descriptions="Import an existing wallet using the initial recovery passphrase"
           buttonTitle="Wallet import"

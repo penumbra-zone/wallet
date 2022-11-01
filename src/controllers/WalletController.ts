@@ -56,6 +56,9 @@ export class WalletController extends EventEmitter {
   }
 
   unlock(password: string) {
+     if (!password || typeof password !== 'string') {
+       throw new Error('Password is needed to init vault');
+     }
     this._restoreWallets(password);
     this._setPassword(password);
   }

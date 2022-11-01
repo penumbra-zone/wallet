@@ -1,5 +1,6 @@
 import {
   generate_spend_key,
+  get_address_by_index,
   get_full_viewing_key,
 } from 'penumbra-web-assembly';
 import { WalletPrivateDataOfType } from './types';
@@ -9,6 +10,8 @@ export interface ISeedWalletInput {
   seed: string;
   name: string;
 }
+
+
 
 export class SeedWallet extends Wallet<WalletPrivateDataOfType<'seed'>> {
   constructor({ seed, name }: ISeedWalletInput) {
@@ -23,7 +26,12 @@ export class SeedWallet extends Wallet<WalletPrivateDataOfType<'seed'>> {
     return {
       type: this.data.type,
       name: this.data.name,
-    } as any;
+      addressByIndex: this.getAddressByIndex(),
+    };
+  }
+
+  getAddressByIndex() {
+    return get_address_by_index(this.getFullViewingKey(), BigInt(0));
   }
 
   getSeed() {

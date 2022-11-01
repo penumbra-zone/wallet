@@ -59,7 +59,12 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
     );
     await Background.initVault(password);
     await dispatch(
-      createAccount({ seed: seedStr, type: 'seed', name: 'Wallet 1' })
+      createAccount({
+        seed: seedStr,
+        type: 'seed',
+        name: 'Wallet 1',
+        addressByIndex: ''
+      })
     );
     setIsShowModal(true);
   };
