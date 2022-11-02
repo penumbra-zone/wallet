@@ -1,6 +1,7 @@
 import EventEmitter from 'events';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  ClientController,
   IdleController,
   NetworkController,
   PreferencesController,
@@ -11,6 +12,7 @@ import {
 import { extension, PortStream, setupDnode, TabsManager } from './lib';
 import { ExtensionStorage, StorageLocalState } from './storage';
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig';
+import { getCompactBlockRange } from './utils';
 import { CreateWalletInput, ISeedWalletInput } from './wallets';
 
 const bgPromise = setupBackgroundService();
@@ -60,6 +62,7 @@ class BackgroundService extends EventEmitter {
   networkController;
   remoteConfigController;
   preferencesController;
+  clientController;
 
   constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
     super();
@@ -91,6 +94,9 @@ class BackgroundService extends EventEmitter {
     this.idleController = new IdleController({
       extensionStorage: this.extensionStorage,
       vaultController: this.vaultController,
+    });
+    this.clientController = new ClientController({
+      extensionStorage: this.extensionStorage,
     });
   }
 
@@ -146,6 +152,8 @@ class BackgroundService extends EventEmitter {
         this.walletController.getAccountFullViewingKey(password),
       getAccountSpendingKey: async (password: string) =>
         this.walletController.getAccountSpendingKey(password),
+      getCompactBlockRange: async () =>
+        this.clientController.getCompactBlockRange(),
     };
   }
   getInpageApi(origin: string, connectionId: string) {

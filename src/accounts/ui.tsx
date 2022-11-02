@@ -29,6 +29,9 @@ async function startUi() {
       return;
     }
 
+    console.log({ changes });
+    
+
     const stateChanges: Partial<Record<string, unknown>> &
       Partial<BackgroundGetStateResult> = await backgroundService.getState([
       'isInitialized',

@@ -27,6 +27,7 @@ export type StorageLocalState = {
     vault: string | undefined;
   };
   whitelist: string[];
+  startHeight: number
 };
 
 export type StorageSessionState = {

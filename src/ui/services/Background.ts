@@ -372,6 +372,17 @@ class Background {
         throw new Error(prepareErrorMessage(err));
       }
     }
+    async getCompactBlockRange(): Promise<void> {
+       try {
+         await this.initPromise;
+         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+         await this._connect!();
+         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+         return await this.background!.getCompactBlockRange();
+       } catch (err) {
+         throw new Error(prepareErrorMessage(err));
+       }
+    }
 
   //   async editWalletName(address: string, name: string, network: NetworkName) {
   //     try {

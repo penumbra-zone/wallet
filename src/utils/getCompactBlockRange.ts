@@ -16,7 +16,7 @@ import {
 import IndexedDb from './IndexedDb';
 import { extension } from '../lib';
 
-const CHAIN_ID = 'penumbra-testnet-chaldene';
+const CHAIN_ID = 'penumbra-testnet-aoede';
 
 const transport = createGrpcWebTransport({
   baseUrl: 'http://testnet.penumbra.zone:8080',
@@ -52,6 +52,7 @@ export const getChainParams = async () => {
 
 export const getCompactBlockRange = async () => {
   const startHeight = await extension.storage.local.get('startHeight');
+  console.log({ startHeight });
 
   const compactBlockRangeRequest = new CompactBlockRangeRequest();
   compactBlockRangeRequest.chainId = CHAIN_ID;
@@ -64,6 +65,8 @@ export const getCompactBlockRange = async () => {
     for await (const response of client.compactBlockRange(
       compactBlockRangeRequest
     )) {
+      // console.log(response);
+      
       extension.storage.local.set({ startHeight: Number(response.height) });
     }
   } catch (error) {

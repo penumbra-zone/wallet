@@ -15,7 +15,8 @@ import {
 } from '../../components';
 import { selectSelectedAccount, selectState } from '../../redux';
 import toast from 'react-hot-toast';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Background from '../../services/Background';
 
 type MainProps = {};
 
@@ -24,8 +25,7 @@ export type KeysModalType = '' | 'full_viewing_key' | 'spending_key';
 export const Main: React.FC<MainProps> = () => {
   const [isOpenMorePopup, setIsOpenMorePopup] = useState<boolean>(false);
   const [isOpenDetailPopup, setIsOpenDetailPopup] = useState<boolean>(false);
-  const [keyModalType, setKeyModalType] =
-    useState<KeysModalType>('');
+  const [keyModalType, setKeyModalType] = useState<KeysModalType>('');
 
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
   const state = useAccountsSelector(selectState);
