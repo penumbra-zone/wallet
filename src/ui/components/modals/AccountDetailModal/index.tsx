@@ -1,16 +1,18 @@
 import { useAccountsSelector } from '../../../../accounts';
+import { KeysModalType } from '../../../containers';
 import { selectSelectedAccount } from '../../../redux';
 import { Button } from '../../Button';
 import { ModalWrapper } from '../../ModalWrapper';
-import { CopySvg, SettingsSvg, SupportSvg } from '../../Svg';
 import { UserLogo } from '../../UserLogo';
 import { SuccessCreateModalProps } from '../SuccessCreateModal';
-import { PopupButton } from '../../PopupButton';
 
-export const AccountDetailModal: React.FC<SuccessCreateModalProps> = ({
-  show,
-  onClose,
-}) => {
+type AccountDetailModalProps = {
+  changeKeyModalType: (key: KeysModalType) => () => void;
+};
+
+export const AccountDetailModal: React.FC<
+  SuccessCreateModalProps & AccountDetailModalProps
+> = ({ show, onClose, changeKeyModalType }) => {
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
 
   return (
@@ -23,7 +25,7 @@ export const AccountDetailModal: React.FC<SuccessCreateModalProps> = ({
       <div>
         <div className="flex flex-col items-center border-b-[1px] border-solid border-dark_grey pb-[24px]">
           <UserLogo />
-          <p className="h2 mt-[12px] mb-[40px]">Wallet 1</p>
+          <p className="h2 mt-[12px] mb-[40px]">{selectedAccount.name}</p>
           <div className="w-[100%] px-[31px]">
             <div className="px-[16px] py-[8px] rounded-[15px] bg-dark_grey break-words">
               {selectedAccount.addressByIndex}
@@ -34,13 +36,13 @@ export const AccountDetailModal: React.FC<SuccessCreateModalProps> = ({
           <Button
             title="Export full viewing key"
             mode="gradient"
-            onClick={() => console.log('asd')}
+            onClick={changeKeyModalType('full_viewing_key')}
             className="w-[100%] py-[7px]"
           />
           <Button
             title="Export spending key"
             mode="gradient"
-            onClick={() => console.log('asd')}
+            onClick={changeKeyModalType('spending_key')}
             className="w-[100%] py-[7px] mt-[24px]"
           />
         </div>

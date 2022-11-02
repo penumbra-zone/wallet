@@ -9,6 +9,7 @@ import {
   CopySvg,
   DotsSvg,
   DowmloadSvg,
+  ExportKeyModal,
   MoreModal,
   Tabs,
 } from '../../components';
@@ -18,9 +19,13 @@ import { useState } from 'react';
 
 type MainProps = {};
 
+export type KeysModalType = '' | 'full_viewing_key' | 'spending_key';
+
 export const Main: React.FC<MainProps> = () => {
   const [isOpenMorePopup, setIsOpenMorePopup] = useState<boolean>(false);
   const [isOpenDetailPopup, setIsOpenDetailPopup] = useState<boolean>(false);
+  const [keyModalType, setKeyModalType] =
+    useState<KeysModalType>('');
 
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
   const state = useAccountsSelector(selectState);
@@ -42,6 +47,16 @@ export const Main: React.FC<MainProps> = () => {
   const handleAccountDetail = () => {
     setIsOpenMorePopup(false);
     setIsOpenDetailPopup(true);
+  };
+
+  const changeKeyModalType = (type: KeysModalType) => () => {
+    setKeyModalType(type);
+    setIsOpenDetailPopup(false);
+  };
+
+  const handleBackExportPopup = () => {
+    setIsOpenDetailPopup(true);
+    setKeyModalType('');
   };
 
   return (
@@ -146,6 +161,13 @@ export const Main: React.FC<MainProps> = () => {
       <AccountDetailModal
         show={isOpenDetailPopup}
         onClose={toggleDetailPopup(false)}
+        changeKeyModalType={changeKeyModalType}
+      />
+      <ExportKeyModal
+        type={keyModalType}
+        show={Boolean(keyModalType)}
+        onClose={changeKeyModalType('')}
+        handleBack={handleBackExportPopup}
       />
     </>
   );

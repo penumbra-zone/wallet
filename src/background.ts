@@ -82,12 +82,11 @@ class BackgroundService extends EventEmitter {
     this.walletController = new WalletController({
       extensionStorage: this.extensionStorage,
     });
-    
+
     this.vaultController = new VaultController({
       extensionStorage: this.extensionStorage,
       wallet: this.walletController,
     });
-
 
     this.idleController = new IdleController({
       extensionStorage: this.extensionStorage,
@@ -143,6 +142,10 @@ class BackgroundService extends EventEmitter {
         this.walletController.addWallet(account),
       selectAccount: async (lastAccount: ISeedWalletInput) =>
         this.preferencesController.selectAccount(lastAccount),
+      getAccountFullViewingKey: async (password: string) =>
+        this.walletController.getAccountFullViewingKey(password),
+      getAccountSpendingKey: async (password: string) =>
+        this.walletController.getAccountSpendingKey(password),
     };
   }
   getInpageApi(origin: string, connectionId: string) {

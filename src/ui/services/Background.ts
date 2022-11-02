@@ -345,25 +345,33 @@ class Background {
   //     }
   //   }
 
-  //   async getAccountPrivateKey(
-  //     address: string,
-  //     network: NetworkName,
-  //     password: string
-  //   ): Promise<string> {
-  //     try {
-  //       await this.initPromise;
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       await this._connect!();
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       return await this.background!.getAccountPrivateKey(
-  //         address,
-  //         network,
-  //         password
-  //       );
-  //     } catch (err) {
-  //       throw new Error(prepareErrorMessage(err));
-  //     }
-  //   }
+    async getAccountFullViewingKey(
+      password: string
+    ): Promise<string> {
+      try {
+        await this.initPromise;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await this._connect!();
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return await this.background!.getAccountFullViewingKey(password);
+      } catch (err) {
+        throw new Error(prepareErrorMessage(err));
+      }
+    }
+
+   async getAccountSpendingKey(
+      password: string
+    ): Promise<string> {
+      try {
+        await this.initPromise;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await this._connect!();
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return await this.background!.getAccountSpendingKey(password);
+      } catch (err) {
+        throw new Error(prepareErrorMessage(err));
+      }
+    }
 
   //   async editWalletName(address: string, name: string, network: NetworkName) {
   //     try {

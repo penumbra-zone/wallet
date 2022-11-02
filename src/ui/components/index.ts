@@ -18,6 +18,7 @@ export * from './modals/AccountModal';
 export * from './modals/NetworkModal';
 export * from './modals/MoreModal';
 export * from './modals/AccountDetailModal';
+export * from './modals/ExportKeyModal';
 
 //forms
 export * from './forms/CreatePasswordForm';

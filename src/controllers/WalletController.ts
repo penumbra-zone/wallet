@@ -56,9 +56,9 @@ export class WalletController extends EventEmitter {
   }
 
   unlock(password: string) {
-     if (!password || typeof password !== 'string') {
-       throw new Error('Password is needed to init vault');
-     }
+    if (!password || typeof password !== 'string') {
+      throw new Error('Password is needed to init vault');
+    }
     this._restoreWallets(password);
     this._setPassword(password);
   }
@@ -81,6 +81,20 @@ export class WalletController extends EventEmitter {
   lock() {
     this._setPassword(null);
     this.wallets = [];
+  }
+
+  getAccountFullViewingKey(password: string) {
+    if (!password) throw new Error('Password is required');
+    this._restoreWallets(password);
+
+    return this.wallets[0].getFullViewingKey();
+  }
+
+  getAccountSpendingKey(password: string) {
+    if (!password) throw new Error('Password is required');
+    this._restoreWallets(password);
+
+    return this.wallets[0].getSpendKey();
   }
 
   _restoreWallets(password: string | null | undefined) {

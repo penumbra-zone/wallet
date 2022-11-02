@@ -10,9 +10,9 @@ export abstract class Wallet<TData extends WalletPrivateData> {
 
   abstract getAccount(): WalletAccount;
   abstract getSeed(): string;
-  //   getEncodedSeed() {
-  //     return base58Encode(this.getSeed());
-  //   }
+  abstract getFullViewingKey(): string;
+  abstract getSpendKey(): string;
+
   serialize() {
     return this.data;
   }
