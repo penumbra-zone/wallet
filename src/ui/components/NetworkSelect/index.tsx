@@ -1,3 +1,6 @@
+import { useCallback } from 'react';
+import { useAccountsSelector } from '../../../accounts';
+import { selectCurNetwork, selectNetworks } from '../../redux';
 import { ChevronLeftIcon } from '../Svg';
 
 type NetworkSelectProps = {
@@ -10,6 +13,13 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
   className,
   onClick,
 }) => {
+  const networks = useAccountsSelector(selectNetworks);
+  const currentNetworkName = useAccountsSelector(selectCurNetwork);
+
+  const currrentNetwork = useCallback(() => {
+    return networks.find((i) => i.name === currentNetworkName);
+  }, [networks, currentNetworkName]);
+
   return (
     <div
       onClick={onClick}
@@ -18,8 +28,9 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
     >
       <div className="flex items-center">
         <div className="w-[8px] h-[8px] bg-[#608E84] rounded-[50%] mr-[10px]"></div>
-        <p className="text_button">Penumbra Mainnet</p>
+        <p className="text_button">{currrentNetwork().code}</p>
       </div>
+
       <div className={`${!isOpen ? 'rotate-[270deg]' : 'rotate-[90deg]'}`}>
         <ChevronLeftIcon />
       </div>

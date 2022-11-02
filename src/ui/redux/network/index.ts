@@ -5,7 +5,11 @@ import { DEFAULT_LEGACY_CONFIG } from '../../../lib';
 
 type Init = {
   currentNetwork: NetworkName;
-  networks: typeof DEFAULT_LEGACY_CONFIG.NETWORK_CONFIG[];
+  networks: {
+    code: string;
+    name: string;
+    server: string;
+  }[];
   customCodes: Record<NetworkName, string | null | undefined>;
   customNodes: Record<NetworkName, string | null | undefined>;
 };

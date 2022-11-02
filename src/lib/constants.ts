@@ -5,7 +5,7 @@ export const DEFAULT_LEGACY_CONFIG = {
   NETWORKS: ['testnet'],
   NETWORK_CONFIG: {
     testnet: {
-      code: 'T',
+      code: 'penumbra-testnet-aoede',
       server: 'http://testnet.penumbra.zone:8080',
     },
   },

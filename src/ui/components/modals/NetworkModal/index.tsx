@@ -1,3 +1,6 @@
+import { Fragment } from 'react';
+import { useAccountsSelector } from '../../../../accounts';
+import { selectCurNetwork, selectNetworks } from '../../../redux';
 import { Button } from '../../Button';
 import { ModalWrapper } from '../../ModalWrapper';
 import { PopupButton } from '../../PopupButton';
@@ -7,6 +10,8 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
   show,
   onClose,
 }) => {
+  const networks = useAccountsSelector(selectNetworks);
+  const currentNetworkName = useAccountsSelector(selectCurNetwork);
   return (
     <ModalWrapper
       show={show}
@@ -19,12 +24,21 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
           Networks
         </p>
         <div className="pt-[24px]">
-          <PopupButton
-            svg={
-              <div className="w-[8px] h-[8px] bg-[#608E84] rounded-[50%] mr-[8px]"></div>
-            }
-            text="Penumbra Mainnet"
-          />
+          {networks.map((i) => (
+            <Fragment key={i.name}>
+              <PopupButton
+                svg={
+                  <div
+                    className={`w-[8px] h-[8px] ${
+                      currentNetworkName === i.name ? 'bg-[#608E84]' : 'bg-red'
+                    } rounded-[50%] mr-[8px]`}
+                  ></div>
+                }
+                text={i.code}
+              />
+            </Fragment>
+          ))}
+
           <div className="w-[100%] mt-[40px] px-[16px]">
             <Button
               title="Change"
