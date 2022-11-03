@@ -12,7 +12,6 @@ import {
 import { extension, PortStream, setupDnode, TabsManager } from './lib';
 import { ExtensionStorage, StorageLocalState } from './storage';
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig';
-import { getCompactBlockRange } from './utils';
 import { CreateWalletInput, ISeedWalletInput } from './wallets';
 
 const bgPromise = setupBackgroundService();
@@ -44,6 +43,8 @@ async function setupBackgroundService() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global as any).background = backgroundService;
   }
+
+  backgroundService.clientController.getCompactBlockRange();
 
   const tabsManager = new TabsManager({ extensionStorage });
   backgroundService.on('Show tab', async (url, name) => {
@@ -95,8 +96,11 @@ class BackgroundService extends EventEmitter {
       extensionStorage: this.extensionStorage,
       vaultController: this.vaultController,
     });
+
     this.clientController = new ClientController({
       extensionStorage: this.extensionStorage,
+      getAccountFullViewingKey: () =>
+        this.walletController.getAccountFullViewingKeyWithoutPassword(),
     });
   }
 
@@ -154,6 +158,8 @@ class BackgroundService extends EventEmitter {
         this.walletController.getAccountSpendingKey(password),
       getCompactBlockRange: async () =>
         this.clientController.getCompactBlockRange(),
+      getAssets: async () => this.clientController.getAssets(),
+      getChainParams: async () => this.clientController.getChainParams(),
     };
   }
   getInpageApi(origin: string, connectionId: string) {

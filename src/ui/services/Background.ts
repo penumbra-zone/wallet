@@ -261,17 +261,17 @@ class Background {
   //     }
   //   }
 
-    async lock(): Promise<void> {
-      try {
-        await this.initPromise;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await this._connect!();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return await this.background!.lock();
-      } catch (err) {
-        throw new Error(prepareErrorMessage(err));
-      }
+  async lock(): Promise<void> {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.lock();
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
     }
+  }
 
   async unlock(password: string): Promise<void> {
     try {
@@ -345,44 +345,64 @@ class Background {
   //     }
   //   }
 
-    async getAccountFullViewingKey(
-      password: string
-    ): Promise<string> {
-      try {
-        await this.initPromise;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await this._connect!();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return await this.background!.getAccountFullViewingKey(password);
-      } catch (err) {
-        throw new Error(prepareErrorMessage(err));
-      }
+  async getAccountFullViewingKey(password: string): Promise<string> {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.getAccountFullViewingKey(password);
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
     }
+  }
 
-   async getAccountSpendingKey(
-      password: string
-    ): Promise<string> {
-      try {
-        await this.initPromise;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await this._connect!();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return await this.background!.getAccountSpendingKey(password);
-      } catch (err) {
-        throw new Error(prepareErrorMessage(err));
-      }
+  async getAccountSpendingKey(password: string): Promise<string> {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.getAccountSpendingKey(password);
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
     }
-    async getCompactBlockRange(): Promise<void> {
-       try {
-         await this.initPromise;
-         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-         await this._connect!();
-         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-         return await this.background!.getCompactBlockRange();
-       } catch (err) {
-         throw new Error(prepareErrorMessage(err));
-       }
+  }
+  async getCompactBlockRange(): Promise<void> {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.getCompactBlockRange();
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
     }
+  }
+
+  async getAssets(): Promise<void> {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.getAssets();
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
+    }
+  }
+
+   async getChainParams(): Promise<void> {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.getChainParams();
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
+    }
+  }
 
   //   async editWalletName(address: string, name: string, network: NetworkName) {
   //     try {

@@ -1,26 +1,31 @@
 import { IDBPDatabase, openDB } from 'idb';
 
-class IndexedDb {
+export class IndexedDb {
   private database: string;
   private db: any;
 
-  constructor(database: string) {
-    this.database = database;
+  constructor() {
+    this.database = 'penumbra';
+    this.createObjectStore();
   }
 
-  public async createObjectStore(tableNames: string[], keyPath: string) {
+  public async createObjectStore() {
     try {
       this.db = await openDB(this.database, 2, {
         upgrade(db: IDBPDatabase) {
-          for (const tableName of tableNames) {
-            if (db.objectStoreNames.contains(tableName)) {
-              continue;
-            }
-            db.createObjectStore(tableName, {
-              autoIncrement: true,
-              keyPath,
-            });
-          }
+          db.createObjectStore('assets', {
+            autoIncrement: true,
+            keyPath: 'denom',
+          });
+
+          db.createObjectStore('chain', {
+            autoIncrement: true,
+            keyPath: 'chainId',
+          });
+          db.createObjectStore('notes', {
+            autoIncrement: true,
+            keyPath: 'note_commitment',
+          });
         },
       });
     } catch (error) {
@@ -71,5 +76,3 @@ class IndexedDb {
     return id;
   }
 }
-
-export default IndexedDb;

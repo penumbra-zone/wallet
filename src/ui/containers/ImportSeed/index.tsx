@@ -24,7 +24,32 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const [seed, setSeed] = useState({});
+  const [seed, setSeed] = useState({
+    1: 'nose',
+    2: 'expose',
+    3: 'distance',
+    4: 'call',
+    5: 'output',
+    6: 'ivory',
+    7: 'supply',
+    8: 'produce',
+    9: 'lawn',
+    10: 'romance',
+    11: 'clinic',
+    12: 'shoulder',
+    13: 'eye',
+    14: 'rely',
+    15: 'soon',
+    16: 'beef',
+    17: 'sense',
+    18: 'thought',
+    19: 'barrel',
+    20: 'lizard',
+    21: 'trial',
+    22: 'inflict',
+    23: 'repair',
+    24: 'find',
+  });
   const [isValidMnemonic, setIsValidMnemonic] = useState<boolean>(true);
   const [isShowModal, setIsShowModal] = useState<boolean>(false);
 
@@ -63,7 +88,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
         seed: seedStr,
         type: 'seed',
         name: 'Wallet 1',
-        addressByIndex: ''
+        addressByIndex: '',
       })
     );
     setIsShowModal(true);

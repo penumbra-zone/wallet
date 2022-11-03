@@ -1,6 +1,12 @@
-import { useCallback } from 'react';
-import { useAccountsSelector } from '../../../accounts';
-import { selectCurNetwork, selectNetworks } from '../../redux';
+import { useCallback, useEffect } from 'react';
+import { useAccountsSelector, useAppDispatch } from '../../../accounts';
+import {
+  getLastBlockHeight,
+  selectCurNetwork,
+  selectLastExistBlock,
+  selectLastSavedBlock,
+  selectNetworks,
+} from '../../redux';
 import { ChevronLeftIcon } from '../Svg';
 
 type NetworkSelectProps = {
@@ -13,12 +19,22 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
   className,
   onClick,
 }) => {
+  const dispatch = useAppDispatch();
   const networks = useAccountsSelector(selectNetworks);
   const currentNetworkName = useAccountsSelector(selectCurNetwork);
+  const lastExistBlock = useAccountsSelector(selectLastExistBlock);
+  const lastSavedBlock = useAccountsSelector(selectLastSavedBlock);
+
+  console.log({ lastExistBlock, lastSavedBlock });
+  
 
   const currrentNetwork = useCallback(() => {
     return networks.find((i) => i.name === currentNetworkName);
   }, [networks, currentNetworkName]);
+
+  useEffect(() => {
+    dispatch(getLastBlockHeight());
+  }, []);
 
   return (
     <div

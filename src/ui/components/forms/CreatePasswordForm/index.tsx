@@ -18,8 +18,8 @@ export const CreatePasswordForm: React.FC<CreatePasswordFormProps> = ({
     newPass: string;
     confirmPass: string;
   }>({
-    newPass: '',
-    confirmPass: '',
+    newPass: '1qazXsw@',
+    confirmPass: '1qazXsw@',
   });
   const [isValidate, setIsValidate] = useState<PasswordValidatorsType>(
     {} as PasswordValidatorsType
@@ -90,14 +90,14 @@ export const CreatePasswordForm: React.FC<CreatePasswordFormProps> = ({
         <Button
           title={buttonTitle}
           mode="gradient"
-          disabled={
-            !(
-              Boolean(Object.values(isValidate).length) &&
-              !Object.values(isValidate).includes(false) &&
-              password.confirmPass === password.newPass &&
-              isChecked
-            )
-          }
+          // disabled={
+          //   !(
+          //     Boolean(Object.values(isValidate).length) &&
+          //     !Object.values(isValidate).includes(false) &&
+          //     password.confirmPass === password.newPass &&
+          //     isChecked
+          //   )
+          // }
           onClick={onClick(password.newPass)}
         />
       </div>

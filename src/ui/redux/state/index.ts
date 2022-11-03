@@ -4,6 +4,7 @@ import { AccountsState } from '../../../accounts/rootReducer';
 type Init = {
   isInitialized: boolean | undefined;
   isLocked: boolean;
+  
 };
 
 const init: Init = {

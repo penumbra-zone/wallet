@@ -158,7 +158,7 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
             <Button
               title="Confirm"
               mode="gradient"
-              disabled={Object.values(isError).includes(false)}
+              // disabled={Object.values(isError).includes(false)}
               onClick={handleSubmit}
             />
           </div>

@@ -37,6 +37,27 @@ export const Main: React.FC<MainProps> = () => {
     });
   };
 
+  const checkFirstLoad = async () => {
+    const lastSavedBlock = await Background.getState(['lastSavedBlock']);
+    if (lastSavedBlock.lastSavedBlock === 1) {
+      await Background.getCompactBlockRange();
+    }
+  };
+
+  const saveToDB = async () => {
+    await Background.getChainParams();
+    await Background.getAssets();
+  };
+
+  useEffect(() => {
+    checkFirstLoad();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedAccount.addressByIndex) return;
+    saveToDB();
+  }, [selectedAccount]);
+
   if (state.isLocked) return <></>;
 
   const toggleMorePopup = (value: boolean) => () => setIsOpenMorePopup(value);

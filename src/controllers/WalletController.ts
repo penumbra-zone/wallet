@@ -90,6 +90,14 @@ export class WalletController extends EventEmitter {
     return this.wallets[0].getFullViewingKey();
   }
 
+  getAccountFullViewingKeyWithoutPassword() {
+    try {
+      return this.wallets[0].getFullViewingKey();
+    } catch (error) {
+      return '';
+    }
+  }
+
   getAccountSpendingKey(password: string) {
     if (!password) throw new Error('Password is required');
     this._restoreWallets(password);
