@@ -27,10 +27,6 @@ export function createUpdateState(store: AccountsStore) {
 
     if (state.lastSavedBlock) {
       dispatch(accountsActions.setLastSavedBlock(state.lastSavedBlock));
-      console.log(
-        +currentState.accounts.lastSavedBlock -
-          +currentState.accounts.lastExistBlock
-      );
 
       if (
         currentState.accounts.lastSavedBlock -

@@ -15,6 +15,7 @@ import { IndexedDb } from '../utils';
 import { CompactBlock } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
 import { decrypt_note } from 'penumbra-web-assembly';
 import { WalletController } from './WalletController';
+import { extension } from '../lib';
 
 export class ClientController {
   transport;
@@ -77,7 +78,6 @@ export class ClientController {
     } catch (error) {
       fvk = '';
     }
-
     if (!fvk) {
       return;
     }
@@ -90,8 +90,8 @@ export class ClientController {
       for await (const response of this.client.compactBlockRange(
         compactBlockRangeRequest
       )) {
-        this.store.updateState({ lastSavedBlock: Number(response.height) });
         this.scanBlock(response, fvk);
+        extension.storage.local.set({ lastSavedBlock: Number(response.height) });
       }
     } catch (error) {}
   }
