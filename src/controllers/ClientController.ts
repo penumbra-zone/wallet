@@ -77,6 +77,7 @@ export class ClientController {
     } catch (error) {
       fvk = '';
     }
+
     if (!fvk) {
       return;
     }
@@ -89,8 +90,8 @@ export class ClientController {
       for await (const response of this.client.compactBlockRange(
         compactBlockRangeRequest
       )) {
-        this.scanBlock(response, fvk);
         this.store.updateState({ lastSavedBlock: Number(response.height) });
+        this.scanBlock(response, fvk);
       }
     } catch (error) {}
   }

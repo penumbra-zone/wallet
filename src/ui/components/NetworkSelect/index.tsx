@@ -42,6 +42,8 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
       className={`h-[52px] w-[296px] px-[20px] bg-brown rounded-[15px] border-[1px] border-solid border-dark_grey flex items-center justify-between cursor-pointer
       ${className}`}
     >
+      <p>lastExistBlock: {lastExistBlock}</p>
+      <p>lastSavedBlock: {lastSavedBlock}</p>
       <div className="flex items-center">
         <div className="w-[8px] h-[8px] bg-[#608E84] rounded-[50%] mr-[10px]"></div>
         <p className="text_button">{currrentNetwork().code}</p>

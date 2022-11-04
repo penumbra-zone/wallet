@@ -16,6 +16,7 @@ export const Login: React.FC<LoginProps> = ({}) => {
   const handleSubmitPassword = async () => {
     try {
       await Background.unlock(password);
+      await Background.getCompactBlockRange();
     } catch {
       setIsError(true);
     }
