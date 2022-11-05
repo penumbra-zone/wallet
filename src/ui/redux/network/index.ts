@@ -1,15 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AccountsState } from '../../../accounts/rootReducer';
-import { NetworkName } from '../../../controllers';
+import { NetworkConfigItem, NetworkName } from '../../../controllers';
 import { DEFAULT_LEGACY_CONFIG } from '../../../lib';
 
 type Init = {
   currentNetwork: NetworkName;
-  networks: {
-    code: string;
+  networks: (NetworkConfigItem & {
     name: string;
-    server: string;
-  }[];
+  })[];
   customCodes: Record<NetworkName, string | null | undefined>;
   customNodes: Record<NetworkName, string | null | undefined>;
 };

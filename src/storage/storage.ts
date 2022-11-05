@@ -4,17 +4,16 @@ import asStream from 'obs-store/lib/asStream';
 import debounceStream from 'debounce-stream';
 import log from 'loglevel';
 import { createStreamSink, DEFAULT_LEGACY_CONFIG, extension } from '../lib';
-import { NetworkName } from '../controllers';
+import { NetworkConfigItem, NetworkName } from '../controllers';
 import { WalletAccount } from '../preferences';
 
 export type StorageLocalState = {
   selectedAccount: WalletAccount | undefined;
   isInitialized: boolean | null;
   isLocked: boolean | null;
-  blacklist: string[];
   config: {
-    networks: typeof DEFAULT_LEGACY_CONFIG.NETWORKS;
-    network_config: typeof DEFAULT_LEGACY_CONFIG.NETWORK_CONFIG;
+    networks: string[];
+    network_config: NetworkConfigItem;
     messages_config: typeof DEFAULT_LEGACY_CONFIG.MESSAGES_CONFIG;
     pack_config: typeof DEFAULT_LEGACY_CONFIG.PACK_CONFIG;
     idle: typeof DEFAULT_LEGACY_CONFIG.IDLE;
@@ -26,7 +25,6 @@ export type StorageLocalState = {
   WalletController: {
     vault: string | undefined;
   };
-  whitelist: string[];
   lastSavedBlock: number;
 };
 

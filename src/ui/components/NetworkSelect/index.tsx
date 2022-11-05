@@ -53,7 +53,7 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
           <ProgressBar percent={percent} />
         </div>
       )}
-      <p className="text_button">{currrentNetwork().code}</p>
+      <p className="text_button">{currrentNetwork().chainId}</p>
     </div>
   );
 };

@@ -5,7 +5,6 @@ export const DEFAULT_LEGACY_CONFIG = {
   NETWORKS: ['testnet'],
   NETWORK_CONFIG: {
     testnet: {
-      code: 'penumbra-testnet-aoede',
       server: 'http://testnet.penumbra.zone:8080',
     },
   },
@@ -30,3 +29,5 @@ export const DEFAULT_LEGACY_CONFIG = {
     '1h': 60 * 60 * 1000,
   },
 };
+
+export const TESTNET_URL = 'http://testnet.penumbra.zone:8080';

@@ -15,45 +15,61 @@ import { IndexedDb } from '../utils';
 import { CompactBlock } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
 import { decrypt_note } from 'penumbra-web-assembly';
 import { WalletController } from './WalletController';
-import { extension } from '../lib';
+import { extension, TESTNET_URL } from '../lib';
+import { RemoteConfigController } from './RemoteConfigController';
+import { NetworkController } from './NetworkController';
 
 export class ClientController {
-  transport;
-  client;
   store;
   db;
-  getAccountFullViewingKey;
   extensionStorage;
   indexedDb;
+  private configApi;
 
   constructor({
     extensionStorage,
     getAccountFullViewingKey,
+    setNetworks,
+    getNetwork,
+    getNetworkConfig,
   }: {
     extensionStorage: ExtensionStorage;
     getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword'];
+    setNetworks: RemoteConfigController['setNetworks'];
+    getNetwork: NetworkController['getNetwork'];
+    getNetworkConfig: RemoteConfigController['getNetworkConfig'];
   }) {
     this.store = new ObservableStore(
       extensionStorage.getInitState({ lastSavedBlock: 1 })
     );
-    this.getAccountFullViewingKey = getAccountFullViewingKey;
-    // this.db = new IndexedDb()
-
+    this.configApi = {
+      getAccountFullViewingKey,
+      setNetworks,
+      getNetwork,
+      getNetworkConfig,
+    };
     extensionStorage.subscribe(this.store);
-
-    this.transport = createGrpcWebTransport({
-      baseUrl: 'http://testnet.penumbra.zone:8080',
-    });
-    this.client = createPromiseClient(ObliviousQuery, this.transport);
 
     this.indexedDb = new IndexedDb();
   }
 
   async getAssets() {
-    const assetsRequest = new AssetListRequest();
-    assetsRequest.chainId = 'penumbra-testnet-aoede';
+    const assets = await this.indexedDb.getAllValue('assets');
 
-    const res = await this.client.assetList(assetsRequest);
+    if (assets.length) return;
+
+    const { server, chainId } =
+      this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
+
+    const transport = createGrpcWebTransport({
+      baseUrl: server,
+    });
+    const client = createPromiseClient(ObliviousQuery, transport);
+
+    const assetsRequest = new AssetListRequest();
+    assetsRequest.chainId = chainId;
+
+    const res = await client.assetList(assetsRequest);
     const newRes = res.assets.map((asset) => ({
       id: asset.id?.inner,
       denom: asset.denom?.denom,
@@ -63,18 +79,28 @@ export class ClientController {
   }
 
   async getChainParams() {
+    const chain = await this.indexedDb.getAllValue('chain');
+
+    if (chain.length) return;
+
+    const baseUrl =
+      this.configApi.getNetworkConfig()[this.configApi.getNetwork()].server;
+
+    const transport = createGrpcWebTransport({
+      baseUrl,
+    });
+    const client = createPromiseClient(ObliviousQuery, transport);
+
     const chainParameters = new ChainParamsRequest();
-    chainParameters.chainId = 'penumbra-testnet-aoede';
-
-    const res = await this.client.chainParameters(chainParameters);
-
+    const res = await client.chainParameters(chainParameters);
     await this.indexedDb.putValue('chain', res);
+    await this.configApi.setNetworks(res.chainId, this.configApi.getNetwork());
   }
 
   async getCompactBlockRange() {
     let fvk;
     try {
-      fvk = this.getAccountFullViewingKey();
+      fvk = this.configApi.getAccountFullViewingKey();
     } catch (error) {
       fvk = '';
     }
@@ -82,12 +108,20 @@ export class ClientController {
       return;
     }
 
+    const { server, chainId } =
+      this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
+
+    const transport = createGrpcWebTransport({
+      baseUrl: server,
+    });
+    const client = createPromiseClient(ObliviousQuery, transport);
+
     const compactBlockRangeRequest = new CompactBlockRangeRequest();
-    compactBlockRangeRequest.chainId = 'penumbra-testnet-aoede';
+    compactBlockRangeRequest.chainId = chainId;
     compactBlockRangeRequest.startHeight = this.store.getState().lastSavedBlock;
     compactBlockRangeRequest.keepAlive = true;
     try {
-      for await (const response of this.client.compactBlockRange(
+      for await (const response of client.compactBlockRange(
         compactBlockRangeRequest
       )) {
         this.scanBlock(response, fvk);

@@ -4,6 +4,7 @@ import {
   ClientController,
   IdleController,
   NetworkController,
+  NetworkName,
   PreferencesController,
   RemoteConfigController,
   VaultController,
@@ -101,6 +102,10 @@ class BackgroundService extends EventEmitter {
       extensionStorage: this.extensionStorage,
       getAccountFullViewingKey: () =>
         this.walletController.getAccountFullViewingKeyWithoutPassword(),
+      setNetworks: (networkName: string, type: NetworkName) =>
+        this.remoteConfigController.setNetworks(networkName, type),
+      getNetwork: () => this.networkController.getNetwork(),
+      getNetworkConfig: () => this.remoteConfigController.getNetworkConfig()
     });
   }
 

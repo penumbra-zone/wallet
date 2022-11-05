@@ -47,7 +47,7 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
                     {lastSavedBlock}/{lastExistBlock}
                   </p>
                 }
-                text={i.code}
+                text={i.chainId}
               />
             </Fragment>
           ))}

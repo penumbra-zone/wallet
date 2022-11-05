@@ -40,6 +40,19 @@ export function createUpdateState(store: AccountsStore) {
       dispatch(networkActions.setNetworks(state.networks));
     }
 
+    if (state.config) {
+      dispatch(
+        networkActions.setNetworks(
+          Object.entries(state.config.network_config).map(
+            (i: [string, any]) => ({
+              name: i[0],
+              ...i[1],
+            })
+          )
+        )
+      );
+    }
+
     const customNodes = getParam(state.customNodes, {});
     if (customNodes && !equals(currentState.network.customNodes, customNodes)) {
       dispatch(networkActions.setCustomNodes(customNodes));

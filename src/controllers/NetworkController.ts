@@ -4,6 +4,7 @@ import { RemoteConfigController } from './RemoteConfigController';
 
 export enum NetworkName {
   Testnet = 'testnet',
+  MAINNET = 'mainnet',
 }
 
 export class NetworkController {
@@ -24,9 +25,11 @@ export class NetworkController {
         currentNetwork: NetworkName.Testnet,
         customNodes: {
           testnet: null,
+          mainnet: null,
         },
         customCodes: {
           testnet: null,
+          mainnet: null,
         },
       })
     );
@@ -38,6 +41,7 @@ export class NetworkController {
 
   getNetworks() {
     const networks = this.configApi.getNetworkConfig();
+
     return this.configApi
       .getNetworks()
       .map((name) => ({ ...networks[name], name }));
