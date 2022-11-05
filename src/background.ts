@@ -41,11 +41,10 @@ async function setupBackgroundService() {
 
   // global access to service on debug
   if (PENUMBRAWALLET_DEBUG) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (global as any).background = backgroundService;
+    global.background = backgroundService;
   }
 
-  // backgroundService.clientController.getCompactBlockRange();
+  backgroundService.clientController.getCompactBlockRange();
 
   const tabsManager = new TabsManager({ extensionStorage });
   backgroundService.on('Show tab', async (url, name) => {
@@ -105,7 +104,7 @@ class BackgroundService extends EventEmitter {
       setNetworks: (networkName: string, type: NetworkName) =>
         this.remoteConfigController.setNetworks(networkName, type),
       getNetwork: () => this.networkController.getNetwork(),
-      getNetworkConfig: () => this.remoteConfigController.getNetworkConfig()
+      getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
     });
   }
 

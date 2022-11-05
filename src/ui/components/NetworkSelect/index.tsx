@@ -26,11 +26,10 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const networks = useAccountsSelector(selectNetworks);
+  const currentNetwork = useAccountsSelector(selectCurNetwork);
   const currentNetworkName = useAccountsSelector(selectCurNetwork);
   const lastExistBlock = useAccountsSelector(selectLastExistBlock);
   const lastSavedBlock = useAccountsSelector(selectLastSavedBlock);
-
-  const percent = percentage(lastSavedBlock, lastExistBlock);
 
   const currrentNetwork = useCallback(() => {
     return networks.find((i) => i.name === currentNetworkName);
@@ -39,6 +38,8 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
   useEffect(() => {
     dispatch(getLastBlockHeight());
   }, []);
+
+  const percent = percentage(lastSavedBlock[currentNetwork], lastExistBlock);
 
   return (
     <div

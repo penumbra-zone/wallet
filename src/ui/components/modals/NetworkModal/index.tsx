@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { useAccountsSelector } from '../../../../accounts';
 import {
+  selectCurNetwork,
   selectLastExistBlock,
   selectLastSavedBlock,
   selectNetworks,
@@ -19,8 +20,14 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
   const networks = useAccountsSelector(selectNetworks);
   const lastExistBlock = useAccountsSelector(selectLastExistBlock);
   const lastSavedBlock = useAccountsSelector(selectLastSavedBlock);
+  const currentNetwork = useAccountsSelector(selectCurNetwork);
 
-  const percent = percentage(lastSavedBlock, lastExistBlock);
+  console.log({
+    lastSavedBlock: lastSavedBlock[currentNetwork],
+    lastExistBlock,
+  });
+
+  const percent = percentage(lastSavedBlock[currentNetwork], lastExistBlock);
 
   return (
     <ModalWrapper
@@ -44,7 +51,7 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
                 }
                 rightChild={
                   <p className="text-light_grey text-[10px] pl-[8px]">
-                    {lastSavedBlock}/{lastExistBlock}
+                    {lastSavedBlock[i.name]}/{lastExistBlock}
                   </p>
                 }
                 text={i.chainId}

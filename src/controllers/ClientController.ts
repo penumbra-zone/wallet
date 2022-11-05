@@ -40,7 +40,12 @@ export class ClientController {
     getNetworkConfig: RemoteConfigController['getNetworkConfig'];
   }) {
     this.store = new ObservableStore(
-      extensionStorage.getInitState({ lastSavedBlock: 1 })
+      extensionStorage.getInitState({
+        lastSavedBlock: {
+          mainnet: 0,
+          testnet: 0,
+        },
+      })
     );
     this.configApi = {
       getAccountFullViewingKey,
@@ -118,15 +123,23 @@ export class ClientController {
 
     const compactBlockRangeRequest = new CompactBlockRangeRequest();
     compactBlockRangeRequest.chainId = chainId;
-    compactBlockRangeRequest.startHeight = this.store.getState().lastSavedBlock;
+    compactBlockRangeRequest.startHeight =
+      this.store.getState().lastSavedBlock[this.configApi.getNetwork()];
     compactBlockRangeRequest.keepAlive = true;
     try {
       for await (const response of client.compactBlockRange(
         compactBlockRangeRequest
       )) {
         this.scanBlock(response, fvk);
+        const oldState = this.store.getState().lastSavedBlock;
+
+        const lastSavedBlock = {
+          ...oldState,
+          [this.configApi.getNetwork()]: Number(response.height),
+        };
+
         extension.storage.local.set({
-          lastSavedBlock: Number(response.height),
+          lastSavedBlock,
         });
       }
     } catch (error) {}

@@ -25,7 +25,10 @@ export type StorageLocalState = {
   WalletController: {
     vault: string | undefined;
   };
-  lastSavedBlock: number;
+  lastSavedBlock: {
+    mainnet: number;
+    testnet: number
+  };
 };
 
 export type StorageSessionState = {

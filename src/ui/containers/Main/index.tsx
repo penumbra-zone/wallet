@@ -46,10 +46,12 @@ export const Main: React.FC<MainProps> = () => {
 
   const checkFirstLoad = async () => {
     const lastSavedBlock = await Background.getState(['lastSavedBlock']);
-    if (lastSavedBlock.lastSavedBlock === 1) {
-      // await Background.getCompactBlockRange();
+    if (lastSavedBlock.lastSavedBlock[currentNetwork] === 0) {
+      await Background.getCompactBlockRange();
     }
   };
+  
+  // console.log(await Background.getState(['lastSavedBlock']))
 
   const saveChainsToDB = async () => {
     await Background.getChainParams();
