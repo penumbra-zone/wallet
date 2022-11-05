@@ -26,8 +26,6 @@ export function createUpdateState(store: AccountsStore) {
     const dispatch = store.dispatch;
 
     if (state.lastSavedBlock) {
-      dispatch(accountsActions.setLastSavedBlock(state.lastSavedBlock));
-
       if (
         currentState.accounts.lastSavedBlock -
           +currentState.accounts.lastExistBlock >=
@@ -35,6 +33,12 @@ export function createUpdateState(store: AccountsStore) {
       ) {
         dispatch(accountsActions.setLastExistBlock(state.lastSavedBlock));
       }
+      dispatch(accountsActions.setLastSavedBlock(state.lastSavedBlock));
+      console.log({
+        minus:
+          currentState.accounts.lastSavedBlock -
+          +currentState.accounts.lastExistBlock,
+      });
     }
 
     if (state.networks && state.networks.length) {

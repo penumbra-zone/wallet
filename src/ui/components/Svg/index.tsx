@@ -293,3 +293,43 @@ export const SettingsSvg = () => {
   );
 }
 
+export const DoneSvg = () => {
+  return (
+    <svg
+      width="40"
+      height="42"
+      viewBox="0 0 40 42"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M35 21C35 12.3047 28.2812 5.25 20 5.25C11.7188 5.25 5 12.3047 5 21C5 29.6953 11.7188 36.75 20 36.75C28.2812 36.75 35 29.6953 35 21Z"
+        stroke="#368E00"
+        strokeWidth="1.25"
+        strokeMiterlimit="10"
+      />
+      <path
+        d="M35 21C35 12.3047 28.2812 5.25 20 5.25C11.7188 5.25 5 12.3047 5 21C5 29.6953 11.7188 36.75 20 36.75C28.2812 36.75 35 29.6953 35 21Z"
+        stroke="black"
+        strokeOpacity="0.2"
+        strokeWidth="1.25"
+        strokeMiterlimit="10"
+      />
+      <path
+        d="M26.4859 14.7L17.7461 25.2L14 21.2625"
+        stroke="#368E00"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M26.4859 14.7L17.7461 25.2L14 21.2625"
+        stroke="black"
+        strokeOpacity="0.2"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}

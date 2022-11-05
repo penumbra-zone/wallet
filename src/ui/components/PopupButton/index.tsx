@@ -1,22 +1,27 @@
 type PopupButtonProps = {
   svg: JSX.Element;
   text: string;
+  rightChild?: JSX.Element
   onClick?: () => void;
 };
 export const PopupButton: React.FC<PopupButtonProps> = ({
   svg,
   text,
+  rightChild,
   onClick,
 }) => {
   return (
     <div
       onClick={onClick}
-      className="flex items-center py-[12px] px-[18px] cursor-pointer"
+      className="flex items-center justify-bettwen py-[12px] px-[18px]  cursor-pointer"
       role="button"
       tabIndex={0}
     >
-      {svg}
-      <p className="pl-[16px] text_ext">{text}</p>
+      <div className="flex items-center">
+        {svg}
+        <p className="pl-[11px] text_ext">{text}</p>
+      </div>
+     {rightChild}
     </div>
   );
 };

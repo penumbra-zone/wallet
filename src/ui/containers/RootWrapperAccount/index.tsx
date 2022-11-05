@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAccountsSelector } from '../../../accounts';
-import { AccountModal, Logo, NetworkModal, NetworkSelect, UserLogo } from '../../components';
+import {
+  AccountModal,
+  Logo,
+  NetworkModal,
+  NetworkSelect,
+  UserLogo,
+} from '../../components';
 import {
   selectRedirectToAccountPage,
   selectSelectedAccount,
@@ -44,10 +50,7 @@ export const RootWrapperAccount: React.FC<RootWrapperAccountProps> = ({
             )}
             {selectedAccount.addressByIndex && isRedirect && !state.isLocked && (
               <div className="flex items-center gap-x-[54px]">
-                <NetworkSelect
-                  onClick={handleToggleNetworkModal(true)}
-                  isOpen={isOpenNetworkPopup}
-                />
+                <NetworkSelect onClick={handleToggleNetworkModal(true)} />
                 <UserLogo onClick={handleToggleAccountModal(true)} />
               </div>
             )}

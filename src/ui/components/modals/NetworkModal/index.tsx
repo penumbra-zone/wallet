@@ -1,9 +1,15 @@
 import { Fragment } from 'react';
 import { useAccountsSelector } from '../../../../accounts';
-import { selectCurNetwork, selectNetworks } from '../../../redux';
+import {
+  selectLastExistBlock,
+  selectLastSavedBlock,
+  selectNetworks,
+} from '../../../redux';
 import { Button } from '../../Button';
 import { ModalWrapper } from '../../ModalWrapper';
+import { percentage } from '../../NetworkSelect';
 import { PopupButton } from '../../PopupButton';
+import { ProgressBar } from '../../ProgressBar';
 import { SuccessCreateModalProps } from '../SuccessCreateModal';
 
 export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
@@ -11,7 +17,11 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
   onClose,
 }) => {
   const networks = useAccountsSelector(selectNetworks);
-  const currentNetworkName = useAccountsSelector(selectCurNetwork);
+  const lastExistBlock = useAccountsSelector(selectLastExistBlock);
+  const lastSavedBlock = useAccountsSelector(selectLastSavedBlock);
+
+  const percent = percentage(lastSavedBlock, lastExistBlock);
+
   return (
     <ModalWrapper
       show={show}
@@ -28,11 +38,14 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
             <Fragment key={i.name}>
               <PopupButton
                 svg={
-                  <div
-                    className={`w-[8px] h-[8px] ${
-                      currentNetworkName === i.name ? 'bg-[#608E84]' : 'bg-red'
-                    } rounded-[50%] mr-[8px]`}
-                  ></div>
+                  <div className="w-[20px] h-[20px]">
+                    <ProgressBar percent={percent} />
+                  </div>
+                }
+                rightChild={
+                  <p className="text-light_grey text-[10px] pl-[8px]">
+                    {lastSavedBlock}/{lastExistBlock}
+                  </p>
                 }
                 text={i.code}
               />

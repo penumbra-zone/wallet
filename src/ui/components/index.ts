@@ -11,6 +11,7 @@ export * from './Tabs';
 export * from './UserLogo';
 export * from './NetworkSelect';
 export * from './PopupButton';
+export * from './ProgressBar';
 
 //modals
 export * from './modals/SuccessCreateModal';
