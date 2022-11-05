@@ -10,6 +10,8 @@ import {
   SeedPhraseConfirm,
   SelectAction,
   Welcome,
+  Settings,
+  SettingsSecurityPrivacy,
 } from '../ui/containers';
 import { RootAccounts } from './RootAccounts';
 import { routesPath } from '../utils';
@@ -59,7 +61,40 @@ export const routes: RouteObject[] = [
         path: routesPath.IMPORT_SEED_PHRASE,
         element: <ImportSeed />,
       },
-      {},
+      {
+        path: routesPath.SETTINGS,
+        element: <Settings />,
+        children: [
+          {
+            path: routesPath.SETTINGS,
+            element: <h2>SUPPORT</h2>,
+          },
+          {
+            path: routesPath.SETTINGS_ADDITIONALLY,
+            element: <h2>SETTINGS_ADDITIONALLY</h2>,
+          },
+          {
+            path: routesPath.SETTINGS_CONTACTS,
+            element: <h2>SETTINGS_CONTACTS</h2>,
+          },
+          {
+            path: routesPath.SETTINGS_SECURITY_PRIVACY,
+            element: <SettingsSecurityPrivacy />,
+          },
+          {
+            path: routesPath.SETTINGS_WARNINGS,
+            element: <h2>SETTINGS_WARNINGS</h2>,
+          },
+          {
+            path: routesPath.SETTINGS_NETWORKS,
+            element: <h2>SETTINGS_NETWORKS</h2>,
+          },
+          {
+            path: routesPath.SETTINGS_GENERAL_INFORMATION,
+            element: <h2>SETTINGS_GENERAL_INFORMATION</h2>,
+          },
+        ],
+      },
     ],
   },
 ];

@@ -308,3 +308,11 @@ select {
     border-color: #ced4da !important;
 }
 
+.svg_notActive_link svg path {
+    fill: #524B4B;
+    stroke: #524B4B;
+}
+
+.svg_notActive_link_stroke svg path {
+    stroke: #524B4B;
+}

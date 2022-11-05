@@ -91,13 +91,14 @@ export class ClientController {
         compactBlockRangeRequest
       )) {
         this.scanBlock(response, fvk);
-        extension.storage.local.set({ lastSavedBlock: Number(response.height) });
+        extension.storage.local.set({
+          lastSavedBlock: Number(response.height),
+        });
       }
     } catch (error) {}
   }
 
   async scanBlock(compactBlock: CompactBlock, fvk: string) {
-    // console.log('Handle block with height ' + compactBlock.height);
     if (this.requireScanning(compactBlock)) {
       for (const notePayload of compactBlock.notePayloads) {
         try {
@@ -112,7 +113,6 @@ export class ClientController {
         } catch (e) {}
       }
     }
-    // else console.log('skip empty block with height ' + compactBlock.height);
   }
 
   requireScanning(compactBlock: CompactBlock) {

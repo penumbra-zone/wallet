@@ -12,6 +12,7 @@ export * from './UserLogo';
 export * from './NetworkSelect';
 export * from './PopupButton';
 export * from './ProgressBar';
+export * from './SettingSideBar';
 
 //modals
 export * from './modals/SuccessCreateModal';

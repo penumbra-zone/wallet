@@ -11,3 +11,5 @@ export * from './Rules';
 export * from './SeedPharseRules';
 export * from './CreateSuccess';
 export * from './RootWrapperAccount';
+export * from './Settings';
+export * from './SettingsSecurityPrivacy';

@@ -44,7 +44,7 @@ async function setupBackgroundService() {
     (global as any).background = backgroundService;
   }
 
-  backgroundService.clientController.getCompactBlockRange();
+  // backgroundService.clientController.getCompactBlockRange();
 
   const tabsManager = new TabsManager({ extensionStorage });
   backgroundService.on('Show tab', async (url, name) => {

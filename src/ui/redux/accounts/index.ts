@@ -70,9 +70,7 @@ export function getLastBlockHeight() {
       );
 
       dispatch(setLastExistBlock(+data.result.response.last_block_height));
-    } catch (error) {
-      // console.log('getLastBlockHeight:', error);
-    }
+    } catch (error) {}
   };
 }
 

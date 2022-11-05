@@ -16,16 +16,12 @@ export const RootAccounts = () => {
   const state = useAccountsSelector(selectState);
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
   const isRedirect = useAccountsSelector(selectRedirectToAccountPage);
-  const s = useAccountsSelector((s) => s);
-
-  // const getBlocks = async () => await Background.getCompactBlockRange();
 
   useEffect(() => {
     if (!isRedirect) return;
 
     if (selectedAccount.name && isRedirect && !state.isLocked) {
-      // getBlocks();
-      return navigate(routesPath.HOME);
+      return navigate(routesPath.SETTINGS_SECURITY_PRIVACY);
     }
 
     if (!state.isInitialized) return navigate(routesPath.WELCOME);

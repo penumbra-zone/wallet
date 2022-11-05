@@ -40,7 +40,7 @@ export const Main: React.FC<MainProps> = () => {
   const checkFirstLoad = async () => {
     const lastSavedBlock = await Background.getState(['lastSavedBlock']);
     if (lastSavedBlock.lastSavedBlock === 1) {
-      await Background.getCompactBlockRange();
+      // await Background.getCompactBlockRange();
     }
   };
 

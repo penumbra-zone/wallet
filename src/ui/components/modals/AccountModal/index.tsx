@@ -7,16 +7,24 @@ import { UserLogo } from '../../UserLogo';
 import { SuccessCreateModalProps } from '../SuccessCreateModal';
 import Background from '../../../services/Background';
 import { PopupButton } from '../../PopupButton';
+import { useNavigate } from 'react-router-dom';
+import { routesPath } from '../../../../utils';
 
 export const AccountModal: React.FC<SuccessCreateModalProps> = ({
   show,
   onClose,
 }) => {
+  const navigate = useNavigate();
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
 
   const handleBlock = async () => {
     await Background.lock();
     onClose();
+  };
+
+  const handleSettings = () => {
+    onClose();
+    navigate(routesPath.SETTINGS);
   };
 
   return (
@@ -47,7 +55,11 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
         </div>
         <div className="pt-[24px]">
           <PopupButton svg={<SupportSvg />} text="Support" />
-          <PopupButton svg={<SettingsSvg />} text="Settings" />
+          <PopupButton
+            svg={<SettingsSvg />}
+            text="Settings"
+            onClick={handleSettings}
+          />
         </div>
       </div>
     </ModalWrapper>

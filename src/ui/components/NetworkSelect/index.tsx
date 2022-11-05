@@ -40,7 +40,6 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
     dispatch(getLastBlockHeight());
   }, []);
 
-  console.log({ lastExistBlock, lastSavedBlock });
   return (
     <div
       onClick={onClick}
