@@ -81,9 +81,10 @@ export class RemoteConfigController extends EventEmitter {
       ...oldStore,
       network_config: DEFAULT_LEGACY_CONFIG.NETWORK_CONFIG,
     };
-    console.log(config);
 
-    this.store.updateState({ config });
+    this.store.updateState({
+      config,
+    });
   }
 
   getPackConfig(): typeof DEFAULT_LEGACY_CONFIG.PACK_CONFIG {

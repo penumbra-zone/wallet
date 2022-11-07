@@ -56,20 +56,22 @@ async function setupBackgroundService() {
     await backgroundService.clientController.getAssets();
     await backgroundService.clientController.getChainParams();
 
-    backgroundService.clientController.getCompactBlockRange();
+    await backgroundService.clientController.getCompactBlockRange();
   });
 
   backgroundService.walletController.on('wallet unlock', async () => {
     await backgroundService.clientController.getAssets();
     await backgroundService.clientController.getChainParams();
-    backgroundService.clientController.getCompactBlockRange();
+    await backgroundService.clientController.getCompactBlockRange();
   });
 
   backgroundService.walletController.on('reset wallet', async () => {
-    backgroundService.vaultController.lock();
-    await backgroundService.clientController.resetWallet();
     await backgroundService.remoteConfigController.resetWallet();
-    extension.runtime.reload();
+    await backgroundService.clientController.resetWallet();
+    await backgroundService.vaultController.lock();
+    setTimeout(() => {
+      extension.runtime.reload();
+    }, 500);
   });
 
   return backgroundService;

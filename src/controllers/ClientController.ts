@@ -133,16 +133,18 @@ export class ClientController {
         compactBlockRangeRequest
       )) {
         this.scanBlock(response, fvk);
-        const oldState = this.store.getState().lastSavedBlock;
+        if (Number(response.height) % 100 === 0) {
+          const oldState = this.store.getState().lastSavedBlock;
 
-        const lastSavedBlock = {
-          ...oldState,
-          [this.configApi.getNetwork()]: Number(response.height),
-        };
+          const lastSavedBlock = {
+            ...oldState,
+            [this.configApi.getNetwork()]: Number(response.height),
+          };
 
-        extension.storage.local.set({
-          lastSavedBlock,
-        });
+          extension.storage.local.set({
+            lastSavedBlock,
+          });
+        }
       }
     } catch (error) {}
   }
