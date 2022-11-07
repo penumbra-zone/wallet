@@ -134,13 +134,12 @@ export class ClientController {
       )) {
         this.scanBlock(response, fvk);
         const oldState = this.store.getState().lastSavedBlock;
-       
-        
+
         const lastSavedBlock = {
           ...oldState,
           [this.configApi.getNetwork()]: Number(response.height),
         };
-        if()
+
         extension.storage.local.set({
           lastSavedBlock,
         });
