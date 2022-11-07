@@ -75,6 +75,17 @@ export class RemoteConfigController extends EventEmitter {
     this.store.updateState({ config });
   }
 
+  resetWallet() {
+    const oldStore = this.store.getState().config;
+    const config = {
+      ...oldStore,
+      network_config: DEFAULT_LEGACY_CONFIG.NETWORK_CONFIG,
+    };
+    console.log(config);
+
+    this.store.updateState({ config });
+  }
+
   getPackConfig(): typeof DEFAULT_LEGACY_CONFIG.PACK_CONFIG {
     try {
       const { pack_config } = this.store.getState().config;

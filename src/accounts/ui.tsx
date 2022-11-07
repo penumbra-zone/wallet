@@ -28,6 +28,7 @@ async function startUi() {
     if (area !== 'local') {
       return;
     }
+
     const stateChanges: Partial<Record<string, unknown>> &
       Partial<BackgroundGetStateResult> = await backgroundService.getState([
       'isInitialized',

@@ -55,6 +55,7 @@ export class VaultController {
 
     this.isLocked = false;
     this.isInitialized = true;
+    
   }
 
   lock() {

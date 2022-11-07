@@ -52,6 +52,26 @@ async function setupBackgroundService() {
     return tabsManager.getOrCreate(url, name);
   });
 
+  backgroundService.walletController.on('wallet create', async () => {
+    await backgroundService.clientController.getAssets();
+    await backgroundService.clientController.getChainParams();
+
+    backgroundService.clientController.getCompactBlockRange();
+  });
+
+  backgroundService.walletController.on('wallet unlock', async () => {
+    await backgroundService.clientController.getAssets();
+    await backgroundService.clientController.getChainParams();
+    backgroundService.clientController.getCompactBlockRange();
+  });
+
+  backgroundService.walletController.on('reset wallet', async () => {
+    backgroundService.vaultController.lock();
+    await backgroundService.clientController.resetWallet();
+    await backgroundService.remoteConfigController.resetWallet();
+    extension.runtime.reload();
+  });
+
   return backgroundService;
 }
 
@@ -164,6 +184,7 @@ class BackgroundService extends EventEmitter {
         this.clientController.getCompactBlockRange(),
       getAssets: async () => this.clientController.getAssets(),
       getChainParams: async () => this.clientController.getChainParams(),
+      resetWallet: async () => this.walletController.resetWallet(),
     };
   }
   getInpageApi(origin: string, connectionId: string) {

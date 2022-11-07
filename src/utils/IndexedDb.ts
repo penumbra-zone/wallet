@@ -75,4 +75,10 @@ export class IndexedDb {
     console.log('Deleted Data', id);
     return id;
   }
+
+  public async resetTables(tableName: string[]) {
+    const tx = this.db.transaction([tableName], 'readwrite');
+    const store = tx.objectStore(tableName);
+    await store.clear();
+  }
 }

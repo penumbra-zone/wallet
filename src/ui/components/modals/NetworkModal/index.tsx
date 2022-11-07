@@ -22,11 +22,6 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
   const lastSavedBlock = useAccountsSelector(selectLastSavedBlock);
   const currentNetwork = useAccountsSelector(selectCurNetwork);
 
-  console.log({
-    lastSavedBlock: lastSavedBlock[currentNetwork],
-    lastExistBlock,
-  });
-
   const percent = percentage(lastSavedBlock[currentNetwork], lastExistBlock);
 
   return (

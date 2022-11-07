@@ -65,10 +65,10 @@ export class IdleController {
       return;
     }
 
-    const time = Date.now() - this.lastUpdateIdle - this.options.interval;
-    if (time > 0) {
-      this._lock('locked');
-    }
+    // const time = Date.now() - this.lastUpdateIdle - this.options.interval;
+    // if (time > 0) {
+    //   this._lock('locked');
+    // }
 
     extension.alarms.create('idle', {
       delayInMinutes: 5 / 60,

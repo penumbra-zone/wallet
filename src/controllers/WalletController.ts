@@ -61,6 +61,7 @@ export class WalletController extends EventEmitter {
     }
     this._restoreWallets(password);
     this._setPassword(password);
+     this.emit('wallet unlock');
   }
 
   addWallet(options: CreateWalletInput) {
@@ -71,6 +72,8 @@ export class WalletController extends EventEmitter {
 
     this.wallets.push(wallet);
     this._saveWallets();
+
+    this.emit('wallet create');
     return wallet.getAccount();
   }
 
@@ -96,6 +99,10 @@ export class WalletController extends EventEmitter {
     } catch (error) {
       return '';
     }
+  }
+
+  resetWallet(){
+    this.emit('reset wallet');
   }
 
   getAccountSpendingKey(password: string) {

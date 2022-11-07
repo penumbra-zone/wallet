@@ -21,6 +21,7 @@ export * from './modals/NetworkModal';
 export * from './modals/MoreModal';
 export * from './modals/AccountDetailModal';
 export * from './modals/ExportKeyModal';
+export * from './modals/ResetWalletModal';
 
 //forms
 export * from './forms/CreatePasswordForm';

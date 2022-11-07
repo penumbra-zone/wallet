@@ -13,15 +13,9 @@ import {
   MoreModal,
   Tabs,
 } from '../../components';
-import {
-  selectCurNetwork,
-  selectNetworks,
-  selectSelectedAccount,
-  selectState,
-} from '../../redux';
+import { selectSelectedAccount, selectState } from '../../redux';
 import toast from 'react-hot-toast';
-import { useEffect, useState } from 'react';
-import Background from '../../services/Background';
+import { useState } from 'react';
 
 type MainProps = {};
 
@@ -34,8 +28,6 @@ export const Main: React.FC<MainProps> = () => {
 
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
   const state = useAccountsSelector(selectState);
-  const networks = useAccountsSelector(selectNetworks);
-  const currentNetwork = useAccountsSelector(selectCurNetwork);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(selectedAccount.addressByIndex);
@@ -43,38 +35,6 @@ export const Main: React.FC<MainProps> = () => {
       position: 'top-right',
     });
   };
-
-  const checkFirstLoad = async () => {
-    const lastSavedBlock = await Background.getState(['lastSavedBlock']);
-    if (lastSavedBlock.lastSavedBlock[currentNetwork] === 0) {
-      await Background.getCompactBlockRange();
-    }
-  };
-  
-  // console.log(await Background.getState(['lastSavedBlock']))
-
-  const saveChainsToDB = async () => {
-    await Background.getChainParams();
-  };
-
-  const saveAssetsToDB = async () => {
-    await Background.getAssets();
-  };
-
-  useEffect(() => {
-    checkFirstLoad();
-  }, []);
-
-  useEffect(() => {
-    if (!selectedAccount.addressByIndex) return;
-    saveChainsToDB();
-  }, [selectedAccount]);
-
-  useEffect(() => {
-    if (networks.find((v) => v.name === currentNetwork).chainId) {
-      saveAssetsToDB();
-    }
-  }, [networks, currentNetwork]);
 
   if (state.isLocked) return <></>;
 

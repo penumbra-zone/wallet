@@ -273,6 +273,18 @@ class Background {
     }
   }
 
+  async resetWallet(): Promise<void> {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.resetWallet();
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
+    }
+  }
+
   async unlock(password: string): Promise<void> {
     try {
       await this.initPromise;
@@ -392,7 +404,7 @@ class Background {
     }
   }
 
-   async getChainParams(): Promise<void> {
+  async getChainParams(): Promise<void> {
     try {
       await this.initPromise;
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

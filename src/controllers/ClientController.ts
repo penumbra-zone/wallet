@@ -25,6 +25,7 @@ export class ClientController {
   extensionStorage;
   indexedDb;
   private configApi;
+  isReset;
 
   constructor({
     extensionStorage,
@@ -54,6 +55,7 @@ export class ClientController {
       getNetworkConfig,
     };
     extensionStorage.subscribe(this.store);
+    this.isReset = false;
 
     this.indexedDb = new IndexedDb();
   }
@@ -132,12 +134,13 @@ export class ClientController {
       )) {
         this.scanBlock(response, fvk);
         const oldState = this.store.getState().lastSavedBlock;
-
+       
+        
         const lastSavedBlock = {
           ...oldState,
           [this.configApi.getNetwork()]: Number(response.height),
         };
-
+        if()
         extension.storage.local.set({
           lastSavedBlock,
         });
@@ -160,6 +163,18 @@ export class ClientController {
         } catch (e) {}
       }
     }
+  }
+
+  async resetWallet() {
+    extension.storage.local.set({
+      lastSavedBlock: {
+        mainnet: 0,
+        testnet: 0,
+      },
+    });
+    await this.indexedDb.resetTables('notes');
+    await this.indexedDb.resetTables('chain');
+    await this.indexedDb.resetTables('assets');
   }
 
   requireScanning(compactBlock: CompactBlock) {
