@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAccountsSelector } from '.';
 import { routesPath } from '../utils';
 import {
@@ -12,15 +12,12 @@ import { Toaster } from 'react-hot-toast';
 
 export const RootAccounts = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const state = useAccountsSelector(selectState);
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
   const isRedirect = useAccountsSelector(selectRedirectToAccountPage);
   const globalState = useAccountsSelector((s) => s);
-
-  console.log({
-    globalState,
-  });
 
   useEffect(() => {
     if (!isRedirect) return;

@@ -57,7 +57,7 @@ export const Main: React.FC<MainProps> = () => {
     setIsOpenDetailPopup(true);
     setKeyModalType('');
   };
-
+  if (!selectedAccount.addressByIndex) return <></>;
   return (
     <>
       <div className="w-[100%] mt-[10px] mb-[20px]">
