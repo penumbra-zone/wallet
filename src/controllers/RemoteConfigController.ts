@@ -31,8 +31,9 @@ const extendValues = (defaultValues: any, newValues: any) => {
 };
 
 export interface NetworkConfigItem {
-  server: string;
+  grpc: string;
   chainId?: string;
+  tendermint: string
 }
 
 type NetworkConfig = Record<string, NetworkConfigItem>;

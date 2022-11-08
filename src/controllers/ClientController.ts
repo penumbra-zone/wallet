@@ -69,11 +69,11 @@ export class ClientController {
 
     if (assets.length) return;
 
-    const { server, chainId } =
+    const { grpc, chainId } =
       this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
 
     const transport = createGrpcWebTransport({
-      baseUrl: server,
+      baseUrl: grpc,
     });
     const client = createPromiseClient(ObliviousQuery, transport);
 
@@ -95,7 +95,7 @@ export class ClientController {
     if (chain.length) return;
 
     const baseUrl =
-      this.configApi.getNetworkConfig()[this.configApi.getNetwork()].server;
+      this.configApi.getNetworkConfig()[this.configApi.getNetwork()].grpc;
 
     const transport = createGrpcWebTransport({
       baseUrl,
@@ -119,13 +119,13 @@ export class ClientController {
       return;
     }
 
-    const { server, chainId } =
+    const { grpc, chainId } =
       this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
 
     const lastBlock = await this.getLastExistBlock();
 
     const transport = createGrpcWebTransport({
-      baseUrl: server,
+      baseUrl: grpc,
     });
     const client = createPromiseClient(ObliviousQuery, transport);
 
@@ -178,9 +178,10 @@ export class ClientController {
   }
 
   async getLastExistBlock() {
-    const response = await fetch(
-      'http://testnet.penumbra.zone:26657/abci_info'
-    );
+    const { tendermint } =
+      this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
+
+    const response = await fetch(`${tendermint}/abci_info`);
     const data = await response.json();
 
     const lastBlock = Number(data.result.response.last_block_height);

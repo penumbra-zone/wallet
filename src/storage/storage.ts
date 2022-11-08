@@ -20,8 +20,8 @@ export type StorageLocalState = {
   };
   lastUpdateIdle: number;
   currentNetwork: NetworkName;
-  customCodes: Record<NetworkName, string | null | undefined>;
-  customNodes: Record<NetworkName, string | null | undefined>;
+  customTendermint: Record<NetworkName, string | null | undefined>;
+  customGRPC: Record<NetworkName, string | null | undefined>;
   WalletController: {
     vault: string | undefined;
   };

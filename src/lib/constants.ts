@@ -5,7 +5,8 @@ export const DEFAULT_LEGACY_CONFIG = {
   NETWORKS: ['testnet'],
   NETWORK_CONFIG: {
     testnet: {
-      server: 'http://testnet.penumbra.zone:8080',
+      grpc: 'http://testnet.penumbra.zone:8080',
+      tendermint: 'http://testnet.penumbra.zone:26657',
     },
   },
   MESSAGES_CONFIG: {
