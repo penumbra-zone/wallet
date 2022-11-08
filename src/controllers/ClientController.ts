@@ -15,7 +15,7 @@ import { IndexedDb } from '../utils';
 import { CompactBlock } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
 import { decrypt_note } from 'penumbra-web-assembly';
 import { WalletController } from './WalletController';
-import { extension, TESTNET_URL } from '../lib';
+import { extension } from '../lib';
 import { RemoteConfigController } from './RemoteConfigController';
 import { NetworkController } from './NetworkController';
 
@@ -43,6 +43,10 @@ export class ClientController {
     this.store = new ObservableStore(
       extensionStorage.getInitState({
         lastSavedBlock: {
+          mainnet: 0,
+          testnet: 0,
+        },
+        lastBlockHeight: {
           mainnet: 0,
           testnet: 0,
         },
@@ -118,6 +122,8 @@ export class ClientController {
     const { server, chainId } =
       this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
 
+    const lastBlock = await this.getLastExistBlock();
+
     const transport = createGrpcWebTransport({
       baseUrl: server,
     });
@@ -125,15 +131,29 @@ export class ClientController {
 
     const compactBlockRangeRequest = new CompactBlockRangeRequest();
     compactBlockRangeRequest.chainId = chainId;
-    compactBlockRangeRequest.startHeight =
-      this.store.getState().lastSavedBlock[this.configApi.getNetwork()];
+    compactBlockRangeRequest.startHeight = BigInt(
+      this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
+    );
     compactBlockRangeRequest.keepAlive = true;
     try {
       for await (const response of client.compactBlockRange(
         compactBlockRangeRequest
       )) {
         this.scanBlock(response, fvk);
-        if (Number(response.height) % 100 === 0) {
+        if (Number(response.height) < lastBlock) {
+          if (Number(response.height) % 100000 === 0) {
+            const oldState = this.store.getState().lastSavedBlock;
+
+            const lastSavedBlock = {
+              ...oldState,
+              [this.configApi.getNetwork()]: Number(response.height),
+            };
+
+            extension.storage.local.set({
+              lastSavedBlock,
+            });
+          }
+        } else {
           const oldState = this.store.getState().lastSavedBlock;
 
           const lastSavedBlock = {
@@ -141,12 +161,39 @@ export class ClientController {
             [this.configApi.getNetwork()]: Number(response.height),
           };
 
+          const oldLastBlockHeight = this.store.getState().lastBlockHeight;
+
+          const lastBlockHeight = {
+            ...oldLastBlockHeight,
+            [this.configApi.getNetwork()]: Number(response.height),
+          };
+
           extension.storage.local.set({
             lastSavedBlock,
+            lastBlockHeight,
           });
         }
       }
     } catch (error) {}
+  }
+
+  async getLastExistBlock() {
+    const response = await fetch(
+      'http://testnet.penumbra.zone:26657/abci_info'
+    );
+    const data = await response.json();
+
+    const lastBlock = Number(data.result.response.last_block_height);
+    const oldLastBlockHeight = this.store.getState().lastBlockHeight;
+
+    const lastBlockHeight = {
+      ...oldLastBlockHeight,
+      [this.configApi.getNetwork()]: lastBlock,
+    };
+
+    this.store.updateState({ lastBlockHeight });
+
+    return lastBlock;
   }
 
   async scanBlock(compactBlock: CompactBlock, fvk: string) {
@@ -161,6 +208,9 @@ export class ClientController {
           console.log('decrypted note: ', decryptedNote);
 
           await this.indexedDb.putBulkValue('notes', decryptedNote);
+          extension.storage.local.set({
+            lastSavedBlock: Number(compactBlock.height),
+          });
         } catch (e) {}
       }
     }
@@ -169,6 +219,10 @@ export class ClientController {
   async resetWallet() {
     extension.storage.local.set({
       lastSavedBlock: {
+        mainnet: 0,
+        testnet: 0,
+      },
+      lastBlockHeight: {
         mainnet: 0,
         testnet: 0,
       },

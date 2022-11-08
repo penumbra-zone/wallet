@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { useAccountsSelector, useAppDispatch } from '../../../accounts';
 import {
-  getLastBlockHeight,
   selectCurNetwork,
   selectLastExistBlock,
   selectLastSavedBlock,
@@ -35,11 +34,10 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
     return networks.find((i) => i.name === currentNetworkName);
   }, [networks, currentNetworkName]);
 
-  useEffect(() => {
-    dispatch(getLastBlockHeight());
-  }, []);
-
-  const percent = percentage(lastSavedBlock[currentNetwork], lastExistBlock);
+  const percent = percentage(
+    lastSavedBlock[currentNetwork],
+    lastExistBlock[currentNetwork]
+  );
 
   return (
     <div

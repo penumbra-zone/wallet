@@ -27,7 +27,11 @@ export type StorageLocalState = {
   };
   lastSavedBlock: {
     mainnet: number;
-    testnet: number
+    testnet: number;
+  };
+  lastBlockHeight: {
+    mainnet: number;
+    testnet: number;
   };
 };
 

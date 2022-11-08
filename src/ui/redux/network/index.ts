@@ -17,7 +17,7 @@ type Init = {
   customCodes: Record<NetworkName, string | null | undefined>;
   customNodes: Record<NetworkName, string | null | undefined>;
   lastSavedBlock: LastBlocks;
-  lastExistBlock?: number;
+  lastExistBlock: LastBlocks;
 };
 
 const init: Init = {
@@ -26,6 +26,10 @@ const init: Init = {
   customCodes: {} as Record<NetworkName, string | null | undefined>,
   customNodes: {} as Record<NetworkName, string | null | undefined>,
   lastSavedBlock: {
+    mainnet: 0,
+    testnet: 0,
+  },
+  lastExistBlock: {
     mainnet: 0,
     testnet: 0,
   },
@@ -65,20 +69,6 @@ const network = createSlice({
 export const networkActions = network.actions;
 
 export default network.reducer;
-
-const { setLastExistBlock } = networkActions;
-
-export function getLastBlockHeight() {
-  return async (dispatch) => {
-    try {
-      const { data } = await axios.get(
-        'http://testnet.penumbra.zone:26657/abci_info'
-      );
-
-      dispatch(setLastExistBlock(+data.result.response.last_block_height));
-    } catch (error) {}
-  };
-}
 
 export const selectCurNetwork = (state: AccountsState) =>
   state.network.currentNetwork;

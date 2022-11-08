@@ -25,20 +25,11 @@ export function createUpdateState(store: AccountsStore) {
     const currentState = store.getState();
     const dispatch = store.dispatch;
 
+    if (state.lastBlockHeight) {
+      dispatch(networkActions.setLastExistBlock(state.lastBlockHeight));
+    }
+
     if (state.lastSavedBlock) {
-      if (
-        currentState.network.lastSavedBlock[
-          currentState.network.currentNetwork
-        ] -
-          +currentState.network.lastExistBlock >=
-        0
-      ) {
-        dispatch(
-          networkActions.setLastExistBlock(
-            state.lastSavedBlock[currentState.network.currentNetwork]
-          )
-        );
-      }
       dispatch(networkActions.setLastSavedBlock(state.lastSavedBlock));
     }
 
