@@ -1,3 +1,4 @@
+import EventEmitter from 'events';
 import ObservableStore from 'obs-store';
 import { ExtensionStorage } from '../storage';
 import { RemoteConfigController } from './RemoteConfigController';
@@ -7,7 +8,7 @@ export enum NetworkName {
   MAINNET = 'mainnet',
 }
 
-export class NetworkController {
+export class NetworkController extends EventEmitter {
   store;
   private configApi;
 
@@ -20,6 +21,7 @@ export class NetworkController {
     getNetworkConfig: RemoteConfigController['getNetworkConfig'];
     getNetworks: RemoteConfigController['getNetworks'];
   }) {
+    super();
     this.store = new ObservableStore(
       extensionStorage.getInitState({
         currentNetwork: NetworkName.Testnet,
@@ -72,6 +74,7 @@ export class NetworkController {
     const { customGRPC } = this.store.getState();
     customGRPC[network] = url;
     this.store.updateState({ customGRPC });
+    this.emit('change grpc');
   }
 
   setCustomTendermint(url: string | undefined, network = NetworkName.Testnet) {

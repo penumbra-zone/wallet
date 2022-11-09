@@ -25,7 +25,7 @@ export class ClientController {
   extensionStorage;
   indexedDb;
   private configApi;
-  isReset;
+  clientCompactBlocRange;
 
   constructor({
     extensionStorage,
@@ -59,7 +59,6 @@ export class ClientController {
       getNetworkConfig,
     };
     extensionStorage.subscribe(this.store);
-    this.isReset = false;
 
     this.indexedDb = new IndexedDb();
   }
@@ -135,10 +134,12 @@ export class ClientController {
       this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
     );
     compactBlockRangeRequest.keepAlive = true;
+    this.clientCompactBlocRange = client.compactBlockRange(
+      compactBlockRangeRequest
+    );
+
     try {
-      for await (const response of client.compactBlockRange(
-        compactBlockRangeRequest
-      )) {
+      for await (const response of this.clientCompactBlocRange) {
         this.scanBlock(response, fvk);
         if (Number(response.height) < lastBlock) {
           if (Number(response.height) % 100000 === 0) {
@@ -175,6 +176,10 @@ export class ClientController {
         }
       }
     } catch (error) {}
+  }
+
+  async cancelGetBlockRange() {
+    await this.clientCompactBlocRange.end();
   }
 
   async getLastExistBlock() {

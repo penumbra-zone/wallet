@@ -293,11 +293,11 @@ export const SettingsSvg = (props) => {
   );
 };
 
-export const DoneSvg = () => {
+export const DoneSvg = (props) => {
   return (
     <svg
-      width="40"
-      height="42"
+      width={props.width && '40'}
+      height={props.height && '42'}
       viewBox="0 0 40 42"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

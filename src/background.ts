@@ -75,6 +75,10 @@ async function setupBackgroundService() {
     }, 500);
   });
 
+  backgroundService.networkController.on('change grpc', async () => {
+    await backgroundService.clientController.cancelGetBlockRange();
+  });
+
   return backgroundService;
 }
 

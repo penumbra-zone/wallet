@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAccountsSelector } from '../../../accounts';
-import { Button, Input } from '../../components';
+import { Button, DoneSvg, Input } from '../../components';
 import {
   NetworkType,
+  selectCurNetwork,
   selectCustomGRPC,
   selectCustomTendermint,
   selectNetworks,
@@ -13,6 +14,7 @@ export const SettingsNetworks = () => {
   const networks = useAccountsSelector(selectNetworks);
   const customTendermint = useAccountsSelector(selectCustomTendermint);
   const customGRPC = useAccountsSelector(selectCustomGRPC);
+  const currentNetwork = useAccountsSelector(selectCurNetwork);
 
   const [inputsValues, setInputsValues] = useState<{
     chainId: string;
@@ -78,17 +80,20 @@ export const SettingsNetworks = () => {
         <div className="w-[55%] h-[100%] flex flex-col border-r-[1px] border-solid border-dark_grey pt-[24px] pr-[15px]">
           <div className="-mx-[16px]">
             {networks.map((i, index) => (
-              <p
+              <div
                 key={index}
-                className={`w-[100] px-[16px] text_ext cursor-pointer hover:bg-dark_grey py-[12px] ${
-                  selected.chainId === i.chainId
-                    ? 'bg-dark_grey border-[1px] border-solid border-white'
-                    : ''
+                className={`w-[100] flex items-center px-[16px] text_ext cursor-pointer hover:bg-dark_grey py-[12px] ${
+                  selected.chainId === i.chainId ? 'bg-dark_grey' : ''
                 }`}
                 onClick={handleSelect(i)}
               >
-                {i.chainId}
-              </p>
+                <span className="pr-[18px]">
+                  {currentNetwork === i.name && (
+                    <DoneSvg width="18" height="18" />
+                  )}
+                </span>
+                <p>{i.chainId}</p>
+              </div>
             ))}
           </div>
         </div>

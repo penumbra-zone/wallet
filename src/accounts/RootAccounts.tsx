@@ -25,7 +25,7 @@ export const RootAccounts = () => {
     if (!isRedirect) return;
 
     if (selectedAccount.name && isRedirect && !state.isLocked) {
-      return navigate(routesPath.HOME);
+      return navigate(routesPath.SETTINGS_NETWORKS);
     }
 
     if (!state.isInitialized) return navigate(routesPath.WELCOME);
