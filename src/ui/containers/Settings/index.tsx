@@ -27,7 +27,7 @@ export const Settings = () => {
             <p className="w-[100%] h2 pl-[16px] py-[21px] border-b-[1px] border-solid border-dark_grey">
               {header[pathname]}
             </p>
-            <div className="py-[24px] px-[16px]">
+            <div className="px-[16px] h-[100%]">
               <Outlet />
             </div>
           </div>

@@ -1,3 +1,4 @@
+import EventEmitter from 'events';
 import ObservableStore from 'obs-store';
 import { ExtensionStorage } from '../storage';
 import { RemoteConfigController } from './RemoteConfigController';
@@ -7,7 +8,7 @@ export enum NetworkName {
   MAINNET = 'mainnet',
 }
 
-export class NetworkController {
+export class NetworkController extends EventEmitter {
   store;
   private configApi;
 
@@ -20,14 +21,15 @@ export class NetworkController {
     getNetworkConfig: RemoteConfigController['getNetworkConfig'];
     getNetworks: RemoteConfigController['getNetworks'];
   }) {
+    super();
     this.store = new ObservableStore(
       extensionStorage.getInitState({
         currentNetwork: NetworkName.Testnet,
-        customNodes: {
+        customGRPC: {
           testnet: null,
           mainnet: null,
         },
-        customCodes: {
+        customTendermint: {
           testnet: null,
           mainnet: null,
         },
@@ -37,6 +39,19 @@ export class NetworkController {
     extensionStorage.subscribe(this.store);
 
     this.configApi = { getNetworkConfig, getNetworks };
+  }
+
+  resetWallet() {
+    this.store.updateState({
+      customGRPC: {
+        testnet: null,
+        mainnet: null,
+      },
+      customTendermint: {
+        testnet: null,
+        mainnet: null,
+      },
+    });
   }
 
   getNetworks() {
@@ -55,35 +70,30 @@ export class NetworkController {
     return this.store.getState().currentNetwork;
   }
 
-  setCustomNode(url: string | null | undefined, network = NetworkName.Testnet) {
-    const { customNodes } = this.store.getState();
-    customNodes[network] = url;
-    this.store.updateState({ customNodes });
+  setCustomGRPC(url: string | null | undefined, network = NetworkName.Testnet) {
+    const { customGRPC } = this.store.getState();
+    customGRPC[network] = url;
+    this.store.updateState({ customGRPC });
+    this.emit('change grpc');
   }
 
-  setCustomCode(code: string | undefined, network = NetworkName.Testnet) {
-    const { customCodes } = this.store.getState();
-    customCodes[network] = code;
-    this.store.updateState({ customCodes });
+  setCustomTendermint(url: string | undefined, network = NetworkName.Testnet) {
+    const { customTendermint } = this.store.getState();
+    customTendermint[network] = url;
+    this.store.updateState({ customTendermint });
   }
 
-  getCustomCodes() {
-    return this.store.getState().customCodes;
+  getCustomTendermint() {
+    return this.store.getState().customTendermint;
   }
 
-  getNetworkCode(network?: NetworkName) {
-    const networks = this.configApi.getNetworkConfig();
-    network = network || this.getNetwork();
-    return this.getCustomCodes()[network] || networks[network].code;
-  }
-
-  getCustomNodes() {
-    return this.store.getState().customNodes;
+  getCustomGRPC() {
+    return this.store.getState().customGRPC;
   }
 
   getNode(network?: NetworkName) {
     const networks = this.configApi.getNetworkConfig();
     network = network || this.getNetwork();
-    return this.getCustomNodes()[network] || networks[network].server;
+    return this.getCustomGRPC()[network] || networks[network].grpc;
   }
 }

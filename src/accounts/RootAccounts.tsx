@@ -18,6 +18,9 @@ export const RootAccounts = () => {
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
   const isRedirect = useAccountsSelector(selectRedirectToAccountPage);
   const globalState = useAccountsSelector((s) => s);
+  // console.log({ globalState });
+  
+  
 
   useEffect(() => {
     if (!isRedirect) return;

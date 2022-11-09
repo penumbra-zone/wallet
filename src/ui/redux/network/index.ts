@@ -1,21 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { AccountsState } from '../../../accounts/rootReducer';
 import { NetworkConfigItem, NetworkName } from '../../../controllers';
-import { DEFAULT_LEGACY_CONFIG } from '../../../lib';
 
 export type LastBlocks = {
   mainnet: number;
   testnet: number;
 };
 
+export type NetworkType = NetworkConfigItem & {
+  name: NetworkName;
+};
+
 type Init = {
   currentNetwork: NetworkName;
-  networks: (NetworkConfigItem & {
-    name: string;
-  })[];
-  customCodes: Record<NetworkName, string | null | undefined>;
-  customNodes: Record<NetworkName, string | null | undefined>;
+  networks: NetworkType[];
+  customTendermint: Record<NetworkName, string | null | undefined>;
+  customGRPC: Record<NetworkName, string | null | undefined>;
   lastSavedBlock: LastBlocks;
   lastExistBlock: LastBlocks;
 };
@@ -23,8 +23,8 @@ type Init = {
 const init: Init = {
   currentNetwork: NetworkName.Testnet,
   networks: [],
-  customCodes: {} as Record<NetworkName, string | null | undefined>,
-  customNodes: {} as Record<NetworkName, string | null | undefined>,
+  customTendermint: {} as Record<NetworkName, string | null | undefined>,
+  customGRPC: {} as Record<NetworkName, string | null | undefined>,
   lastSavedBlock: {
     mainnet: 0,
     testnet: 0,
@@ -47,13 +47,13 @@ const network = createSlice({
       ...state,
       networks: action.payload,
     }),
-    setCustomCodes: (state, action) => ({
+    customTendermint: (state, action) => ({
       ...state,
-      customCodes: action.payload,
+      customTendermint: action.payload,
     }),
-    setCustomNodes: (state, action) => ({
+    setCustomGRPC: (state, action) => ({
       ...state,
-      customNodes: action.payload,
+      customGRPC: action.payload,
     }),
     setLastSavedBlock: (state, action) => ({
       ...state,
@@ -73,10 +73,10 @@ export default network.reducer;
 export const selectCurNetwork = (state: AccountsState) =>
   state.network.currentNetwork;
 export const selectNetworks = (state: AccountsState) => state.network.networks;
-export const selectCustomCodes = (state: AccountsState) =>
-  state.network.customCodes;
-export const selectCustomNodes = (state: AccountsState) =>
-  state.network.customNodes;
+export const selectCustomTendermint = (state: AccountsState) =>
+  state.network.customTendermint;
+export const selectCustomGRPC = (state: AccountsState) =>
+  state.network.customGRPC;
 export const selectLastSavedBlock = (state: AccountsState) =>
   state.network.lastSavedBlock;
 export const selectLastExistBlock = (state: AccountsState) =>

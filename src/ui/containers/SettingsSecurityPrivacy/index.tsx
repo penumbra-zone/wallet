@@ -8,7 +8,7 @@ export const SettingsSecurityPrivacy = () => {
     setIsOpenResetWallet(value);
   return (
     <>
-      <div className="w-[100%] flex flex-col">
+      <div className="w-[100%] flex flex-col py-[24px]">
         <div className="flex flex-col pb-[40px]">
           <p className="h3">Show recovery passphrase</p>
           <Button

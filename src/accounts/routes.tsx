@@ -12,6 +12,7 @@ import {
   Welcome,
   Settings,
   SettingsSecurityPrivacy,
+  SettingsNetworks,
 } from '../ui/containers';
 import { RootAccounts } from './RootAccounts';
 import { routesPath } from '../utils';
@@ -87,7 +88,7 @@ export const routes: RouteObject[] = [
           },
           {
             path: routesPath.SETTINGS_NETWORKS,
-            element: <h2>SETTINGS_NETWORKS</h2>,
+            element: <SettingsNetworks />,
           },
           {
             path: routesPath.SETTINGS_GENERAL_INFORMATION,

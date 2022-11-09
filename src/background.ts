@@ -68,10 +68,15 @@ async function setupBackgroundService() {
   backgroundService.walletController.on('reset wallet', async () => {
     await backgroundService.remoteConfigController.resetWallet();
     await backgroundService.clientController.resetWallet();
+    await backgroundService.networkController.resetWallet();
     await backgroundService.vaultController.lock();
     setTimeout(() => {
       extension.runtime.reload();
     }, 500);
+  });
+
+  backgroundService.networkController.on('change grpc', async () => {
+    await backgroundService.clientController.cancelGetBlockRange();
   });
 
   return backgroundService;
@@ -187,6 +192,14 @@ class BackgroundService extends EventEmitter {
       getAssets: async () => this.clientController.getAssets(),
       getChainParams: async () => this.clientController.getChainParams(),
       resetWallet: async () => this.walletController.resetWallet(),
+      setCustomGRPC: async (
+        url: string | null | undefined,
+        network: NetworkName
+      ) => this.networkController.setCustomGRPC(url, network),
+      setCustomTendermint: async (
+        url: string | null | undefined,
+        network: NetworkName
+      ) => this.networkController.setCustomTendermint(url, network),
     };
   }
   getInpageApi(origin: string, connectionId: string) {

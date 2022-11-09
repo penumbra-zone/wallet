@@ -13,7 +13,7 @@ export const PopupButton: React.FC<PopupButtonProps> = ({
   return (
     <div
       onClick={onClick}
-      className="flex items-center justify-bettwen py-[12px] px-[18px]  cursor-pointer"
+      className="flex items-center justify-bettwen py-[12px] px-[18px]  cursor-pointer hover:bg-dark_grey"
       role="button"
       tabIndex={0}
     >
@@ -21,7 +21,7 @@ export const PopupButton: React.FC<PopupButtonProps> = ({
         {svg}
         <p className="pl-[11px] text_ext">{text}</p>
       </div>
-     {rightChild}
+      {rightChild}
     </div>
   );
 };

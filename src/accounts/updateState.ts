@@ -50,14 +50,14 @@ export function createUpdateState(store: AccountsStore) {
       );
     }
 
-    const customNodes = getParam(state.customNodes, {});
-    if (customNodes && !equals(currentState.network.customNodes, customNodes)) {
-      dispatch(networkActions.setCustomNodes(customNodes));
+    const customGRPC = getParam(state.customGRPC, {});
+    if (customGRPC && !equals(currentState.network.customGRPC, customGRPC)) {
+      dispatch(networkActions.setCustomGRPC(customGRPC));
     }
 
-    const customCodes = getParam(state.customCodes, {});
-    if (customCodes && !equals(currentState.network.customCodes, customCodes)) {
-      dispatch(networkActions.setCustomCodes(customCodes));
+    const customTendermint = getParam(state.customTendermint, {});
+    if (customTendermint && !equals(currentState.network.customTendermint, customTendermint)) {
+      dispatch(networkActions.customTendermint(customTendermint));
     }
 
     const currentNetwork = getParam(state.currentNetwork, '');

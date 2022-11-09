@@ -1,4 +1,5 @@
 import { __BackgroundUiApiDirect } from '../../background';
+import { NetworkName } from '../../controllers';
 import { StorageLocalState } from '../../storage';
 import { CreateWalletInput, ISeedWalletInput } from '../../wallets';
 import { PENUMBRAWALLET_DEBUG } from '../appConfig';
@@ -515,35 +516,35 @@ class Background {
   //     }
   //   }
 
-  //   async setCustomNode(
-  //     url: string | null | undefined,
-  //     network: NetworkName
-  //   ): Promise<void> {
-  //     try {
-  //       await this.initPromise;
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       await this._connect!();
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       return await this.background!.setCustomNode(url, network);
-  //     } catch (err) {
-  //       throw new Error(prepareErrorMessage(err));
-  //     }
-  //   }
+    async setCustomGRPC(
+      url: string | null | undefined,
+      network: NetworkName
+    ): Promise<void> {
+      try {
+        await this.initPromise;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await this._connect!();
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return await this.background!.setCustomGRPC(url, network);
+      } catch (err) {
+        throw new Error(prepareErrorMessage(err));
+      }
+    }
 
-  //   async setCustomCode(
-  //     code: string | undefined,
-  //     network: NetworkName
-  //   ): Promise<void> {
-  //     try {
-  //       await this.initPromise;
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       await this._connect!();
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       return await this.background!.setCustomCode(code, network);
-  //     } catch (err) {
-  //       throw new Error(prepareErrorMessage(err));
-  //     }
-  //   }
+    async setCustomTendermint(
+      code: string | undefined,
+      network: NetworkName
+    ): Promise<void> {
+      try {
+        await this.initPromise;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await this._connect!();
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return await this.background!.setCustomTendermint(code, network);
+      } catch (err) {
+        throw new Error(prepareErrorMessage(err));
+      }
+    }
 
   //   async setCustomMatcher(
   //     url: string | null | undefined,

@@ -6,6 +6,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLElement> {
   isError?: boolean;
   helperText?: string;
   customType?: 'password' | 'text';
+  className?: string
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -14,6 +15,7 @@ export const Input: React.FC<InputProps> = ({
   label,
   placeholder,
   customType = 'text',
+  className,
   ...props
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -33,7 +35,7 @@ export const Input: React.FC<InputProps> = ({
   };
 
   return (
-    <div>
+    <div className={className}>
       <label htmlFor="" className="h2">
         {label}
       </label>

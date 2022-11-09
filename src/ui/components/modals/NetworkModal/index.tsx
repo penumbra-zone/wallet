@@ -1,5 +1,7 @@
 import { Fragment } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAccountsSelector } from '../../../../accounts';
+import { routesPath } from '../../../../utils';
 import {
   selectCurNetwork,
   selectLastExistBlock,
@@ -17,13 +19,21 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
   show,
   onClose,
 }) => {
+  const navigate = useNavigate();
   const networks = useAccountsSelector(selectNetworks);
   const lastExistBlock = useAccountsSelector(selectLastExistBlock);
   const lastSavedBlock = useAccountsSelector(selectLastSavedBlock);
   const currentNetwork = useAccountsSelector(selectCurNetwork);
 
-  const percent = percentage(lastSavedBlock[currentNetwork], lastExistBlock[currentNetwork]);
+  const percent = percentage(
+    lastSavedBlock[currentNetwork],
+    lastExistBlock[currentNetwork]
+  );
 
+  const handleChange = () => {
+    onClose();
+    navigate(routesPath.SETTINGS_NETWORKS);
+  };
   return (
     <ModalWrapper
       show={show}
@@ -58,7 +68,7 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
             <Button
               title="Change"
               mode="gradient"
-              onClick={() => console.log('asd')}
+              onClick={handleChange}
               className="py-[7px]"
             />
           </div>
