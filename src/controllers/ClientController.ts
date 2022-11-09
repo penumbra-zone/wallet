@@ -144,7 +144,7 @@ export class ClientController {
             for await (const response of client.compactBlockRange(
                 compactBlockRangeRequest
             )) {
-                console.log('handle new block height = : ', response.height);
+                // console.log('handle new block height = : ', response.height);
                 this.scanBlock(response, fvk);
                 if (Number(response.height) < lastBlock) {
                     if (Number(response.height) % 100000 === 0) {
@@ -217,7 +217,7 @@ export class ClientController {
                     decryptedNote.ephemeralKey = this.toHexString(notePayload.payload?.ephemeralKey);
                     decryptedNote.amount = this.byteArrayToLong(decryptedNote.value.amount.inner);
                     decryptedNote.asset  = decryptedNote.value.asset_id;
-                    console.log('decrypted note: ', decryptedNote);
+                    // console.log('decrypted note: ', decryptedNote);
 
                     if (decryptedNote.amount != 0) {
                         await this.indexedDb.putValue('notes', decryptedNote);
