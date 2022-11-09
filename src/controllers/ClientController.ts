@@ -180,9 +180,10 @@ export class ClientController {
   }
 
   async getLastExistBlock() {
-    const response = await fetch(
-      'http://testnet.penumbra.zone:26657/abci_info'
-    );
+    const { tendermint } =
+      this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
+
+    const response = await fetch(`${tendermint}/abci_info`);
     const data = await response.json();
 
     const lastBlock = Number(data.result.response.last_block_height);
