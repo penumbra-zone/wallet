@@ -26,7 +26,6 @@ export class ClientController {
   extensionStorage;
   indexedDb;
   private configApi;
-  clientCompactBlocRange;
 
   constructor({
     extensionStorage,
