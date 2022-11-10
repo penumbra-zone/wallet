@@ -40,6 +40,7 @@ export const ExportKeyModal: React.FC<
       setPassword('');
     } catch (e) {
       setIsError(true);
+      console.error(e)
     }
   };
 

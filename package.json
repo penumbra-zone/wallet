@@ -24,7 +24,7 @@
     "loglevel": "^1.8.0",
     "obj-multiplex": "^1.0.0",
     "obs-store": "^4.0.3",
-    "penumbra-web-assembly": "^0.34.2-getAddressByIndex",
+    "penumbra-web-assembly": "^0.34.5",
     "post-message-stream": "^3.0.0",
     "pump": "^3.0.0",
     "ramda": "^0.28.0",
@@ -40,7 +40,8 @@
     "redux": "^4.2.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.1",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "wasm-tracing-allocator": "^0.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.19.6",

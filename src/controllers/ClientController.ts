@@ -20,6 +20,7 @@ import { RemoteConfigController } from './RemoteConfigController';
 import { NetworkController } from './NetworkController';
 import { encode } from 'bech32-buffer';
 
+
 export class ClientController {
   store;
   db;
@@ -134,7 +135,7 @@ export class ClientController {
     compactBlockRangeRequest.startHeight = BigInt(
       this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
     );
-    compactBlockRangeRequest.endHeight = BigInt(10000)
+
     compactBlockRangeRequest.keepAlive = true;
     try {
       for await (const response of client.compactBlockRange(
@@ -202,12 +203,15 @@ export class ClientController {
   async scanBlock(compactBlock: CompactBlock, fvk: string) {
     if (this.requireScanning(compactBlock)) {
       for (const notePayload of compactBlock.notePayloads) {
+
         try {
           let decryptedNote = decrypt_note(
             fvk,
             this.toHexString(notePayload.payload?.encryptedNote),
             this.toHexString(notePayload.payload?.ephemeralKey)
           );
+          if (decryptedNote === null)
+            continue;
           console.log(decryptedNote);
           
 
@@ -218,9 +222,9 @@ export class ClientController {
           decryptedNote.ephemeralKey = this.toHexString(
             notePayload.payload?.ephemeralKey
           );
-          decryptedNote.amount = this.byteArrayToLong(
-            decryptedNote.value.amount.inner
-          );
+          decryptedNote.amount =
+            decryptedNote.value.amount.lo;
+
           decryptedNote.asset = decryptedNote.value.asset_id;
 
           if (decryptedNote.amount != 0) {
@@ -236,9 +240,13 @@ export class ClientController {
           extension.storage.local.set({
             lastSavedBlock,
           });
-        } catch (e) {}
+        } catch (e) {
+          console.error(e)
+        }
       }
+
     }
+
   }
 
   byteArrayToLong = function (/*byte[]*/ byteArray) {
