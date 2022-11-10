@@ -68,11 +68,11 @@ export class ClientController {
 
     if (assets.length) return;
 
-    const { server, chainId } =
+    const { grpc, chainId } =
       this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
 
     const transport = createGrpcWebTransport({
-      baseUrl: server,
+      baseUrl: grpc,
     });
     const client = createPromiseClient(ObliviousQuery, transport);
 
@@ -95,7 +95,7 @@ export class ClientController {
     if (chain.length) return;
 
     const baseUrl =
-      this.configApi.getNetworkConfig()[this.configApi.getNetwork()].server;
+      this.configApi.getNetworkConfig()[this.configApi.getNetwork()].grpc;
 
     const transport = createGrpcWebTransport({
       baseUrl,
@@ -119,13 +119,13 @@ export class ClientController {
       return;
     }
 
-    const { server, chainId } =
+    const { grpc, chainId } =
       this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
 
     const lastBlock = await this.getLastExistBlock();
 
     const transport = createGrpcWebTransport({
-      baseUrl: server,
+      baseUrl: grpc,
     });
     const client = createPromiseClient(ObliviousQuery, transport);
 
@@ -134,13 +134,14 @@ export class ClientController {
     compactBlockRangeRequest.startHeight = BigInt(
       this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
     );
+    compactBlockRangeRequest.endHeight = BigInt(10000)
     compactBlockRangeRequest.keepAlive = true;
     try {
       for await (const response of client.compactBlockRange(
         compactBlockRangeRequest
       )) {
-        // console.log('handle new block height = : ', response.height);
-        this.scanBlock(response, fvk);
+       
+        await this.scanBlock(response, fvk);
         if (Number(response.height) < lastBlock) {
           if (Number(response.height) % 100000 === 0) {
             const oldState = this.store.getState().lastSavedBlock;
@@ -207,6 +208,9 @@ export class ClientController {
             this.toHexString(notePayload.payload?.encryptedNote),
             this.toHexString(notePayload.payload?.ephemeralKey)
           );
+          console.log(decryptedNote);
+          
+
           decryptedNote.height = compactBlock.height;
           decryptedNote.note_commitment = this.toHexString(
             notePayload.payload?.noteCommitment.inner
@@ -218,7 +222,6 @@ export class ClientController {
             decryptedNote.value.amount.inner
           );
           decryptedNote.asset = decryptedNote.value.asset_id;
-          console.log('decrypted note: ', decryptedNote);
 
           if (decryptedNote.amount != 0) {
             await this.indexedDb.putValue('notes', decryptedNote);
@@ -233,9 +236,7 @@ export class ClientController {
           extension.storage.local.set({
             lastSavedBlock,
           });
-        } catch (e) {
-          console.error(e);
-        }
+        } catch (e) {}
       }
     }
   }
