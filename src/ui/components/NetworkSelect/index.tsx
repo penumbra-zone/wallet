@@ -1,5 +1,7 @@
 import React, { useCallback } from 'react';
-import { useAccountsSelector, useAppDispatch } from '../../../accounts';
+import { useAccountsSelector } from '../../../accounts';
+import { useMediaQuery } from '../../../hooks';
+import { kitcut } from '../../../utils';
 import {
   selectCurNetwork,
   selectLastExistBlock,
@@ -23,7 +25,8 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
   className,
   onClick,
 }) => {
-  const dispatch = useAppDispatch();
+  const isDesktop = useMediaQuery();
+
   const networks = useAccountsSelector(selectNetworks);
   const currentNetwork = useAccountsSelector(selectCurNetwork);
   const currentNetworkName = useAccountsSelector(selectCurNetwork);
@@ -42,17 +45,21 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`h-[52px] w-[296px] px-[21px] bg-brown rounded-[15px] border-[1px] border-solid border-dark_grey flex items-center justify-between cursor-pointer
+      className={`ext:h-[36px] ext:w-[152px] tablet:h-[52px] tablet:w-[296px] ext:px-[10px] tablet:px-[21px] bg-brown rounded-[15px] border-[1px] border-solid border-dark_grey flex items-center justify-between cursor-pointer
       ${className}`}
     >
       {percent === 101 ? (
         <DoneSvg />
       ) : (
-        <div className="w-[35px] h-[35px] mr-[16px]">
+        <div className="ext:w-[25px] ext:h-[25px] tablet:w-[35px] tablet:h-[35px] ext:mr-[6px] tablet:mr-[16px] flex items-center">
           <ProgressBar percent={percent} />
         </div>
       )}
-      <p className="text_button">{currrentNetwork().chainId}</p>
+      <p className="text_button">
+        {isDesktop
+          ? currrentNetwork().chainId
+          : kitcut(12, currrentNetwork().chainId)}
+      </p>
     </div>
   );
 };

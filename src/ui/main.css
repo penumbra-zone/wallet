@@ -156,6 +156,32 @@ select {
     line-height: 22px;
 }
 
+@media (max-width: 480px) {
+    .h1 {
+        font-family: 'Faktum SemiBold';
+        font-style: normal;
+        font-weight: 600;
+        font-size: 20px;
+        line-height: 30px;
+    }
+
+    .text_body {
+        font-family: "Faktum Bold";
+        font-style: normal;
+        font-weight: 500;
+        font-size: 12px;
+        line-height: 18px;
+    }
+
+    .text_button {
+        font-family: "Faktum Bold";
+        font-style: normal;
+        font-weight: 500;
+        font-size: 12px;
+        line-height: 18px;
+    }
+}
+
 /* colors */
 
 .button_gradient {

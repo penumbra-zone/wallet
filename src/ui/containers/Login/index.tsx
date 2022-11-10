@@ -23,31 +23,29 @@ export const Login: React.FC<LoginProps> = ({}) => {
 
   return (
     <div className="w-[100%] flex items-center justify-center">
-      <div className="w-[400px] flex flex-col items-center justify-center">
+      <div className="w-[400px] ext:py-[20px] tablet:py-[0px] ext:px-[16px] tablet:px-[0px] ext:mx-[40px] tablet:mx-[0px] ext:bg-brown tablet:bg-transparent rounded-[15px] flex flex-col items-center justify-center">
         <p className="h1">Welcome back!</p>
-        <p className="text _body text-light_grey mb-[40px] mt-[16px]">
+        <p className="text_body text-light_grey mb-[40px] ext:mt-[12px] tablet:mt-[16px]">
           A decentralized network awaits
         </p>
-        <div className="w-[100%] mb-[24px]">
-          <Input
-            label="New Password"
-            placeholder="Password"
-            isError={isError}
-            helperText="Incorrect password"
-            value={password}
-            onChange={handleChangePassword}
-            customType="password"
-          />
-        </div>
-        <div className="w-[100%] mb-[60px] mt-[40px]">
-          <Button
-            title="Unlock"
-            mode="gradient"
-            onClick={handleSubmitPassword}
-            disabled={!password}
-          />
-        </div>
-        <p className="text _body text-light_grey">
+        <Input
+          label="New Password"
+          placeholder="Password"
+          isError={isError}
+          helperText="Incorrect password"
+          value={password}
+          onChange={handleChangePassword}
+          customType="password"
+          className="w-[100%] mb-[24px]"
+        />
+        <Button
+          title="Unlock"
+          mode="gradient"
+          onClick={handleSubmitPassword}
+          disabled={!password}
+          className="w-[100%] mb-[60px]"
+        />
+        <p className="text_body text-light_grey">
           Need help? Contact Penumbra support
         </p>
       </div>

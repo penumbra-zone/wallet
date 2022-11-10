@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
@@ -40,6 +41,11 @@ module.exports = {
         action_box: '0px 5px 10px rgba(44, 42, 42, 0.4)',
       },
     },
+    screens: {
+      ext: '0px',
+      tablet: '680px',
+    },
   },
+
   plugins: [],
 };

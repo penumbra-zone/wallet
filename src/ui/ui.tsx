@@ -5,19 +5,26 @@ import {
   setupDnode,
   transformMethods,
 } from '../lib';
+import ReactDOM from 'react-dom/client';
 import backgroundService, {
   BackgroundGetStateResult,
   BackgroundUiApi,
 } from './services/Background';
 import './main.css';
+import { createAccountsStore, createUpdateState } from '../accounts';
+import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { routesUi } from './routesUi';
+import './main.css';
 
 startUi();
 
 async function startUi() {
+  const store = createAccountsStore();
+  const updateState = createUpdateState(store);
+
   extension.storage.onChanged.addListener(async (changes, area) => {
-    if (area !== 'local') {
-      return;
-    }
+    if (area !== 'local') return;
 
     const stateChanges: Partial<Record<string, unknown>> &
       Partial<BackgroundGetStateResult> = await backgroundService.getState([
@@ -25,9 +32,12 @@ async function startUi() {
       'isLocked',
     ]);
 
+    console.log(stateChanges);
+
     for (const key in changes) {
       stateChanges[key] = changes[key].newValue;
     }
+    updateState(stateChanges);
   });
 
   const emitterApi = {
@@ -64,11 +74,16 @@ async function startUi() {
 
   const background = await connect();
 
-  const [state] = await Promise.all([background.getState()]);
+  const [selectedAccount, networks] = await Promise.all([
+    background.getSelectedAccount(),
+    background.getNetworks(),
+    ,
+  ]);
 
-  // if (!state.isInitialized) {
-  background.showTab(window.location.origin + '/accounts.html', 'accounts');
-  // }
+  if (!selectedAccount) {
+    background.showTab(window.location.origin + '/accounts.html', 'accounts');
+  }
+  updateState({ selectedAccount, networks });
 
   backgroundService.init(background);
 
@@ -76,4 +91,16 @@ async function startUi() {
   document.addEventListener('keyup', () => backgroundService.updateIdle());
   document.addEventListener('mousedown', () => backgroundService.updateIdle());
   document.addEventListener('focus', () => backgroundService.updateIdle());
+
+  const router = createMemoryRouter(routesUi);
+
+  const root = ReactDOM.createRoot(
+    document.getElementById('app-content') as HTMLElement
+  );
+
+  root.render(
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
+  );
 }

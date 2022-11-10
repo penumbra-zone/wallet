@@ -60,18 +60,18 @@ export const Main: React.FC<MainProps> = () => {
   if (!selectedAccount.addressByIndex) return <></>;
   return (
     <>
-      <div className="w-[100%] mt-[10px] mb-[20px]">
-        <div className="w-[816px] flex flex-col justify-center bg-brown rounded-[15px] relative pb-[40px]">
+      <div className="ext:w-[400px] tablet:w-[100%] mt-[10px] mb-[20px] ">
+        <div className="tablet:w-[816px] ext:mx-[40px] tablet:mx-[0px] flex flex-col justify-center bg-brown rounded-[15px] relative pb-[40px]">
           <div
-            className="absolute right-[30px] top-[34px] cursor-pointer"
+            className="absolute ext:right-[24px] ext:top-[28px] tablet:right-[30px] tablet:top-[34px] cursor-pointer"
             role="button"
             tabIndex={0}
             onClick={toggleMorePopup(true)}
           >
             <DotsSvg />
           </div>
-          <div className="flex flex-col items-center justify-center pt-[30px] pb-[24px]">
-            <p className="h2 mb-[4px]">{selectedAccount.name}</p>
+          <div className="flex flex-col items-center justify-center ext:pt-[20px] tablet:pt-[24px] ext:pb-[16px] tablet:pb-[14px]">
+            <p className="h1 mb-[4px]">{selectedAccount.name}</p>
             <div className="flex items-center  text_body text-light_grey">
               {getShortKey(selectedAccount.addressByIndex)}
               <span
@@ -85,13 +85,13 @@ export const Main: React.FC<MainProps> = () => {
             </div>
           </div>
           <div className="border-y-[1px] border-solid border-dark_grey pt-[16px] flex flex-col items-center justify-center">
-            <div className="w-[51px] h-[51px] li_gradient rounded-[50%] flex  items-center justify-center">
-              <div className="w-[50px] h-[50px] bg-brown rounded-[50%] flex items-center justify-center">
+            <div className="ext:w-[40px] ext:h-[40px] tablet:w-[51px] tablet:h-[51px] li_gradient rounded-[50%] flex  items-center justify-center">
+              <div className="w-[39px] h-[39px] bg-brown rounded-[50%] flex items-center justify-center">
                 PNB
               </div>
             </div>
             <p className="pt-[16px] pb-[24px] text_numbers">0 PNB</p>
-            <div className="flex gap-x-[69px] mb-[60px]">
+            <div className="flex ext:gap-x-[0px] ext:gap-x-[45px] tablet:gap-x-[69px] ext:mb-[40px] tablet:mb-[60px]">
               <div className="flex flex-col items-center">
                 <Button
                   mode="gradient"
@@ -101,7 +101,7 @@ export const Main: React.FC<MainProps> = () => {
                       <DowmloadSvg />
                     </div>
                   }
-                  className="rounded-[50%] w-[51px]"
+                  className="rounded-[50%] w-[51px] ext:py-[14px] tablet:py-[14px]"
                 />
                 <p className="text_button pt-[8px]">Receive</p>
               </div>
@@ -114,7 +114,7 @@ export const Main: React.FC<MainProps> = () => {
                       <ArrowUpRightSvg />
                     </div>
                   }
-                  className="rounded-[50%] w-[51px]"
+                  className="rounded-[50%] w-[51px] ext:py-[14px] tablet:py-[14px]"
                 />
                 <p className="text_button pt-[8px]">Send</p>
               </div>
@@ -127,7 +127,7 @@ export const Main: React.FC<MainProps> = () => {
                       <CachedSvg />
                     </div>
                   }
-                  className="rounded-[50%] w-[51px]"
+                  className="rounded-[50%] w-[51px] ext:py-[14px] tablet:py-[14px]"
                 />
                 <p className="text_button pt-[8px]">Exchange</p>
               </div>

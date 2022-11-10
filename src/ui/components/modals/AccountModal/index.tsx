@@ -42,7 +42,7 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
               title="Block"
               mode="gradient"
               onClick={handleBlock}
-              className="py-[7px]"
+              className="tablet:py-[7px]"
             />
           </div>
         </div>

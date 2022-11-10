@@ -134,13 +134,12 @@ export class ClientController {
     compactBlockRangeRequest.startHeight = BigInt(
       this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
     );
-    compactBlockRangeRequest.endHeight = BigInt(10000)
+    compactBlockRangeRequest.endHeight = BigInt(10000);
     compactBlockRangeRequest.keepAlive = true;
     try {
       for await (const response of client.compactBlockRange(
         compactBlockRangeRequest
       )) {
-       
         await this.scanBlock(response, fvk);
         if (Number(response.height) < lastBlock) {
           if (Number(response.height) % 100000 === 0) {
@@ -208,8 +207,6 @@ export class ClientController {
             this.toHexString(notePayload.payload?.encryptedNote),
             this.toHexString(notePayload.payload?.ephemeralKey)
           );
-          console.log(decryptedNote);
-          
 
           decryptedNote.height = compactBlock.height;
           decryptedNote.note_commitment = this.toHexString(

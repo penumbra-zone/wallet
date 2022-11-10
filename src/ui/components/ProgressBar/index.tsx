@@ -17,6 +17,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ percent }) => {
           transition: 'stroke-dashoffset 0.5s ease 0s',
           transform: 'rotate(0.25turn)',
           transformOrigin: 'center center',
+          width: '124px'
         },
         trail: {
           stroke: '#282626',
