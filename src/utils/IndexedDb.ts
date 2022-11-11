@@ -44,6 +44,7 @@ export class IndexedDb {
     const tx = this.db.transaction(tableName, 'readonly');
     const store = tx.objectStore(tableName);
     const result = await store.getAll();
+
     return result;
   }
 

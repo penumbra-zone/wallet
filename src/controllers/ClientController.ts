@@ -20,7 +20,6 @@ import { RemoteConfigController } from './RemoteConfigController';
 import { NetworkController } from './NetworkController';
 import { encode } from 'bech32-buffer';
 
-
 export class ClientController {
   store;
   db;
@@ -141,7 +140,6 @@ export class ClientController {
       for await (const response of client.compactBlockRange(
         compactBlockRangeRequest
       )) {
-       
         await this.scanBlock(response, fvk);
         if (Number(response.height) < lastBlock) {
           if (Number(response.height) % 100000 === 0) {
@@ -203,27 +201,22 @@ export class ClientController {
   async scanBlock(compactBlock: CompactBlock, fvk: string) {
     if (this.requireScanning(compactBlock)) {
       for (const notePayload of compactBlock.notePayloads) {
-
         try {
           let decryptedNote = decrypt_note(
             fvk,
             this.toHexString(notePayload.payload?.encryptedNote),
             this.toHexString(notePayload.payload?.ephemeralKey)
           );
-          if (decryptedNote === null)
-            continue;
-          console.log(decryptedNote);
-          
-
-          decryptedNote.height = compactBlock.height;
+          if (decryptedNote === null) continue;
+          //TODO to bigint
+          decryptedNote.height = Number(compactBlock.height);
           decryptedNote.note_commitment = this.toHexString(
             notePayload.payload?.noteCommitment.inner
           );
           decryptedNote.ephemeralKey = this.toHexString(
             notePayload.payload?.ephemeralKey
           );
-          decryptedNote.amount =
-            decryptedNote.value.amount.lo;
+          decryptedNote.amount = decryptedNote.value.amount.lo;
 
           decryptedNote.asset = decryptedNote.value.asset_id;
 
@@ -241,12 +234,10 @@ export class ClientController {
             lastSavedBlock,
           });
         } catch (e) {
-          console.error(e)
+          console.error(e);
         }
       }
-
     }
-
   }
 
   byteArrayToLong = function (/*byte[]*/ byteArray) {

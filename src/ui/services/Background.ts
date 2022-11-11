@@ -393,6 +393,18 @@ class Background {
     }
   }
 
+  async getAllValueIndexedDB(tableName: string) {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.getAllValueIndexedDB(tableName);
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
+    }
+  }
+
   async getAssets(): Promise<void> {
     try {
       await this.initPromise;
@@ -516,35 +528,35 @@ class Background {
   //     }
   //   }
 
-    async setCustomGRPC(
-      url: string | null | undefined,
-      network: NetworkName
-    ): Promise<void> {
-      try {
-        await this.initPromise;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await this._connect!();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return await this.background!.setCustomGRPC(url, network);
-      } catch (err) {
-        throw new Error(prepareErrorMessage(err));
-      }
+  async setCustomGRPC(
+    url: string | null | undefined,
+    network: NetworkName
+  ): Promise<void> {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.setCustomGRPC(url, network);
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
     }
+  }
 
-    async setCustomTendermint(
-      code: string | undefined,
-      network: NetworkName
-    ): Promise<void> {
-      try {
-        await this.initPromise;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await this._connect!();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return await this.background!.setCustomTendermint(code, network);
-      } catch (err) {
-        throw new Error(prepareErrorMessage(err));
-      }
+  async setCustomTendermint(
+    code: string | undefined,
+    network: NetworkName
+  ): Promise<void> {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.setCustomTendermint(code, network);
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
     }
+  }
 
   //   async setCustomMatcher(
   //     url: string | null | undefined,

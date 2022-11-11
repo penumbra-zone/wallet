@@ -3,6 +3,7 @@ import { getShortKey } from '../../../utils';
 import {
   AccountDetailModal,
   ArrowUpRightSvg,
+  Balance,
   Button,
   CachedSvg,
   ChevronLeftIcon,
@@ -90,7 +91,7 @@ export const Main: React.FC<MainProps> = () => {
                 PNB
               </div>
             </div>
-            <p className="pt-[16px] pb-[24px] text_numbers">0 PNB</p>
+            <Balance className="pt-[16px] pb-[24px] text_numbers" />
             <div className="flex gap-x-[69px] mb-[60px]">
               <div className="flex flex-col items-center">
                 <Button
@@ -141,7 +142,7 @@ export const Main: React.FC<MainProps> = () => {
                   PNB
                 </div>
               </div>
-              <p className="pl-[16px] text_numbers">0 PNB</p>
+              <Balance className="pl-[16px] text_numbers" />
             </div>
             <div className="rotate-180">
               <ChevronLeftIcon />

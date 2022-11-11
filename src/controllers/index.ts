@@ -5,3 +5,4 @@ export * from './NetworkController';
 export * from './RemoteConfigController';
 export * from './PreferencesController';
 export * from './ClientController';
+export * from './CurrentAccountController';
