@@ -134,7 +134,6 @@ export class ClientController {
     compactBlockRangeRequest.startHeight = BigInt(
       this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
     );
-    compactBlockRangeRequest.endHeight = BigInt(10000);
     compactBlockRangeRequest.keepAlive = true;
     try {
       for await (const response of client.compactBlockRange(
@@ -207,17 +206,17 @@ export class ClientController {
             this.toHexString(notePayload.payload?.encryptedNote),
             this.toHexString(notePayload.payload?.ephemeralKey)
           );
-
-          decryptedNote.height = compactBlock.height;
+          if (decryptedNote === null) continue;
+          //TODO to bigint
+          decryptedNote.height = Number(compactBlock.height);
           decryptedNote.note_commitment = this.toHexString(
             notePayload.payload?.noteCommitment.inner
           );
           decryptedNote.ephemeralKey = this.toHexString(
             notePayload.payload?.ephemeralKey
           );
-          decryptedNote.amount = this.byteArrayToLong(
-            decryptedNote.value.amount.inner
-          );
+          decryptedNote.amount = decryptedNote.value.amount.lo;
+
           decryptedNote.asset = decryptedNote.value.asset_id;
 
           if (decryptedNote.amount != 0) {
@@ -233,7 +232,9 @@ export class ClientController {
           extension.storage.local.set({
             lastSavedBlock,
           });
-        } catch (e) {}
+        } catch (e) {
+          console.error(e);
+        }
       }
     }
   }

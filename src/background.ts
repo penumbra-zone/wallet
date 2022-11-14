@@ -13,6 +13,7 @@ import {
 import { extension, PortStream, setupDnode, TabsManager } from './lib';
 import { ExtensionStorage, StorageLocalState } from './storage';
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig';
+import { IndexedDb } from './utils';
 import { CreateWalletInput, ISeedWalletInput } from './wallets';
 
 const bgPromise = setupBackgroundService();
@@ -87,6 +88,7 @@ class BackgroundService extends EventEmitter {
   remoteConfigController;
   preferencesController;
   clientController;
+  indexedDb;
 
   constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
     super();
@@ -129,6 +131,8 @@ class BackgroundService extends EventEmitter {
       getNetwork: () => this.networkController.getNetwork(),
       getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
     });
+
+    this.indexedDb = new IndexedDb()
   }
 
   setupPageConnection(remotePort: chrome.runtime.Port) {
@@ -198,6 +202,7 @@ class BackgroundService extends EventEmitter {
         url: string | null | undefined,
         network: NetworkName
       ) => this.networkController.setCustomTendermint(url, network),
+      getAllValueIndexedDB: async (tableName: string) => this.indexedDb.getAllValue(tableName),
     };
   }
   getInpageApi(origin: string, connectionId: string) {
