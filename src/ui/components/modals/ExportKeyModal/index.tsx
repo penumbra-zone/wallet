@@ -10,7 +10,6 @@ import { ChevronLeftIcon, InformationOutlineSvg } from '../../Svg';
 import { UserLogo } from '../../UserLogo';
 import { SuccessCreateModalProps } from '../SuccessCreateModal';
 import toast from 'react-hot-toast';
-import { useMediaQuery } from '../../../../hooks';
 
 type ExportKeyModalProps = {
   type: KeysModalType;
@@ -20,7 +19,6 @@ type ExportKeyModalProps = {
 export const ExportKeyModal: React.FC<
   SuccessCreateModalProps & ExportKeyModalProps
 > = ({ show, onClose, type, handleBack }) => {
-  const isDesktop = useMediaQuery();
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
 
   const [password, setPassword] = useState<string>('');

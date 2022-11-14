@@ -39,7 +39,7 @@ export const Button: React.FC<ButtonProps> = ({
       <button
         disabled={disabled}
         onClick={onClick}
-        className={`flex text_button items-center text-light_grey ${className}`}
+        className={`flex text_button items-center justify-center text-light_grey ${className}`}
       >
         <span>{iconLeft}</span>
         <span>{title}</span>

@@ -61,7 +61,7 @@ export class WalletController extends EventEmitter {
     }
     this._restoreWallets(password);
     this._setPassword(password);
-     this.emit('wallet unlock');
+    this.emit('wallet unlock');
   }
 
   addWallet(options: CreateWalletInput) {
@@ -101,7 +101,14 @@ export class WalletController extends EventEmitter {
     }
   }
 
-  resetWallet(){
+  getAccountSeed(password: string) {
+    if (!password) throw new Error('Password is required');
+    this._restoreWallets(password);
+
+    return this.wallets[0].getSeed();
+  }
+
+  resetWallet() {
     this.emit('reset wallet');
   }
 

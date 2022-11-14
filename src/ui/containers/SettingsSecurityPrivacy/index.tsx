@@ -1,11 +1,19 @@
 import { useState } from 'react';
-import { Button, ResetWalletModal } from '../../components';
+import {
+  Button,
+  ExportSeedPhraseModal,
+  ResetWalletModal,
+} from '../../components';
 
 export const SettingsSecurityPrivacy = () => {
   const [isOpenResetWallet, setIsOpenResetWallet] = useState<boolean>(false);
+  const [isOpenSeedModal, setIsOpenSeedModal] = useState<boolean>(true);
 
   const toggleShowResetWalletModal = (value: boolean) => () =>
     setIsOpenResetWallet(value);
+
+  const toggleShowSeedModal = (value: boolean) => () =>
+    setIsOpenSeedModal(value);
   return (
     <>
       <div className="w-[100%] flex flex-col py-[24px] ext:px-[16px] tablet:px-[0px]">
@@ -14,7 +22,7 @@ export const SettingsSecurityPrivacy = () => {
           <Button
             title="Show passphrase"
             mode="gradient"
-            onClick={() => console.log('asd')}
+            onClick={toggleShowSeedModal(true)}
             className="ext:w-[100%] tablet:w-[280px] mt-[16px]"
           />
         </div>
@@ -31,6 +39,10 @@ export const SettingsSecurityPrivacy = () => {
       <ResetWalletModal
         show={isOpenResetWallet}
         onClose={toggleShowResetWalletModal(false)}
+      />
+      <ExportSeedPhraseModal
+        show={isOpenSeedModal}
+        onClose={toggleShowSeedModal(false)}
       />
     </>
   );

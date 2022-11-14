@@ -189,6 +189,8 @@ class BackgroundService extends EventEmitter {
         this.walletController.getAccountFullViewingKey(password),
       getAccountSpendingKey: async (password: string) =>
         this.walletController.getAccountSpendingKey(password),
+      getAccountSeed: async (password: string) =>
+        this.walletController.getAccountSeed(password),
       getCompactBlockRange: async () =>
         this.clientController.getCompactBlockRange(),
       getAssets: async () => this.clientController.getAssets(),
@@ -202,7 +204,8 @@ class BackgroundService extends EventEmitter {
         url: string | null | undefined,
         network: NetworkName
       ) => this.networkController.setCustomTendermint(url, network),
-      getAllValueIndexedDB: async (tableName: string) => this.indexedDb.getAllValue(tableName),
+      getAllValueIndexedDB: async (tableName: string) =>
+        this.indexedDb.getAllValue(tableName),
     };
   }
   getInpageApi(origin: string, connectionId: string) {

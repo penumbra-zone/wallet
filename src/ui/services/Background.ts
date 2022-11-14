@@ -322,21 +322,19 @@ class Background {
   //     }
   //   }
 
-  //   async getAccountSeed(
-  //     address: string,
-  //     network: NetworkName,
-  //     password: string
-  //   ): Promise<string> {
-  //     try {
-  //       await this.initPromise;
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       await this._connect!();
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       return await this.background!.getAccountSeed(address, network, password);
-  //     } catch (err) {
-  //       throw new Error(prepareErrorMessage(err));
-  //     }
-  //   }
+    async getAccountSeed(
+      password: string
+    ): Promise<string> {
+      try {
+        await this.initPromise;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await this._connect!();
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return await this.background!.getAccountSeed(password);
+      } catch (err) {
+        throw new Error(prepareErrorMessage(err));
+      }
+    }
 
   //   async getAccountEncodedSeed(
   //     address: string,
