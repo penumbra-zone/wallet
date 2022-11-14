@@ -10,6 +10,7 @@ import { ChevronLeftIcon, InformationOutlineSvg } from '../../Svg';
 import { UserLogo } from '../../UserLogo';
 import { SuccessCreateModalProps } from '../SuccessCreateModal';
 import toast from 'react-hot-toast';
+import { useMediaQuery } from '../../../../hooks';
 
 type ExportKeyModalProps = {
   type: KeysModalType;
@@ -19,6 +20,7 @@ type ExportKeyModalProps = {
 export const ExportKeyModal: React.FC<
   SuccessCreateModalProps & ExportKeyModalProps
 > = ({ show, onClose, type, handleBack }) => {
+  const isDesktop = useMediaQuery();
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
 
   const [password, setPassword] = useState<string>('');
@@ -35,12 +37,12 @@ export const ExportKeyModal: React.FC<
       const key =
         type === 'full_viewing_key'
           ? await Background.getAccountFullViewingKey(password)
-          : await Background.getAccountSpendingKey(password); 
+          : await Background.getAccountSpendingKey(password);
       setKey(key);
       setPassword('');
     } catch (e) {
       setIsError(true);
-      console.error(e)
+      console.error(e);
     }
   };
 

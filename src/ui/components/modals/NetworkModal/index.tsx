@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccountsSelector } from '../../../../accounts';
+import { useMediaQuery } from '../../../../hooks';
 import { routesPath } from '../../../../utils';
 import {
   selectCurNetwork,
@@ -19,6 +20,7 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
   show,
   onClose,
 }) => {
+  const isDesktop = useMediaQuery();
   const navigate = useNavigate();
   const networks = useAccountsSelector(selectNetworks);
   const lastExistBlock = useAccountsSelector(selectLastExistBlock);
@@ -38,8 +40,8 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
     <ModalWrapper
       show={show}
       onClose={onClose}
-      position="top_right"
-      className="py-[20px] px-[0px] w-[296px] mr-[106px]"
+      position={isDesktop ? "top_right": "center"}
+      className={`py-[20px] px-[0px] w-[296px] ${isDesktop && 'mr-[106px]'}`}
     >
       <div className="flex flex-col">
         <p className="h1_ext px-[18px] pb-[24px] border-b-[1px] border-solid border-dark_grey text-center">

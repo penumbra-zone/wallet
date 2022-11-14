@@ -9,11 +9,13 @@ import Background from '../../../services/Background';
 import { PopupButton } from '../../PopupButton';
 import { useNavigate } from 'react-router-dom';
 import { routesPath } from '../../../../utils';
+import { useMediaQuery } from '../../../../hooks';
 
 export const AccountModal: React.FC<SuccessCreateModalProps> = ({
   show,
   onClose,
 }) => {
+  const isDesktop = useMediaQuery();
   const navigate = useNavigate();
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
 
@@ -31,8 +33,8 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
     <ModalWrapper
       show={show}
       onClose={onClose}
-      position="top_right"
-      className="py-[20px] px-[0px]"
+      position={isDesktop ? 'top_right' : 'center'}
+      className={isDesktop ? 'py-[20px] px-[0px]' : ''}
     >
       <div className="flex flex-col">
         <div className="flex items-center justify-between px-[18px] pb-[24px] border-b-[1px] border-solid border-dark_grey">
