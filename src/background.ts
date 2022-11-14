@@ -45,7 +45,7 @@ async function setupBackgroundService() {
     global.background = backgroundService;
   }
 
-  // backgroundService.clientController.getCompactBlockRange();
+  backgroundService.clientController.getCompactBlockRange();
 
   const tabsManager = new TabsManager({ extensionStorage });
   backgroundService.on('Show tab', async (url, name) => {
@@ -57,13 +57,13 @@ async function setupBackgroundService() {
     await backgroundService.clientController.getAssets();
     await backgroundService.clientController.getChainParams();
 
-    // await backgroundService.clientController.getCompactBlockRange();
+    await backgroundService.clientController.getCompactBlockRange();
   });
 
   backgroundService.walletController.on('wallet unlock', async () => {
     await backgroundService.clientController.getAssets();
     await backgroundService.clientController.getChainParams();
-    // await backgroundService.clientController.getCompactBlockRange();
+    await backgroundService.clientController.getCompactBlockRange();
   });
 
   backgroundService.walletController.on('reset wallet', async () => {

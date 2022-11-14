@@ -15,3 +15,4 @@ export * from './Settings';
 export * from './SettingsSecurityPrivacy';
 export * from './SettingsNetworks';
 export * from './RootWrapperUi';
+export * from './SettingsExtenion';

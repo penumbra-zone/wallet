@@ -30,7 +30,7 @@ export const Button: React.FC<ButtonProps> = ({
       ${className}`;
 
     if (mode === 'transparent' && disabled)
-      return `w-[100%] bg-brown  text-light_brown text_button border-[1px] border-solid border-dark_greyext:py-[7px] tablet:py-[14px] rounded-[15px]
+      return `w-[100%] bg-brown  text-light_brown text_button border-[1px] border-solid border-dark_grey ext:py-[7px] tablet:py-[14px] rounded-[15px]
       ${className}`;
   }, [className, mode, disabled]);
 
@@ -39,7 +39,7 @@ export const Button: React.FC<ButtonProps> = ({
       <button
         disabled={disabled}
         onClick={onClick}
-        className="flex text_button items-center text-light_grey"
+        className={`flex text_button items-center text-light_grey ${className}`}
       >
         <span>{iconLeft}</span>
         <span>{title}</span>

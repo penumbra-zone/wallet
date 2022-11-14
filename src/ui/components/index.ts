@@ -13,7 +13,8 @@ export * from './NetworkSelect';
 export * from './PopupButton';
 export * from './ProgressBar';
 export * from './SettingSideBar';
-export * from './Balance'
+export * from './Balance';
+export * from './SettingsExtensionSideBar';
 
 //modals
 export * from './modals/SuccessCreateModal';

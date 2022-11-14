@@ -141,7 +141,7 @@ export class ClientController {
       )) {
         await this.scanBlock(response, fvk);
         if (Number(response.height) < lastBlock) {
-          if (Number(response.height) % 100000 === 0) {
+          if (Number(response.height) % 10000 === 0) {
             const oldState = this.store.getState().lastSavedBlock;
 
             const lastSavedBlock = {

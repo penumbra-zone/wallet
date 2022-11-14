@@ -2,7 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { routesPath } from '../../../utils';
 import { SettingSideBar } from '../../components';
 
-const header = {
+export const header = {
   [routesPath.SETTINGS]: 'Support',
   [routesPath.SETTINGS_ADDITIONALLY]: 'Additionally',
   [routesPath.SETTINGS_CONTACTS]: 'Contact Information',

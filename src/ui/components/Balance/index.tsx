@@ -5,20 +5,22 @@ import { selectLastExistBlock, selectLastSavedBlock } from '../../redux';
 import Background from '../../services/Background';
 
 type BalanceProps = {
-    className?: string
-}
+  className?: string;
+};
 
-export const Balance: React.FC<BalanceProps> = ({ className}) => {
+export const Balance: React.FC<BalanceProps> = ({ className }) => {
   const [balance, setBalance] = useState<number>(0);
   const lastSavedBlock = useAccountsSelector(selectLastSavedBlock);
   const lastExistBlock = useAccountsSelector(selectLastExistBlock);
 
   const getNotes = async () => {
     const data = await Background.getAllValueIndexedDB('notes');
+    if (!data.length) return setBalance(0);
 
     const max = data.reduce(function (prev, current) {
       return prev.height > current.height ? prev : current;
     });
+
     setBalance(max.amount);
   };
 

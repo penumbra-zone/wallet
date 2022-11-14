@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useAccountsSelector } from '../../../accounts';
 import { getShortKey } from '../../../utils';
 import {
@@ -16,7 +17,6 @@ import {
 } from '../../components';
 import { selectSelectedAccount, selectState } from '../../redux';
 import toast from 'react-hot-toast';
-import { useState } from 'react';
 
 type MainProps = {};
 
@@ -58,7 +58,9 @@ export const Main: React.FC<MainProps> = () => {
     setIsOpenDetailPopup(true);
     setKeyModalType('');
   };
+
   if (!selectedAccount.addressByIndex) return <></>;
+
   return (
     <>
       <div className="ext:w-[400px] tablet:w-[100%] mt-[10px] mb-[20px] ">
@@ -87,7 +89,7 @@ export const Main: React.FC<MainProps> = () => {
           </div>
           <div className="border-y-[1px] border-solid border-dark_grey pt-[16px] flex flex-col items-center justify-center">
             <div className="ext:w-[40px] ext:h-[40px] tablet:w-[51px] tablet:h-[51px] li_gradient rounded-[50%] flex  items-center justify-center">
-              <div className="w-[39px] h-[39px] bg-brown rounded-[50%] flex items-center justify-center">
+              <div className="ext:w-[39px] ext:h-[39px] tablet:w-[50px] tablet:h-[50px] bg-brown rounded-[50%] flex items-center justify-center">
                 PNB
               </div>
             </div>

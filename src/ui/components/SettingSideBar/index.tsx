@@ -10,7 +10,7 @@ import {
   SettingsSvg,
 } from '../Svg';
 
-const links = [
+export const links = [
   {
     to: routesPath.SETTINGS,
     svg: <SettingsSvg />,
