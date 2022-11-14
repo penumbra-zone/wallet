@@ -11,8 +11,8 @@ import { RootWrapperAccount } from '../ui/containers';
 import { Toaster } from 'react-hot-toast';
 
 export const RootAccounts = () => {
-  const navigate = useNavigate();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const state = useAccountsSelector(selectState);
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
@@ -22,6 +22,9 @@ export const RootAccounts = () => {
     if (!isRedirect) return;
 
     if (selectedAccount.name && isRedirect && !state.isLocked) {
+      if (pathname === routesPath.SETTINGS_NETWORKS) {
+        return navigate(routesPath.SETTINGS_NETWORKS);
+      }
       return navigate(routesPath.HOME);
     }
 

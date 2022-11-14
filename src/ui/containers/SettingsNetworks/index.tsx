@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAccountsSelector } from '../../../accounts';
 import { useMediaQuery } from '../../../hooks';
 import { routesPath } from '../../../utils';
@@ -14,7 +15,7 @@ import Background from '../../services/Background';
 
 export const SettingsNetworks = () => {
   const isDesktop = useMediaQuery();
-
+  const navigate = useNavigate();
   const networks = useAccountsSelector(selectNetworks);
   const customTendermint = useAccountsSelector(selectCustomTendermint);
   const customGRPC = useAccountsSelector(selectCustomGRPC);
@@ -78,11 +79,13 @@ export const SettingsNetworks = () => {
     );
   }, [selected, inputsValues]);
 
-  const handleOpentTab = () =>
+  const handleOpentTab = () => {
     Background.showTab(
-      window.location.origin + `/accounts.html#/settings/general-information`,
-      'accounts'
+      `${window.location.origin}/accounts.html#${routesPath.SETTINGS_NETWORKS}`,
+      'settings/networks'
     );
+    navigate('/', { replace: true });
+  };
 
   return (
     <div className="w-[100%] ext:h-[calc(100%-100px)] tablet:h-[100%] flex">
