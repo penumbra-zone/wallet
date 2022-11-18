@@ -63,7 +63,7 @@ export class ClientController {
     this.indexedDb = new IndexedDb();
   }
 
-  async getAssets() {
+  async saveAssets() {
     const assets = await this.indexedDb.getAllValue('assets');
 
     if (assets.length) return;

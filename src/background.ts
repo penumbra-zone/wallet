@@ -54,14 +54,14 @@ async function setupBackgroundService() {
   });
 
   backgroundService.walletController.on('wallet create', async () => {
-    await backgroundService.clientController.getAssets();
+    await backgroundService.clientController.saveAssets();
     await backgroundService.clientController.getChainParams();
 
     await backgroundService.clientController.getCompactBlockRange();
   });
 
   backgroundService.walletController.on('wallet unlock', async () => {
-    await backgroundService.clientController.getAssets();
+    await backgroundService.clientController.saveAssets();
     await backgroundService.clientController.getChainParams();
     await backgroundService.clientController.getCompactBlockRange();
   });
@@ -193,7 +193,7 @@ class BackgroundService extends EventEmitter {
         this.walletController.getAccountSeed(password),
       getCompactBlockRange: async () =>
         this.clientController.getCompactBlockRange(),
-      getAssets: async () => this.clientController.getAssets(),
+      saveAssets: async () => this.clientController.saveAssets(),
       getChainParams: async () => this.clientController.getChainParams(),
       resetWallet: async () => this.walletController.resetWallet(),
       setCustomGRPC: async (

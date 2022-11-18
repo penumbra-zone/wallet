@@ -7,7 +7,7 @@ import {
 
 export const SettingsSecurityPrivacy = () => {
   const [isOpenResetWallet, setIsOpenResetWallet] = useState<boolean>(false);
-  const [isOpenSeedModal, setIsOpenSeedModal] = useState<boolean>(true);
+  const [isOpenSeedModal, setIsOpenSeedModal] = useState<boolean>(false);
 
   const toggleShowResetWalletModal = (value: boolean) => () =>
     setIsOpenResetWallet(value);

@@ -403,18 +403,6 @@ class Background {
     }
   }
 
-  async getAssets(): Promise<void> {
-    try {
-      await this.initPromise;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await this._connect!();
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return await this.background!.getAssets();
-    } catch (err) {
-      throw new Error(prepareErrorMessage(err));
-    }
-  }
-
   async getChainParams(): Promise<void> {
     try {
       await this.initPromise;
