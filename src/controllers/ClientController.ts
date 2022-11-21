@@ -3,7 +3,7 @@ import {
   createPromiseClient,
 } from '@bufbuild/connect-web';
 
-import { ObliviousQuery } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_connectweb';
+import { ObliviousQueryService } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_connectweb';
 import { ExtensionStorage } from '../storage';
 import {
   AssetListRequest,
@@ -74,7 +74,7 @@ export class ClientController {
     const transport = createGrpcWebTransport({
       baseUrl: grpc,
     });
-    const client = createPromiseClient(ObliviousQuery, transport);
+    const client = createPromiseClient(ObliviousQueryService, transport);
 
     const assetsRequest = new AssetListRequest();
     assetsRequest.chainId = chainId;
@@ -100,7 +100,7 @@ export class ClientController {
     const transport = createGrpcWebTransport({
       baseUrl,
     });
-    const client = createPromiseClient(ObliviousQuery, transport);
+    const client = createPromiseClient(ObliviousQueryService, transport);
 
     const chainParameters = new ChainParamsRequest();
     const res = await client.chainParameters(chainParameters);
@@ -127,7 +127,7 @@ export class ClientController {
     const transport = createGrpcWebTransport({
       baseUrl: grpc,
     });
-    const client = createPromiseClient(ObliviousQuery, transport);
+    const client = createPromiseClient(ObliviousQueryService, transport);
 
     const compactBlockRangeRequest = new CompactBlockRangeRequest();
     compactBlockRangeRequest.chainId = chainId;

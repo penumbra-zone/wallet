@@ -17,6 +17,9 @@ import { Provider } from 'react-redux';
 import { routesUi } from './routesUi';
 import './main.css';
 
+console.log(document.getElementById('root'));
+
+
 startUi();
 
 async function startUi() {
@@ -95,7 +98,7 @@ async function startUi() {
   const router = createMemoryRouter(routesUi);
 
   const root = ReactDOM.createRoot(
-    document.getElementById('app-content') as HTMLElement
+    document.getElementById('root') as HTMLElement
   );
 
   root.render(

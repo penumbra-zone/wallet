@@ -98,7 +98,7 @@ async function startUi() {
   });
 
   const root = ReactDOM.createRoot(
-    document.getElementById('app-content') as HTMLElement
+    document.getElementById('accounts') as HTMLElement
   );
 
   root.render(
