@@ -17,9 +17,6 @@ import { Provider } from 'react-redux';
 import { routesUi } from './routesUi';
 import './main.css';
 
-console.log(document.getElementById('root'));
-
-
 startUi();
 
 async function startUi() {
@@ -34,8 +31,6 @@ async function startUi() {
       'isInitialized',
       'isLocked',
     ]);
-
-    console.log(stateChanges);
 
     for (const key in changes) {
       stateChanges[key] = changes[key].newValue;

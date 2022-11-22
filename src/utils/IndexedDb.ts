@@ -18,7 +18,7 @@ export class IndexedDb {
             keyPath: 'denom',
           });
 
-          db.createObjectStore('chain', {
+          db.createObjectStore('chainParameters', {
             autoIncrement: true,
             keyPath: 'chainId',
           });

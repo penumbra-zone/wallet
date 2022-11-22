@@ -14,3 +14,8 @@ export type BackgroundType = {
   };
   unlock: (password: string) => void;
 };
+
+export type EncodeAsset = {
+  denom: string;
+  id: string;
+};

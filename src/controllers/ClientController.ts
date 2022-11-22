@@ -7,18 +7,24 @@ import { ObliviousQueryService } from '@buf/bufbuild_connect-web_penumbra-zone_p
 import { ExtensionStorage } from '../storage';
 import {
   AssetListRequest,
-  ChainParamsRequest,
+  AssetListResponse,
+  ChainParametersRequest,
+  ChainParametersResponse,
   CompactBlockRangeRequest,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
 import ObservableStore from 'obs-store';
 import { IndexedDb } from '../utils';
-import { CompactBlock } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
+import {
+  ChainParameters,
+  CompactBlock,
+} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
 import { decrypt_note } from 'penumbra-web-assembly';
 import { WalletController } from './WalletController';
 import { extension } from '../lib';
 import { RemoteConfigController } from './RemoteConfigController';
 import { NetworkController } from './NetworkController';
 import { encode } from 'bech32-buffer';
+import { EncodeAsset } from '../types';
 
 export class ClientController {
   store;
@@ -64,9 +70,11 @@ export class ClientController {
   }
 
   async saveAssets() {
-    const assets = await this.indexedDb.getAllValue('assets');
+    const savedAssets: EncodeAsset[] = await this.indexedDb.getAllValue(
+      'assets'
+    );
 
-    if (assets.length) return;
+    if (savedAssets.length) return;
 
     const { grpc, chainId } =
       this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
@@ -76,23 +84,25 @@ export class ClientController {
     });
     const client = createPromiseClient(ObliviousQueryService, transport);
 
-    const assetsRequest = new AssetListRequest();
-    assetsRequest.chainId = chainId;
+    const assetRequest = new AssetListRequest();
+    assetRequest.chainId = chainId;
 
-    const res = await client.assetList(assetsRequest);
+    const asset: AssetListResponse = await client.assetList(assetRequest);
 
-    const newRes = res.assets.map((asset) => ({
+    const encodeAsset: EncodeAsset[] = asset.assetList.assets.map((asset) => ({
       id: encode('passet', asset.id?.inner, 'bech32m'),
       denom: asset.denom?.denom,
     }));
 
-    await this.indexedDb.putBulkValue('assets', newRes);
+    await this.indexedDb.putBulkValue('assets', encodeAsset);
   }
 
   async getChainParams() {
-    const chain = await this.indexedDb.getAllValue('chain');
+    const savedChainParameters: ChainParameters[] =
+      await this.indexedDb.getAllValue('chainParameters');
+    console.log({ savedChainParameters });
 
-    if (chain.length) return;
+    if (savedChainParameters.length) return;
 
     const baseUrl =
       this.configApi.getNetworkConfig()[this.configApi.getNetwork()].grpc;
@@ -102,10 +112,20 @@ export class ClientController {
     });
     const client = createPromiseClient(ObliviousQueryService, transport);
 
-    const chainParameters = new ChainParamsRequest();
-    const res = await client.chainParameters(chainParameters);
-    await this.indexedDb.putValue('chain', res);
-    await this.configApi.setNetworks(res.chainId, this.configApi.getNetwork());
+    const chainParametersRequest = new ChainParametersRequest();
+
+    const chainParameters: ChainParametersResponse =
+      await client.chainParameters(chainParametersRequest);
+
+    await this.indexedDb.putValue(
+      'chainParameters',
+      chainParameters.chainParameters
+    );
+
+    await this.configApi.setNetworks(
+      chainParameters.chainParameters.chainId,
+      this.configApi.getNetwork()
+    );
   }
 
   async getCompactBlockRange() {
@@ -127,9 +147,11 @@ export class ClientController {
     const transport = createGrpcWebTransport({
       baseUrl: grpc,
     });
+
     const client = createPromiseClient(ObliviousQueryService, transport);
 
     const compactBlockRangeRequest = new CompactBlockRangeRequest();
+
     compactBlockRangeRequest.chainId = chainId;
     compactBlockRangeRequest.startHeight = BigInt(
       this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
@@ -139,35 +161,31 @@ export class ClientController {
       for await (const response of client.compactBlockRange(
         compactBlockRangeRequest
       )) {
-        await this.scanBlock(response, fvk);
-        if (Number(response.height) < lastBlock) {
-          if (Number(response.height) % 10000 === 0) {
+        await this.scanBlock(response.compactBlock, fvk);
+        if (Number(response.compactBlock.height) < lastBlock) {
+          if (Number(response.compactBlock.height) % 10000 === 0) {
             const oldState = this.store.getState().lastSavedBlock;
-
             const lastSavedBlock = {
               ...oldState,
-              [this.configApi.getNetwork()]: Number(response.height),
+              [this.configApi.getNetwork()]: Number(
+                response.compactBlock.height
+              ),
             };
-
             extension.storage.local.set({
               lastSavedBlock,
             });
           }
         } else {
           const oldState = this.store.getState().lastSavedBlock;
-
           const lastSavedBlock = {
             ...oldState,
-            [this.configApi.getNetwork()]: Number(response.height),
+            [this.configApi.getNetwork()]: Number(response.compactBlock.height),
           };
-
           const oldLastBlockHeight = this.store.getState().lastBlockHeight;
-
           const lastBlockHeight = {
             ...oldLastBlockHeight,
-            [this.configApi.getNetwork()]: Number(response.height),
+            [this.configApi.getNetwork()]: Number(response.compactBlock.height),
           };
-
           extension.storage.local.set({
             lastSavedBlock,
             lastBlockHeight,
@@ -260,7 +278,7 @@ export class ClientController {
       },
     });
     await this.indexedDb.resetTables('notes');
-    await this.indexedDb.resetTables('chain');
+    await this.indexedDb.resetTables('chainParameters');
     await this.indexedDb.resetTables('assets');
   }
 
