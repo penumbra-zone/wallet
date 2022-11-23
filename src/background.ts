@@ -11,6 +11,7 @@ import {
   WalletController,
 } from './controllers';
 import { extension, PortStream, setupDnode, TabsManager } from './lib';
+import { ViewProtocolService } from './services';
 import { ExtensionStorage, StorageLocalState } from './storage';
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig';
 import { IndexedDb } from './utils';
@@ -55,14 +56,14 @@ async function setupBackgroundService() {
 
   backgroundService.walletController.on('wallet create', async () => {
     await backgroundService.clientController.saveAssets();
-    await backgroundService.clientController.getChainParams();
+    await backgroundService.clientController.saveChainParameters();
 
     await backgroundService.clientController.getCompactBlockRange();
   });
 
   backgroundService.walletController.on('wallet unlock', async () => {
     await backgroundService.clientController.saveAssets();
-    await backgroundService.clientController.getChainParams();
+    await backgroundService.clientController.saveChainParameters();
     await backgroundService.clientController.getCompactBlockRange();
   });
 
@@ -89,9 +90,12 @@ class BackgroundService extends EventEmitter {
   preferencesController;
   clientController;
   indexedDb;
+  viewProtocolService;
 
   constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
     super();
+
+    this.indexedDb = new IndexedDb();
     this.extensionStorage = extensionStorage;
 
     this.remoteConfigController = new RemoteConfigController({
@@ -124,6 +128,7 @@ class BackgroundService extends EventEmitter {
 
     this.clientController = new ClientController({
       extensionStorage: this.extensionStorage,
+      indexedDb: this.indexedDb,
       getAccountFullViewingKey: () =>
         this.walletController.getAccountFullViewingKeyWithoutPassword(),
       setNetworks: (networkName: string, type: NetworkName) =>
@@ -132,7 +137,9 @@ class BackgroundService extends EventEmitter {
       getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
     });
 
-    this.indexedDb = new IndexedDb()
+    this.viewProtocolService = new ViewProtocolService({
+      indexedDb: this.indexedDb,
+    });
   }
 
   setupPageConnection(remotePort: chrome.runtime.Port) {
@@ -194,7 +201,8 @@ class BackgroundService extends EventEmitter {
       getCompactBlockRange: async () =>
         this.clientController.getCompactBlockRange(),
       saveAssets: async () => this.clientController.saveAssets(),
-      getChainParams: async () => this.clientController.getChainParams(),
+      saveChainParameters: async () =>
+        this.clientController.saveChainParameters(),
       resetWallet: async () => this.walletController.resetWallet(),
       setCustomGRPC: async (
         url: string | null | undefined,
@@ -210,9 +218,11 @@ class BackgroundService extends EventEmitter {
   }
   getInpageApi(origin: string, connectionId: string) {
     return {
-      publicState: async () => {
-        return this._publicState(origin);
-      },
+      publicState: async () => this._publicState(origin),
+      getAssets: async () => this.viewProtocolService.getAssets(),
+      getChainParameters: async () =>
+        this.viewProtocolService.getChainParameters(),
+      getNotes: async () => this.viewProtocolService.getNotes(),
     };
   }
 

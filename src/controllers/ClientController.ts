@@ -13,7 +13,7 @@ import {
   CompactBlockRangeRequest,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
 import ObservableStore from 'obs-store';
-import { IndexedDb } from '../utils';
+
 import {
   ChainParameters,
   CompactBlock,
@@ -25,6 +25,7 @@ import { RemoteConfigController } from './RemoteConfigController';
 import { NetworkController } from './NetworkController';
 import { encode } from 'bech32-buffer';
 import { EncodeAsset } from '../types';
+import { IndexedDb } from '../utils';
 
 export class ClientController {
   store;
@@ -35,12 +36,14 @@ export class ClientController {
 
   constructor({
     extensionStorage,
+    indexedDb,
     getAccountFullViewingKey,
     setNetworks,
     getNetwork,
     getNetworkConfig,
   }: {
     extensionStorage: ExtensionStorage;
+    indexedDb: IndexedDb;
     getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword'];
     setNetworks: RemoteConfigController['setNetworks'];
     getNetwork: NetworkController['getNetwork'];
@@ -65,8 +68,7 @@ export class ClientController {
       getNetworkConfig,
     };
     extensionStorage.subscribe(this.store);
-
-    this.indexedDb = new IndexedDb();
+    this.indexedDb = indexedDb;
   }
 
   async saveAssets() {
@@ -97,10 +99,9 @@ export class ClientController {
     await this.indexedDb.putBulkValue('assets', encodeAsset);
   }
 
-  async getChainParams() {
+  async saveChainParameters() {
     const savedChainParameters: ChainParameters[] =
       await this.indexedDb.getAllValue('chainParameters');
-    console.log({ savedChainParameters });
 
     if (savedChainParameters.length) return;
 

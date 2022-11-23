@@ -1,5 +1,7 @@
 import { IDBPDatabase, openDB } from 'idb';
 
+type TableName = 'assets' | 'chainParameters' | 'notes';
+
 export class IndexedDb {
   private database: string;
   private db: any;
@@ -33,14 +35,14 @@ export class IndexedDb {
     }
   }
 
-  public async getValue(tableName: string, id: number) {
+  public async getValue(tableName: TableName, id: number) {
     const tx = this.db.transaction(tableName, 'readonly');
     const store = tx.objectStore(tableName);
     const result = await store.get(id);
     return result;
   }
 
-  public async getAllValue(tableName: string) {
+  public async getAllValue(tableName: TableName) {
     const tx = this.db.transaction(tableName, 'readonly');
     const store = tx.objectStore(tableName);
     const result = await store.getAll();
@@ -48,14 +50,14 @@ export class IndexedDb {
     return result;
   }
 
-  public async putValue(tableName: string, value: object) {
+  public async putValue(tableName: TableName, value: object) {
     const tx = this.db.transaction(tableName, 'readwrite');
     const store = tx.objectStore(tableName);
     const result = await store.put(value);
     return result;
   }
 
-  public async putBulkValue(tableName: string, values: object[]) {
+  public async putBulkValue(tableName: TableName, values: object[]) {
     const tx = this.db.transaction(tableName, 'readwrite');
     const store = tx.objectStore(tableName);
     for (const value of values) {
@@ -64,7 +66,7 @@ export class IndexedDb {
     return this.getAllValue(tableName);
   }
 
-  public async deleteValue(tableName: string, id: number) {
+  public async deleteValue(tableName: TableName, id: number) {
     const tx = this.db.transaction(tableName, 'readwrite');
     const store = tx.objectStore(tableName);
     const result = await store.get(id);
