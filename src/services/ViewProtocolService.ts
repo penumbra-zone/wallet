@@ -31,7 +31,6 @@ export class ViewProtocolService {
 
   async getNotes() {
     const notes: CompactBlock[] = await this.indexedDb.getAllValue('notes');
-
     return notes;
   }
 }
