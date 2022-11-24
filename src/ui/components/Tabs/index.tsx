@@ -3,9 +3,14 @@ import { useState } from 'react';
 type TabsProps = {
   tabs: string[];
   children: any;
+  className?: string
 };
 
-export const Tabs: React.FC<TabsProps> = ({ tabs, children }) => {
+export const Tabs: React.FC<TabsProps> = ({
+  tabs,
+  children,
+  className = 'bg-brown',
+}) => {
   const [activeTab, setActivetab] = useState<string>(tabs[0]);
 
   const handleChangeTab = (tab: string) => () => setActivetab(tab);
@@ -24,7 +29,7 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, children }) => {
               }`}
               onClick={handleChangeTab(i)}
             >
-              <p className="h-[51px] flex items-center justify-center bg-brown">
+              <p className={`h-[51px] flex items-center justify-center ${className}`}>
                 {i}
               </p>
             </div>

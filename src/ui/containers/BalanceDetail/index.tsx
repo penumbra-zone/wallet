@@ -17,7 +17,7 @@ export const BalanceDetail = () => {
   const account = useAccountsSelector(selectNewAccount);
 
   return (
-    <div className="ext:w-[400px] tablet:w-[100%] mt-[10px] mb-[20px] ">
+    <div className="ext:w-[400px] tablet:w-[100%] mt-[20px] mb-[20px] ">
       <div className="tablet:w-[816px] ext:mx-[40px] tablet:mx-[0px] flex flex-col items-center bg-brown rounded-[15px] relative ext:pb-[28px] tablet:pb-[40px]">
         <MorePopupButton />
         <Button

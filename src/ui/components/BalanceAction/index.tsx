@@ -1,10 +1,23 @@
+import { useNavigate } from 'react-router-dom';
 import { useMediaQuery } from '../../../hooks';
+import { routesPath } from '../../../utils';
+import Background from '../../services/Background';
 import { Balance } from '../Balance';
 import { Button } from '../Button';
 import { ArrowUpRightSvg, CachedSvg, DowmloadSvg } from '../Svg';
 
 export const BalanceAction = () => {
   const isDesktop = useMediaQuery();
+  const navigate = useNavigate();
+
+  const handleStake = () => {
+    if (isDesktop) return navigate(routesPath.VALIDATORS);
+     Background.showTab(
+       `${window.location.origin}/accounts.html#${routesPath.VALIDATORS}`,
+       'validators'
+     );
+      navigate('/', { replace: true });
+  };
   return (
     <div className="w-[100%] flex flex-col items-center">
       <div className="ext:w-[40px] ext:h-[40px] tablet:w-[51px] tablet:h-[51px] li_gradient rounded-[50%] flex  items-center justify-center">
@@ -13,7 +26,7 @@ export const BalanceAction = () => {
         </div>
       </div>
       <Balance className="pt-[16px] pb-[24px] text_numbers" />
-      <div className="flex tablet:gap-x-[69px]  tablet:gap-x-[69px] ext:mb-[24px] tablet:mb-[40px]">
+      <div className="flex ext:gap-x-[30px]  tablet:gap-x-[69px] ext:mb-[24px] tablet:mb-[40px]">
         <div className="flex flex-col items-center">
           <Button
             mode="gradient"
@@ -67,7 +80,7 @@ export const BalanceAction = () => {
         </div>
         <Button
           mode="gradient"
-          onClick={() => console.log('asd')}
+          onClick={handleStake}
           title="Stake"
           className="w-[119px]"
         />

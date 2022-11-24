@@ -17,3 +17,4 @@ export * from './SettingsNetworks';
 export * from './RootWrapperUi';
 export * from './SettingsExtenion';
 export * from './BalanceDetail';
+export * from './Validators';

@@ -1,11 +1,10 @@
 import { RouteObject } from 'react-router-dom';
 import { routesPath } from '../utils';
-import { SettingsExtensionSideBar, SettingSideBar } from './components';
+import { SettingsExtensionSideBar } from './components';
 import {
   BalanceDetail,
   Login,
   Main,
-  Settings,
   SettingsExtenion,
   SettingsNetworks,
   SettingsSecurityPrivacy,

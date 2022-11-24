@@ -32,3 +32,6 @@ export * from './modals/ExportSeedPhraseModal';
 
 //forms
 export * from './forms/CreatePasswordForm';
+
+//tables
+export * from './tables/ValidatorTable';

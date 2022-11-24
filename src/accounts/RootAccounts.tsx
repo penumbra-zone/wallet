@@ -25,6 +25,9 @@ export const RootAccounts = () => {
       if (pathname === routesPath.SETTINGS_NETWORKS) {
         return navigate(routesPath.SETTINGS_NETWORKS);
       }
+      if (pathname === routesPath.VALIDATORS) {
+        return navigate(routesPath.VALIDATORS);
+      }
       return navigate(routesPath.HOME);
       // return navigate(routesPath.BALANCE_DETAIL.replace(':name', 'pnb'));
     }

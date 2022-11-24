@@ -14,6 +14,7 @@ import {
   SettingsSecurityPrivacy,
   SettingsNetworks,
   BalanceDetail,
+  Validators,
 } from '../ui/containers';
 import { RootAccounts } from './RootAccounts';
 import { routesPath } from '../utils';
@@ -66,6 +67,10 @@ export const routes: RouteObject[] = [
       {
         path: routesPath.BALANCE_DETAIL,
         element: <BalanceDetail />,
+      },
+      {
+        path: routesPath.VALIDATORS,
+        element: <Validators />,
       },
       {
         path: routesPath.SETTINGS,
