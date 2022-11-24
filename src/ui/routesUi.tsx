@@ -2,6 +2,7 @@ import { RouteObject } from 'react-router-dom';
 import { routesPath } from '../utils';
 import { SettingsExtensionSideBar, SettingSideBar } from './components';
 import {
+  BalanceDetail,
   Login,
   Main,
   Settings,
@@ -25,12 +26,16 @@ export const routesUi: RouteObject[] = [
         element: <Login />,
       },
       {
+        path: routesPath.BALANCE_DETAIL,
+        element: <BalanceDetail />,
+      },
+      {
         path: routesPath.SETTINGS,
         element: <SettingsExtenion />,
         children: [
           {
             path: routesPath.SETTINGS,
-            element: <SettingsExtensionSideBar/>
+            element: <SettingsExtensionSideBar />,
           },
           {
             path: routesPath.SETTINGS_SUPPORT,

@@ -15,6 +15,7 @@ export * from './ProgressBar';
 export * from './SettingSideBar';
 export * from './Balance';
 export * from './SettingsExtensionSideBar';
+export * from './BalanceAction';
 
 //modals
 export * from './modals/SuccessCreateModal';

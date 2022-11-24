@@ -1,28 +1,27 @@
 import { useState } from 'react';
 import { useAccountsSelector } from '../../../accounts';
-import { getShortKey } from '../../../utils';
+import { getShortKey, routesPath } from '../../../utils';
 import {
   AccountDetailModal,
-  ArrowUpRightSvg,
   Balance,
-  Button,
-  CachedSvg,
+  BalanceAction,
   ChevronLeftIcon,
   CopySvg,
   DotsSvg,
-  DowmloadSvg,
   ExportKeyModal,
   MoreModal,
   Tabs,
 } from '../../components';
 import { selectSelectedAccount, selectState } from '../../redux';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 type MainProps = {};
 
 export type KeysModalType = '' | 'full_viewing_key' | 'spending_key';
 
 export const Main: React.FC<MainProps> = () => {
+  const navigate = useNavigate();
   const [isOpenMorePopup, setIsOpenMorePopup] = useState<boolean>(false);
   const [isOpenDetailPopup, setIsOpenDetailPopup] = useState<boolean>(false);
   const [keyModalType, setKeyModalType] = useState<KeysModalType>('');
@@ -59,6 +58,9 @@ export const Main: React.FC<MainProps> = () => {
     setKeyModalType('');
   };
 
+  const handleBalancedetail = (currencyName: string) => () =>
+    navigate(routesPath.BALANCE_DETAIL.replace(':name', currencyName));
+
   if (!selectedAccount.addressByIndex) return <></>;
 
   return (
@@ -88,56 +90,15 @@ export const Main: React.FC<MainProps> = () => {
             </div>
           </div>
           <div className="border-y-[1px] border-solid border-dark_grey pt-[16px] flex flex-col items-center justify-center">
-            <div className="ext:w-[40px] ext:h-[40px] tablet:w-[51px] tablet:h-[51px] li_gradient rounded-[50%] flex  items-center justify-center">
-              <div className="ext:w-[39px] ext:h-[39px] tablet:w-[50px] tablet:h-[50px] bg-brown rounded-[50%] flex items-center justify-center">
-                PNB
-              </div>
-            </div>
-            <Balance className="pt-[16px] pb-[24px] text_numbers" />
-            <div className="flex gap-x-[69px] mb-[60px]">
-              <div className="flex flex-col items-center">
-                <Button
-                  mode="gradient"
-                  onClick={() => console.log('asd')}
-                  title={
-                    <div className="flex items-center justify-center">
-                      <DowmloadSvg />
-                    </div>
-                  }
-                  className="rounded-[50%] w-[51px] ext:py-[14px] tablet:py-[14px]"
-                />
-                <p className="text_button pt-[8px]">Receive</p>
-              </div>
-              <div className="flex flex-col items-center">
-                <Button
-                  mode="gradient"
-                  onClick={() => console.log('asd')}
-                  title={
-                    <div className="flex items-center justify-center">
-                      <ArrowUpRightSvg />
-                    </div>
-                  }
-                  className="rounded-[50%] w-[51px] ext:py-[14px] tablet:py-[14px]"
-                />
-                <p className="text_button pt-[8px]">Send</p>
-              </div>
-              <div className="flex flex-col items-center">
-                <Button
-                  mode="gradient"
-                  onClick={() => console.log('asd')}
-                  title={
-                    <div className="flex items-center justify-center">
-                      <CachedSvg />
-                    </div>
-                  }
-                  className="rounded-[50%] w-[51px] ext:py-[14px] tablet:py-[14px]"
-                />
-                <p className="text_button pt-[8px]">Exchange</p>
-              </div>
+            <div className="w-[100%] ext:mb-[24px] tablet:mb-[40px]">
+              <BalanceAction />
             </div>
             <Tabs tabs={['Assets', 'Activity']} />
           </div>
-          <div className="flex items-center justify-between py-[20px] pl-[22px] pr-[30px] border-b-[1px] border-solid border-dark_grey cursor-pointer">
+          <div
+            onClick={handleBalancedetail('pnb')}
+            className="flex items-center justify-between py-[20px] pl-[22px] pr-[30px] border-b-[1px] border-solid border-dark_grey cursor-pointer hover:bg-brown"
+          >
             <div className="flex items-center">
               <div className="w-[51px] h-[51px] li_gradient rounded-[50%] flex  items-center justify-center">
                 <div className="w-[50px] h-[50px] bg-brown rounded-[50%] flex items-center justify-center">

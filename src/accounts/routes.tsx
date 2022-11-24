@@ -13,6 +13,7 @@ import {
   Settings,
   SettingsSecurityPrivacy,
   SettingsNetworks,
+  BalanceDetail,
 } from '../ui/containers';
 import { RootAccounts } from './RootAccounts';
 import { routesPath } from '../utils';
@@ -61,6 +62,10 @@ export const routes: RouteObject[] = [
       {
         path: routesPath.IMPORT_SEED_PHRASE,
         element: <ImportSeed />,
+      },
+      {
+        path: routesPath.BALANCE_DETAIL,
+        element: <BalanceDetail />,
       },
       {
         path: routesPath.SETTINGS,

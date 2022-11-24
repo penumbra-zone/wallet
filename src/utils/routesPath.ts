@@ -17,4 +17,5 @@ export const routesPath = {
   SETTINGS_WARNINGS: '/settings/warnings',
   SETTINGS_NETWORKS: '/settings/networks',
   SETTINGS_GENERAL_INFORMATION: '/settings/general-information',
+  BALANCE_DETAIL: '/balance-detail/:name',
 };
