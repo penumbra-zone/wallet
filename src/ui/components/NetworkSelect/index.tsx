@@ -9,7 +9,6 @@ import {
   selectNetworks,
 } from '../../redux';
 import { ProgressBar } from '../ProgressBar';
-import { DoneSvg } from '../Svg';
 
 type NetworkSelectProps = {
   onClick: () => void;
@@ -48,8 +47,8 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
       className={`ext:h-[36px] ext:w-[152px] tablet:h-[52px] tablet:w-[296px] ext:px-[10px] tablet:px-[21px] bg-brown rounded-[15px] border-[1px] border-solid border-dark_grey flex items-center justify-between cursor-pointer
       ${className}`}
     >
-      {percent === 101 ? (
-        <DoneSvg />
+      {percent > 100 ? (
+        <></>
       ) : (
         <div className="ext:w-[25px] ext:h-[25px] tablet:w-[35px] tablet:h-[35px] ext:mr-[6px] tablet:mr-[16px] flex items-center">
           <ProgressBar percent={percent} />

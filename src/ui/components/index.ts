@@ -18,6 +18,7 @@ export * from './SettingsExtensionSideBar';
 export * from './BalanceAction';
 export * from './ActivityList';
 export * from './AssetsList';
+export * from './MorePopupButton';
 
 //modals
 export * from './modals/SuccessCreateModal';

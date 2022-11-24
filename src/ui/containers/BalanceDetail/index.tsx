@@ -6,7 +6,7 @@ import {
   BalanceAction,
   Button,
   ChevronLeftIcon,
-  DotsSvg,
+  MorePopupButton,
 } from '../../components';
 import { selectNewAccount } from '../../redux';
 
@@ -19,13 +19,7 @@ export const BalanceDetail = () => {
   return (
     <div className="ext:w-[400px] tablet:w-[100%] mt-[10px] mb-[20px] ">
       <div className="tablet:w-[816px] ext:mx-[40px] tablet:mx-[0px] flex flex-col items-center bg-brown rounded-[15px] relative ext:pb-[28px] tablet:pb-[40px]">
-        <div
-          className="absolute ext:right-[24px] ext:top-[28px] tablet:right-[30px] tablet:top-[34px] cursor-pointer"
-          role="button"
-          tabIndex={0}
-        >
-          <DotsSvg />
-        </div>
+        <MorePopupButton />
         <Button
           mode="icon_transparent"
           onClick={handleBack}

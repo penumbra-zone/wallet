@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAccountsSelector } from '../../../../accounts';
-import { KeysModalType } from '../../../containers';
 import { selectSelectedAccount } from '../../../redux';
 import Background from '../../../services/Background';
 import { Button } from '../../Button';
@@ -10,6 +9,7 @@ import { ChevronLeftIcon, InformationOutlineSvg } from '../../Svg';
 import { UserLogo } from '../../UserLogo';
 import { SuccessCreateModalProps } from '../SuccessCreateModal';
 import toast from 'react-hot-toast';
+import { KeysModalType } from '../../MorePopupButton';
 
 type ExportKeyModalProps = {
   type: KeysModalType;
