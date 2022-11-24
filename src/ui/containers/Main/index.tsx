@@ -88,12 +88,12 @@ export const Main: React.FC<MainProps> = () => {
             <div className="w-[100%] ext:mb-[24px] tablet:mb-[40px]">
               <BalanceAction />
             </div>
-            {/* <Tabs
+            <Tabs
               tabs={['Assets', 'Activity']}
               children={(type) =>
                 type === 'Assets' ? <AssetsList /> : <ActivityList />
               }
-            ></Tabs> */}
+            ></Tabs>
           </div>
 
           <p className="mt-[60px] text-center text_body text-light_grey">

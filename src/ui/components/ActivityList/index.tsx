@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { getShortKey } from '../../../utils';
 import { Button } from '../Button';
 import { ArrowUpRightSvg, DowmloadSvg } from '../Svg';
+import moment from 'moment';
 
 const activity = [
   {
@@ -75,9 +76,9 @@ export const ActivityList = () => {
                   <div className="flex flex-col ml-[16px]">
                     <p className="h3 mb-[6px]">{i.type}</p>
                     <div className="flex text_ext">
-                      <p className="text-green">{`${i.date.getDate()}.${
-                        i.date.getMonth() + 1
-                      }`}</p>
+                      <p className="text-green">
+                        {moment(i.date).format('MMM D')}
+                      </p>
                       <p className="text-light_grey ext:mx-[2px] tablet:mx-[6px]">
                         {textAction[i.type]}
                       </p>

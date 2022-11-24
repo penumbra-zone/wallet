@@ -3,13 +3,13 @@ import {
   createPromiseClient,
 } from '@bufbuild/connect-web';
 
-// import { ObliviousQueryService } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_connectweb';
+import { ObliviousQueryService } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_connectweb';
 import { ExtensionStorage } from '../storage';
 import {
   AssetListRequest,
-  // AssetListResponse,
-  // ChainParametersRequest,
-  // ChainParametersResponse,
+  AssetListResponse,
+  ChainParametersRequest,
+  ChainParametersResponse,
   CompactBlockRangeRequest,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
 import ObservableStore from 'obs-store';
@@ -72,128 +72,128 @@ export class ClientController {
   }
 
   async saveAssets() {
-    // const savedAssets: EncodeAsset[] = await this.indexedDb.getAllValue(
-    //   'assets'
-    // );
+    const savedAssets: EncodeAsset[] = await this.indexedDb.getAllValue(
+      'assets'
+    );
 
-    // if (savedAssets.length) return;
+    if (savedAssets.length) return;
 
-    // const { grpc, chainId } =
-    //   this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
+    const { grpc, chainId } =
+      this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
 
-    // const transport = createGrpcWebTransport({
-    //   baseUrl: grpc,
-    // });
-    // const client = createPromiseClient(ObliviousQueryService, transport);
+    const transport = createGrpcWebTransport({
+      baseUrl: grpc,
+    });
+    const client = createPromiseClient(ObliviousQueryService, transport);
 
-    // const assetRequest = new AssetListRequest();
-    // assetRequest.chainId = chainId;
+    const assetRequest = new AssetListRequest();
+    assetRequest.chainId = chainId;
 
-    // const asset: AssetListResponse = await client.assetList(assetRequest);
+    const asset: AssetListResponse = await client.assetList(assetRequest);
 
-    // const encodeAsset: EncodeAsset[] = asset.assetList.assets.map((asset) => ({
-    //   id: encode('passet', asset.id?.inner, 'bech32m'),
-    //   denom: asset.denom?.denom,
-    // }));
+    const encodeAsset: EncodeAsset[] = asset.assetList.assets.map((asset) => ({
+      id: encode('passet', asset.id?.inner, 'bech32m'),
+      denom: asset.denom?.denom,
+    }));
 
-    // await this.indexedDb.putBulkValue('assets', encodeAsset);
+    await this.indexedDb.putBulkValue('assets', encodeAsset);
   }
 
   async saveChainParameters() {
-    // const savedChainParameters: ChainParameters[] =
-    //   await this.indexedDb.getAllValue('chainParameters');
+    const savedChainParameters: ChainParameters[] =
+      await this.indexedDb.getAllValue('chainParameters');
 
-    // if (savedChainParameters.length) return;
+    if (savedChainParameters.length) return;
 
-    // const baseUrl =
-    //   this.configApi.getNetworkConfig()[this.configApi.getNetwork()].grpc;
+    const baseUrl =
+      this.configApi.getNetworkConfig()[this.configApi.getNetwork()].grpc;
 
-    // const transport = createGrpcWebTransport({
-    //   baseUrl,
-    // });
-    // const client = createPromiseClient(ObliviousQueryService, transport);
+    const transport = createGrpcWebTransport({
+      baseUrl,
+    });
+    const client = createPromiseClient(ObliviousQueryService, transport);
 
-    // const chainParametersRequest = new ChainParametersRequest();
+    const chainParametersRequest = new ChainParametersRequest();
 
-    // const chainParameters: ChainParametersResponse =
-    //   await client.chainParameters(chainParametersRequest);
+    const chainParameters: ChainParametersResponse =
+      await client.chainParameters(chainParametersRequest);
 
-    // await this.indexedDb.putValue(
-    //   'chainParameters',
-    //   chainParameters.chainParameters
-    // );
+    await this.indexedDb.putValue(
+      'chainParameters',
+      chainParameters.chainParameters
+    );
 
-    // await this.configApi.setNetworks(
-    //   chainParameters.chainParameters.chainId,
-    //   this.configApi.getNetwork()
-    // );
+    await this.configApi.setNetworks(
+      chainParameters.chainParameters.chainId,
+      this.configApi.getNetwork()
+    );
   }
 
   async getCompactBlockRange() {
-    // let fvk;
-    // try {
-    //   fvk = this.configApi.getAccountFullViewingKey();
-    // } catch (error) {
-    //   fvk = '';
-    // }
-    // if (!fvk) {
-    //   return;
-    // }
+    let fvk;
+    try {
+      fvk = this.configApi.getAccountFullViewingKey();
+    } catch (error) {
+      fvk = '';
+    }
+    if (!fvk) {
+      return;
+    }
 
-    // const { grpc, chainId } =
-    //   this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
+    const { grpc, chainId } =
+      this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
 
-    // const lastBlock = await this.getLastExistBlock();
+    const lastBlock = await this.getLastExistBlock();
 
-    // const transport = createGrpcWebTransport({
-    //   baseUrl: grpc,
-    // });
+    const transport = createGrpcWebTransport({
+      baseUrl: grpc,
+    });
 
-    // const client = createPromiseClient(ObliviousQueryService, transport);
+    const client = createPromiseClient(ObliviousQueryService, transport);
 
-    // const compactBlockRangeRequest = new CompactBlockRangeRequest();
+    const compactBlockRangeRequest = new CompactBlockRangeRequest();
 
-    // compactBlockRangeRequest.chainId = chainId;
-    // compactBlockRangeRequest.startHeight = BigInt(
-    //   this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
-    // );
-    // compactBlockRangeRequest.keepAlive = true;
-    // try {
-    //   for await (const response of client.compactBlockRange(
-    //     compactBlockRangeRequest
-    //   )) {
-    //     await this.scanBlock(response.compactBlock, fvk);
-    //     if (Number(response.compactBlock.height) < lastBlock) {
-    //       if (Number(response.compactBlock.height) % 10000 === 0) {
-    //         const oldState = this.store.getState().lastSavedBlock;
-    //         const lastSavedBlock = {
-    //           ...oldState,
-    //           [this.configApi.getNetwork()]: Number(
-    //             response.compactBlock.height
-    //           ),
-    //         };
-    //         extension.storage.local.set({
-    //           lastSavedBlock,
-    //         });
-    //       }
-    //     } else {
-    //       const oldState = this.store.getState().lastSavedBlock;
-    //       const lastSavedBlock = {
-    //         ...oldState,
-    //         [this.configApi.getNetwork()]: Number(response.compactBlock.height),
-    //       };
-    //       const oldLastBlockHeight = this.store.getState().lastBlockHeight;
-    //       const lastBlockHeight = {
-    //         ...oldLastBlockHeight,
-    //         [this.configApi.getNetwork()]: Number(response.compactBlock.height),
-    //       };
-    //       extension.storage.local.set({
-    //         lastSavedBlock,
-    //         lastBlockHeight,
-    //       });
-    //     }
-    //   }
-    // } catch (error) {}
+    compactBlockRangeRequest.chainId = chainId;
+    compactBlockRangeRequest.startHeight = BigInt(
+      this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
+    );
+    compactBlockRangeRequest.keepAlive = true;
+    try {
+      for await (const response of client.compactBlockRange(
+        compactBlockRangeRequest
+      )) {
+        await this.scanBlock(response.compactBlock, fvk);
+        if (Number(response.compactBlock.height) < lastBlock) {
+          if (Number(response.compactBlock.height) % 10000 === 0) {
+            const oldState = this.store.getState().lastSavedBlock;
+            const lastSavedBlock = {
+              ...oldState,
+              [this.configApi.getNetwork()]: Number(
+                response.compactBlock.height
+              ),
+            };
+            extension.storage.local.set({
+              lastSavedBlock,
+            });
+          }
+        } else {
+          const oldState = this.store.getState().lastSavedBlock;
+          const lastSavedBlock = {
+            ...oldState,
+            [this.configApi.getNetwork()]: Number(response.compactBlock.height),
+          };
+          const oldLastBlockHeight = this.store.getState().lastBlockHeight;
+          const lastBlockHeight = {
+            ...oldLastBlockHeight,
+            [this.configApi.getNetwork()]: Number(response.compactBlock.height),
+          };
+          extension.storage.local.set({
+            lastSavedBlock,
+            lastBlockHeight,
+          });
+        }
+      }
+    } catch (error) {}
   }
 
   async getLastExistBlock() {
