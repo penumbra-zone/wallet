@@ -4,6 +4,7 @@ import {
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
 import { EncodeAsset } from '../types';
 import { IndexedDb } from '../utils';
+
 function toJson(data) {
   return JSON.stringify(data, (_, v) =>
     typeof v === 'bigint' ? `${v}n` : v
