@@ -13,7 +13,7 @@ export const BalanceAction = () => {
         </div>
       </div>
       <Balance className="pt-[16px] pb-[24px] text_numbers" />
-      <div className="flex gap-x-[69px] ext:mb-[24px] tablet:mb-[40px]">
+      <div className="flex tablet:gap-x-[69px]  tablet:gap-x-[69px] ext:mb-[24px] tablet:mb-[40px]">
         <div className="flex flex-col items-center">
           <Button
             mode="gradient"

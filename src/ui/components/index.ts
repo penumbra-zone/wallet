@@ -16,6 +16,8 @@ export * from './SettingSideBar';
 export * from './Balance';
 export * from './SettingsExtensionSideBar';
 export * from './BalanceAction';
+export * from './ActivityList';
+export * from './AssetsList';
 
 //modals
 export * from './modals/SuccessCreateModal';

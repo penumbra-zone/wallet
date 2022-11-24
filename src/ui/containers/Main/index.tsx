@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useAccountsSelector } from '../../../accounts';
-import { getShortKey, routesPath } from '../../../utils';
+import { getShortKey } from '../../../utils';
 import {
   AccountDetailModal,
-  Balance,
+  ActivityList,
+  AssetsList,
   BalanceAction,
-  ChevronLeftIcon,
   CopySvg,
   DotsSvg,
   ExportKeyModal,
@@ -14,14 +14,12 @@ import {
 } from '../../components';
 import { selectSelectedAccount, selectState } from '../../redux';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 
 type MainProps = {};
 
 export type KeysModalType = '' | 'full_viewing_key' | 'spending_key';
 
 export const Main: React.FC<MainProps> = () => {
-  const navigate = useNavigate();
   const [isOpenMorePopup, setIsOpenMorePopup] = useState<boolean>(false);
   const [isOpenDetailPopup, setIsOpenDetailPopup] = useState<boolean>(false);
   const [keyModalType, setKeyModalType] = useState<KeysModalType>('');
@@ -58,9 +56,6 @@ export const Main: React.FC<MainProps> = () => {
     setKeyModalType('');
   };
 
-  const handleBalancedetail = (currencyName: string) => () =>
-    navigate(routesPath.BALANCE_DETAIL.replace(':name', currencyName));
-
   if (!selectedAccount.addressByIndex) return <></>;
 
   return (
@@ -89,28 +84,18 @@ export const Main: React.FC<MainProps> = () => {
               </span>
             </div>
           </div>
-          <div className="border-y-[1px] border-solid border-dark_grey pt-[16px] flex flex-col items-center justify-center">
+          <div className="pt-[16px] flex flex-col items-center justify-center">
             <div className="w-[100%] ext:mb-[24px] tablet:mb-[40px]">
               <BalanceAction />
             </div>
-            <Tabs tabs={['Assets', 'Activity']} />
+            {/* <Tabs
+              tabs={['Assets', 'Activity']}
+              children={(type) =>
+                type === 'Assets' ? <AssetsList /> : <ActivityList />
+              }
+            ></Tabs> */}
           </div>
-          <div
-            onClick={handleBalancedetail('pnb')}
-            className="flex items-center justify-between py-[20px] pl-[22px] pr-[30px] border-b-[1px] border-solid border-dark_grey cursor-pointer hover:bg-brown"
-          >
-            <div className="flex items-center">
-              <div className="w-[51px] h-[51px] li_gradient rounded-[50%] flex  items-center justify-center">
-                <div className="w-[50px] h-[50px] bg-brown rounded-[50%] flex items-center justify-center">
-                  PNB
-                </div>
-              </div>
-              <Balance className="pl-[16px] text_numbers" />
-            </div>
-            <div className="rotate-180">
-              <ChevronLeftIcon />
-            </div>
-          </div>
+
           <p className="mt-[60px] text-center text_body text-light_grey">
             Need help? Contact Penumbra Support
           </p>

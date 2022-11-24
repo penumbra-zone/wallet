@@ -25,8 +25,8 @@ export const RootAccounts = () => {
       if (pathname === routesPath.SETTINGS_NETWORKS) {
         return navigate(routesPath.SETTINGS_NETWORKS);
       }
-      // return navigate(routesPath.HOME);
-      return navigate(routesPath.BALANCE_DETAIL.replace(':name', 'pnb'));
+      return navigate(routesPath.HOME);
+      // return navigate(routesPath.BALANCE_DETAIL.replace(':name', 'pnb'));
     }
 
     if (!state.isInitialized) return navigate(routesPath.WELCOME);
