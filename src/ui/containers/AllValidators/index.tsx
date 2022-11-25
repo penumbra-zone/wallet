@@ -1,4 +1,5 @@
 import { ValidatorInfo } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/stake/v1alpha1/stake_pb';
+import { BigNumber } from 'big-integer';
 import { useEffect, useState } from 'react';
 import { useAccountsSelector } from '../../../accounts';
 import { Input, SearchSvg, Select, ValidatorTable } from '../../components';
@@ -20,11 +21,31 @@ enum ValidatorsState {
 const filterValidator = (validator: ValidatorInfo[], filter: number) =>
   validator.filter((v) => v.status.state.state === filter);
 
+type TableDataType = {
+  name: string;
+  votingPower: BigNumber;
+  commission: number;
+  arp: number;
+  state: number;
+};
+
+const getTableData = (validators: ValidatorInfo[]) => {
+  return validators.map((i) => ({
+    name: i.validator.name,
+    votingPower: i.status.votingPower,
+    //TODO add commision
+    commission: 0,
+    arp: 0,
+    state: i.status.state.state as number,
+  }));
+};
+
 export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
   const networks = useAccountsSelector(selectNetworks);
   const [search, setSearch] = useState<string>('');
   const [totalValidators, setTotalValidators] = useState<number | null>(null);
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState<TableDataType[]>([]);
+  const [select, setSelect] = useState<number | string | null>(null);
 
   const getValidatorsCount = async () => {
     try {
@@ -45,14 +66,8 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
 
   useEffect(() => {
     if (validators.length === totalValidators) {
-      const d = validators.map((i, index) => ({
-        name: i.validator.name,
-        votingPower: i.status.votingPower,
-        //TODO add commision
-        commission: 0,
-        arp: 0,
-      }));
-      setTableData(d);
+      const validatorTableData = getTableData(validators);
+      setTableData(validatorTableData);
     }
   }, [validators, totalValidators]);
 
@@ -116,8 +131,14 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
     },
   ];
 
-  const handleChangeSelect = (value: string) => {
-    console.log(value);
+  const handleChangeSelect = (value: number | string) => {
+    setSelect(value);
+    const tableData = getTableData(validators);
+    if (value === 'all') setTableData(tableData);
+    else {
+      const filterData = tableData.filter((v) => v.state === value);
+      setTableData(filterData);
+    }
   };
 
   const handleSorting = (sortField, sortOrder) => {
@@ -156,12 +177,16 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
           className="w-[192px]"
           initialValue={
             totalValidators === validators.length
-              ? ValidatorsState.VALIDATOR_STATE_ENUM_ACTIVE
+              ? 'all'
               : undefined
           }
         />
       </div>
-      <ValidatorTable data={tableData} handleSorting={handleSorting} />
+      <ValidatorTable
+        data={tableData}
+        handleSorting={handleSorting}
+        select={select}
+      />
     </div>
   );
 };

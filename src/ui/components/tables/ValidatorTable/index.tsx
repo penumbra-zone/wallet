@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTable, useSortBy } from 'react-table';
 import { Button } from '../../Button';
 import { ArrowGradientSvg, SortSvg } from '../../Svg';
@@ -70,7 +70,7 @@ const columns = [
   },
 ];
 
-export const ValidatorTable = ({ data, handleSorting }) => {
+export const ValidatorTable = ({ select, data, handleSorting }) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable(
       {
@@ -83,13 +83,17 @@ export const ValidatorTable = ({ data, handleSorting }) => {
   const [sortField, setSortField] = useState('');
   const [order, setOrder] = useState('asc');
 
+  useEffect(() => {
+    setSortField('');
+    setOrder('asc');
+  }, [select]);
+
   const handleSortingChange = (accessor: string) => () => {
     const sortOrder =
       accessor === sortField && order === 'asc' ? 'desc' : 'asc';
     setSortField(accessor);
     setOrder(sortOrder);
     handleSorting(accessor, sortOrder);
-    console.log(sortOrder);
   };
 
   return (
