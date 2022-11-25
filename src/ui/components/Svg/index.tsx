@@ -469,3 +469,51 @@ export const SaveSvg = (props) => {
     </svg>
   );
 };
+
+export const SearchSvg = () => {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9.5 3C11.2239 3 12.8772 3.68482 14.0962 4.90381C15.3152 6.12279 16 7.77609 16 9.5C16 11.11 15.41 12.59 14.44 13.73L14.71 14H15.5L20.5 19L19 20.5L14 15.5V14.71L13.73 14.44C12.59 15.41 11.11 16 9.5 16C7.77609 16 6.12279 15.3152 4.90381 14.0962C3.68482 12.8772 3 11.2239 3 9.5C3 7.77609 3.68482 6.12279 4.90381 4.90381C6.12279 3.68482 7.77609 3 9.5 3M9.5 5C7 5 5 7 5 9.5C5 12 7 14 9.5 14C12 14 14 12 14 9.5C14 7 12 5 9.5 5Z"
+        fill="#E0E0E0"
+      />
+    </svg>
+  );
+};
+
+export const ArrowGradientSvg = () => {
+  return (
+    <svg
+      width="17"
+      height="8"
+      viewBox="0 0 17 8"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M16.3536 4.35355C16.5488 4.15829 16.5488 3.84171 16.3536 3.64645L13.1716 0.464466C12.9763 0.269204 12.6597 0.269204 12.4645 0.464466C12.2692 0.659728 12.2692 0.976311 12.4645 1.17157L15.2929 4L12.4645 6.82843C12.2692 7.02369 12.2692 7.34027 12.4645 7.53553C12.6597 7.7308 12.9763 7.7308 13.1716 7.53553L16.3536 4.35355ZM0 4.5H16V3.5H0V4.5Z"
+        fill="url(#paint0_linear_662_244)"
+      />
+      <defs>
+        <linearGradient
+          id="paint0_linear_662_244"
+          x1="1.8724e-09"
+          y1="4.5"
+          x2="17.7838"
+          y2="4.5"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#8BE4D9" stopOpacity="0.6" />
+          <stop offset="0.526042" stopColor="#C8B880" stopOpacity="0.6" />
+          <stop offset="1" stopColor="#FF902F" stopOpacity="0.5" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+};

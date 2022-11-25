@@ -214,6 +214,7 @@ class BackgroundService extends EventEmitter {
       ) => this.networkController.setCustomTendermint(url, network),
       getAllValueIndexedDB: async (tableName: string) =>
         this.indexedDb.getAllValue(tableName),
+      
     };
   }
   getInpageApi(origin: string, connectionId: string) {

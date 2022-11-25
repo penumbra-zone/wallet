@@ -28,8 +28,8 @@ export const RootAccounts = () => {
       if (pathname === routesPath.VALIDATORS) {
         return navigate(routesPath.VALIDATORS);
       }
-      return navigate(routesPath.HOME);
-      // return navigate(routesPath.BALANCE_DETAIL.replace(':name', 'pnb'));
+      return navigate(routesPath.VALIDATORS);
+     
     }
 
     if (!state.isInitialized) return navigate(routesPath.WELCOME);

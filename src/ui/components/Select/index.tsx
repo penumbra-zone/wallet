@@ -6,18 +6,19 @@ import SelectComponent, {
 } from 'react-select';
 
 export type OptionType = {
-  value: string;
+  value: string | number;
   label: string;
 };
 
 type SelectPropsType = {
-  fieldName: string;
+  fieldName?: string;
   label?: string;
   isLoading?: boolean;
   placeholder?: string;
   options: OptionType[];
-  initialValue?: string;
-  handleChange?: (value: string) => void;
+  initialValue?: string | number;
+  className?: string;
+  handleChange?: (value: string | number) => void;
 };
 
 export const Select: React.FC<SelectPropsType> = ({
@@ -27,22 +28,23 @@ export const Select: React.FC<SelectPropsType> = ({
   placeholder,
   initialValue,
   fieldName = '1',
+  className,
   handleChange,
   ...props
 }) => {
-  const [values, setValues] = useState<string | null>(null);
+  const [values, setValues] = useState<string | number | null>(null);
   const [isFocus, setFocus] = useState(false);
   const inputRef = useRef<any>(null);
 
   //add initailValue
   useEffect(() => {
-    if (!initialValue) return;
+    if (initialValue === undefined) return;
     setValues(initialValue);
   }, [initialValue]);
 
   //find selected value
   const selectedValue = useCallback(() => {
-    if (values) return options.find((i) => i.value === values);
+    if (values || values === 0) return options.find((i) => i.value === values);
     else return '';
   }, [values, options])();
 
@@ -61,7 +63,7 @@ export const Select: React.FC<SelectPropsType> = ({
   const inputBlurHandler = () => setFocus(false);
 
   return (
-    <div>
+    <div className={className}>
       <p className="text _body">{label}</p>
       <div
         onClick={containerHandler}

@@ -11,6 +11,7 @@ import {
   ChainParametersRequest,
   ChainParametersResponse,
   CompactBlockRangeRequest,
+  ValidatorInfoRequest,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
 import ObservableStore from 'obs-store';
 

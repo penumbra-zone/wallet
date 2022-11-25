@@ -1,10 +1,44 @@
-import { Button, Tabs, ValidatorTable } from '../../components';
+import { Button, Tabs } from '../../components';
+import { AllValidators } from '../AllValidators';
+import { useEffect, useState } from 'react';
+import {
+  createGrpcWebTransport,
+  createPromiseClient,
+} from '@bufbuild/connect-web';
+import { ObliviousQueryService } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_connectweb';
+import { ValidatorInfoRequest } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
+import { useAccountsSelector } from '../../../accounts';
+import { selectNetworks } from '../../redux';
+import { ValidatorInfo } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/stake/v1alpha1/stake_pb';
 
 export const Validators = () => {
+  const networks = useAccountsSelector(selectNetworks);
+  const [validators, setValidators] = useState<ValidatorInfo[]>([]);
+
+  const getValidators = async () => {
+    const transport = createGrpcWebTransport({
+      baseUrl: networks[0].grpc,
+    });
+    const client = createPromiseClient(ObliviousQueryService, transport);
+
+    const validatorInfoRequest = new ValidatorInfoRequest();
+    validatorInfoRequest.chainId = networks[0].chainId;
+
+    try {
+      for await (const response of client.validatorInfo(validatorInfoRequest)) {
+        setValidators((state) => [...state, response.validatorInfo]);
+      }
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    getValidators();
+  }, []);
+
   return (
     <div className="w-[100%] mt-[20px] mb-[20px]">
       <div className="w-[816px]mx-[0px] flex flex-col items-center">
-        <div className="w-[100%] flex items-center justify-between rounded-[15px] bg-brown py-[24px] px-[20px] mb-[24px]">
+        {/* <div className="w-[100%] flex items-center justify-between rounded-[15px] bg-brown py-[24px] px-[20px] mb-[24px]">
           <div className="flex flex-col">
             <p className="h3 mb-[16px]">Total PNB Amount </p>
             <p className="text_numbers pb-[4px]">1,050.0096 PNB</p>
@@ -50,14 +84,14 @@ export const Validators = () => {
             title="Claim"
             className="w-[110px] ml-[16px] tablet:py-[9px]"
           />
-        </div>
+        </div> */}
       </div>
       <Tabs
         tabs={['All Penumbra Validators', 'My Validators']}
         className="bg-[#000000]"
         children={(type) =>
           type === 'All Penumbra Validators' ? (
-            <ValidatorTable />
+            <AllValidators validators={validators} />
           ) : (
             <div>My Validators</div>
           )

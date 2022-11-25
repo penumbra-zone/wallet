@@ -6,6 +6,7 @@ type ButtonProps = {
   mode: 'gradient' | 'icon_transparent' | 'transparent';
   className?: string;
   iconLeft?: JSX.Element;
+  iconRight?: JSX.Element;
   onClick: () => void;
 };
 
@@ -15,6 +16,7 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   className,
   iconLeft,
+  iconRight,
   onClick,
 }) => {
   const cn = useMemo(() => {
@@ -43,6 +45,7 @@ export const Button: React.FC<ButtonProps> = ({
       >
         <span>{iconLeft}</span>
         <span>{title}</span>
+        {iconRight && <span className="ml-[6px]">{iconRight}</span>}
       </button>
     );
 

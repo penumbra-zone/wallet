@@ -403,7 +403,6 @@ class Background {
     }
   }
 
-
   //   async editWalletName(address: string, name: string, network: NetworkName) {
   //     try {
   //       await this.initPromise;

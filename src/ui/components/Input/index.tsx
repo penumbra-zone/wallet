@@ -2,11 +2,12 @@ import { ReactElement, useRef, useState } from 'react';
 import { CloseEyeSvg, OpenEyeSvg } from '../Svg';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLElement> {
-  label: string | ReactElement;
+  label?: string | ReactElement;
   isError?: boolean;
   helperText?: string;
   customType?: 'password' | 'text';
-  className?: string
+  className?: string;
+  leftSvg?: ReactElement;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -16,6 +17,7 @@ export const Input: React.FC<InputProps> = ({
   placeholder,
   customType = 'text',
   className,
+  leftSvg,
   ...props
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -61,6 +63,7 @@ export const Input: React.FC<InputProps> = ({
               props.value && !isError ? 'input_typing_bg' : 'bg-brown'
             } cursor-text rounded-[15px] flex justify-center items-center`}
           >
+            {leftSvg}
             <input
               ref={inputRef}
               className={`${
