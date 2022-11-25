@@ -1,5 +1,5 @@
 import { ValidatorInfo } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/stake/v1alpha1/stake_pb';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccountsSelector } from '../../../accounts';
 import { Input, SearchSvg, Select, ValidatorTable } from '../../components';
 import { selectNetworks } from '../../redux';
@@ -24,6 +24,7 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
   const networks = useAccountsSelector(selectNetworks);
   const [search, setSearch] = useState<string>('');
   const [totalValidators, setTotalValidators] = useState<number | null>(null);
+  const [tableData, setTableData] = useState([]);
 
   const getValidatorsCount = async () => {
     try {
@@ -41,6 +42,19 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
     if (totalValidators && validators.length > totalValidators)
       setTotalValidators(validators.length);
   }, [validators]);
+
+  useEffect(() => {
+    if (validators.length === totalValidators) {
+      const d = validators.map((i, index) => ({
+        name: i.validator.name,
+        votingPower: i.status.votingPower,
+        //TODO add commision
+        commission: 0,
+        arp: 0,
+      }));
+      setTableData(d);
+    }
+  }, [validators, totalValidators]);
 
   const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) =>
     setSearch(event.target.value);
@@ -106,42 +120,21 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
     console.log(value);
   };
 
-  const columns = useMemo(
-    () => [
-      {
-        Header: 'Validator',
-        accessor: 'name',
-      },
-      {
-        Header: 'Voting Power',
-        accessor: 'votingPower',
-      },
-      {
-        Header: 'Commission',
-        accessor: 'commission',
-      },
-      {
-        Header: 'APR',
-        accessor: 'arp',
-      },
-      {
-        Header: '',
-        accessor: 'manage',
-      },
-    ],
-
-    []
-  );
-
-  const data = useMemo(() => {
-    return validators.map((i) => ({
-      name: i.validator.name,
-      votingPower: i.status.votingPower,
-      //TODO add commision
-      commission: '0%',
-      arp: '0%'
-    }));
-  }, [validators])
+  const handleSorting = (sortField, sortOrder) => {
+    if (sortField) {
+      const sorted = [...tableData].sort((a, b) => {
+        if (a[sortField] === null) return 1;
+        if (b[sortField] === null) return -1;
+        if (a[sortField] === null && b[sortField] === null) return 0;
+        return (
+          a[sortField].toString().localeCompare(b[sortField].toString(), 'en', {
+            numeric: true,
+          }) * (sortOrder === 'asc' ? 1 : -1)
+        );
+      });
+      setTableData(sorted);
+    }
+  };
 
   return (
     <div className="flex flex-col mt-[26px]">
@@ -168,7 +161,7 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
           }
         />
       </div>
-      <ValidatorTable columns={columns} data={data} />
+      <ValidatorTable data={tableData} handleSorting={handleSorting} />
     </div>
   );
 };

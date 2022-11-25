@@ -517,3 +517,20 @@ export const ArrowGradientSvg = () => {
     </svg>
   );
 };
+
+export const SortSvg = (props) => {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 10 10"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6.9125 6.42499L5 4.51249L3.0875 6.42499L2.5 5.83332L5 3.33332L7.5 5.83332L6.9125 6.42499Z"
+        fill={props.fill || 'white'}
+      />
+    </svg>
+  );
+};
