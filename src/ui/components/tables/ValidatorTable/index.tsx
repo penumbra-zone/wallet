@@ -70,7 +70,7 @@ const columns = [
   },
 ];
 
-export const ValidatorTable = ({ select, data, handleSorting }) => {
+export const ValidatorTable = ({ select,search, data, handleSorting }) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable(
       {
@@ -86,7 +86,7 @@ export const ValidatorTable = ({ select, data, handleSorting }) => {
   useEffect(() => {
     setSortField('');
     setOrder('asc');
-  }, [select]);
+  }, [select, search]);
 
   const handleSortingChange = (accessor: string) => () => {
     const sortOrder =

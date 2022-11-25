@@ -71,8 +71,22 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
     }
   }, [validators, totalValidators]);
 
-  const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) =>
+  const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
+    const filtered = getTableData(validators).filter((v) => {
+      return (
+        v.name
+          .toString()
+          .toLowerCase()
+          .indexOf(event.target.value.toLowerCase()) > -1
+      );
+    });
+    if (select === 'all') setTableData(filtered);
+    else {
+      const filterDataBySelect = filtered.filter((v) => v.state === select);
+      setTableData(filterDataBySelect);
+    }
+  };
 
   const options = [
     {
@@ -139,6 +153,7 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
       const filterData = tableData.filter((v) => v.state === value);
       setTableData(filterData);
     }
+    setSearch('');
   };
 
   const handleSorting = (sortField, sortOrder) => {
@@ -176,9 +191,7 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
           handleChange={handleChangeSelect}
           className="w-[192px]"
           initialValue={
-            totalValidators === validators.length
-              ? 'all'
-              : undefined
+            totalValidators === validators.length ? 'all' : undefined
           }
         />
       </div>
@@ -186,6 +199,7 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
         data={tableData}
         handleSorting={handleSorting}
         select={select}
+        search={search}
       />
     </div>
   );
