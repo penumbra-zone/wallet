@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useAccountsSelector } from '../../../accounts';
-import { IndexedDb } from '../../../utils';
 import { selectLastExistBlock, selectLastSavedBlock } from '../../redux';
 import Background from '../../services/Background';
 
@@ -29,5 +28,5 @@ export const Balance: React.FC<BalanceProps> = ({ className }) => {
 
     getNotes();
   }, [lastExistBlock, lastSavedBlock]);
-  return <p className={className}>{balance} PNB</p>;
+  return <p className={className}>{balance.toLocaleString('en-US')} PNB</p>;
 };

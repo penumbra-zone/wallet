@@ -51,6 +51,7 @@ export const MyValidators = () => {
         data={tableData}
         handleSorting={handleSorting}
         columns={columnsMyValidator}
+        type="my_validator"
       />
     </div>
   );

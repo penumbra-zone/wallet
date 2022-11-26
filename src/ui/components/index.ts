@@ -29,6 +29,7 @@ export * from './modals/AccountDetailModal';
 export * from './modals/ExportKeyModal';
 export * from './modals/ResetWalletModal';
 export * from './modals/ExportSeedPhraseModal';
+export * from './modals/ManageValidatorModal';
 
 //forms
 export * from './forms/CreatePasswordForm';

@@ -1,4 +1,4 @@
-import { Button, Tabs } from '../../components';
+import { Balance, Button, Tabs } from '../../components';
 import { AllValidators } from '../AllValidators';
 import { useEffect, useState } from 'react';
 import {
@@ -43,10 +43,10 @@ export const Validators = () => {
         <div className="w-[100%] flex items-center justify-between rounded-[15px] bg-brown py-[24px] px-[20px] mb-[24px]">
           <div className="flex flex-col">
             <p className="h3 mb-[16px]">Total PNB Amount </p>
-            <p className="text_numbers pb-[4px]">1,050.0096 PNB</p>
+            <Balance className="text_numbers pb-[4px]" />
             <div className="flex text_numbers_s">
-              <p>~ $306</p>
-              <p className="text-green mx-[4px]">(-3.15%)</p>
+              <p>~ $ -</p>
+              <p className="text-green mx-[4px]">(0%)</p>
               <p>24h</p>
             </div>
           </div>
@@ -68,17 +68,17 @@ export const Validators = () => {
         <div className="w-[100%] flex items-center justify-between rounded-[15px] bg-brown py-[24px] px-[20px] mb-[40px]">
           <div className="flex flex-col">
             <p className="h3 mb-[8px]">Staked Amount</p>
-            <p className="text_numbers mb-[4px]">538 PNB</p>
-            <p className="text_numbers_s">~$157</p>
+            <p className="text_numbers mb-[4px]">0 PNB</p>
+            <p className="text_numbers_s">~ $ -</p>
           </div>
           <div className="flex flex-col border-l-[1px] border-solid border-light_brown pl-[24px]">
             <p className="h3 mb-[8px]">Available Balance</p>
-            <p className="text_numbers mb-[4px]">507.3785 PNB</p>
-            <p className="text_numbers_s">~$148</p>
+            <Balance className="text_numbers pb-[4px]" />
+            <p className="text_numbers_s">~ $ -</p>
           </div>
           <div className="flex flex-col border-l-[1px] border-solid border-light_brown pl-[24px]">
             <p className="h3 mb-[8px]">Claimable Rewards</p>
-            <p className="text_numbers mb-[14px] ">~ $1.35</p>
+            <p className="text_numbers mb-[14px] ">~ $ -</p>
           </div>
           <Button
             mode="gradient"

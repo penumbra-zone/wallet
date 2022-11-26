@@ -107,6 +107,15 @@ select {
     line-height: 26px;
 }
 
+.h2_ext{
+    font-family: 'Faktum Medium';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+
 .h1_ext {
     font-family: 'Faktum SemiBold';
     font-style: normal;
@@ -148,6 +157,14 @@ select {
     line-height: 30px;
 }
 
+.text_numbers_ext {
+    font-family: 'Faktum SemiBold';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 18px;
+}
+
 .text_body {
     font-family: 'Devanagari Sangam Regular';
     font-style: normal;
@@ -162,6 +179,16 @@ select {
     font-weight: 500;
     font-size: 16px;
     line-height: 24px;
+}
+
+.link_website {
+    font-family: 'Faktum Medium';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 18px;
+
+    text-decoration-line: underline;
 }
 
 @media (max-width: 480px) {
@@ -349,4 +376,8 @@ select {
 
 .svg_notActive_link_stroke svg path {
     stroke: #524B4B;
+}
+
+.svg_hover:hover svg path {
+    fill: #FFFFFF;
 }

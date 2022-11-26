@@ -29,6 +29,8 @@ export type AllValidatorsTableDataType = {
   arp: number;
   state: number;
   manage: undefined;
+  website: string;
+  description: string;
 };
 
 const getTableData = (validators: ValidatorInfo[]) => {
@@ -40,6 +42,8 @@ const getTableData = (validators: ValidatorInfo[]) => {
     arp: 0,
     state: i.status.state.state as number,
     manage: undefined,
+    website: i.validator.website,
+    description: i.validator.description,
   }));
 };
 
@@ -49,7 +53,6 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
   const [totalValidators, setTotalValidators] = useState<number | null>(null);
   const [tableData, setTableData] = useState<AllValidatorsTableDataType[]>([]);
   const [select, setSelect] = useState<number | string | null>(null);
-  console.log({ tableData, validators, totalValidators });
 
   const getValidatorsCount = async () => {
     try {
@@ -212,6 +215,7 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
         select={select}
         search={search}
         columns={columnsAllValidator}
+        type="all_validator"
       />
     </div>
   );
