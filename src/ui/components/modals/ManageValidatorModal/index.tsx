@@ -20,6 +20,7 @@ export const ManageValidatorModal = ({
 }: DataProps & SuccessCreateModalProps): JSX.Element => {
   const balance = useAccountsSelector(selectBalance);
   const [showDelegeta, setShowDelegeta] = useState<boolean>(false);
+  const [redelegateStep, setRedelegateStep] = useState<0 | 1 | 2>(0);
   const [amount, setAmount] = useState<string>('');
 
   const toggleDelegeta = () => setShowDelegeta((state) => !state);

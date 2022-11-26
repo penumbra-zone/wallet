@@ -19,6 +19,7 @@ export * from './BalanceAction';
 export * from './ActivityList';
 export * from './AssetsList';
 export * from './MorePopupButton';
+export * from './EmptyTableHelper';
 
 //modals
 export * from './modals/SuccessCreateModal';

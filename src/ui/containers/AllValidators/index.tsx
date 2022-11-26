@@ -3,7 +3,13 @@ import { BigNumber } from 'big-integer';
 import { useEffect, useState } from 'react';
 import { useAccountsSelector } from '../../../accounts';
 import { columnsAllValidator } from '../../../lib';
-import { Input, SearchSvg, Select, ValidatorTable } from '../../components';
+import {
+  EmptyTableHelper,
+  Input,
+  SearchSvg,
+  Select,
+  ValidatorTable,
+} from '../../components';
 import { selectNetworks } from '../../redux';
 
 type AllValidatorsProps = {
@@ -52,7 +58,7 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
   const [search, setSearch] = useState<string>('');
   const [totalValidators, setTotalValidators] = useState<number | null>(null);
   const [tableData, setTableData] = useState<AllValidatorsTableDataType[]>([]);
-  const [select, setSelect] = useState<number | string | null>(null);
+  const [select, setSelect] = useState<number | string>('all');
 
   const getValidatorsCount = async () => {
     try {
@@ -81,6 +87,8 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
           .indexOf(event.target.value.toLowerCase()) > -1
       );
     });
+    console.log({ filtered });
+    
     if (select === 'all') setTableData(filtered);
     else {
       const filterDataBySelect = filtered.filter((v) => v.state === select);
@@ -172,6 +180,9 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
     }
   };
 
+  console.log(tableData);
+  
+
   return (
     <div className="flex flex-col mt-[26px]">
       <div className="flex items-center justify-between mb-[24px]">
@@ -204,19 +215,37 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
               validators,
               ValidatorsState.VALIDATOR_STATE_ENUM_ACTIVE
             ).length
-              ? 'all'
+              ? select
               : undefined
           }
         />
       </div>
-      <ValidatorTable
-        data={tableData}
-        handleSorting={handleSorting}
-        select={select}
-        search={search}
-        columns={columnsAllValidator}
-        type="all_validator"
-      />
+      {totalValidators &&
+      filterValidator(validators, ValidatorsState.VALIDATOR_STATE_ENUM_ACTIVE)
+        .length ? (
+        <>
+          {!tableData.length ? (
+            <EmptyTableHelper
+              text={
+                search
+                  ? `No results were found for "${search}"`
+                  : 'There are not validators'
+              }
+            />
+          ) : (
+            <ValidatorTable
+              data={tableData}
+              handleSorting={handleSorting}
+              select={select}
+              search={search}
+              columns={columnsAllValidator}
+              type="all_validator"
+            />
+          )}
+        </>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

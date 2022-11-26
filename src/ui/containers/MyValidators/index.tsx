@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { columnsMyValidator } from '../../../lib';
-import { ValidatorTable } from '../../components';
+import { EmptyTableHelper, ValidatorTable } from '../../components';
 
 export type MyValidatorsTableDataType = {
   name: string;
@@ -47,12 +47,16 @@ export const MyValidators = () => {
 
   return (
     <div className="mt-[26px]">
-      <ValidatorTable
-        data={tableData}
-        handleSorting={handleSorting}
-        columns={columnsMyValidator}
-        type="my_validator"
-      />
+      {!tableData.length ? (
+        <EmptyTableHelper text='There are not validators' />
+      ) : (
+        <ValidatorTable
+          data={tableData}
+          handleSorting={handleSorting}
+          columns={columnsMyValidator}
+          type="my_validator"
+        />
+      )}
     </div>
   );
 };
