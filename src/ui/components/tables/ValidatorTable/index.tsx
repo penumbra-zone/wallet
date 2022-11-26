@@ -120,10 +120,10 @@ export const ValidatorTable = <T, K extends keyof T>({
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   const [showedValidator, setShowedValidator] = useState<T | null>();
 
-  useEffect(() => {
-    if(!data.length) return;
-    setShowedValidator(data[1]);
-  }, [data])
+  // useEffect(() => {
+  //   if (!data.length) return;
+  //   setShowedValidator({ ...data[1], description: 'asdasdasasdsda' });
+  // }, [data]);
 
   useEffect(() => {
     setSortField('');
@@ -141,9 +141,6 @@ export const ValidatorTable = <T, K extends keyof T>({
   const handleManage = (data: T) => () => setShowedValidator(data);
 
   const handleClose = () => setShowedValidator(null);
-
-  console.log(showedValidator);
-  
 
   return (
     <>

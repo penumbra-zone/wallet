@@ -20,9 +20,6 @@ export const SettingsNetworks = () => {
   const customTendermint = useAccountsSelector(selectCustomTendermint);
   const customGRPC = useAccountsSelector(selectCustomGRPC);
   const currentNetwork = useAccountsSelector(selectCurNetwork);
-  const s = useAccountsSelector(s => s)
-  console.log(s);
-  
 
   const [inputsValues, setInputsValues] = useState<{
     chainId: string;

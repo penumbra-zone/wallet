@@ -8,6 +8,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLElement> {
   customType?: 'password' | 'text';
   className?: string;
   leftSvg?: ReactElement;
+  rightElement?: ReactElement;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -18,6 +19,7 @@ export const Input: React.FC<InputProps> = ({
   customType = 'text',
   className,
   leftSvg,
+  rightElement,
   ...props
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -83,6 +85,7 @@ export const Input: React.FC<InputProps> = ({
               }
               {...props}
             />
+            {rightElement}
             {customType === 'password' && (
               <div
                 className="ml-[18px] mr-[12px] cursor-pointer"

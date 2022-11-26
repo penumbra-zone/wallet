@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useAccountsSelector } from '../../../accounts';
-import { selectLastExistBlock, selectLastSavedBlock } from '../../redux';
+import { useAccountsSelector, useAppDispatch } from '../../../accounts';
+import {
+  accountsActions,
+  selectLastExistBlock,
+  selectLastSavedBlock,
+} from '../../redux';
 import Background from '../../services/Background';
 
 type BalanceProps = {
@@ -12,6 +16,8 @@ export const Balance: React.FC<BalanceProps> = ({ className }) => {
   const lastSavedBlock = useAccountsSelector(selectLastSavedBlock);
   const lastExistBlock = useAccountsSelector(selectLastExistBlock);
 
+  const dispatch = useAppDispatch();
+
   const getNotes = async () => {
     const data = await Background.getAllValueIndexedDB('notes');
     if (!data.length) return setBalance(0);
@@ -19,7 +25,7 @@ export const Balance: React.FC<BalanceProps> = ({ className }) => {
     const max = data.reduce(function (prev, current) {
       return prev.height > current.height ? prev : current;
     });
-
+    dispatch(accountsActions.setBalance(Number(max.amount)));
     setBalance(max.amount);
   };
 

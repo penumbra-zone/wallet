@@ -7,16 +7,19 @@ type CreateAccountInput = {
   name: string;
   seed: string;
   addressByIndex: string;
+
 };
 
 type Init = {
   selectedAccount: CreateAccountInput;
   isRedirectToAccountPage: boolean;
+  balance: number;
 };
 
 const init: Init = {
   selectedAccount: {} as CreateAccountInput,
   isRedirectToAccountPage: true,
+  balance: 0
 };
 
 const accounts = createSlice({
@@ -30,6 +33,10 @@ const accounts = createSlice({
     setRedirectAccountPage: (state, action) => ({
       ...state,
       isRedirectToAccountPage: action.payload,
+    }),
+    setBalance: (state, action) => ({
+      ...state,
+      balance: action.payload,
     }),
   },
 });
@@ -54,3 +61,5 @@ export const selectSelectedAccount = (state: AccountsState) =>
   state.accounts.selectedAccount;
 export const selectRedirectToAccountPage = (state: AccountsState) =>
   state.accounts.isRedirectToAccountPage;
+  export const selectBalance = (state: AccountsState) =>
+    state.accounts.balance;

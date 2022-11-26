@@ -71,9 +71,7 @@ export const BalanceAction = () => {
         <div className="flex flex-col">
           <p className="text_button mb-[4px]">Stake</p>
           <p
-            className={`${
-              isDesktop ? 'text_body' : 'text_ext'
-            } text-light_grey`}
+            className='text_body text-light_grey'
           >
             Earn to 21% per year
           </p>
