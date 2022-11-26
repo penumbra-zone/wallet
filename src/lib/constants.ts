@@ -1,3 +1,9 @@
+import { ColumnDefinitionType } from '../ui/components';
+import {
+  AllValidatorsTableDataType,
+  MyValidatorsTableDataType,
+} from '../ui/containers';
+
 export const DEFAULT_LEGACY_CONFIG = {
   CONFIG: {
     update_ms: 30000,
@@ -32,3 +38,65 @@ export const DEFAULT_LEGACY_CONFIG = {
 };
 
 export const TESTNET_URL = 'http://testnet.penumbra.zone:8080';
+
+export const columnsAllValidator: Array<
+  ColumnDefinitionType<
+    AllValidatorsTableDataType,
+    keyof AllValidatorsTableDataType
+  >
+> = [
+  {
+    Header: 'Validator',
+    accessor: 'name',
+    sortable: false,
+  },
+  {
+    Header: 'Voting Power',
+    accessor: 'votingPower',
+    sortable: true,
+  },
+  {
+    Header: 'Commission',
+    accessor: 'commission',
+    sortable: true,
+  },
+  {
+    Header: 'APR',
+    accessor: 'arp',
+    sortable: true,
+  },
+  {
+    Header: '',
+    accessor: 'manage',
+    sortable: false,
+  },
+];
+
+export const columnsMyValidator: Array<
+  ColumnDefinitionType<
+    MyValidatorsTableDataType,
+    keyof MyValidatorsTableDataType
+  >
+> = [
+  {
+    Header: 'Validator',
+    accessor: 'name',
+    sortable: false,
+  },
+  {
+    Header: 'Amound Staked',
+    accessor: 'stakedCurrency',
+    sortable: true,
+  },
+  {
+    Header: 'Claimable Rewards',
+    accessor: 'rewardsCurrency',
+    sortable: true,
+  },
+
+  {
+    Header: '',
+    accessor: 'manage',
+    sortable: false,
+  },
+];

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useTable, useSortBy } from 'react-table';
+import { useTable, useSortBy, HeaderGroup, Column } from 'react-table';
 import { Button } from '../../Button';
 import { ArrowGradientSvg, SortSvg } from '../../Svg';
 
@@ -34,6 +34,24 @@ const renderCell = (columnId: string, cell, index: number) => {
     return (
       <div className="flex items-center justify-center h-[48px] bg-dark_grey -ml-[2px]">{`${cell.value} %`}</div>
     );
+  else if (columnId === 'stakedCurrency')
+    return (
+      <div className="flex flex-col items-center justify-center h-[48px] bg-dark_grey -ml-[2px] text_numbers_s">
+        <p>{cell.value.toLocaleString('en-US')} PNB</p>
+        <p className="text-light_grey">
+          ~ ${cell.row.original.stakedDollar.toLocaleString('en-US')}
+        </p>
+      </div>
+    );
+  else if (columnId === 'rewardsCurrency')
+    return (
+      <div className="flex flex-col items-center justify-center h-[48px] bg-dark_grey -ml-[2px] text_numbers_s">
+        <p>{cell.value.toLocaleString('en-US')} PNB</p>
+        <p className="text-light_grey">
+          ~ ${cell.row.original.rewardsCurrency.toLocaleString('en-US')}
+        </p>
+      </div>
+    );
   else
     return (
       <div className="flex items-center justify-center h-[48px] bg-dark_grey -ml-[2px]">
@@ -42,53 +60,53 @@ const renderCell = (columnId: string, cell, index: number) => {
     );
 };
 
-const columns = [
-  {
-    Header: 'Validator',
-    accessor: 'name',
-    sortable: false,
-  },
-  {
-    Header: 'Voting Power',
-    accessor: 'votingPower',
-    sortable: true,
-  },
-  {
-    Header: 'Commission',
-    accessor: 'commission',
-    sortable: true,
-  },
-  {
-    Header: 'APR',
-    accessor: 'arp',
-    sortable: true,
-  },
-  {
-    Header: '',
-    accessor: 'manage',
-    sortable: false,
-  },
-];
+export type ColumnDefinitionType<T, K extends keyof T> = {
+  accessor: K;
+  Header: string;
+  sortable: boolean;
+};
 
-export const ValidatorTable = ({ select,search, data, handleSorting }) => {
+type TableHeaderProps<T, K extends keyof T> = {
+  columns: Array<ColumnDefinitionType<T, K>>;
+  handleSorting: (sortField: K, sortOrder: 'asc' | 'desc') => void;
+};
+
+type TableRowsProps<T> = {
+  data: Array<T>;
+};
+
+type ValidatorTableProps = {
+  select?: string | number;
+  search?: string;
+};
+
+export const ValidatorTable = <T, K extends keyof T>({
+  columns,
+  select,
+  search,
+  data,
+  handleSorting,
+}: TableHeaderProps<T, K> &
+  TableRowsProps<T> &
+  ValidatorTableProps): JSX.Element => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable(
       {
-        columns,
-        data,
+        columns: columns as readonly Column<object>[],
+        data: data as readonly object[],
       },
       useSortBy
     );
 
-  const [sortField, setSortField] = useState('');
-  const [order, setOrder] = useState('asc');
+  const [sortField, setSortField] = useState<K | ''>('');
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
     setSortField('');
     setOrder('asc');
   }, [select, search]);
 
-  const handleSortingChange = (accessor: string) => () => {
+  const handleSortingChange = (accessor: K) => () => {
     const sortOrder =
       accessor === sortField && order === 'asc' ? 'desc' : 'asc';
     setSortField(accessor);
@@ -102,47 +120,58 @@ export const ValidatorTable = ({ select,search, data, handleSorting }) => {
         <thead className="h3">
           {headerGroups.map((headerGroup, headerGroupIndex) => (
             <tr key={headerGroupIndex}>
-              {headerGroup.headers.map((column, index) => {
-                // console.log(column);
-
-                return (
-                  <th
-                    onClick={
-                      column.sortable ? handleSortingChange(column.id) : null
-                    }
-                    key={index}
-                    className={`pb-[22px] ${
-                      column.id === 'name' ? 'text-left' : 'text-center'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <div>{column.render('Header')}</div>
-                      {column.sortable && (
-                        <div className="flex flex-col ml-[8px] cursor-pointer">
-                          <span>
-                            <SortSvg
-                              fill={
-                                sortField === column.id && order === 'asc'
-                                  ? 'white'
-                                  : '#524B4B'
-                              }
-                            />
-                          </span>
-                          <span className="rotate-180">
-                            <SortSvg
-                              fill={
-                                sortField === column.id && order === 'desc'
-                                  ? 'white'
-                                  : '#524B4B'
-                              }
-                            />
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </th>
-                );
-              })}
+              {headerGroup.headers.map(
+                (
+                  column: HeaderGroup<object> & { sortable: boolean },
+                  index
+                ) => {
+                  return (
+                    <th
+                      onClick={
+                        column.sortable
+                          ? handleSortingChange(column.id as K)
+                          : null
+                      }
+                      key={index}
+                      className={`pb-[22px] ${
+                        column.id === 'name' ? 'text-left' : ''
+                      }`}
+                    >
+                      <div
+                        className={`flex items-center ${
+                          column.id === 'name'
+                            ? 'justify-start'
+                            : 'justify-center'
+                        }`}
+                      >
+                        <div>{column.render('Header')}</div>
+                        {column.sortable && (
+                          <div className="flex flex-col ml-[8px] cursor-pointer">
+                            <span>
+                              <SortSvg
+                                fill={
+                                  sortField === column.id && order === 'asc'
+                                    ? 'white'
+                                    : '#524B4B'
+                                }
+                              />
+                            </span>
+                            <span className="rotate-180">
+                              <SortSvg
+                                fill={
+                                  sortField === column.id && order === 'desc'
+                                    ? 'white'
+                                    : '#524B4B'
+                                }
+                              />
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </th>
+                  );
+                }
+              )}
             </tr>
           ))}
         </thead>
@@ -156,7 +185,7 @@ export const ValidatorTable = ({ select,search, data, handleSorting }) => {
                   return (
                     <td
                       {...cell.getCellProps()}
-                      className="text_number_s py-[4px]"
+                      className="text_numbers_s py-[4px] text-left"
                     >
                       {renderCell(cell.column.id, cell, i)}
                     </td>

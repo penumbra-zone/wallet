@@ -2,6 +2,7 @@ import { ValidatorInfo } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/
 import { BigNumber } from 'big-integer';
 import { useEffect, useState } from 'react';
 import { useAccountsSelector } from '../../../accounts';
+import { columnsAllValidator } from '../../../lib';
 import { Input, SearchSvg, Select, ValidatorTable } from '../../components';
 import { selectNetworks } from '../../redux';
 
@@ -21,12 +22,13 @@ enum ValidatorsState {
 const filterValidator = (validator: ValidatorInfo[], filter: number) =>
   validator.filter((v) => v.status.state.state === filter);
 
-type TableDataType = {
+export type AllValidatorsTableDataType = {
   name: string;
   votingPower: BigNumber;
   commission: number;
   arp: number;
   state: number;
+  manage: undefined;
 };
 
 const getTableData = (validators: ValidatorInfo[]) => {
@@ -37,6 +39,7 @@ const getTableData = (validators: ValidatorInfo[]) => {
     commission: 0,
     arp: 0,
     state: i.status.state.state as number,
+    manage: undefined,
   }));
 };
 
@@ -44,8 +47,9 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
   const networks = useAccountsSelector(selectNetworks);
   const [search, setSearch] = useState<string>('');
   const [totalValidators, setTotalValidators] = useState<number | null>(null);
-  const [tableData, setTableData] = useState<TableDataType[]>([]);
+  const [tableData, setTableData] = useState<AllValidatorsTableDataType[]>([]);
   const [select, setSelect] = useState<number | string | null>(null);
+  console.log({ tableData, validators, totalValidators });
 
   const getValidatorsCount = async () => {
     try {
@@ -60,15 +64,8 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
   }, [networks]);
 
   useEffect(() => {
-    if (totalValidators && validators.length > totalValidators)
-      setTotalValidators(validators.length);
-  }, [validators]);
-
-  useEffect(() => {
-    if (validators.length === totalValidators) {
-      const validatorTableData = getTableData(validators);
-      setTableData(validatorTableData);
-    }
+    const validatorTableData = getTableData(validators);
+    setTableData(validatorTableData);
   }, [validators, totalValidators]);
 
   const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -187,11 +184,25 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
           className="w-[400px]"
         />
         <Select
-          options={totalValidators === validators.length ? options : []}
+          options={
+            totalValidators ===
+            filterValidator(
+              validators,
+              ValidatorsState.VALIDATOR_STATE_ENUM_ACTIVE
+            ).length
+              ? options
+              : []
+          }
           handleChange={handleChangeSelect}
           className="w-[192px]"
           initialValue={
-            totalValidators === validators.length ? 'all' : undefined
+            totalValidators ===
+            filterValidator(
+              validators,
+              ValidatorsState.VALIDATOR_STATE_ENUM_ACTIVE
+            ).length
+              ? 'all'
+              : undefined
           }
         />
       </div>
@@ -200,6 +211,7 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
         handleSorting={handleSorting}
         select={select}
         search={search}
+        columns={columnsAllValidator}
       />
     </div>
   );

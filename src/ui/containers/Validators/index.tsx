@@ -10,6 +10,7 @@ import { ValidatorInfoRequest } from '@buf/bufbuild_connect-web_penumbra-zone_pe
 import { useAccountsSelector } from '../../../accounts';
 import { selectNetworks } from '../../redux';
 import { ValidatorInfo } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/stake/v1alpha1/stake_pb';
+import { MyValidators } from '../MyValidators';
 
 export const Validators = () => {
   const networks = useAccountsSelector(selectNetworks);
@@ -23,6 +24,7 @@ export const Validators = () => {
 
     const validatorInfoRequest = new ValidatorInfoRequest();
     validatorInfoRequest.chainId = networks[0].chainId;
+    validatorInfoRequest.showInactive = true;
 
     try {
       for await (const response of client.validatorInfo(validatorInfoRequest)) {
@@ -42,7 +44,7 @@ export const Validators = () => {
           <div className="flex flex-col">
             <p className="h3 mb-[16px]">Total PNB Amount </p>
             <p className="text_numbers pb-[4px]">1,050.0096 PNB</p>
-            <div className="flex text_number_s">
+            <div className="flex text_numbers_s">
               <p>~ $306</p>
               <p className="text-green mx-[4px]">(-3.15%)</p>
               <p>24h</p>
@@ -93,7 +95,7 @@ export const Validators = () => {
           type === 'All Penumbra Validators' ? (
             <AllValidators validators={validators} />
           ) : (
-            <div>My Validators</div>
+            <MyValidators />
           )
         }
       ></Tabs>
