@@ -19,4 +19,5 @@ export const routesPath = {
   SETTINGS_GENERAL_INFORMATION: '/settings/general-information',
   BALANCE_DETAIL: '/balance-detail/:name',
   VALIDATORS: '/validators',
+  SEND: '/send'
 };

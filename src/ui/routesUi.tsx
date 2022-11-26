@@ -5,6 +5,7 @@ import {
   BalanceDetail,
   Login,
   Main,
+  Send,
   SettingsExtenion,
   SettingsNetworks,
   SettingsSecurityPrivacy,
@@ -27,6 +28,10 @@ export const routesUi: RouteObject[] = [
       {
         path: routesPath.BALANCE_DETAIL,
         element: <BalanceDetail />,
+      },
+      {
+        path: routesPath.SEND,
+        element: <Send/>,
       },
       {
         path: routesPath.SETTINGS,

@@ -22,6 +22,8 @@ export const Tabs: React.FC<TabsProps> = ({
           return (
             <div
               key={i}
+              role="button"
+              tabIndex={0}
               className={`w-[50%] h-[52px] text-center text_button cursor-pointer ${
                 activeTab === i
                   ? 'tab_gradient'
@@ -29,7 +31,9 @@ export const Tabs: React.FC<TabsProps> = ({
               }`}
               onClick={handleChangeTab(i)}
             >
-              <p className={`h-[51px] flex items-center justify-center ${className}`}>
+              <p
+                className={`h-[51px] flex items-center justify-center ${className}`}
+              >
                 {i}
               </p>
             </div>

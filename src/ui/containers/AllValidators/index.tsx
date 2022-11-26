@@ -87,8 +87,7 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
           .indexOf(event.target.value.toLowerCase()) > -1
       );
     });
-    console.log({ filtered });
-    
+
     if (select === 'all') setTableData(filtered);
     else {
       const filterDataBySelect = filtered.filter((v) => v.state === select);
@@ -179,9 +178,6 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
       setTableData(sorted);
     }
   };
-
-  console.log(tableData);
-  
 
   return (
     <div className="flex flex-col mt-[26px]">

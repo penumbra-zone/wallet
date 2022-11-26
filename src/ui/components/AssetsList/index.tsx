@@ -10,7 +10,9 @@ export const AssetsList = () => {
   return (
     <div
       onClick={handleBalancedetail('pnb')}
-      className="flex items-center justify-between py-[20px] pl-[22px] pr-[30px] border-y-[1px] border-solid border-dark_grey cursor-pointer hover:bg-brown"
+      role="button"
+      tabIndex={0}
+      className="flex items-center justify-between py-[20px] pl-[22px] pr-[30px] border-y-[1px] border-solid border-dark_grey cursor-pointer hover:bg-dark_grey "
     >
       <div className="flex items-center">
         <div className="w-[51px] h-[51px] li_gradient rounded-[50%] flex  items-center justify-center">

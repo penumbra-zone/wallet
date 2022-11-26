@@ -1,12 +1,18 @@
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAccountsSelector } from '../../../accounts';
 import img from '../../../assets/img/logo.png';
+import { routesPath } from '../../../utils';
+import { selectState } from '../../redux';
 
 type LogoProps = {
-  size: 'big' | 'medium' | 'small' |'small_tabs';
-  className?: string
+  size: 'big' | 'medium' | 'small' | 'small_tabs';
+  className?: string;
 };
 
 export const Logo: React.FC<LogoProps> = ({ size, className }) => {
+  const navigate = useNavigate();
+  const state = useAccountsSelector(selectState);
   const cn = useMemo(() => {
     if (size === 'small') {
       return `w-[96px] ${className}`;
@@ -19,5 +25,14 @@ export const Logo: React.FC<LogoProps> = ({ size, className }) => {
     }
   }, [size, className]);
 
-  return <img src={img} alt="penumbra log" className={`${cn} object-cover`} />;
+  const handleClick = () => navigate(routesPath.HOME);
+
+  return (
+    <img
+      src={img}
+      alt="penumbra log"
+      className={`${cn} object-cover cursor-pointer`}
+      onClick={!state.isLocked && state.isInitialized ? handleClick : undefined}
+    />
+  );
 };

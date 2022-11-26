@@ -15,6 +15,7 @@ import {
   SettingsNetworks,
   BalanceDetail,
   Validators,
+  Send,
 } from '../ui/containers';
 import { RootAccounts } from './RootAccounts';
 import { routesPath } from '../utils';
@@ -71,6 +72,10 @@ export const routes: RouteObject[] = [
       {
         path: routesPath.VALIDATORS,
         element: <Validators />,
+      },
+      {
+        path: routesPath.SEND,
+        element: <Send/>
       },
       {
         path: routesPath.SETTINGS,

@@ -12,12 +12,14 @@ export const BalanceAction = () => {
 
   const handleStake = () => {
     if (isDesktop) return navigate(routesPath.VALIDATORS);
-     Background.showTab(
-       `${window.location.origin}/accounts.html#${routesPath.VALIDATORS}`,
-       'validators'
-     );
-      navigate('/', { replace: true });
+    Background.showTab(
+      `${window.location.origin}/accounts.html#${routesPath.VALIDATORS}`,
+      'validators'
+    );
+    navigate('/', { replace: true });
   };
+
+  const handleNavigate = (url: string) => () => navigate(url);
   return (
     <div className="w-[100%] flex flex-col items-center">
       <div className="ext:w-[40px] ext:h-[40px] tablet:w-[51px] tablet:h-[51px] li_gradient rounded-[50%] flex  items-center justify-center">
@@ -43,7 +45,7 @@ export const BalanceAction = () => {
         <div className="flex flex-col items-center">
           <Button
             mode="gradient"
-            onClick={() => console.log('asd')}
+            onClick={handleNavigate(routesPath.SEND)}
             title={
               <div className="flex items-center justify-center">
                 <ArrowUpRightSvg />
@@ -70,11 +72,7 @@ export const BalanceAction = () => {
       <div className="w-[100%] flex items-center justify-between ext:py-[15.5px] tablet:py-[13.5px] px-[18px] border-y-[1px] border-solid border-dark_grey">
         <div className="flex flex-col">
           <p className="text_button mb-[4px]">Stake</p>
-          <p
-            className='text_body text-light_grey'
-          >
-            Earn to 21% per year
-          </p>
+          <p className="text_body text-light_grey">Earn to 21% per year</p>
         </div>
         <Button
           mode="gradient"

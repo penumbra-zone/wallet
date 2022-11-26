@@ -37,7 +37,7 @@ export const Main: React.FC<MainProps> = () => {
           <div className="flex items-center  text_body text-light_grey">
             {getShortKey(selectedAccount.addressByIndex)}
             <span
-              className="ml-[7px] cursor-pointer"
+              className="ml-[7px] cursor-pointer svg_hover"
               onClick={copyToClipboard}
               role="button"
               tabIndex={0}

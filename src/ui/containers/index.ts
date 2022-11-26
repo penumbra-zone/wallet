@@ -20,3 +20,4 @@ export * from './BalanceDetail';
 export * from './Validators';
 export * from './AllValidators';
 export * from './MyValidators';
+export * from './Send';
