@@ -149,12 +149,12 @@ select {
     line-height: 22px;
 }
 
-.text_button_ext{
-      font-family: "Faktum Bold";
-     font-style: normal;
-     font-weight: 700;
-     font-size: 12px;
-     line-height: 18px;
+.text_button_ext {
+    font-family: "Faktum Bold";
+    font-style: normal;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 18px;
 }
 
 .text_numbers {

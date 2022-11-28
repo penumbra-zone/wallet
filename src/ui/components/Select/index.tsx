@@ -1,4 +1,4 @@
-import { Ref, useCallback, useEffect, useRef, useState } from 'react';
+import { ReactElement, Ref, useCallback, useEffect, useRef, useState } from 'react';
 import SelectComponent, {
   MultiValue,
   SingleValue,
@@ -7,7 +7,7 @@ import SelectComponent, {
 
 export type OptionType = {
   value: string | number;
-  label: string;
+  label: string | ReactElement;
 };
 
 type SelectPropsType = {
@@ -64,7 +64,7 @@ export const Select: React.FC<SelectPropsType> = ({
 
   return (
     <div className={className}>
-      <p className="text _body">{label}</p>
+      <p className="text_body">{label}</p>
       <div
         onClick={containerHandler}
         className={`w-[100%] h-[52px] rounded-[15px] flex items-center justify-center mt-[8px] rounded-[15px]

@@ -25,6 +25,8 @@ export const Balance: React.FC<BalanceProps> = ({ className }) => {
     const max = data.reduce(function (prev, current) {
       return prev.height > current.height ? prev : current;
     });
+    console.log({max: max.amount});
+    
     dispatch(accountsActions.setBalance(Number(max.amount)));
     setBalance(max.amount);
   };
