@@ -2,6 +2,7 @@ import {
   ChainParameters,
   CompactBlock,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
+import { ClientController } from '../controllers';
 import { ExtensionStorage } from '../storage';
 import { EncodeAsset } from '../types';
 import { IndexedDb } from '../utils';
@@ -13,17 +14,21 @@ function toJson(data) {
 }
 
 export class ViewProtocolService {
-  indexedDb;
-  extensionStorage;
+  private indexedDb;
+  private extensionStorage;
+  private getLastExistBlock;
   constructor({
     indexedDb,
     extensionStorage,
+    getLastExistBlock,
   }: {
     indexedDb: IndexedDb;
     extensionStorage: ExtensionStorage;
+    getLastExistBlock: ClientController['getLastExistBlock'];
   }) {
     this.indexedDb = indexedDb;
     this.extensionStorage = extensionStorage;
+    this.getLastExistBlock = getLastExistBlock;
   }
 
   async getAssets() {
@@ -45,13 +50,14 @@ export class ViewProtocolService {
   }
 
   async getStatus() {
-    const data = await this.extensionStorage.getState([
-      'lastSavedBlock',
-      'lastBlockHeight',
-    ]);
+    const { lastSavedBlock } = await this.extensionStorage.getState(
+      'lastSavedBlock'
+    );
+    const lasBlock = await this.getLastExistBlock();
     return {
-      sync_height: data.lastSavedBlock.testnet,
-      catching_up: data.lastSavedBlock.testnet === data.lastBlockHeight.testnet,
+      sync_height: lastSavedBlock.testnet,
+      catching_up: lastSavedBlock.testnet === lasBlock,
+      last_block: lasBlock,
     };
   }
 }

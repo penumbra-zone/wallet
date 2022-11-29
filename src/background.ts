@@ -140,6 +140,7 @@ class BackgroundService extends EventEmitter {
     this.viewProtocolService = new ViewProtocolService({
       indexedDb: this.indexedDb,
       extensionStorage: this.extensionStorage,
+      getLastExistBlock: () => this.clientController.getLastExistBlock()
     });
   }
 

@@ -199,7 +199,11 @@ export class ClientController {
     const { tendermint } =
       this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
 
-    const response = await fetch(`${tendermint}/abci_info`);
+    const response = await fetch(`${tendermint}/abci_info`, {
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
+    });
     const data = await response.json();
 
     const lastBlock = Number(data.result.response.last_block_height);
