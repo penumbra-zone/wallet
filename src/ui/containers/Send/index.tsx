@@ -3,12 +3,10 @@ import { Address } from './Address';
 import { DetailTxBeforeSend } from './DetailTxBeforeSend';
 
 export const Send = () => {
-  const [search, setSearch] = useState<string>(
-    'penumbrav2t156t9s3s0786ghjnpk20jjaweqyeavfevpd7rkjycllu5qtevuuy69j948fy6gpgwptl2mgcgl0u5mw8glk38puggxx290cryz6pvxde3vgv4tuuey4rlrpf2smes5wt2m957r9'
-  );
-  const [amount, setAmount] = useState<string>('0.1');
+  const [search, setSearch] = useState<string>('');
+  const [amount, setAmount] = useState<string>('');
   const [select, setSelect] = useState<string>('PNB');
-  const [isOpenDetailTx, setIsOpenDetailTx] = useState<boolean>(true);
+  const [isOpenDetailTx, setIsOpenDetailTx] = useState<boolean>(false);
 
   return (
     <div className="w-[100%] flex items-center justify-center">

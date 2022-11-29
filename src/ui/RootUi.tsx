@@ -13,7 +13,7 @@ export const RootUi = () => {
 
   useEffect(() => {
     if (selectedAccount.name && !state.isLocked) {
-      return navigate(routesPath.SEND);
+      return navigate(routesPath.HOME);
     }
 
     if (state.isInitialized && state.isLocked)

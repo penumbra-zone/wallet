@@ -2,6 +2,7 @@ import {
   ChainParameters,
   CompactBlock,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
+import { ExtensionStorage } from '../storage';
 import { EncodeAsset } from '../types';
 import { IndexedDb } from '../utils';
 
@@ -13,8 +14,16 @@ function toJson(data) {
 
 export class ViewProtocolService {
   indexedDb;
-  constructor({ indexedDb }: { indexedDb: IndexedDb }) {
+  extensionStorage;
+  constructor({
+    indexedDb,
+    extensionStorage,
+  }: {
+    indexedDb: IndexedDb;
+    extensionStorage: ExtensionStorage;
+  }) {
     this.indexedDb = indexedDb;
+    this.extensionStorage = extensionStorage;
   }
 
   async getAssets() {
@@ -33,5 +42,16 @@ export class ViewProtocolService {
   async getNotes() {
     const notes: CompactBlock[] = await this.indexedDb.getAllValue('notes');
     return notes;
+  }
+
+  async getStatus() {
+    const data = await this.extensionStorage.getState([
+      'lastSavedBlock',
+      'lastBlockHeight',
+    ]);
+    return {
+      sync_height: data.lastSavedBlock.testnet,
+      catching_up: data.lastSavedBlock.testnet === data.lastBlockHeight.testnet,
+    };
   }
 }

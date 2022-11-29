@@ -139,6 +139,7 @@ class BackgroundService extends EventEmitter {
 
     this.viewProtocolService = new ViewProtocolService({
       indexedDb: this.indexedDb,
+      extensionStorage: this.extensionStorage,
     });
   }
 
@@ -214,7 +215,6 @@ class BackgroundService extends EventEmitter {
       ) => this.networkController.setCustomTendermint(url, network),
       getAllValueIndexedDB: async (tableName: string) =>
         this.indexedDb.getAllValue(tableName),
-      
     };
   }
   getInpageApi(origin: string, connectionId: string) {
@@ -224,6 +224,7 @@ class BackgroundService extends EventEmitter {
       getChainParameters: async () =>
         this.viewProtocolService.getChainParameters(),
       getNotes: async () => this.viewProtocolService.getNotes(),
+      getStatus: async () => this.viewProtocolService.getStatus(),
     };
   }
 

@@ -188,10 +188,8 @@ export class ClientController {
             ...oldLastBlockHeight,
             [this.configApi.getNetwork()]: Number(response.compactBlock.height),
           };
-          extension.storage.local.set({
-            lastSavedBlock,
-            lastBlockHeight,
-          });
+
+          this.store.updateState({ lastBlockHeight, lastSavedBlock });
         }
       }
     } catch (error) {}
