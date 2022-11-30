@@ -27,6 +27,20 @@ export const SelectAction: React.FC<{}> = () => {
           className="w-[50%] ml-[12px]"
         />
       </div>
+      <div className="text_body mt-[60px] text-center">
+        This data is aggregated and is therefore anonymous for the purposes of
+        General Data Protection Regulation (EU) 2016/679. For more information
+        in relation to our privacy practices, please see our{' '}
+        <span>
+          <a
+            className="underline cursor-pointer hover:text-light_grey"
+            target="_blank"
+            href="https://www.notion.so/zpoken/Privacy-Policy-c3db8914f6054b74be02aaafd846030b"
+          >
+            Privacy policy here.
+          </a>
+        </span>
+      </div>
     </div>
   );
 };
