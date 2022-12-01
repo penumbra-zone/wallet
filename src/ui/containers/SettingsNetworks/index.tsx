@@ -35,7 +35,6 @@ export const SettingsNetworks = () => {
   const [filteredNetworks, setFilteredNetworks] =
     useState<NetworkType[]>(networks);
 
-  console.log({ filteredNetworks });
 
   useEffect(() => {
     setInputsValues({
@@ -109,7 +108,7 @@ export const SettingsNetworks = () => {
   return (
     <div className="ext:h-[calc(100%-100px)] tablet:h-[100%]">
       <p
-        className={`w-[100%] pl-[16px] py-[20px] border-b-[1px] border-solid border-dark_grey ${
+        className={`w-[100%] px-[16px] py-[24px] border-b-[1px] border-solid border-dark_grey ${
           isDesktop ? 'h2' : 'h1_ext'
         }`}
       >

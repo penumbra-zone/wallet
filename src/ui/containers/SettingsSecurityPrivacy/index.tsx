@@ -19,7 +19,7 @@ export const SettingsSecurityPrivacy = () => {
   return (
     <>
       <div>
-        <p className={`w-[100%] pl-[16px] py-[20px] border-b-[1px] border-solid border-dark_grey ${isDesktop ? 'h2': 'h1_ext'}`}>
+        <p className={`w-[100%] px-[16px] py-[24px] border-b-[1px] border-solid border-dark_grey ${isDesktop ? 'h2': 'h1_ext'}`}>
           Security and Privacy
         </p>
         <div className="px-[16px] h-[100%]">

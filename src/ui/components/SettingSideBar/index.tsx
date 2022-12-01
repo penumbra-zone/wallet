@@ -24,7 +24,7 @@ export const links = [
   {
     to: routesPath.SETTINGS_CONTACTS,
     svg: <ContactsSvg />,
-    text: 'Contact Information',
+    text: 'Contacts',
   },
   {
     to: routesPath.SETTINGS_SECURITY_PRIVACY,

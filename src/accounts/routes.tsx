@@ -16,6 +16,7 @@ import {
   BalanceDetail,
   Validators,
   Send,
+  SettingsContacts,
 } from '../ui/containers';
 import { RootAccounts } from './RootAccounts';
 import { routesPath } from '../utils';
@@ -91,7 +92,7 @@ export const routes: RouteObject[] = [
           },
           {
             path: routesPath.SETTINGS_CONTACTS,
-            element: <h2>SETTINGS_CONTACTS</h2>,
+            element: <SettingsContacts />,
           },
           {
             path: routesPath.SETTINGS_SECURITY_PRIVACY,

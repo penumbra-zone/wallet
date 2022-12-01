@@ -1,6 +1,7 @@
 import EventEmitter from 'events';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  ContactBookController,
   ClientController,
   IdleController,
   NetworkController,
@@ -9,6 +10,7 @@ import {
   RemoteConfigController,
   VaultController,
   WalletController,
+  Contact,
 } from './controllers';
 import { extension, PortStream, setupDnode, TabsManager } from './lib';
 import { ViewProtocolService } from './services';
@@ -91,12 +93,17 @@ class BackgroundService extends EventEmitter {
   clientController;
   indexedDb;
   viewProtocolService;
+  contactBookController;
 
   constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
     super();
 
     this.indexedDb = new IndexedDb();
     this.extensionStorage = extensionStorage;
+
+    // this.contactBookController = new ContactBookController({
+    //   extensionStorage: this.extensionStorage,
+    // });
 
     this.remoteConfigController = new RemoteConfigController({
       extensionStorage: this.extensionStorage,
@@ -216,6 +223,13 @@ class BackgroundService extends EventEmitter {
       ) => this.networkController.setCustomTendermint(url, network),
       getAllValueIndexedDB: async (tableName: string) =>
         this.indexedDb.getAllValue(tableName),
+      // addresses
+      setContact: async (contact: Contact) =>
+        this.contactBookController.setContact(contact),
+      updateContact: async (addresses: Record<string, string>) =>
+        this.contactBookController.updateContact(addresses),
+      removeContact: async (address: string) =>
+        this.contactBookController.removeContact(address),
     };
   }
   getInpageApi(origin: string) {

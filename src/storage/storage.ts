@@ -4,10 +4,11 @@ import asStream from 'obs-store/lib/asStream';
 import debounceStream from 'debounce-stream';
 import log from 'loglevel';
 import { createStreamSink, DEFAULT_LEGACY_CONFIG, extension } from '../lib';
-import { NetworkConfigItem, NetworkName } from '../controllers';
+import {  Contact, NetworkConfigItem, NetworkName } from '../controllers';
 import { WalletAccount } from '../preferences';
 
 export type StorageLocalState = {
+  contacts: Contact[];
   selectedAccount: WalletAccount | undefined;
   isInitialized: boolean | null;
   isLocked: boolean | null;

@@ -1,5 +1,5 @@
 import { __BackgroundUiApiDirect } from '../../background';
-import { NetworkName } from '../../controllers';
+import { Contact, NetworkName } from '../../controllers';
 import { StorageLocalState } from '../../storage';
 import { CreateWalletInput, ISeedWalletInput } from '../../wallets';
 import { PENUMBRAWALLET_DEBUG } from '../appConfig';
@@ -322,19 +322,17 @@ class Background {
   //     }
   //   }
 
-    async getAccountSeed(
-      password: string
-    ): Promise<string> {
-      try {
-        await this.initPromise;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await this._connect!();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return await this.background!.getAccountSeed(password);
-      } catch (err) {
-        throw new Error(prepareErrorMessage(err));
-      }
+  async getAccountSeed(password: string): Promise<string> {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.getAccountSeed(password);
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
     }
+  }
 
   //   async getAccountEncodedSeed(
   //     address: string,
@@ -571,41 +569,41 @@ class Background {
   //     }
   //   }
 
-  //   async setAddress(address: string, name: string): Promise<void> {
-  //     try {
-  //       await this.initPromise;
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       await this._connect!();
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       return await this.background!.setAddress(address, name);
-  //     } catch (err) {
-  //       throw new Error(prepareErrorMessage(err));
-  //     }
-  //   }
+  async setContact(contact: Contact): Promise<void> {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.setContact(contact);
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
+    }
+  }
 
-  //   async setAddresses(addresses: Record<string, string>): Promise<void> {
-  //     try {
-  //       await this.initPromise;
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       await this._connect!();
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       return await this.background!.setAddresses(addresses);
-  //     } catch (err) {
-  //       throw new Error(prepareErrorMessage(err));
-  //     }
-  //   }
+  async updateContact(addresses: Record<string, string>): Promise<void> {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.updateContact(addresses);
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
+    }
+  }
 
-  //   async removeAddress(address: string): Promise<void> {
-  //     try {
-  //       await this.initPromise;
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       await this._connect!();
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       return await this.background!.removeAddress(address);
-  //     } catch (err) {
-  //       throw new Error(prepareErrorMessage(err));
-  //     }
-  //   }
+  async removeContact(address: string): Promise<void> {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.removeContact(address);
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
+    }
+  }
 
   //   async toggleAssetFavorite(assetId: string): Promise<void> {
   //     try {

@@ -6,6 +6,7 @@ import {
   Login,
   Main,
   Send,
+  SettingsContacts,
   SettingsExtenion,
   SettingsNetworks,
   SettingsSecurityPrivacy,
@@ -31,7 +32,7 @@ export const routesUi: RouteObject[] = [
       },
       {
         path: routesPath.SEND,
-        element: <Send/>,
+        element: <Send />,
       },
       {
         path: routesPath.SETTINGS,
@@ -51,7 +52,7 @@ export const routesUi: RouteObject[] = [
           },
           {
             path: routesPath.SETTINGS_CONTACTS,
-            element: <h2>SETTINGS_CONTACTS</h2>,
+            element: <SettingsContacts />,
           },
           {
             path: routesPath.SETTINGS_SECURITY_PRIVACY,

@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AccountsState } from '../../../accounts/rootReducer';
+import { Contact } from '../../../controllers';
 import Background from '../../services/Background';
 
 type CreateAccountInput = {
@@ -7,19 +8,20 @@ type CreateAccountInput = {
   name: string;
   seed: string;
   addressByIndex: string;
-
 };
 
 type Init = {
   selectedAccount: CreateAccountInput;
   isRedirectToAccountPage: boolean;
   balance: number;
+  contacts: Contact[];
 };
 
 const init: Init = {
   selectedAccount: {} as CreateAccountInput,
   isRedirectToAccountPage: true,
-  balance: 0
+  balance: 0,
+  contacts: [],
 };
 
 const accounts = createSlice({
@@ -37,6 +39,10 @@ const accounts = createSlice({
     setBalance: (state, action) => ({
       ...state,
       balance: action.payload,
+    }),
+    setContacts: (state, action) => ({
+      ...state,
+      contacts: action.payload,
     }),
   },
 });
@@ -61,5 +67,5 @@ export const selectSelectedAccount = (state: AccountsState) =>
   state.accounts.selectedAccount;
 export const selectRedirectToAccountPage = (state: AccountsState) =>
   state.accounts.isRedirectToAccountPage;
-  export const selectBalance = (state: AccountsState) =>
-    state.accounts.balance;
+export const selectBalance = (state: AccountsState) => state.accounts.balance;
+export const selectContacts = (state: AccountsState) => state.accounts.contacts;

@@ -2,16 +2,6 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { routesPath } from '../../../utils';
 import { Button, ChevronLeftIcon, CloseSvg } from '../../components';
 
-const header = {
-  [routesPath.SETTINGS]: 'Settings',
-  [routesPath.SETTINGS_ADDITIONALLY]: 'Additionally',
-  [routesPath.SETTINGS_CONTACTS]: 'Contact Information',
-  [routesPath.SETTINGS_SECURITY_PRIVACY]: 'Security and Privacy',
-  [routesPath.SETTINGS_WARNINGS]: 'Warnings',
-  [routesPath.SETTINGS_NETWORKS]: 'Networks',
-  [routesPath.SETTINGS_GENERAL_INFORMATION]: 'General information',
-};
-
 export const SettingsExtenion = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();

@@ -75,7 +75,6 @@ async function startUi() {
   const [selectedAccount, networks] = await Promise.all([
     background.getSelectedAccount(),
     background.getNetworks(),
-    ,
   ]);
 
   if (!selectedAccount) {

@@ -28,7 +28,7 @@ export const RootAccounts = () => {
       if (pathname === routesPath.VALIDATORS) {
         return navigate(routesPath.VALIDATORS);
       }
-      return navigate(routesPath.SETTINGS_NETWORKS);
+      return navigate(routesPath.HOME);
     }
 
     if (!state.isInitialized) return navigate(routesPath.WELCOME);

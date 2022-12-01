@@ -56,7 +56,10 @@ export function createUpdateState(store: AccountsStore) {
     }
 
     const customTendermint = getParam(state.customTendermint, {});
-    if (customTendermint && !equals(currentState.network.customTendermint, customTendermint)) {
+    if (
+      customTendermint &&
+      !equals(currentState.network.customTendermint, customTendermint)
+    ) {
       dispatch(networkActions.customTendermint(customTendermint));
     }
 

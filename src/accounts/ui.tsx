@@ -69,7 +69,7 @@ async function startUi() {
 
     return await new Promise<BackgroundUiApi>((resolve) => {
       dnode.once('remote', (background: Record<string, unknown>) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any---
         resolve(transformMethods(cbToPromise, background) as any);
       });
     });
