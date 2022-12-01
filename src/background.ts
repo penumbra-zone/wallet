@@ -140,7 +140,7 @@ class BackgroundService extends EventEmitter {
     this.viewProtocolService = new ViewProtocolService({
       indexedDb: this.indexedDb,
       extensionStorage: this.extensionStorage,
-      getLastExistBlock: () => this.clientController.getLastExistBlock()
+      getLastExistBlock: () => this.clientController.getLastExistBlock(),
     });
   }
 
@@ -151,7 +151,7 @@ class BackgroundService extends EventEmitter {
 
     const origin = new URL(sender.url).hostname;
     const connectionId = uuidv4();
-    const inpageApi = this.getInpageApi(origin, connectionId);
+    const inpageApi = this.getInpageApi(origin);
     const dnode = setupDnode(
       new PortStream(remotePort),
       inpageApi,
@@ -218,7 +218,7 @@ class BackgroundService extends EventEmitter {
         this.indexedDb.getAllValue(tableName),
     };
   }
-  getInpageApi(origin: string, connectionId: string) {
+  getInpageApi(origin: string) {
     return {
       publicState: async () => this._publicState(origin),
       getAssets: async () => this.viewProtocolService.getAssets(),

@@ -230,6 +230,7 @@ export class ClientController {
           );
           if (decryptedNote === null) continue;
           //TODO to bigint
+
           decryptedNote.height = Number(compactBlock.height);
           decryptedNote.note_commitment = this.toHexString(
             notePayload.payload?.noteCommitment.inner
@@ -240,6 +241,8 @@ export class ClientController {
           decryptedNote.amount = decryptedNote.value.amount.lo;
 
           decryptedNote.asset = decryptedNote.value.asset_id;
+          decryptedNote.nullifier = compactBlock.nullifiers;
+          decryptedNote.source = this.toHexString(notePayload.source?.inner);
 
           if (decryptedNote.amount != 0) {
             await this.indexedDb.putValue('notes', decryptedNote);

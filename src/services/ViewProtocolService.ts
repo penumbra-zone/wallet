@@ -1,7 +1,4 @@
-import {
-  ChainParameters,
-  CompactBlock,
-} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
+import { ChainParameters } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
 import { ClientController } from '../controllers';
 import { ExtensionStorage } from '../storage';
 import { EncodeAsset } from '../types';
@@ -45,8 +42,25 @@ export class ViewProtocolService {
   }
 
   async getNotes() {
-    const notes: CompactBlock[] = await this.indexedDb.getAllValue('notes');
-    return notes;
+    const notes = await this.indexedDb.getAllValue('notes');
+
+    const mapData = notes.map((i) => ({
+      note_commitment: i.note_commitment,
+      note: {
+        value: i.value,
+        note_blinding: i.note_blinding,
+        address: i.address,
+      },
+      address_index: 0,
+      nullifier: i.nullifier,
+      height_created: i.height,
+      //TODO add height_spent and position
+      height_spent: undefined,
+      position: undefined,
+      source: i.source,
+    }));
+
+    return mapData;
   }
 
   async getStatus() {
