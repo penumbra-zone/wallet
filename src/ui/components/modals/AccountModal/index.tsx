@@ -10,6 +10,7 @@ import { PopupButton } from '../../PopupButton';
 import { useNavigate } from 'react-router-dom';
 import { routesPath } from '../../../../utils';
 import { useMediaQuery } from '../../../../hooks';
+import { Balance } from '../../Balance';
 
 export const AccountModal: React.FC<SuccessCreateModalProps> = ({
   show,
@@ -34,7 +35,7 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
       show={show}
       onClose={onClose}
       position={isDesktop ? 'top_right' : 'center'}
-      className={isDesktop ? 'py-[20px] px-[0px]' : ''}
+      className={isDesktop ? 'py-[20px] px-[0px]' : 'px-[0px]'}
     >
       <div className="flex flex-col">
         <div className="flex items-center justify-between px-[18px] pb-[24px] border-b-[1px] border-solid border-dark_grey">
@@ -52,7 +53,7 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
           <UserLogo className="w-[42px] h-[42px]" />
           <div className="flex flex-col items-center  ml-[4px]">
             <p className="h1_ext">{selectedAccount.name}</p>
-            <p className="text_numbers">0 PNB</p>
+            <Balance className="text_numbers" />
           </div>
         </div>
         <div className="pt-[24px]">

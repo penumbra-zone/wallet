@@ -12,12 +12,13 @@ const header = {
   [routesPath.SETTINGS_GENERAL_INFORMATION]: 'General information',
 };
 
-
 export const SettingsExtenion = () => {
   const navigate = useNavigate();
-  const { pathname} = useLocation();
+  const { pathname } = useLocation();
 
   const handleBack = () => navigate(routesPath.SETTINGS);
+
+  const handleHome = () => navigate(routesPath.HOME);
 
   return (
     <div className="min-h-[500px] w-[100%]">
@@ -33,16 +34,20 @@ export const SettingsExtenion = () => {
             className="text-[12px] pl-[8px] pt-[22px] pb-[2px]"
           />
         )}
-        <div
-          className={`pt-[24px] px-[16px] flex justify-between items-center pb-[16px] ${
-            pathname !== routesPath.SETTINGS
-              ? 'border-b-[1px] border-solid border-dark_grey'
-              : ''
-          }`}
-        >
-          <p className="h1_ext">{header[pathname]}</p>
-          <CloseSvg width="14" height="14" fill="white" />
-        </div>
+        {pathname === routesPath.SETTINGS && (
+          <div
+            className={`pt-[24px] px-[16px] flex justify-between items-center pb-[16px] ${
+              pathname !== routesPath.SETTINGS
+                ? 'border-b-[1px] border-solid border-dark_grey'
+                : ''
+            }`}
+          >
+            <p className="h1_ext">Settings</p>
+            <span className="cursor-pointer" onClick={handleHome}>
+              <CloseSvg width="14" height="14" fill="white" />
+            </span>
+          </div>
+        )}
         <Outlet />
       </div>
     </div>
