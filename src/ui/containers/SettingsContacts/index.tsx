@@ -2,69 +2,17 @@ import { useState } from 'react';
 import { useAccountsSelector } from '../../../accounts';
 import { Contact } from '../../../controllers';
 import { useMediaQuery } from '../../../hooks';
-import { Button, ContactsList, CopySvg } from '../../components';
+import { Button, ContactsList, CreateContactForm } from '../../components';
 import { selectContacts } from '../../redux';
-import toast from 'react-hot-toast';
-
-type DetailContactCardProps = {
-  contact: Contact;
-};
-
-const DetailContactCard: React.FC<DetailContactCardProps> = ({ contact }) => {
-  const isDesktop = useMediaQuery();
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(contact.address);
-    toast.success('Success copied!', {
-      position: 'top-right',
-    });
-  };
-
-  return (
-    <div className="py-[24px] w-[100%] flex flex-col px-[16px]">
-      <div className="ext:w-[40px] ext:h-[40px] tablet:w-[52px] tablet:h-[52px] li_gradient rounded-[50%] flex items-center justify-center mb-[16px]">
-        <div className="ext:w-[39px] ext:h-[39px] tablet:w-[51px] tablet:h-[51px] bg-brown rounded-[50%] flex items-center justify-center"></div>
-      </div>
-      <p className={`mb-[24px] ${isDesktop ? 'h3' : 'h2_ext'}`}>
-        {contact.name}
-      </p>
-      <Button
-        title="Edit"
-        mode="gradient"
-        onClick={() => console.log('asd')}
-        className="tablet:w-[100%] mb-[24px]"
-      />
-      <div className="flex flex-col mb-[24px]">
-        <p className="text_body mb-[16px]">Penumbra's address</p>
-        <div className="flex items-center py-[8px] ext:px-[16px] tablet:px-[10px] bg-dark_grey rounded-[15px]">
-          <p className="break-all text_body mr-[10px]">{contact.address}</p>
-          <span
-            className=" cursor-pointer svg_hover"
-            onClick={copyToClipboard}
-            role="button"
-            tabIndex={0}
-          >
-            <CopySvg width="20" height="20" fill="#524B4B" />
-          </span>
-        </div>
-      </div>
-      {contact.note && (
-        <div className="flex flex-col mb-[24px]">
-          <p className="text_body mb-[16px]">Note</p>
-          <div className="flex items-center py-[8px] ext:px-[16px] tablet:px-[10px] bg-dark_grey rounded-[15px]">
-            <p className="break-all text_body">{contact.note}</p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
+import { DetailContactCard } from './DetailContactCard';
 
 export const SettingsContacts = () => {
   const isDesktop = useMediaQuery();
   const contacts = useAccountsSelector(selectContacts);
 
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+
+  const [mode, setMode] = useState<'show' | 'create' | ''>('');
 
   const list = contacts.reduce((result, item: Contact) => {
     let letter = item.name[0].toUpperCase();
@@ -76,17 +24,30 @@ export const SettingsContacts = () => {
     return result;
   }, {});
 
-  const handleSelect = (contact: Contact) => () => setSelectedContact(contact);
+  const handleSelect = (contact: Contact) => () => {
+    setSelectedContact(contact);
+    setMode('show');
+  };
+
+  const handleCreate = () => {
+    setSelectedContact(null);
+    setMode('create');
+  };
+
+  const handleCloseMode = () => {
+    setMode('');
+    setSelectedContact(null);
+  };
 
   return (
-    <div className="">
-      <div className="w-[100%] px-[16px] py-[24px] border-b-[1px] border-solid border-dark_grey flex items-center justify-between">
+    <div className="w-[100%] h-[100%]">
+      <div className="w-[100%] px-[16px] h-[74px] border-b-[1px] border-solid border-dark_grey flex items-center justify-between">
         <div className={`flex items-center ${isDesktop ? 'h2' : 'h1_ext'}`}>
           <p
             className="cursor-pointer"
             role="button"
             tabIndex={0}
-            onClick={handleSelect(null)}
+            onClick={handleCloseMode}
           >
             Contacts
           </p>
@@ -98,7 +59,7 @@ export const SettingsContacts = () => {
         {contacts.length && !selectedContact ? (
           <Button
             mode="gradient"
-            onClick={() => console.log('asd')}
+            onClick={handleCreate}
             title="Add contact"
             className="w-[172px] ext:py-[7px] tablet:py-[7px]"
           />
@@ -106,34 +67,52 @@ export const SettingsContacts = () => {
           <></>
         )}
       </div>
-      {isDesktop ? (
-        <>
-          <div className="w-[100%] ext:h-[100%] tablet:h-[100%] flex justify-between items-stretch">
-            <div
-              className={`${selectedContact ? 'w-[60%]' : 'w-[100%]'} ${
-                selectedContact
-                  ? 'tablet:border-r-[1px] tablet:border-solid tablet:border-dark_grey'
-                  : ''
-              }`}
-            >
-              <ContactsList list={list} handleSelect={handleSelect} />
-            </div>
-            {selectedContact && (
-              <div className="w-[40%] h-[100%]">
-                <DetailContactCard contact={selectedContact} />
-              </div>
+      <div className="w-[100%] h-[calc(100%-74px]] flex justify-between ">
+        <div
+          className={` ${
+            mode
+              ? !isDesktop
+                ? 'w-[100%] h-[100%]'
+                : 'w-[50%] tablet:border-r-[1px] tablet:border-solid tablet:border-dark_grey'
+              : 'w-[100%]'
+          }`}
+        >
+          {isDesktop ? (
+            <ContactsList
+              list={list}
+              handleSelect={handleSelect}
+              handleCreate={handleCreate}
+            />
+          ) : mode === 'create' ? (
+            <CreateContactForm handleCancel={handleCloseMode} />
+          ) : mode === 'show' ? (
+            <DetailContactCard
+              contact={selectedContact}
+              setSelectedContact={setSelectedContact}
+              handleCancel={handleCloseMode}
+            />
+          ) : (
+            <ContactsList
+              list={list}
+              handleSelect={handleSelect}
+              handleCreate={handleCreate}
+            />
+          )}
+        </div>
+        {mode && isDesktop && (
+          <div className="w-[50%]">
+            {mode === 'show' ? (
+              <DetailContactCard
+                contact={selectedContact}
+                setSelectedContact={setSelectedContact}
+                handleCancel={handleCloseMode}
+              />
+            ) : (
+              <CreateContactForm handleCancel={handleCloseMode} />
             )}
           </div>
-        </>
-      ) : (
-        <>
-          {!selectedContact ? (
-            <ContactsList list={list} handleSelect={handleSelect} />
-          ) : (
-            <DetailContactCard contact={selectedContact} />
-          )}
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 };

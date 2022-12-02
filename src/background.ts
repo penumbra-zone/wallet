@@ -226,8 +226,8 @@ class BackgroundService extends EventEmitter {
       // addresses
       setContact: async (contact: Contact) =>
         this.contactBookController.setContact(contact),
-      updateContact: async (addresses: Record<string, string>) =>
-        this.contactBookController.updateContact(addresses),
+      updateContact: async (contact: Contact, prevAddress: string) =>
+        this.contactBookController.updateContact(contact, prevAddress),
       removeContact: async (address: string) =>
         this.contactBookController.removeContact(address),
     };

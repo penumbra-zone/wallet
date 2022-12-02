@@ -581,13 +581,13 @@ class Background {
     }
   }
 
-  async updateContact(addresses: Record<string, string>): Promise<void> {
+  async updateContact(contact:Contact, prevAddress: string): Promise<void> {
     try {
       await this.initPromise;
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       await this._connect!();
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return await this.background!.updateContact(addresses);
+      return await this.background!.updateContact(contact, prevAddress);
     } catch (err) {
       throw new Error(prepareErrorMessage(err));
     }

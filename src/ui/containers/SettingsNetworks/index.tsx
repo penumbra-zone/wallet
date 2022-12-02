@@ -35,7 +35,6 @@ export const SettingsNetworks = () => {
   const [filteredNetworks, setFilteredNetworks] =
     useState<NetworkType[]>(networks);
 
-
   useEffect(() => {
     setInputsValues({
       chainId: selected.chainId,
@@ -108,15 +107,15 @@ export const SettingsNetworks = () => {
   return (
     <div className="ext:h-[calc(100%-100px)] tablet:h-[100%]">
       <p
-        className={`w-[100%] px-[16px] py-[24px] border-b-[1px] border-solid border-dark_grey ${
+        className={`flex items-center w-[100%] px-[16px] h-[74px] border-b-[1px] border-solid border-dark_grey ${
           isDesktop ? 'h2' : 'h1_ext'
         }`}
       >
         Networks
       </p>
-      <div className="w-[100%] ext:h-[100%] tablet:h-[100%] flex">
-        <div className="ext:w-[100%] tablet:w-[816px] h-[100%] flex rounded-[15px]">
-          <div className="ext:w-[100%] tablet:w-[55%] h-[100%] flex flex-col justify-between pt-[24px]">
+      <div className="w-[100%] ext:h-[100%] tablet:h-[calc(100%-74px)] flex">
+        <div className="ext:w-[100%] tablet:w-[816px]  flex rounded-[15px]">
+          <div className="ext:w-[100%] tablet:w-[55%]  flex flex-col justify-between pt-[24px]">
             <div>
               <Input
                 placeholder="Search a previously added..."
@@ -153,12 +152,12 @@ export const SettingsNetworks = () => {
                 title="Add network"
                 mode="gradient"
                 onClick={handleOpentTab}
-                className="w-[calc(100%-32px)] py-[7px] mx-[16px]"
+                className="w-[calc(100%-32px)] py-[7px] mx-[16px] mb-[24px]"
               />
             )}
           </div>
           {isDesktop && (
-            <div className="w-[45%] h-[100%] flex flex-col pt-[24px] px-[16px] border-l-[1px] border-solid border-dark_grey ">
+            <div className="w-[45%] flex flex-col pt-[24px] px-[16px] border-l-[1px] border-solid border-dark_grey ">
               <Input
                 label="Network name"
                 value={inputsValues.chainId}

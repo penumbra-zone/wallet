@@ -35,6 +35,7 @@ export * from './modals/ManageValidatorModal';
 
 //forms
 export * from './forms/CreatePasswordForm';
+export * from './forms/CreateContactForm';
 
 //tables
 export * from './tables/ValidatorTable';
