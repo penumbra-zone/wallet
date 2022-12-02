@@ -18,15 +18,21 @@ export const CreatePasswordForm: React.FC<CreatePasswordFormProps> = ({
     newPass: string;
     confirmPass: string;
   }>({
-    newPass: '1qazXsw@',
-    confirmPass: '1qazXsw@',
-    // newPass: '',
-    // confirmPass: ''
+    // newPass: '1qazXsw@',
+    // confirmPass: '1qazXsw@',
+    newPass: '',
+    confirmPass: ''
   });
   const [isValidate, setIsValidate] = useState<PasswordValidatorsType>(
     {} as PasswordValidatorsType
   );
-  const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [isChecked, setIsChecked] = useState<{
+    terms: boolean;
+    privacy: boolean;
+  }>({
+    terms: false,
+    privacy: false,
+  });
 
   const handleChangePassword =
     (type: 'newPass' | 'confirmPass') =>
@@ -44,14 +50,18 @@ export const CreatePasswordForm: React.FC<CreatePasswordFormProps> = ({
       }
     };
 
-  const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setIsChecked(e.target.checked);
+  const handleChangeCheck =
+    (type: 'terms' | 'privacy') => (e: React.ChangeEvent<HTMLInputElement>) =>
+      setIsChecked((s) => ({
+        ...s,
+        [type]: e.target.checked,
+      }));
 
-  const handleKeyPressCheckBox = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      setIsChecked((state) => !state);
-    }
-  };
+  // const handleKeyPressCheckBox = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e.key === 'Enter') {
+  //     setIsChecked((state) => !state);
+  //   }
+  // };
 
   return (
     <div>
@@ -80,26 +90,45 @@ export const CreatePasswordForm: React.FC<CreatePasswordFormProps> = ({
         />
       </div>
       <PasswordRules password={password.newPass} validates={isValidate} />
-      <div className="self-start mb-[40px] mt-[16px]">
+      <div className="self-start mb-[10px] mt-[16px]">
         <CheckBox
           label="I have read the terms of use and agree to them"
-          onChange={handleChangeCheck}
-          checked={isChecked}
-          onKeyDown={handleKeyPressCheckBox}
+          onChange={handleChangeCheck('terms')}
+          checked={isChecked.terms}
+          // onKeyDown={handleKeyPressCheckBox}
+        />
+      </div>
+      <div className="self-start mb-[40px]">
+        <CheckBox
+          label={
+            <div className="flex items-center">
+              <p>I have read and agree with the</p>
+              <a
+                className="text-green underline cursor-pointer hover:text-light_grey ml-[2px]"
+                target="_blank"
+                href="https://www.notion.so/zpoken/Privacy-Policy-c3db8914f6054b74be02aaafd846030b"
+              >
+                Privacy policy
+              </a>
+            </div>
+          }
+          onChange={handleChangeCheck('privacy')}
+          checked={isChecked.privacy}
+          // onKeyDown={handleKeyPressCheckBox}
         />
       </div>
       <div className="w-[100%] mb-[30px]">
         <Button
           title={buttonTitle}
           mode="gradient"
-          // disabled={
-          //   !(
-          //     Boolean(Object.values(isValidate).length) &&
-          //     !Object.values(isValidate).includes(false) &&
-          //     password.confirmPass === password.newPass &&
-          //     isChecked
-          //   )
-          // }
+          disabled={
+            !(
+              Boolean(Object.values(isValidate).length) &&
+              !Object.values(isValidate).includes(false) &&
+              password.confirmPass === password.newPass &&
+              isChecked.privacy && isChecked.terms
+            )
+          }
           onClick={onClick(password.newPass)}
         />
       </div>

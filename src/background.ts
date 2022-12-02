@@ -101,9 +101,9 @@ class BackgroundService extends EventEmitter {
     this.indexedDb = new IndexedDb();
     this.extensionStorage = extensionStorage;
 
-    // this.contactBookController = new ContactBookController({
-    //   extensionStorage: this.extensionStorage,
-    // });
+    this.contactBookController = new ContactBookController({
+      extensionStorage: this.extensionStorage,
+    });
 
     this.remoteConfigController = new RemoteConfigController({
       extensionStorage: this.extensionStorage,
