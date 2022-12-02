@@ -6,9 +6,6 @@ import { selectContacts } from '../../redux';
 export const SettingsContacts = () => {
   const isDesktop = useMediaQuery();
   const contacts = useAccountsSelector(selectContacts);
-  const s = useAccountsSelector(s => s)
-  // console.log({ s });
-  
 
   return (
     <div className="ext:h-[calc(100%-100px)] tablet:h-[100%]">

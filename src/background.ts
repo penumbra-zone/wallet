@@ -158,7 +158,7 @@ class BackgroundService extends EventEmitter {
 
     const origin = new URL(sender.url).hostname;
     const connectionId = uuidv4();
-    const inpageApi = this.getInpageApi(origin);
+    const inpageApi = this.getInpageApi(origin, connectionId);
     const dnode = setupDnode(
       new PortStream(remotePort),
       inpageApi,
@@ -232,7 +232,7 @@ class BackgroundService extends EventEmitter {
         this.contactBookController.removeContact(address),
     };
   }
-  getInpageApi(origin: string) {
+  getInpageApi(origin: string, connectionId: string) {
     return {
       publicState: async () => this._publicState(origin),
       getAssets: async () => this.viewProtocolService.getAssets(),

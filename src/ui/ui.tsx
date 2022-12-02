@@ -71,18 +71,19 @@ async function startUi() {
   };
 
   const background = await connect();
+  background.showTab(window.location.origin + '/accounts.html', 'accounts');
+  // const [selectedAccount, networks] = await Promise.all([
+  //   background.getSelectedAccount(),
+  //   background.getNetworks(),
+  //   // background.getState(),
+  // ]);
 
-  const [selectedAccount, networks] = await Promise.all([
-    background.getSelectedAccount(),
-    background.getNetworks(),
-  ]);
+  // if (!selectedAccount) {
+  //   background.showTab(window.location.origin + '/accounts.html', 'accounts');
+  // }
+  // updateState({ selectedAccount, networks });
 
-  if (!selectedAccount) {
-    background.showTab(window.location.origin + '/accounts.html', 'accounts');
-  }
-  updateState({ selectedAccount, networks });
-
-  backgroundService.init(background);
+  // backgroundService.init(background);
 
   document.addEventListener('mousemove', () => backgroundService.updateIdle());
   document.addEventListener('keyup', () => backgroundService.updateIdle());

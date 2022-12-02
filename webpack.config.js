@@ -3,6 +3,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const svgToMiniDataURI = require('mini-svg-data-uri');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = () => {
   const mode = process.env.NODE_ENV || 'development';
@@ -63,6 +64,9 @@ module.exports = () => {
     },
 
     plugins: [
+      new CleanWebpackPlugin({
+        cleanStaleWebpackAssets: false,
+      }),
       new CopyWebpackPlugin({
         patterns: [
           {
