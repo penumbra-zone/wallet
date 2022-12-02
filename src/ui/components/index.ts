@@ -20,6 +20,7 @@ export * from './ActivityList';
 export * from './AssetsList';
 export * from './MorePopupButton';
 export * from './EmptyTableHelper';
+export * from './ContactsList';
 
 //modals
 export * from './modals/SuccessCreateModal';

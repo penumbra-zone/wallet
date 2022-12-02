@@ -38,7 +38,7 @@ export function createUpdateState(store: AccountsStore) {
     }
 
     if (state.contacts) {
-      dispatch(accountsActions.setContacts(state.networks));
+      dispatch(accountsActions.setContacts(state.contacts));
     }
 
     if (state.config) {
