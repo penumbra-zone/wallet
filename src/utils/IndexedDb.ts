@@ -1,6 +1,6 @@
 import { IDBPDatabase, openDB } from 'idb';
 
-type TableName = 'assets' | 'chainParameters' | 'notes';
+type TableName = 'assets' | 'chainParameters' | 'notes' | 'tx';
 
 export class IndexedDb {
   private database: string;
@@ -27,6 +27,10 @@ export class IndexedDb {
           db.createObjectStore('notes', {
             autoIncrement: true,
             keyPath: 'note_commitment',
+          });
+
+          db.createObjectStore('tx', {
+            keyPath: 'tx_hash',
           });
         },
       });
