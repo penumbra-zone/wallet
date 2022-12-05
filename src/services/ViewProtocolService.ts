@@ -1,5 +1,5 @@
 import { ChainParameters } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
-import { ClientController } from '../controllers';
+import { ClientController, Transaction } from '../controllers';
 import { ExtensionStorage } from '../storage';
 import { EncodeAsset } from '../types';
 import { IndexedDb } from '../utils';
@@ -73,5 +73,24 @@ export class ViewProtocolService {
       catching_up: lastSavedBlock.testnet === lasBlock,
       last_block: lasBlock,
     };
+  }
+
+  async getTransactionHashes(startHeight?: number, endHeight?: number) {
+    const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
+    let data: Transaction[] = [];
+    if (startHeight && endHeight) {
+      data = tx.filter(
+        (i) => i.block_height >= startHeight && i.block_height <= endHeight
+      );
+    } else if (startHeight && !endHeight) {
+      data = tx.filter((i) => i.block_height >= startHeight);
+    } else {
+      data = tx;
+    }
+
+    return data.map((i) => ({
+      block_height: i.block_height,
+      tx_hash: i.tx_hash,
+    }));
   }
 }
