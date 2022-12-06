@@ -3,6 +3,7 @@ import { ClientController, Transaction } from '../controllers';
 import { ExtensionStorage } from '../storage';
 import { EncodeAsset } from '../types';
 import { IndexedDb } from '../utils';
+import { decode_transaction } from 'penumbra-web-assembly';
 
 function toJson(data) {
   return JSON.stringify(data, (_, v) =>
@@ -92,5 +93,15 @@ export class ViewProtocolService {
       block_height: i.block_height,
       tx_hash: i.tx_hash,
     }));
+  }
+
+  async getTransactionByHash(txHash: string) {
+    const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
+    const selectedTx = tx.find((t) => t.tx_hash === txHash);
+    if (!selectedTx) {
+      throw new Error('Tx doesn`t exist');
+    }
+
+    return decode_transaction(selectedTx.tx_bytes)
   }
 }
