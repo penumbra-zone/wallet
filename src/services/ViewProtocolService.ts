@@ -102,6 +102,26 @@ export class ViewProtocolService {
       throw new Error('Tx doesn`t exist');
     }
 
-    return decode_transaction(selectedTx.tx_bytes)
+    return decode_transaction(selectedTx.tx_bytes);
+  }
+
+  async getTransactions(startHeight?: number, endHeight?: number) {
+    const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
+    let data: Transaction[] = [];
+    if (startHeight && endHeight) {
+      data = tx.filter(
+        (i) => i.block_height >= startHeight && i.block_height <= endHeight
+      );
+    } else if (startHeight && !endHeight) {
+      data = tx.filter((i) => i.block_height >= startHeight);
+    } else {
+      data = tx;
+    }
+
+    return data.map((i) => ({
+      block_height: i.block_height,
+      tx_hash: i.tx_hash,
+      tx: decode_transaction(i.tx_hash),
+    }));
   }
 }
