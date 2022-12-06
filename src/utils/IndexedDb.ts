@@ -1,6 +1,7 @@
 import { IDBPDatabase, openDB } from 'idb';
 
-type TableName = 'assets' | 'chainParameters' | 'notes' | 'tx';
+type TableName = 'assets' | 'chainParameters' | 'notes' | 'tx' | 'fmd_parameters' | 'nct_commitments' |
+    'nct_forgotten' | 'nct_hashes' | 'nct_position' | 'spendable_notes' | 'tx_by_nullifier' ;
 
 export class IndexedDb {
   private database: string;
@@ -32,6 +33,37 @@ export class IndexedDb {
           db.createObjectStore('tx', {
             keyPath: 'tx_hash',
           });
+
+          db.createObjectStore('fmd_parameters', {
+            keyPath: 'bytes',
+          });
+
+          db.createObjectStore('nct_commitments', {
+            keyPath: 'position',
+          });
+
+          db.createObjectStore('nct_forgotten', {
+            keyPath: 'forgotten',
+          });
+
+          db.createObjectStore('nct_hashes', {
+            keyPath: 'position',
+          });
+          db.createObjectStore('nct_position', {
+            keyPath: 'position',
+          });
+
+          db.createObjectStore('spendable_notes', {
+            autoIncrement: true,
+            keyPath: 'note_commitment',
+          });
+
+          db.createObjectStore('tx_by_nullifier', {
+            autoIncrement: true,
+            keyPath: 'nullifier',
+          });
+
+
         },
       });
     } catch (error) {
