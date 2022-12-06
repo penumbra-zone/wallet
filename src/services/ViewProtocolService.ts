@@ -121,7 +121,7 @@ export class ViewProtocolService {
     return data.map((i) => ({
       block_height: i.block_height,
       tx_hash: i.tx_hash,
-      tx: decode_transaction(i.tx_hash),
+      tx: decode_transaction(i.tx_bytes),
     }));
   }
 }

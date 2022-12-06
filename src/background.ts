@@ -244,6 +244,8 @@ class BackgroundService extends EventEmitter {
         this.viewProtocolService.getTransactionHashes(startHeight, endHeight),
       getTransactionByHash: async (txHash: string) =>
         this.viewProtocolService.getTransactionByHash(txHash),
+      getTransactions: async (startHeight?: number, endHeight?: number) =>
+        this.viewProtocolService.getTransactions(startHeight, endHeight),
     };
   }
 
