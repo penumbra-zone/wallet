@@ -124,4 +124,17 @@ export class ViewProtocolService {
       tx: decode_transaction(i.tx_bytes),
     }));
   }
+
+  async getNoteByCommitment(noteCommitment: string) {
+    const notes = await this.getNotes();
+
+    const selectedNote = notes.find(
+      (n) => n.note_commitment === noteCommitment
+    );
+
+    if (!selectedNote) {
+      throw new Error('Note doesn`t exist');
+    }
+    return selectedNote;
+  }
 }

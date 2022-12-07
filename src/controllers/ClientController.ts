@@ -234,7 +234,6 @@ export class ClientController {
             this.toHexString(notePayload.payload?.ephemeralKey)
           );
           if (decryptedNote === null) continue;
-          //TODO to bigint
 
           decryptedNote.height = Number(compactBlock.height);
           decryptedNote.note_commitment = this.toHexString(
@@ -246,7 +245,9 @@ export class ClientController {
           decryptedNote.amount = decryptedNote.value.amount.lo;
 
           decryptedNote.asset = decryptedNote.value.asset_id;
-          decryptedNote.nullifier = this.toHexString(compactBlock.nullifiers);
+          decryptedNote.nullifier = compactBlock.nullifiers.map((i) =>
+            this.toHexString(i.inner)
+          );
           decryptedNote.source = this.toHexString(notePayload.source?.inner);
 
           if (decryptedNote.amount != 0) {
@@ -282,7 +283,6 @@ export class ClientController {
     const data = await response.json();
 
     console.log(sourceHex);
-    
 
     let tx: Transaction = {
       tx_hash: sourceHex,
