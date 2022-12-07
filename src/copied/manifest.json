@@ -1,7 +1,7 @@
 {
   "name": "Penumbra wallet",
   "description": "Penumbra wallet",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "manifest_version": 3,
   "background": {
     "service_worker": "background.js"
