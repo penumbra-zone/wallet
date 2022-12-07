@@ -101,6 +101,14 @@ export class WalletController extends EventEmitter {
     }
   }
 
+  getAccountSpendingKeyWithoutPassword() {
+    try {
+      return this.wallets[0].getSpendKey();
+    } catch (error) {
+      return '';
+    }
+  }
+
   getAccountSeed(password: string) {
     if (!password) throw new Error('Password is required');
     this._restoreWallets(password);
