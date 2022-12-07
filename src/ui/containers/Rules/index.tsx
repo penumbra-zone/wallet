@@ -76,7 +76,7 @@ export const Rules = () => {
             <a
               className="text-green underline cursor-pointer hover:text-light_grey"
               target="_blank"
-              href="https://www.notion.so/zpoken/Privacy-Policy-c3db8914f6054b74be02aaafd846030b"
+              href="https://privacy.penumbra.zpoken.io/"
             >
               Privacy policy here.
             </a>
