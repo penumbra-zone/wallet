@@ -317,6 +317,14 @@ export class ClientController {
     await this.indexedDb.resetTables('chainParameters');
     await this.indexedDb.resetTables('assets');
     await this.indexedDb.resetTables('tx');
+    await this.indexedDb.resetTables('fmd_parameters');
+    await this.indexedDb.resetTables('nct_commitments');
+    await this.indexedDb.resetTables('nct_forgotten');
+    await this.indexedDb.resetTables('nct_hashes');
+    await this.indexedDb.resetTables('nct_position');
+    await this.indexedDb.resetTables('spendable_notes');
+    await this.indexedDb.resetTables('tx_by_nullifier');
+
   }
 
   requireScanning(compactBlock: CompactBlock) {
