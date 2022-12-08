@@ -6,6 +6,7 @@ import {
   ContactsSvg,
   InformationOutlineSvg,
   LockSvg,
+  PermissionsSvg,
   PlugSvg,
   SettingsSvg,
 } from '../Svg';
@@ -46,9 +47,14 @@ export const links = [
     svg: <InformationOutlineSvg height="20" width="20" />,
     text: 'General information',
   },
+  {
+    to: routesPath.SETTINGS_PERMISSIONS,
+    svg: <PermissionsSvg />,
+    text: 'Permissions',
+  },
 ];
 export const SettingSideBar = () => {
-    const {pathname} = useLocation()
+  const { pathname } = useLocation();
   return (
     <div className="h-[100%] w-[206px] border-r-[1px] border-solid border-dark_grey pt-[16px]">
       <ul style={{ listStyleType: 'none', padding: 0 }}>

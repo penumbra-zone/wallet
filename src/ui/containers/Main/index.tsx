@@ -55,7 +55,7 @@ export const Main: React.FC<MainProps> = () => {
             children={(type) =>
               type === 'Assets' ? <AssetsList /> : <ActivityList />
             }
-          ></Tabs>
+          />
         </div>
 
         <p className="mt-[60px] text-center text_body text-light_grey">

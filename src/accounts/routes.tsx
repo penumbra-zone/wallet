@@ -17,6 +17,7 @@ import {
   Validators,
   Send,
   SettingsContacts,
+  SettingsPermissions,
 } from '../ui/containers';
 import { RootAccounts } from './RootAccounts';
 import { routesPath } from '../utils';
@@ -76,7 +77,7 @@ export const routes: RouteObject[] = [
       },
       {
         path: routesPath.SEND,
-        element: <Send/>
+        element: <Send />,
       },
       {
         path: routesPath.SETTINGS,
@@ -109,6 +110,10 @@ export const routes: RouteObject[] = [
           {
             path: routesPath.SETTINGS_GENERAL_INFORMATION,
             element: <h2>SETTINGS_GENERAL_INFORMATION</h2>,
+          },
+          {
+            path: routesPath.SETTINGS_PERMISSIONS,
+            element: <SettingsPermissions />,
           },
         ],
       },

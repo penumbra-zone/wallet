@@ -9,6 +9,7 @@ import {
   SettingsContacts,
   SettingsExtenion,
   SettingsNetworks,
+  SettingsPermissions,
   SettingsSecurityPrivacy,
 } from './containers';
 import { RootUi } from './RootUi';
@@ -69,6 +70,10 @@ export const routesUi: RouteObject[] = [
           {
             path: routesPath.SETTINGS_GENERAL_INFORMATION,
             element: <h2>SETTINGS_GENERAL_INFORMATION</h2>,
+          },
+          {
+            path: routesPath.SETTINGS_PERMISSIONS,
+            element: <SettingsPermissions />,
           },
         ],
       },

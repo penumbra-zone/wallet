@@ -23,3 +23,4 @@ export * from './MyValidators';
 export * from './Send';
 export * from './Send/DetailTxBeforeSend';
 export * from './SettingsContacts';
+export * from './SettingsPermissions';

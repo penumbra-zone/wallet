@@ -21,6 +21,7 @@ export * from './AssetsList';
 export * from './MorePopupButton';
 export * from './EmptyTableHelper';
 export * from './ContactsList';
+export * from './Toogle';
 
 //modals
 export * from './modals/SuccessCreateModal';
@@ -32,6 +33,7 @@ export * from './modals/ExportKeyModal';
 export * from './modals/ResetWalletModal';
 export * from './modals/ExportSeedPhraseModal';
 export * from './modals/ManageValidatorModal';
+export * from './modals/PermissionsModal';
 
 //forms
 export * from './forms/CreatePasswordForm';
