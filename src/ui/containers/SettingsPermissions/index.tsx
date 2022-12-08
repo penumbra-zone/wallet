@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useMediaQuery } from '../../../hooks';
 import { Button, PermissionsModal } from '../../components';
 
@@ -22,7 +23,7 @@ export type Permissions =
   | 'GET_TRANSACTIONS'
   | 'GET_TRANSACTION_PERSPECTIVE';
 
-const sites: Site[] = [
+export const sites: Site[] = [
   {
     name: '1 app.uniswapp.org',
     permissions: [
@@ -60,8 +61,15 @@ const sites: Site[] = [
 
 export const SettingsPermissions = () => {
   const isDesktop = useMediaQuery();
+  const { state } = useLocation();
 
   const [selectedSite, setSelectedSite] = useState<null | Site>(null);
+
+  useEffect(() => {
+    if (!state) return;
+    const editedSite = sites.find((i) => i.name === state.siteName);
+    if (editedSite) setSelectedSite(editedSite);
+  }, [state]);
 
   const handleSelectSite = (site) => () => setSelectedSite(site);
 
@@ -93,13 +101,13 @@ export const SettingsPermissions = () => {
                     mode="transparent"
                     onClick={() => console.log('asd')}
                     title="Revoke"
-                    className="w-[88px] mr-[16px] py-[7px] text_button_ext"
+                    className="w-[88px] mr-[16px] ext:py-[7px] tablet:py-[7px] text_button_ext"
                   />
                   <Button
                     mode="gradient"
                     onClick={handleSelectSite(i)}
                     title="View"
-                    className="w-[88px] py-[7px] text_button_ext"
+                    className="w-[88px] ext:py-[7px] tablet:py-[7px] text_button_ext"
                   />
                 </div>
               </div>

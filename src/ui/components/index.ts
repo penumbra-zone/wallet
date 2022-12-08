@@ -34,6 +34,7 @@ export * from './modals/ResetWalletModal';
 export * from './modals/ExportSeedPhraseModal';
 export * from './modals/ManageValidatorModal';
 export * from './modals/PermissionsModal';
+export * from './modals/ConnectedSitesModal';
 
 //forms
 export * from './forms/CreatePasswordForm';
