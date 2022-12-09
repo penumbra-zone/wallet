@@ -112,7 +112,13 @@ async function setupInpageApi() {
   connectionStream.on('data', async ({ name }) => {
     if (name !== 'updatePublicState') return;
 
+    const isApproved = await (penumbraApi as any).resourceIsApproved();
+    if (!isApproved) {
+      return;
+    }
+
     const updatedPublicState = await (penumbraApi as any).publicState();
+
     if (!equals(updatedPublicState, publicState)) {
       publicState = updatedPublicState;
       eventEmitter.emit('update', updatedPublicState);

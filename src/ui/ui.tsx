@@ -17,6 +17,8 @@ import { Provider } from 'react-redux';
 import { routesUi } from './routesUi';
 import './main.css';
 
+const isNotificationWindow = window.location.pathname === '/notification.html';
+
 startUi();
 
 async function startUi() {
@@ -72,6 +74,25 @@ async function startUi() {
 
   const background = await connect();
 
+  // If popup is opened close notification window
+  if (extension.extension.getViews({ type: 'popup' }).length > 0) {
+    await background.closeNotificationWindow();
+  }
+
+  if (
+    isNotificationWindow &&
+    !window.matchMedia('(display-mode: fullscreen)').matches
+  ) {
+    console.log('asdasd');
+    
+    background.resizeNotificationWindow(
+      400 + window.outerWidth - window.innerWidth,
+      600 + window.outerHeight - window.innerHeight
+    );
+  }
+
+  
+
   const [selectedAccount, networks, state] = await Promise.all([
     background.getSelectedAccount(),
     background.getNetworks(),
@@ -81,7 +102,12 @@ async function startUi() {
   if (!selectedAccount) {
     background.showTab(window.location.origin + '/accounts.html', 'accounts');
   }
-  updateState({ selectedAccount, networks, contacts: state.contacts });
+  updateState({
+    selectedAccount,
+    networks,
+    contacts: state.contacts,
+    messages: state.messages,
+  });
 
   backgroundService.init(background);
 

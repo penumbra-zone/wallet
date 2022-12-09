@@ -1,10 +1,10 @@
 import LocalMessageDuplexStream from 'post-message-stream';
 import { extension, PortStream } from './lib';
 
-// if (shouldInject()) {
+if (shouldInject()) {
   injectBundle();
   setupConnection();
-// }
+}
 
 function injectBundle() {
   const container = document.head || document.documentElement;

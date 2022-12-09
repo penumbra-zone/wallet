@@ -226,17 +226,17 @@ class Background {
   //     }
   //   }
 
-  //   async closeNotificationWindow(): Promise<void> {
-  //     try {
-  //       await this.initPromise;
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       await this._connect!();
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       return await this.background!.closeNotificationWindow();
-  //     } catch (err) {
-  //       throw new Error(prepareErrorMessage(err));
-  //     }
-  //   }
+    async closeNotificationWindow(): Promise<void> {
+      try {
+        await this.initPromise;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await this._connect!();
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return await this.background!.closeNotificationWindow();
+      } catch (err) {
+        throw new Error(prepareErrorMessage(err));
+      }
+    }
 
   async showTab(url: string, name: string): Promise<void> {
     try {

@@ -84,6 +84,13 @@ module.exports = () => {
       }),
       new HtmlWebpackPlugin({
         title: 'Penumbra Wallet',
+        filename: 'notification.html',
+        template: path.resolve(SOURCE_FOLDER, 'notification.html'),
+        hash: true,
+        chunks: ['commons', 'ui'],
+      }),
+      new HtmlWebpackPlugin({
+        title: 'Penumbra Wallet',
         filename: 'popup.html',
         template: path.resolve(SOURCE_FOLDER, 'popup.html'),
         hash: true,

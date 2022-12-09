@@ -11,8 +11,18 @@ import {
   VaultController,
   WalletController,
   Contact,
+  PermissionController,
+  MessageController,
 } from './controllers';
-import { extension, PortStream, setupDnode, TabsManager } from './lib';
+import {
+  extension,
+  PortStream,
+  setupDnode,
+  TabsManager,
+  WindowManager,
+} from './lib';
+import { MessageInput, MessageStoreItem } from './messages/types';
+import { PreferencesAccount } from './preferences';
 import { ViewProtocolService } from './services';
 import { ExtensionStorage, StorageLocalState } from './storage';
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig';
@@ -49,6 +59,19 @@ async function setupBackgroundService() {
   }
 
   backgroundService.clientController.getCompactBlockRange();
+
+  // Notification window management
+  const windowManager = new WindowManager({ extensionStorage });
+  backgroundService.on(
+    'Show notification',
+    windowManager.showWindow.bind(windowManager)
+  );
+  backgroundService.on('Close notification', () => {
+    windowManager.closeWindow();
+  });
+  backgroundService.on('Resize notification', (width, height) => {
+    windowManager.resizeWindow(width, height);
+  });
 
   const tabsManager = new TabsManager({ extensionStorage });
   backgroundService.on('Show tab', async (url, name) => {
@@ -94,6 +117,8 @@ class BackgroundService extends EventEmitter {
   indexedDb;
   viewProtocolService;
   contactBookController;
+  permissionsController;
+  messageController;
 
   constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
     super();
@@ -107,6 +132,12 @@ class BackgroundService extends EventEmitter {
 
     this.remoteConfigController = new RemoteConfigController({
       extensionStorage: this.extensionStorage,
+    });
+
+    this.permissionsController = new PermissionController({
+      extensionStorage: this.extensionStorage,
+      remoteConfig: this.remoteConfigController,
+      getSelectedAccount: () => this.preferencesController.getSelectedAccount(),
     });
 
     this.networkController = new NetworkController({
@@ -126,6 +157,10 @@ class BackgroundService extends EventEmitter {
     this.vaultController = new VaultController({
       extensionStorage: this.extensionStorage,
       wallet: this.walletController,
+    });
+
+    this.messageController = new MessageController({
+      extensionStorage: this.extensionStorage,
     });
 
     this.idleController = new IdleController({
@@ -166,19 +201,9 @@ class BackgroundService extends EventEmitter {
     );
   }
 
-  setupUiConnection(remotePort: chrome.runtime.Port) {
-    const dnode = setupDnode(new PortStream(remotePort), this.getApi(), 'api');
-
-    const remoteHandler = (remote: any) => {
-      const closePopupWindow = remote.closePopupWindow.bind(remote);
-      this.on('closePopupWindow', closePopupWindow);
-
-      dnode.on('end', () => {
-        this.removeListener('closePopupWindow', closePopupWindow);
-      });
-    };
-
-    dnode.on('remote', remoteHandler);
+  getState<K extends keyof StorageLocalState>(params?: K | K[]) {
+    const state = this.extensionStorage.getState(params);
+    return state;
   }
 
   getApi() {
@@ -230,11 +255,85 @@ class BackgroundService extends EventEmitter {
         this.contactBookController.updateContact(contact, prevAddress),
       removeContact: async (address: string) =>
         this.contactBookController.removeContact(address),
+      resizeNotificationWindow: async (width: number, height: number) =>
+        this.emit('Resize notification', width, height),
+      closeNotificationWindow: async () => {
+        this.emit('Close notification');
+      },
     };
+  }
+
+  async validatePermission(origin: string, connectionId: string) {
+    const { selectedAccount } = this.getState('selectedAccount');
+    if (!selectedAccount) throw new Error('Add Keeper Wallet account');
+
+    const canIUse = this.permissionsController.hasPermission(
+      origin,
+      'approved'
+    );
+
+    console.log({ canIUse });
+
+    if (canIUse === null) {
+      let messageId = this.permissionsController.getMessageIdAccess(origin);
+      console.log(messageId);
+
+      if (messageId) {
+        //TODO add logic
+        //  try {
+        //    const message = this.messageController.getMessageById(messageId);
+        //    if (
+        //      !message ||
+        //      message.account.address !== selectedAccount.address
+        //    ) {
+        //      messageId = null;
+        //    }
+        //  } catch (e) {
+        //    messageId = null;
+        //  }
+      }
+      console.log('asdasdasdasd');
+
+      if (!messageId) {
+        const messageData: MessageInput = {
+          origin,
+          connectionId,
+          title: null,
+          options: {},
+          broadcast: false,
+          data: { origin },
+          type: 'authOrigin',
+          account: selectedAccount,
+        };
+        const result = await this.messageController.newMessage(messageData);
+        messageId = result.id;
+        this.permissionsController.setMessageIdAccess(origin, messageId);
+      }
+      this.emit('Show notification');
+    }
   }
   getInpageApi(origin: string, connectionId: string) {
     return {
-      publicState: async () => this._publicState(origin),
+      publicState: async () => {
+        const { selectedAccount, isInitialized } = this.getState([
+          'selectedAccount',
+          'isInitialized',
+        ]);
+
+        if (!selectedAccount) {
+          throw new Error(
+            !isInitialized
+              ? 'Init Penumbra Wallet and add account'
+              : 'Add Penumbra Wallet account'
+          );
+        }
+
+        await this.validatePermission(origin, connectionId);
+        return this._publicState(origin);
+      },
+      resourceIsApproved: async () => {
+        return this.permissionsController.hasPermission(origin, 'approved');
+      },
       getAssets: async () => this.viewProtocolService.getAssets(),
       getChainParameters: async () =>
         this.viewProtocolService.getChainParameters(),
@@ -251,26 +350,53 @@ class BackgroundService extends EventEmitter {
     };
   }
 
-  getState<K extends keyof StorageLocalState>(params?: K | K[]) {
-    const state = this.extensionStorage.getState(params);
+  setupUiConnection(remotePort: chrome.runtime.Port) {
+    const dnode = setupDnode(new PortStream(remotePort), this.getApi(), 'api');
 
-    return { ...state };
+    const remoteHandler = (remote: any) => {
+      const closePopupWindow = remote.closePopupWindow.bind(remote);
+      this.on('closePopupWindow', closePopupWindow);
+
+      dnode.on('end', () => {
+        this.removeListener('closePopupWindow', closePopupWindow);
+      });
+    };
+
+    dnode.on('remote', remoteHandler);
   }
 
   _publicState(originReq: string) {
-    let account;
-    const { selectedAccount, isInitialized, isLocked } = this.getState();
+    let account: PreferencesAccount | null = null;
+
+    let msg: Array<{
+      id: MessageStoreItem['id'];
+      status: MessageStoreItem['status'];
+      uid: MessageStoreItem['ext_uuid'];
+    }> = [];
+
+    const { selectedAccount, isInitialized, isLocked, messages } =
+      this.getState();
+
     if (selectedAccount) {
+      const addressByIndex = selectedAccount.addressByIndex;
       account = {
         ...selectedAccount,
         balance: 0,
       };
+      msg = messages
+        .filter(
+          ({ account, origin }) =>
+            account.addressByIndex === addressByIndex && origin === originReq
+        )
+        .map(({ id, status, ext_uuid }) => ({ id, status, uid: ext_uuid }));
     }
+
     return {
       version: extension.runtime.getManifest().version,
       isInitialized,
       isLocked,
       account,
+      messages: msg,
     };
   }
 }

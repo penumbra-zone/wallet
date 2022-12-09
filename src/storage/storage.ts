@@ -4,8 +4,9 @@ import asStream from 'obs-store/lib/asStream';
 import debounceStream from 'debounce-stream';
 import log from 'loglevel';
 import { createStreamSink, DEFAULT_LEGACY_CONFIG, extension } from '../lib';
-import {  Contact, NetworkConfigItem, NetworkName } from '../controllers';
+import {  Contact, NetworkConfigItem, NetworkName, PermissionType } from '../controllers';
 import { WalletAccount } from '../preferences';
+import { MessageStoreItem } from '../messages/types';
 
 export type StorageLocalState = {
   contacts: Contact[];
@@ -34,6 +35,12 @@ export type StorageLocalState = {
     mainnet: number;
     testnet: number;
   };
+  origins: Record<string, PermissionType[]>;
+  whitelist: string[];
+  inPending: Record<string, string | null>;
+  messages: MessageStoreItem[];
+  notificationWindowId: number | undefined;
+  inShowMode: boolean | undefined;
 };
 
 export type StorageSessionState = {

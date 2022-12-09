@@ -282,8 +282,6 @@ export class ClientController {
     });
     const data = await response.json();
 
-    console.log(sourceHex);
-
     let tx: Transaction = {
       tx_hash: sourceHex,
       tx_bytes: data.result.tx,
@@ -324,7 +322,6 @@ export class ClientController {
     await this.indexedDb.resetTables('nct_position');
     await this.indexedDb.resetTables('spendable_notes');
     await this.indexedDb.resetTables('tx_by_nullifier');
-
   }
 
   requireScanning(compactBlock: CompactBlock) {

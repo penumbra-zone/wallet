@@ -7,3 +7,5 @@ export * from './PreferencesController';
 export * from './ClientController';
 export * from './CurrentAccountController';
 export * from './ContactBookController';
+export * from './PermissionController';
+export * from './MessageController';

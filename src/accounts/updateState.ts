@@ -1,5 +1,11 @@
 import { equals } from 'ramda';
-import { accountsActions, networkActions, stateActions } from '../ui/redux';
+import { MessageStoreItem } from '../messages/types';
+import {
+  accountsActions,
+  messageNotificationActions,
+  networkActions,
+  stateActions,
+} from '../ui/redux';
 import {
   BackgroundGetStateResult,
   BackgroundUiApi,
@@ -74,6 +80,7 @@ export function createUpdateState(store: AccountsStore) {
     ) {
       dispatch(networkActions.setCurrentNetwork(currentNetwork));
     }
+
     const selectedAccount = getParam(state.selectedAccount, {});
     if (
       selectedAccount &&
@@ -81,6 +88,41 @@ export function createUpdateState(store: AccountsStore) {
     ) {
       dispatch(accountsActions.setSelectedAccount(selectedAccount));
     }
+
+    function isMyMessages(msg: MessageStoreItem) {
+      try {
+        const account =
+          state.selectedAccount || currentState.accounts.selectedAccount;
+        return (
+          msg.status === 'unapproved' &&
+          msg.account.addressByIndex === account?.addressByIndex
+        );
+      } catch (e) {
+        return false;
+      }
+    }
+
+    const messages = getParam(state.messages, []);
+    const unapprovedMessages = messages?.filter(isMyMessages);
+    // const toUpdateActiveNotify = {
+    //   allMessages: messages,
+    //   messages: currentState.messageNotification.messages,
+    //   //  notifications: currentState.notifications,
+    // };
+    if (
+      unapprovedMessages &&
+      !equals(unapprovedMessages, currentState.messageNotification.messages)
+    ) {
+      dispatch(
+        messageNotificationActions.setMessages({
+          unapprovedMessages,
+          messages,
+        })
+      );
+
+      // toUpdateActiveNotify.messages = unapprovedMessages;
+    }
+
     if (
       !currentState.state ||
       state.isInitialized !== currentState.state.isInitialized ||
