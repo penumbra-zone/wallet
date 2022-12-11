@@ -56,7 +56,6 @@ export type MessageStoreItem = {
   connectionId?: string;
   account: PreferencesAccount;
   broadcast?: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   err?: any;
   ext_uuid: unknown;
   id: string;

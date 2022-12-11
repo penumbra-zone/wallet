@@ -2,6 +2,7 @@ import { RouteObject } from 'react-router-dom';
 import { routesPath } from '../utils';
 import { SettingsExtensionSideBar } from './components';
 import {
+  ActiveMessage,
   BalanceDetail,
   Login,
   Main,
@@ -76,6 +77,10 @@ export const routesUi: RouteObject[] = [
             element: <SettingsPermissions />,
           },
         ],
+      },
+      {
+        path: routesPath.ACTIVE_MESSAGE,
+        element: <ActiveMessage />,
       },
     ],
   },

@@ -13,6 +13,7 @@ import {
   Contact,
   PermissionController,
   MessageController,
+  PermissionType,
 } from './controllers';
 import {
   extension,
@@ -57,6 +58,20 @@ async function setupBackgroundService() {
   if (PENUMBRAWALLET_DEBUG) {
     global.background = backgroundService;
   }
+
+  const updateBadge = () => {
+    const messages = backgroundService.messageController.getUnapproved();
+
+    const msg = messages.length;
+    const text = msg ? String(msg) : '';
+
+    const action = extension.action || extension.browserAction;
+    action.setBadgeText({ text });
+    action.setBadgeBackgroundColor({ color: 'red' });
+  };
+
+  backgroundService.messageController.on('Update badge', updateBadge);
+  updateBadge();
 
   backgroundService.clientController.getCompactBlockRange();
 
@@ -161,6 +176,9 @@ class BackgroundService extends EventEmitter {
 
     this.messageController = new MessageController({
       extensionStorage: this.extensionStorage,
+      getMessagesConfig: () => this.remoteConfigController.getMessagesConfig(),
+      setPermission: (origin: string, permission: PermissionType) =>
+        this.permissionsController.setPermission(origin, permission),
     });
 
     this.idleController = new IdleController({
@@ -260,6 +278,19 @@ class BackgroundService extends EventEmitter {
       closeNotificationWindow: async () => {
         this.emit('Close notification');
       },
+      reject: async (messageId: string, forever?: boolean) =>
+        this.messageController.reject(messageId, forever),
+      deleteMessage: async (id: string) =>
+        this.messageController.deleteMessage(id),
+      approve: async (messageId: string, account: PreferencesAccount) => {
+        const message = await this.messageController.approve(
+          messageId,
+          account
+        );
+        return message.result;
+      },
+      deleteOrigin: async (origin: string) =>
+        this.permissionsController.deletePermissions(origin),
     };
   }
 
@@ -272,27 +303,20 @@ class BackgroundService extends EventEmitter {
       'approved'
     );
 
-    console.log({ canIUse });
-
     if (canIUse === null) {
       let messageId = this.permissionsController.getMessageIdAccess(origin);
-      console.log(messageId);
 
       if (messageId) {
-        //TODO add logic
-        //  try {
-        //    const message = this.messageController.getMessageById(messageId);
-        //    if (
-        //      !message ||
-        //      message.account.address !== selectedAccount.address
-        //    ) {
-        //      messageId = null;
-        //    }
-        //  } catch (e) {
-        //    messageId = null;
-        //  }
+        try {
+          const message = this.messageController.getMessageById(messageId);
+
+          if (!message || message.account.address !== selectedAccount.address) {
+            messageId = null;
+          }
+        } catch (e) {
+          messageId = null;
+        }
       }
-      console.log('asdasdasdasd');
 
       if (!messageId) {
         const messageData: MessageInput = {
@@ -307,6 +331,7 @@ class BackgroundService extends EventEmitter {
         };
         const result = await this.messageController.newMessage(messageData);
         messageId = result.id;
+
         this.permissionsController.setMessageIdAccess(origin, messageId);
       }
       this.emit('Show notification');
@@ -365,6 +390,14 @@ class BackgroundService extends EventEmitter {
     dnode.on('remote', remoteHandler);
   }
 
+  _getCurrentNetwork(account: PreferencesAccount | undefined) {
+    const networks = {
+      grpc: this.networkController.getNetworkGRPC(),
+      tendermint: this.networkController.getNetworkTendermint(),
+    };
+    return !account ? null : networks;
+  }
+
   _publicState(originReq: string) {
     let account: PreferencesAccount | null = null;
 
@@ -396,6 +429,7 @@ class BackgroundService extends EventEmitter {
       isInitialized,
       isLocked,
       account,
+      network: this._getCurrentNetwork(selectedAccount),
       messages: msg,
     };
   }

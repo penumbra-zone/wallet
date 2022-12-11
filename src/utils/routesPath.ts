@@ -21,4 +21,5 @@ export const routesPath = {
   BALANCE_DETAIL: '/balance-detail/:name',
   VALIDATORS: '/validators',
   SEND: '/send',
+  ACTIVE_MESSAGE: '/active-message',
 };

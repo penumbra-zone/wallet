@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccountsSelector } from '../../../../accounts';
 import { routesPath } from '../../../../utils';
-import { Site, sites } from '../../../containers';
-import { selectNewAccount } from '../../../redux';
+import { selectNewAccount, selectOrigins } from '../../../redux';
 import { Button } from '../../Button';
 import { ModalWrapper } from '../../ModalWrapper';
 import { SuccessCreateModalProps } from '../SuccessCreateModal';
@@ -13,15 +12,16 @@ export const ConnectedSitesModal: React.FC<SuccessCreateModalProps> = ({
   onClose,
 }) => {
   const account = useAccountsSelector(selectNewAccount);
+  const origins = useAccountsSelector(selectOrigins);
   const navigate = useNavigate();
 
-  const [selectedSite, setSelectedSite] = useState<null | Site>(null);
+  const [selectedSite, setSelectedSite] = useState<string>('');
 
-  const handleRevoke = (site) => () => setSelectedSite(site);
+  const handleRevoke = (site: string) => () => setSelectedSite(site);
 
-  const handleEdit = (site) => () =>
+  const handleEdit = (site: string) => () =>
     navigate(routesPath.SETTINGS_PERMISSIONS, {
-      state: { siteName: site.name },
+      state: { siteName: site },
     });
 
   const handleClose = () => {
@@ -42,7 +42,7 @@ export const ConnectedSitesModal: React.FC<SuccessCreateModalProps> = ({
             selectedSite ? '' : 'text-center'
           }`}
         >
-          {selectedSite ? `Revoke ${selectedSite.name}` : 'Connected sites'}
+          {selectedSite ? `Revoke ${selectedSite}` : 'Connected sites'}
         </p>
         <p
           className={`${
@@ -74,18 +74,18 @@ export const ConnectedSitesModal: React.FC<SuccessCreateModalProps> = ({
             </div>
           ) : (
             <>
-              {sites.map((i) => {
+              {Object.keys(origins).map((i) => {
                 return (
                   <div
                     className="flex items-center justify-between py-[6px] px-[16px] mt-[8px]"
-                    key={i.name}
+                    key={i}
                   >
                     <div className="flex items-center">
                       <div className="w-[36px] h-[36px] li_gradient rounded-[50%] flex items-center justify-center">
                         <div className="w-[35px] h-[35px] bg-brown rounded-[50%] flex items-center justify-center"></div>
                       </div>
                       <p className="text-light_grey text_body_ext ml-[8px]">
-                        {i.name}
+                        {i}
                       </p>
                     </div>
                     <div className="flex">

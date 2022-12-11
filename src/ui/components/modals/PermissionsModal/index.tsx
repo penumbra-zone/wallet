@@ -1,5 +1,5 @@
 import { ChangeEvent, useEffect, useState } from 'react';
-import { Permissions, Site } from '../../../containers';
+import { PermissionType } from '../../../../controllers';
 import { ModalWrapper } from '../../ModalWrapper';
 import { Tabs } from '../../Tabs';
 import { Toogle } from '../../Toogle';
@@ -22,29 +22,23 @@ const lowPermissions = {
 };
 
 export const PermissionsModal: React.FC<
-  SuccessCreateModalProps & { selectedSite: Site }
-> = ({ show, selectedSite, onClose }) => {
-  const [permissions, setPermissions] = useState<{
+  SuccessCreateModalProps & { permissions: PermissionType[] }
+> = ({ show, permissions, onClose }) => {
+  const [currentPermissions, setCurrentPermissions] = useState<{
     [key: string]: boolean;
   }>({});
 
-  const obj = {};
-
-  Object.keys(lowPermissions).forEach((i: Permissions) => {
-    obj[i] = selectedSite.permissions.includes(i);
-  });
-
   useEffect(() => {
     const obj = {};
-    Object.keys(lowPermissions).forEach((i: Permissions) => {
-      obj[i] = selectedSite.permissions.includes(i);
+    Object.keys(lowPermissions).forEach((i: PermissionType) => {
+      obj[i] = permissions.includes(i);
     });
-    setPermissions(obj);
+    setCurrentPermissions(obj);
   }, []);
 
   const handleChange =
-    (type: Permissions) => (e: ChangeEvent<HTMLInputElement>) => {
-      setPermissions((state) => ({
+    (type: PermissionType) => (e: ChangeEvent<HTMLInputElement>) => {
+      setCurrentPermissions((state) => ({
         ...state,
         [type]: e.target.checked,
       }));
@@ -64,7 +58,7 @@ export const PermissionsModal: React.FC<
           children={(type) =>
             type === 'Low' ? (
               <>
-                {Object.keys(lowPermissions).map((i: Permissions) => {
+                {Object.keys(lowPermissions).map((i: PermissionType) => {
                   return (
                     <div
                       key={i}
@@ -72,7 +66,7 @@ export const PermissionsModal: React.FC<
                     >
                       <p className="h2_ext mr-[32px]">{lowPermissions[i]}</p>
                       <Toogle
-                        checked={permissions[i]}
+                        checked={currentPermissions[i]}
                         handleChange={handleChange(i)}
                       />
                     </div>

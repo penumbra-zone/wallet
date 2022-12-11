@@ -96,4 +96,16 @@ export class NetworkController extends EventEmitter {
     network = network || this.getNetwork();
     return this.getCustomGRPC()[network] || networks[network].grpc;
   }
+
+  getNetworkGRPC(network?: NetworkName) {
+    const networks = this.configApi.getNetworkConfig();
+    network = network || this.getNetwork();
+    return this.getCustomGRPC()[network] || networks[network].grpc;
+  }
+
+  getNetworkTendermint(network?: NetworkName) {
+    const networks = this.configApi.getNetworkConfig();
+    network = network || this.getNetwork();
+    return this.getCustomTendermint()[network] || networks[network].tendermint;
+  }
 }

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useAccountsSelector } from '../../../accounts';
 import { useMediaQuery } from '../../../hooks';
 import { Button, PermissionsModal } from '../../components';
+import { selectOrigins } from '../../redux';
+import Background from '../../services/Background';
 
-export type Site = {
-  name: string;
-  permissions: Permissions[];
-};
+
 
 export type Permissions =
   | 'GET_CHAIN_CURRENT_STATUS'
@@ -23,55 +23,22 @@ export type Permissions =
   | 'GET_TRANSACTIONS'
   | 'GET_TRANSACTION_PERSPECTIVE';
 
-export const sites: Site[] = [
-  {
-    name: '1 app.uniswapp.org',
-    permissions: [
-      'GET_CHAIN_CURRENT_STATUS',
-      'GET_NOTES',
-      'GET_QUARANTINED_NOTES',
-      'GET_WITNESS',
-      'GET_ASSETS',
-      'GET_CHAIN_PARAMETERS',
-      'GET_FMD_PARAMETERS',
-      'GET_NOTE_BY_COMMITMENT',
-      'GET_NULLIFIER_STATUS',
-      'GET_TRANSACTION_HASHES',
-      'GET_TRANSACTION_BY_HASH',
-      'GET_TRANSACTIONS',
-      'GET_TRANSACTION_PERSPECTIVE',
-    ],
-  },
-  {
-    name: '2 app.uniswapp.org',
-    permissions: [
-      'GET_CHAIN_CURRENT_STATUS',
-      'GET_NOTES',
-      'GET_QUARANTINED_NOTES',
-      'GET_WITNESS',
-      'GET_NOTE_BY_COMMITMENT',
-      'GET_NULLIFIER_STATUS',
-      'GET_TRANSACTION_HASHES',
-      'GET_TRANSACTION_BY_HASH',
-      'GET_TRANSACTIONS',
-      'GET_TRANSACTION_PERSPECTIVE',
-    ],
-  },
-];
-
 export const SettingsPermissions = () => {
   const isDesktop = useMediaQuery();
   const { state } = useLocation();
+  const origins = useAccountsSelector(selectOrigins);
 
-  const [selectedSite, setSelectedSite] = useState<null | Site>(null);
+  const [selectedSite, setSelectedSite] = useState<string>('');
 
   useEffect(() => {
     if (!state) return;
-    const editedSite = sites.find((i) => i.name === state.siteName);
-    if (editedSite) setSelectedSite(editedSite);
+    if (origins[state.siteName]) setSelectedSite(state.siteName);
   }, [state]);
 
-  const handleSelectSite = (site) => () => setSelectedSite(site);
+  const handleSelectSite = (name: string) => () => setSelectedSite(name);
+
+  const handleRevoke = (origin: string) => async () =>
+    await Background.deleteOrigin(origin);
 
   return (
     <>
@@ -83,31 +50,41 @@ export const SettingsPermissions = () => {
         >
           Permissions
         </p>
-        <div className="h-[100%]">
-          {sites.map((i) => {
+        <div className="h-[100%] mt-[16px]">
+          {Object.keys(origins).map((i) => {
             return (
               <div
-                className="flex items-center justify-between p-[16px] border-b-[1px] border-solid border-dark_grey"
-                key={i.name}
+                className={`flex ext:flex-col tablet:flex-row tablet:items-center justify-between px-[16px] ext:py-[8px] tablet:py-[16px] ${
+                  isDesktop
+                    ? 'border-b-[1px] border-solid border-dark_grey'
+                    : ''
+                }`}
+                key={i}
               >
-                <div className="flex items-center">
-                  <div className="w-[36px] h-[36px] li_gradient rounded-[50%] flex items-center justify-center">
-                    <div className="w-[35px] h-[35px] bg-brown rounded-[50%] flex items-center justify-center"></div>
+                <div className="flex items-center justify-between ext:mb-[16px] tablet:mb-[0px]">
+                  <div className="flex items-center">
+                    <div className="ext:w-[20px] ext:h-[20px] tablet:w-[36px] tablet:h-[36px] li_gradient rounded-[50%] flex items-center justify-center">
+                      <div className="ext:w-[19px] ext:h-[19px] tablet:w-[35px] tablet:h-[35px] bg-brown rounded-[50%] flex items-center justify-center"></div>
+                    </div>
+                    <p className={`${isDesktop ? 'h3' : 'h2_ext'} ml-[8px]`}>
+                      {i}
+                    </p>
                   </div>
-                  <p className="h3 ml-[8px]">{i.name}</p>
+                  {!isDesktop && <p className="text_numbers_s">1 / 12</p>}
                 </div>
+                {isDesktop && <p className="text_numbers_s">1 / 12</p>}
                 <div className="flex">
                   <Button
                     mode="transparent"
-                    onClick={() => console.log('asd')}
+                    onClick={handleRevoke(i)}
                     title="Revoke"
-                    className="w-[88px] mr-[16px] ext:py-[7px] tablet:py-[7px] text_button_ext"
+                    className="ext:[50%] tablet:w-[88px] mr-[8px] ext:py-[7px] tablet:py-[7px] text_button_ext"
                   />
                   <Button
                     mode="gradient"
                     onClick={handleSelectSite(i)}
                     title="View"
-                    className="w-[88px] ext:py-[7px] tablet:py-[7px] text_button_ext"
+                    className="ext:[50%] tablet:w-[88px] ml-[8px] ext:py-[7px] tablet:py-[7px] text_button_ext"
                   />
                 </div>
               </div>
@@ -118,8 +95,8 @@ export const SettingsPermissions = () => {
       {selectedSite && (
         <PermissionsModal
           show={Boolean(selectedSite)}
-          onClose={handleSelectSite(null)}
-          selectedSite={selectedSite}
+          onClose={handleSelectSite('')}
+          permissions={origins[selectedSite]}
         />
       )}
     </>

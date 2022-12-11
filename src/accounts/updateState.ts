@@ -109,6 +109,7 @@ export function createUpdateState(store: AccountsStore) {
     //   messages: currentState.messageNotification.messages,
     //   //  notifications: currentState.notifications,
     // };
+
     if (
       unapprovedMessages &&
       !equals(unapprovedMessages, currentState.messageNotification.messages)
@@ -121,6 +122,11 @@ export function createUpdateState(store: AccountsStore) {
       );
 
       // toUpdateActiveNotify.messages = unapprovedMessages;
+    }
+
+    const origins = getParam(state.origins, {});
+    if (origins && !equals(origins, currentState.messageNotification.origins)) {
+      dispatch(messageNotificationActions.setOrigins(origins));
     }
 
     if (

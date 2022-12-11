@@ -63,6 +63,21 @@ export class PermissionController {
     this.updateState({ inPending: { [origin]: messageId } });
   }
 
+  setPermissions(origin: string, permissions: PermissionType[]) {
+    this.setMessageIdAccess(origin, null);
+    this.updateState({ origins: { [origin]: permissions } });
+  }
+
+  setPermission(origin: string, permission: PermissionType) {
+    if (this.hasPermission(origin, permission)) {
+      return null;
+    }
+
+    const permissions = [...(this.getPermissions(origin) || [])];
+    permissions.push(permission);
+    this.setPermissions(origin, permissions);
+  }
+
   getPermissions(origin: string) {
     const { origins, whitelist } = this.store.getState();
     const permissions = origins[origin] || [];
@@ -79,6 +94,16 @@ export class PermissionController {
     const permissionType = permission;
     const findPermission = findPermissionFabric(permissionType);
     return permissions.find(findPermission);
+  }
+
+  deletePermissions(origin: string) {
+    const { origins, ...other } = this.store.getState();
+
+    if (Object.prototype.hasOwnProperty.call(origins, origin)) {
+      delete origins[origin];
+    }
+
+    this.store.updateState({ ...other, origins });
   }
 
   hasPermission(origin: string, permission: PermissionType) {

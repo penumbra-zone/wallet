@@ -83,15 +83,11 @@ async function startUi() {
     isNotificationWindow &&
     !window.matchMedia('(display-mode: fullscreen)').matches
   ) {
-    console.log('asdasd');
-    
     background.resizeNotificationWindow(
       400 + window.outerWidth - window.innerWidth,
       600 + window.outerHeight - window.innerHeight
     );
   }
-
-  
 
   const [selectedAccount, networks, state] = await Promise.all([
     background.getSelectedAccount(),
@@ -107,6 +103,7 @@ async function startUi() {
     networks,
     contacts: state.contacts,
     messages: state.messages,
+    origins: state.origins
   });
 
   backgroundService.init(background);
