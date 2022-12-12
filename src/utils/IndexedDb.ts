@@ -1,6 +1,6 @@
 import { IDBPDatabase, openDB } from 'idb';
 
-type TableName = 'assets' | 'chainParameters' | 'notes' | 'tx' | 'fmd_parameters' | 'nct_commitments' |
+export type TableName = 'assets' | 'chainParameters' | 'notes' | 'tx' | 'fmd_parameters' | 'nct_commitments' |
     'nct_forgotten' | 'nct_hashes' | 'nct_position' | 'spendable_notes' | 'tx_by_nullifier' ;
 
 export class IndexedDb {

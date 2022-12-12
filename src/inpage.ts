@@ -105,6 +105,7 @@ async function setupInpageApi() {
   cbs = {};
 
   Object.assign(penumbraApi, inpageApi);
+  penumbraAppDef.resolve(penumbraApi);
   (global as any).penumbra = penumbraApi;
 
   let publicState = {};

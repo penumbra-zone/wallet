@@ -14,6 +14,7 @@ import {
   PermissionController,
   MessageController,
   PermissionType,
+  PERMISSIONS,
 } from './controllers';
 import {
   extension,
@@ -27,7 +28,7 @@ import { PreferencesAccount } from './preferences';
 import { ViewProtocolService } from './services';
 import { ExtensionStorage, StorageLocalState } from './storage';
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig';
-import { IndexedDb } from './utils';
+import { IndexedDb, TableName } from './utils';
 import { CreateWalletInput, ISeedWalletInput } from './wallets';
 
 const bgPromise = setupBackgroundService();
@@ -121,19 +122,19 @@ async function setupBackgroundService() {
 }
 
 class BackgroundService extends EventEmitter {
-  extensionStorage;
-  idleController;
-  vaultController;
-  walletController;
-  networkController;
-  remoteConfigController;
-  preferencesController;
-  clientController;
-  indexedDb;
-  viewProtocolService;
-  contactBookController;
-  permissionsController;
-  messageController;
+  extensionStorage: ExtensionStorage;
+  idleController: IdleController;
+  vaultController: VaultController;
+  walletController: WalletController;
+  networkController: NetworkController;
+  remoteConfigController: RemoteConfigController;
+  preferencesController: PreferencesController;
+  clientController: ClientController;
+  indexedDb: IndexedDb;
+  viewProtocolService: ViewProtocolService;
+  contactBookController: ContactBookController;
+  permissionsController: PermissionController;
+  messageController: MessageController;
 
   constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
     super();
@@ -264,7 +265,7 @@ class BackgroundService extends EventEmitter {
         url: string | null | undefined,
         network: NetworkName
       ) => this.networkController.setCustomTendermint(url, network),
-      getAllValueIndexedDB: async (tableName: string) =>
+      getAllValueIndexedDB: async (tableName: TableName) =>
         this.indexedDb.getAllValue(tableName),
       // addresses
       setContact: async (contact: Contact) =>
@@ -291,6 +292,10 @@ class BackgroundService extends EventEmitter {
       },
       deleteOrigin: async (origin: string) =>
         this.permissionsController.deletePermissions(origin),
+      setPermission: async (origin: string, permission: PermissionType) =>
+        this.permissionsController.setPermission(origin, permission),
+      deletePermission: async (origin: string, permission: PermissionType) =>
+        this.permissionsController.deletePermission(origin, permission),
     };
   }
 
@@ -300,7 +305,7 @@ class BackgroundService extends EventEmitter {
 
     const canIUse = this.permissionsController.hasPermission(
       origin,
-      'approved'
+      PERMISSIONS.APPROVED
     );
 
     if (canIUse === null) {
@@ -310,7 +315,10 @@ class BackgroundService extends EventEmitter {
         try {
           const message = this.messageController.getMessageById(messageId);
 
-          if (!message || message.account.address !== selectedAccount.address) {
+          if (
+            !message ||
+            message.account.address !== selectedAccount.addressByIndex
+          ) {
             messageId = null;
           }
         } catch (e) {
@@ -335,6 +343,19 @@ class BackgroundService extends EventEmitter {
         this.permissionsController.setMessageIdAccess(origin, messageId);
       }
       this.emit('Show notification');
+
+      await this.messageController
+        .getMessageResult(messageId)
+        .then(() => {
+          this.messageController.setPermission(origin, PERMISSIONS.APPROVED);
+        })
+        .catch((e) => {
+          if (e.data === 'rejected') {
+            // user rejected single permission request
+            this.permissionsController.setMessageIdAccess(origin, null);
+          }
+          return Promise.reject(e);
+        });
     }
   }
   getInpageApi(origin: string, connectionId: string) {
@@ -354,24 +375,101 @@ class BackgroundService extends EventEmitter {
         }
 
         await this.validatePermission(origin, connectionId);
-        return this._publicState(origin);
+        return await this._publicState(origin);
       },
       resourceIsApproved: async () => {
-        return this.permissionsController.hasPermission(origin, 'approved');
+        return this.permissionsController.hasPermission(
+          origin,
+          PERMISSIONS.APPROVED
+        );
       },
-      getAssets: async () => this.viewProtocolService.getAssets(),
-      getChainParameters: async () =>
-        this.viewProtocolService.getChainParameters(),
-      getNotes: async () => this.viewProtocolService.getNotes(),
-      getStatus: async () => this.viewProtocolService.getStatus(),
-      getTransactionHashes: async (startHeight?: number, endHeight?: number) =>
-        this.viewProtocolService.getTransactionHashes(startHeight, endHeight),
-      getTransactionByHash: async (txHash: string) =>
-        this.viewProtocolService.getTransactionByHash(txHash),
-      getTransactions: async (startHeight?: number, endHeight?: number) =>
-        this.viewProtocolService.getTransactions(startHeight, endHeight),
-      getNoteByCommitment: async (noteCommitment: string) =>
-        this.viewProtocolService.getNoteByCommitment(noteCommitment),
+      getAssets: async () => {
+        const canIUse = this.permissionsController.hasPermission(
+          origin,
+          PERMISSIONS.GET_ASSETS
+        );
+        
+        if (!canIUse) {
+          throw new Error('Access denied');
+        }
+        return this.viewProtocolService.getAssets();
+      },
+      getChainParameters: async () => {
+        const canIUse = this.permissionsController.hasPermission(
+          origin,
+          PERMISSIONS.GET_CHAIN_PARAMETERS
+        );
+        if (!canIUse) {
+          throw new Error('Access denied');
+        }
+        return this.viewProtocolService.getChainParameters();
+      },
+      getNotes: async () => {
+        const canIUse = this.permissionsController.hasPermission(
+          origin,
+          PERMISSIONS.GET_NOTES
+        );
+        if (!canIUse) {
+          throw new Error('Access denied');
+        }
+        return this.viewProtocolService.getNotes();
+      },
+      getStatus: async () => {
+        const canIUse = this.permissionsController.hasPermission(
+          origin,
+          PERMISSIONS.GET_CHAIN_CURRENT_STATUS
+        );
+        if (!canIUse) {
+          throw new Error('Access denied');
+        }
+        return this.viewProtocolService.getStatus();
+      },
+      getTransactionHashes: async (
+        startHeight?: number,
+        endHeight?: number
+      ) => {
+        const canIUse = this.permissionsController.hasPermission(
+          origin,
+          PERMISSIONS.GET_TRANSACTION_HASHES
+        );
+        if (!canIUse) {
+          throw new Error('Access denied');
+        }
+        return this.viewProtocolService.getTransactionHashes(
+          startHeight,
+          endHeight
+        );
+      },
+      getTransactionByHash: async (txHash: string) => {
+        const canIUse = this.permissionsController.hasPermission(
+          origin,
+          PERMISSIONS.GET_TRANSACTION_BY_HASH
+        );
+        if (!canIUse) {
+          throw new Error('Access denied');
+        }
+        return this.viewProtocolService.getTransactionByHash(txHash);
+      },
+      getTransactions: async (startHeight?: number, endHeight?: number) => {
+        const canIUse = this.permissionsController.hasPermission(
+          origin,
+          PERMISSIONS.GET_TRANSACTIONS
+        );
+        if (!canIUse) {
+          throw new Error('Access denied');
+        }
+        return this.viewProtocolService.getTransactions(startHeight, endHeight);
+      },
+      getNoteByCommitment: async (noteCommitment: string) => {
+         const canIUse = this.permissionsController.hasPermission(
+           origin,
+           PERMISSIONS.GET_NOTE_BY_COMMITMENT
+         );
+         if (!canIUse) {
+           throw new Error('Access denied');
+         }
+        this.viewProtocolService.getNoteByCommitment(noteCommitment);
+      },
     };
   }
 
@@ -407,14 +505,19 @@ class BackgroundService extends EventEmitter {
       uid: MessageStoreItem['ext_uuid'];
     }> = [];
 
+    const canIUse = this.permissionsController.hasPermission(
+      originReq,
+      PERMISSIONS.APPROVED
+    );
+
     const { selectedAccount, isInitialized, isLocked, messages } =
       this.getState();
 
-    if (selectedAccount) {
+    if (selectedAccount && canIUse) {
       const addressByIndex = selectedAccount.addressByIndex;
       account = {
         ...selectedAccount,
-        balance: 0,
+        // balance: 0,
       };
       msg = messages
         .filter(

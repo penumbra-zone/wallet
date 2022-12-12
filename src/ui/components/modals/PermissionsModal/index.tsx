@@ -1,29 +1,33 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { PermissionType } from '../../../../controllers';
+import Background from '../../../services/Background';
 import { ModalWrapper } from '../../ModalWrapper';
 import { Tabs } from '../../Tabs';
 import { Toogle } from '../../Toogle';
 import { SuccessCreateModalProps } from '../SuccessCreateModal';
 
 const lowPermissions = {
-  GET_CHAIN_CURRENT_STATUS: 'Get current status of chain',
-  GET_NOTES: 'Get notes',
-  GET_QUARANTINED_NOTES: 'Get notes that have been quarantined',
-  GET_WITNESS: 'Get witness',
-  GET_ASSETS: 'Get assets',
-  GET_CHAIN_PARAMETERS: 'Get chain parameters',
-  GET_FMD_PARAMETERS: 'Get FMD parameters',
-  GET_NOTE_BY_COMMITMENT: 'Get note by note commitment',
-  GET_NULLIFIER_STATUS: 'Get nullifier status',
-  GET_TRANSACTION_HASHES: 'Get transaction hashes',
-  GET_TRANSACTION_BY_HASH: 'Get transaction by hash',
-  GET_TRANSACTIONS: 'Get transactions',
-  GET_TRANSACTION_PERSPECTIVE: 'Get transactions perspective',
+  getChainCurrentStatus: 'Get current status of chain',
+  getNotes: 'Get notes',
+  getQuarantinedNotes: 'Get notes that have been quarantined',
+  getWitness: 'Get witness',
+  getAssets: 'Get assets',
+  getChainParameters: 'Get chain parameters',
+  getFmdParameters: 'Get FMD parameters',
+  getNoteByCommitment: 'Get note by note commitment',
+  getNullifierStatus: 'Get nullifier status',
+  getTransactionHashes: 'Get transaction hashes',
+  getTransactionByHash: 'Get transaction by hash',
+  getTransactions: 'Get transactions',
+  getTransactionPerspective: 'Get transactions perspective',
 };
 
 export const PermissionsModal: React.FC<
-  SuccessCreateModalProps & { permissions: PermissionType[] }
-> = ({ show, permissions, onClose }) => {
+  SuccessCreateModalProps & {
+    permissions: PermissionType[];
+    selectedSite: string;
+  }
+> = ({ show, permissions, selectedSite, onClose }) => {
   const [currentPermissions, setCurrentPermissions] = useState<{
     [key: string]: boolean;
   }>({});
@@ -34,14 +38,13 @@ export const PermissionsModal: React.FC<
       obj[i] = permissions.includes(i);
     });
     setCurrentPermissions(obj);
-  }, []);
+  }, [permissions]);
 
   const handleChange =
-    (type: PermissionType) => (e: ChangeEvent<HTMLInputElement>) => {
-      setCurrentPermissions((state) => ({
-        ...state,
-        [type]: e.target.checked,
-      }));
+    (type: PermissionType) => async (e: ChangeEvent<HTMLInputElement>) => {
+      e.target.checked
+        ? await Background.setPermission(selectedSite, type)
+        : await Background.deletePermission(selectedSite, type);
     };
 
   return (

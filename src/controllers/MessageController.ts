@@ -38,13 +38,13 @@ export class MessageController extends EventEmitter {
     this.getMessagesConfig = getMessagesConfig;
     this.setPermission = setPermission;
 
-    extension.alarms.onAlarm.addListener(({ name }) => {
-      if (name === 'rejectMessages') {
-        this.rejectAllByTime();
-      }
-    });
+    // extension.alarms.onAlarm.addListener(({ name }) => {
+    //   if (name === 'rejectMessages') {
+    //     this.rejectAllByTime();
+    //   }
+    // });
 
-    this.rejectAllByTime();
+    // this.rejectAllByTime();
 
     this._updateBadge();
   }
@@ -176,6 +176,37 @@ export class MessageController extends EventEmitter {
     return this.messages.messages.filter(
       ({ status }) => status === MSG_STATUSES.UNAPPROVED
     );
+  }
+
+  async getMessageResult(id: string) {
+    const message = this._getMessageById(id);
+
+    switch (message.status) {
+      case MSG_STATUSES.SIGNED:
+      case MSG_STATUSES.PUBLISHED:
+        return message.result;
+      case MSG_STATUSES.REJECTED:
+        throw new Error('User denied message');
+      case MSG_STATUSES.FAILED:
+        throw new Error('Failed request');
+    }
+
+    const finishedMessage = await new Promise<MessageStoreItem>((resolve) => {
+      this.once(`${id}:finished`, resolve);
+    });
+
+    switch (finishedMessage.status) {
+      case MSG_STATUSES.SIGNED:
+      case MSG_STATUSES.PUBLISHED:
+        return finishedMessage.result;
+      case MSG_STATUSES.REJECTED:
+      case MSG_STATUSES.REJECTED_FOREVER:
+        throw new Error('User denied message');
+      case MSG_STATUSES.FAILED:
+        throw new Error('Failed request');
+      default:
+        throw new Error('Unknown error');
+    }
   }
 
   _updateMessagesByTimeout() {

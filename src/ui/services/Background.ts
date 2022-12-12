@@ -1,5 +1,5 @@
 import { __BackgroundUiApiDirect } from '../../background';
-import { Contact, NetworkName } from '../../controllers';
+import { Contact, NetworkName, PermissionType } from '../../controllers';
 import { PreferencesAccount } from '../../preferences';
 import { StorageLocalState } from '../../storage';
 import { CreateWalletInput, ISeedWalletInput } from '../../wallets';
@@ -119,6 +119,30 @@ class Background {
     } catch (err) {
       throw new Error(prepareErrorMessage(err));
     }
+  }
+
+  async setPermission(origin: string, permission: PermissionType){
+     try {
+       await this.initPromise;
+       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+       await this._connect!();
+       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+       return await this.background!.setPermission(origin, permission);
+     } catch (err) {
+       throw new Error(prepareErrorMessage(err));
+     }
+  }
+
+   async deletePermission(origin: string, permission: PermissionType){
+     try {
+       await this.initPromise;
+       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+       await this._connect!();
+       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+       return await this.background!.deletePermission(origin, permission);
+     } catch (err) {
+       throw new Error(prepareErrorMessage(err));
+     }
   }
 
   //   async setAutoSign(

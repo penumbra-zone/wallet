@@ -123,7 +123,6 @@ export function createUpdateState(store: AccountsStore) {
 
       // toUpdateActiveNotify.messages = unapprovedMessages;
     }
-
     const origins = getParam(state.origins, {});
     if (origins && !equals(origins, currentState.messageNotification.origins)) {
       dispatch(messageNotificationActions.setOrigins(origins));

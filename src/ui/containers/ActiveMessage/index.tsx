@@ -17,12 +17,7 @@ export const ActiveMessage = () => {
     await Background.deleteMessage(messages.unapprovedMessages[0].id);
 
   const handleConfirm = async () => {
-    const data = await Background.approve(
-      messages.unapprovedMessages[0].id,
-      account
-    );
-
-    console.log(data);
+    await Background.approve(messages.unapprovedMessages[0].id, account);
   };
 
   return (

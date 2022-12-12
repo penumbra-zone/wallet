@@ -6,23 +6,6 @@ import { Button, PermissionsModal } from '../../components';
 import { selectOrigins } from '../../redux';
 import Background from '../../services/Background';
 
-
-
-export type Permissions =
-  | 'GET_CHAIN_CURRENT_STATUS'
-  | 'GET_NOTES'
-  | 'GET_QUARANTINED_NOTES'
-  | 'GET_WITNESS'
-  | 'GET_ASSETS'
-  | 'GET_CHAIN_PARAMETERS'
-  | 'GET_FMD_PARAMETERS'
-  | 'GET_NOTE_BY_COMMITMENT'
-  | 'GET_NULLIFIER_STATUS'
-  | 'GET_TRANSACTION_HASHES'
-  | 'GET_TRANSACTION_BY_HASH'
-  | 'GET_TRANSACTIONS'
-  | 'GET_TRANSACTION_PERSPECTIVE';
-
 export const SettingsPermissions = () => {
   const isDesktop = useMediaQuery();
   const { state } = useLocation();
@@ -97,6 +80,7 @@ export const SettingsPermissions = () => {
           show={Boolean(selectedSite)}
           onClose={handleSelectSite('')}
           permissions={origins[selectedSite]}
+          selectedSite={selectedSite}
         />
       )}
     </>

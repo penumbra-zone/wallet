@@ -16,6 +16,19 @@ export const PERMISSIONS = {
   APPROVED: 'approved',
   AUTO_SIGN: 'allowAutoSign',
   GET_MESSAGES: 'allowMessages',
+  GET_CHAIN_CURRENT_STATUS: 'getChainCurrentStatus',
+  GET_NOTES: 'getNotes',
+  GET_QUARANTINED_NOTES: 'getQuarantinedNotes',
+  GET_WITNESS: 'getWitness',
+  GET_ASSETS: 'getAssets',
+  GET_CHAIN_PARAMETERS: 'getChainParameters',
+  GET_FMD_PARAMETERS: 'getFmdParameters',
+  GET_NOTE_BY_COMMITMENT: 'getNoteByCommitment',
+  GET_NULLIFIER_STATUS: 'getNullifierStatus',
+  GET_TRANSACTION_HASHES: 'getTransactionHashes',
+  GET_TRANSACTION_BY_HASH: 'getTransactionByHash',
+  GET_TRANSACTIONS: 'getTransactions',
+  GET_TRANSACTION_PERSPECTIVE: 'getTransactionPerspective',
 } as const;
 
 export type PermissionType = typeof PERMISSIONS[keyof typeof PERMISSIONS];
@@ -75,6 +88,13 @@ export class PermissionController {
 
     const permissions = [...(this.getPermissions(origin) || [])];
     permissions.push(permission);
+    this.setPermissions(origin, permissions);
+  }
+
+  deletePermission(origin: string, permission: PermissionType) {
+    const permissions = this.getPermissions(origin).filter(
+      (i) => i !== permission
+    );
     this.setPermissions(origin, permissions);
   }
 
