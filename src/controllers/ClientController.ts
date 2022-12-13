@@ -236,16 +236,17 @@ export class ClientController {
                     if (statePayload.statePayload.case === "note") {
 
                         let statePayloadNote = statePayload.statePayload.value;
+
                         let decryptedNote = decrypt_note(
                             fvk,
                             this.toHexString(statePayloadNote.note.encryptedNote),
-                            this.toHexString(statePayloadNote.note.encryptedNote)
+                            this.toHexString(statePayloadNote.note.ephemeralKey)
                         );
                         if (decryptedNote === null) continue;
 
                         decryptedNote.height = Number(compactBlock.height);
                         decryptedNote.note_commitment = this.toHexString(
-                            statePayloadNote.note.noteCommitment
+                            statePayloadNote.note.noteCommitment.inner
                         );
                         decryptedNote.ephemeralKey = this.toHexString(
                             statePayloadNote.note.ephemeralKey
