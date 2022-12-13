@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAccountsSelector } from '../../../../accounts';
 import { routesPath } from '../../../../utils';
 import { selectNewAccount, selectOrigins } from '../../../redux';
+import Background from '../../../services/Background';
 import { Button } from '../../Button';
 import { ModalWrapper } from '../../ModalWrapper';
 import { SuccessCreateModalProps } from '../SuccessCreateModal';
@@ -27,6 +28,11 @@ export const ConnectedSitesModal: React.FC<SuccessCreateModalProps> = ({
   const handleClose = () => {
     setSelectedSite(null);
     onClose();
+  };
+
+  const handleConfirmRevoke = async () => {
+    await Background.deleteOrigin(selectedSite);
+    setSelectedSite('');
   };
 
   return (
@@ -67,7 +73,7 @@ export const ConnectedSitesModal: React.FC<SuccessCreateModalProps> = ({
               />
               <Button
                 mode="gradient"
-                onClick={() => console.log('asd')}
+                onClick={handleConfirmRevoke}
                 title="Revoke"
                 className="w-[50%] ext:py-[7px] tablet:py-[7px] text_button_ext ml-[8px]"
               />
