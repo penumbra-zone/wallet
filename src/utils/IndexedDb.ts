@@ -34,9 +34,10 @@ export class IndexedDb {
             keyPath: 'tx_hash',
           });
 
-          db.createObjectStore('fmd_parameters', {
-            keyPath: 'bytes',
-          });
+          db.createObjectStore('fmd_parameters',
+              {
+                keyPath: 'precisionBits',
+              });
 
           db.createObjectStore('nct_commitments', {
             keyPath: 'position',
