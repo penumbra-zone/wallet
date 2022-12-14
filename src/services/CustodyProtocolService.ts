@@ -1,4 +1,3 @@
-import {ExtensionStorage} from "../storage";
 import {
     AuthorizationData,
     TransactionPlan

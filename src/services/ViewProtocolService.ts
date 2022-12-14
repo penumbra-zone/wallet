@@ -1,140 +1,156 @@
-import { ChainParameters } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
-import { ClientController, Transaction } from '../controllers';
-import { ExtensionStorage } from '../storage';
-import { EncodeAsset } from '../types';
-import { IndexedDb } from '../utils';
-import { decode_transaction } from 'penumbra-web-assembly';
+import {
+    ChainParameters,
+    FmdParameters
+} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
+import {ClientController, Transaction} from '../controllers';
+import {ExtensionStorage} from '../storage';
+import {EncodeAsset} from '../types';
+import {IndexedDb} from '../utils';
+import {decode_transaction} from 'penumbra-web-assembly';
+import {
+    FMDParametersRequest,
+    FMDParametersResponse
+} from "@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb";
 
 function toJson(data) {
-  return JSON.stringify(data, (_, v) =>
-    typeof v === 'bigint' ? `${v}n` : v
-  ).replace(/"(-?\d+)n"/g, (_, a) => a);
+    return JSON.stringify(data, (_, v) =>
+        typeof v === 'bigint' ? `${v}n` : v
+    ).replace(/"(-?\d+)n"/g, (_, a) => a);
 }
 
 export class ViewProtocolService {
-  private indexedDb;
-  private extensionStorage;
-  private getLastExistBlock;
-  constructor({
-    indexedDb,
-    extensionStorage,
-    getLastExistBlock,
-  }: {
-    indexedDb: IndexedDb;
-    extensionStorage: ExtensionStorage;
-    getLastExistBlock: ClientController['getLastExistBlock'];
-  }) {
-    this.indexedDb = indexedDb;
-    this.extensionStorage = extensionStorage;
-    this.getLastExistBlock = getLastExistBlock;
-  }
+    private indexedDb;
+    private extensionStorage;
+    private getLastExistBlock;
 
-  async getAssets() {
-    const assets: EncodeAsset[] = await this.indexedDb.getAllValue('assets');
-    return assets;
-  }
-
-  async getChainParameters() {
-    const chainParameters: ChainParameters[] = await this.indexedDb.getAllValue(
-      'chainParameters'
-    );
-
-    return toJson(chainParameters);
-  }
-
-  async getNotes() {
-    const notes = await this.indexedDb.getAllValue('notes');
-
-    const mapData = notes.map((i) => ({
-      note_commitment: i.note_commitment,
-      note: {
-        value: i.value,
-        note_blinding: i.note_blinding,
-        address: i.address,
-      },
-      address_index: 0,
-      nullifier: i.nullifier,
-      height_created: i.height,
-      //TODO add height_spent and position
-      height_spent: undefined,
-      position: undefined,
-      source: i.source,
-    }));
-
-    return mapData;
-  }
-
-  async getStatus() {
-    const { lastSavedBlock } = await this.extensionStorage.getState(
-      'lastSavedBlock'
-    );
-    const lasBlock = await this.getLastExistBlock();
-    return {
-      sync_height: lastSavedBlock.testnet,
-      catching_up: lastSavedBlock.testnet === lasBlock,
-      last_block: lasBlock,
-    };
-  }
-
-  async getTransactionHashes(startHeight?: number, endHeight?: number) {
-    const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
-    let data: Transaction[] = [];
-    if (startHeight && endHeight) {
-      data = tx.filter(
-        (i) => i.block_height >= startHeight && i.block_height <= endHeight
-      );
-    } else if (startHeight && !endHeight) {
-      data = tx.filter((i) => i.block_height >= startHeight);
-    } else {
-      data = tx;
+    constructor({
+                    indexedDb,
+                    extensionStorage,
+                    getLastExistBlock,
+                }: {
+        indexedDb: IndexedDb;
+        extensionStorage: ExtensionStorage;
+        getLastExistBlock: ClientController['getLastExistBlock'];
+    }) {
+        this.indexedDb = indexedDb;
+        this.extensionStorage = extensionStorage;
+        this.getLastExistBlock = getLastExistBlock;
     }
 
-    return data.map((i) => ({
-      block_height: i.block_height,
-      tx_hash: i.tx_hash,
-    }));
-  }
-
-  async getTransactionByHash(txHash: string) {
-    const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
-    const selectedTx = tx.find((t) => t.tx_hash === txHash);
-    if (!selectedTx) {
-      throw new Error('Tx doesn`t exist');
+    async getAssets() {
+        const assets: EncodeAsset[] = await this.indexedDb.getAllValue('assets');
+        return assets;
     }
 
-    return decode_transaction(selectedTx.tx_bytes);
-  }
+    async getChainParameters(): Promise<ChainParameters> {
+        const chainParameters: ChainParameters[] = await this.indexedDb.getAllValue(
+            'chainParameters'
+        );
 
-  async getTransactions(startHeight?: number, endHeight?: number) {
-    const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
-    let data: Transaction[] = [];
-    if (startHeight && endHeight) {
-      data = tx.filter(
-        (i) => i.block_height >= startHeight && i.block_height <= endHeight
-      );
-    } else if (startHeight && !endHeight) {
-      data = tx.filter((i) => i.block_height >= startHeight);
-    } else {
-      data = tx;
+        return chainParameters[0];
     }
 
-    return data.map((i) => ({
-      block_height: i.block_height,
-      tx_hash: i.tx_hash,
-      tx: decode_transaction(i.tx_bytes),
-    }));
-  }
+    async getNotes() {
+        const notes = await this.indexedDb.getAllValue('notes');
 
-  async getNoteByCommitment(noteCommitment: string) {
-    const notes = await this.getNotes();
+        const mapData = notes.map((i) => ({
+            note_commitment: i.note_commitment,
+            note: {
+                value: i.value,
+                note_blinding: i.note_blinding,
+                address: i.address,
+            },
+            address_index: 0,
+            nullifier: i.nullifier,
+            height_created: i.height,
+            //TODO add height_spent and position
+            height_spent: undefined,
+            position: undefined,
+            source: i.source,
+        }));
 
-    const selectedNote = notes.find(
-      (n) => n.note_commitment === noteCommitment
-    );
-
-    if (!selectedNote) {
-      throw new Error('Note doesn`t exist');
+        return mapData;
     }
-    return selectedNote;
-  }
+
+    async getStatus() {
+        const {lastSavedBlock} = await this.extensionStorage.getState(
+            'lastSavedBlock'
+        );
+        const lasBlock = await this.getLastExistBlock();
+        return {
+            sync_height: lastSavedBlock.testnet,
+            catching_up: lastSavedBlock.testnet === lasBlock,
+            last_block: lasBlock,
+        };
+    }
+
+    async getTransactionHashes(startHeight?: number, endHeight?: number) {
+        const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
+        let data: Transaction[] = [];
+        if (startHeight && endHeight) {
+            data = tx.filter(
+                (i) => i.block_height >= startHeight && i.block_height <= endHeight
+            );
+        } else if (startHeight && !endHeight) {
+            data = tx.filter((i) => i.block_height >= startHeight);
+        } else {
+            data = tx;
+        }
+
+        return data.map((i) => ({
+            block_height: i.block_height,
+            tx_hash: i.tx_hash,
+        }));
+    }
+
+    async getTransactionByHash(txHash: string) {
+        const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
+        const selectedTx = tx.find((t) => t.tx_hash === txHash);
+        if (!selectedTx) {
+            throw new Error('Tx doesn`t exist');
+        }
+
+        return decode_transaction(selectedTx.tx_bytes);
+    }
+
+    async getTransactions(startHeight?: number, endHeight?: number) {
+        const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
+        let data: Transaction[] = [];
+        if (startHeight && endHeight) {
+            data = tx.filter(
+                (i) => i.block_height >= startHeight && i.block_height <= endHeight
+            );
+        } else if (startHeight && !endHeight) {
+            data = tx.filter((i) => i.block_height >= startHeight);
+        } else {
+            data = tx;
+        }
+
+        return data.map((i) => ({
+            block_height: i.block_height,
+            tx_hash: i.tx_hash,
+            tx: decode_transaction(i.tx_bytes),
+        }));
+    }
+
+    async getNoteByCommitment(noteCommitment: string) {
+        const notes = await this.getNotes();
+
+        const selectedNote = notes.find(
+            (n) => n.note_commitment === noteCommitment
+        );
+
+        if (!selectedNote) {
+            throw new Error('Note doesn`t exist');
+        }
+        return selectedNote;
+    }
+
+    async getFMDParameters(request: FMDParametersRequest): Promise<FMDParametersResponse> {
+        const fmd: FmdParameters[] = await this.indexedDb.getAllValue('fmd_parameters');
+
+        return new FMDParametersResponse({
+            parameters: fmd[0]
+        })
+    }
 }
