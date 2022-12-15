@@ -16,7 +16,7 @@ export class TransactionPlanner {
         let chainParameters = await this.viewService.getChainParameters();
 
         let transactionPlan = new TransactionPlan();
-        transactionPlan.chainId = chainParameters.chainId;
+        transactionPlan.chainId = chainParameters.chainParameters.chainId;
 
         return
     }

@@ -6,3 +6,4 @@ export * from './getWordListOprions';
 export * from './getShortKey';
 export * from './kitcut';
 export * from './validate/validateAddress';
+export * from './stringToBytes';

@@ -1,156 +1,295 @@
 import {
-    ChainParameters,
-    FmdParameters
+  ChainParameters,
+  FmdParameters,
+  NoteSource,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
-import {ClientController, Transaction} from '../controllers';
-import {ExtensionStorage} from '../storage';
-import {EncodeAsset} from '../types';
-import {IndexedDb} from '../utils';
-import {decode_transaction} from 'penumbra-web-assembly';
+import { ClientController, Transaction } from '../controllers';
+import { ExtensionStorage } from '../storage';
+import { EncodeAsset } from '../types';
+import { bytesToString, IndexedDb, stringToBytes } from '../utils';
+import { decode_transaction } from 'penumbra-web-assembly';
 import {
-    FMDParametersRequest,
-    FMDParametersResponse
-} from "@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb";
-
-function toJson(data) {
-    return JSON.stringify(data, (_, v) =>
-        typeof v === 'bigint' ? `${v}n` : v
-    ).replace(/"(-?\d+)n"/g, (_, a) => a);
-}
+  AssetsRequest,
+  AssetsResponse,
+  FMDParametersRequest,
+  FMDParametersResponse,
+  NoteByCommitmentRequest,
+  NoteByCommitmentResponse,
+  NotesRequest,
+  NotesResponse,
+  SpendableNoteRecord,
+  StatusRequest,
+  StatusResponse,
+  TransactionByHashRequest,
+  TransactionByHashResponse,
+  TransactionHashesRequest,
+  TransactionHashesResponse,
+  TransactionsRequest,
+  TransactionsResponse,
+} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb';
+import {
+  Address,
+  AddressIndex,
+  Amount,
+  Asset,
+  AssetId,
+  Denom,
+  Note,
+  Nullifier,
+  StateCommitment,
+  Value,
+} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/crypto/v1alpha1/crypto_pb';
+import {
+  ChainParametersRequest,
+  ChainParametersResponse,
+} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
 
 export class ViewProtocolService {
-    private indexedDb;
-    private extensionStorage;
-    private getLastExistBlock;
+  private indexedDb;
+  private extensionStorage;
+  private getLastExistBlock;
 
-    constructor({
-                    indexedDb,
-                    extensionStorage,
-                    getLastExistBlock,
-                }: {
-        indexedDb: IndexedDb;
-        extensionStorage: ExtensionStorage;
-        getLastExistBlock: ClientController['getLastExistBlock'];
-    }) {
-        this.indexedDb = indexedDb;
-        this.extensionStorage = extensionStorage;
-        this.getLastExistBlock = getLastExistBlock;
-    }
+  constructor({
+    indexedDb,
+    extensionStorage,
+    getLastExistBlock,
+  }: {
+    indexedDb: IndexedDb;
+    extensionStorage: ExtensionStorage;
+    getLastExistBlock: ClientController['getLastExistBlock'];
+  }) {
+    this.indexedDb = indexedDb;
+    this.extensionStorage = extensionStorage;
+    this.getLastExistBlock = getLastExistBlock;
+  }
 
-    async getAssets() {
-        const assets: EncodeAsset[] = await this.indexedDb.getAllValue('assets');
-        return assets;
-    }
+  async getAssets(request: AssetsRequest): Promise<AssetsResponse[]> {
+    const assets: EncodeAsset[] = await this.indexedDb.getAllValue('assets');
 
-    async getChainParameters(): Promise<ChainParameters> {
-        const chainParameters: ChainParameters[] = await this.indexedDb.getAllValue(
-            'chainParameters'
-        );
-
-        return chainParameters[0];
-    }
-
-    async getNotes() {
-        const notes = await this.indexedDb.getAllValue('notes');
-
-        const mapData = notes.map((i) => ({
-            note_commitment: i.note_commitment,
-            note: {
-                value: i.value,
-                note_blinding: i.note_blinding,
-                address: i.address,
-            },
-            address_index: 0,
-            nullifier: i.nullifier,
-            height_created: i.height,
-            //TODO add height_spent and position
-            height_spent: undefined,
-            position: undefined,
-            source: i.source,
-        }));
-
-        return mapData;
-    }
-
-    async getStatus() {
-        const {lastSavedBlock} = await this.extensionStorage.getState(
-            'lastSavedBlock'
-        );
-        const lasBlock = await this.getLastExistBlock();
+    console.log(
+      assets.map((i) => {
         return {
-            sync_height: lastSavedBlock.testnet,
-            catching_up: lastSavedBlock.testnet === lasBlock,
-            last_block: lasBlock,
+          asset: {
+            id: { inner: stringToBytes(i.id) },
+            denom: { denom: i.denom },
+          },
+        } as AssetsResponse;
+      })
+    );
+
+    return assets.map((i) => {
+      return {
+        asset: {
+          id: { inner: stringToBytes(i.id) },
+          denom: { denom: i.denom },
+        },
+      } as AssetsResponse;
+    });
+  }
+
+  async getChainParameters(
+    request?: ChainParametersRequest
+  ): Promise<ChainParametersResponse> {
+    const chainParameters: ChainParameters[] = await this.indexedDb.getAllValue(
+      'chainParameters'
+    );
+
+    return {
+      chainParameters: new ChainParameters(chainParameters[0]),
+    } as ChainParametersResponse;
+  }
+
+  async getNotes(request?: NotesRequest): Promise<NotesResponse[]> {
+    const notes = await this.indexedDb.getAllValue('notes');
+
+    const mapData = notes.map((i) => ({
+      note_commitment: i.note_commitment,
+      note: {
+        value: i.value,
+        note_blinding: i.note_blinding,
+        address: i.address,
+      },
+      address_index: 0,
+      nullifier: i.nullifier,
+      height_created: i.height,
+      //TODO add height_spent and position
+      height_spent: undefined,
+      position: undefined,
+      source: i.source,
+    }));
+
+    console.log(
+      mapData.map((i) => {
+        return {
+          noteRecord: {
+            noteCommitment: { inner: stringToBytes(i.note_commitment) },
+            note: {
+              value: {
+                amount: {
+                  lo: i.note.value.amount.lo,
+                  hi: i.note.value.amount.hi,
+                },
+                assetId: {
+                  inner: stringToBytes(i.note.value.asset_id),
+                },
+              },
+              noteBlinding: stringToBytes(i.note_blinding),
+              address: { inner: stringToBytes(i.address) },
+            },
+            addressIndex: {
+              inner: stringToBytes('0'),
+            },
+            nullifier: {
+              inner: stringToBytes(i.nullifier[0]),
+            },
+            heightCreated: i.height as any,
+            // heightSpent,
+            // position
+            source: { inner: stringToBytes(i.source) },
+          },
         };
+      })
+    );
+
+    return mapData.map((i) => {
+      return {
+        noteRecord: {
+          noteCommitment: { inner: stringToBytes(i.note_commitment) },
+          note: {
+            value: {
+              amount: {
+                lo: i.note.value.amount.lo,
+                hi: i.note.value.amount.hi,
+              },
+              assetId: {
+                inner: stringToBytes(i.note.value.asset_id),
+              },
+            },
+            noteBlinding: stringToBytes(i.note_blinding),
+            address: { inner: stringToBytes(i.address) },
+          },
+          addressIndex: {
+            inner: stringToBytes('0'),
+          },
+          nullifier: {
+            inner: stringToBytes(i.nullifier[0]),
+          },
+          heightCreated: i.height as any,
+          // heightSpent,
+          // position
+          source: { inner: stringToBytes(i.source) },
+        },
+      };
+    });
+  }
+
+  async getNoteByCommitment(
+    request: NoteByCommitmentRequest
+  ): Promise<NoteByCommitmentResponse> {
+    const notes: NotesResponse[] = await this.getNotes();
+
+    const selectedNote = notes.find(
+      (n) =>
+        bytesToString(n.noteRecord.noteCommitment.inner) ===
+        bytesToString(request.noteCommitment.inner)
+    );
+
+    if (!selectedNote) {
+      throw new Error('Note doesn`t exist');
     }
 
-    async getTransactionHashes(startHeight?: number, endHeight?: number) {
-        const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
-        let data: Transaction[] = [];
-        if (startHeight && endHeight) {
-            data = tx.filter(
-                (i) => i.block_height >= startHeight && i.block_height <= endHeight
-            );
-        } else if (startHeight && !endHeight) {
-            data = tx.filter((i) => i.block_height >= startHeight);
-        } else {
-            data = tx;
-        }
+    return {
+      spendableNote: selectedNote.noteRecord,
+    } as NoteByCommitmentResponse;
+  }
 
-        return data.map((i) => ({
-            block_height: i.block_height,
-            tx_hash: i.tx_hash,
-        }));
+  async getStatus(request: StatusRequest): Promise<StatusResponse> {
+    const { lastSavedBlock } = await this.extensionStorage.getState(
+      'lastSavedBlock'
+    );
+    const lasBlock = await this.getLastExistBlock();
+
+    return {
+      syncHeight: lastSavedBlock.testnet,
+      catchingUp: lastSavedBlock.testnet === lasBlock,
+    } as StatusResponse;
+  }
+
+  async getTransactionHashes(
+    request: TransactionHashesRequest
+  ): Promise<TransactionHashesResponse[]> {
+    const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
+    let data: Transaction[] = [];
+
+    if (request?.startHeight && request?.endHeight) {
+      data = tx.filter(
+        (i) =>
+          i.block_height >= request.startHeight &&
+          i.block_height <= request.endHeight
+      );
+    } else if (request?.startHeight && !request?.endHeight) {
+      data = tx.filter((i) => i.block_height >= request.startHeight);
+    } else {
+      data = tx;
     }
 
-    async getTransactionByHash(txHash: string) {
-        const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
-        const selectedTx = tx.find((t) => t.tx_hash === txHash);
-        if (!selectedTx) {
-            throw new Error('Tx doesn`t exist');
-        }
+    return data.map((i) => {
+      return {
+        blockHeight: i.block_height as any,
+        txHash: stringToBytes(i.tx_hash),
+      } as TransactionHashesResponse;
+    });
+  }
 
-        return decode_transaction(selectedTx.tx_bytes);
+  async getTransactionByHash(
+    request: TransactionByHashRequest
+  ): Promise<TransactionByHashResponse> {
+    const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
+    const selectedTx = tx.find(
+      (t) => t.tx_hash === bytesToString(request.txHash)
+    );
+    if (!selectedTx) {
+      throw new Error('Tx doesn`t exist');
     }
 
-    async getTransactions(startHeight?: number, endHeight?: number) {
-        const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
-        let data: Transaction[] = [];
-        if (startHeight && endHeight) {
-            data = tx.filter(
-                (i) => i.block_height >= startHeight && i.block_height <= endHeight
-            );
-        } else if (startHeight && !endHeight) {
-            data = tx.filter((i) => i.block_height >= startHeight);
-        } else {
-            data = tx;
-        }
+    return decode_transaction(selectedTx.tx_bytes);
+  }
 
-        return data.map((i) => ({
-            block_height: i.block_height,
-            tx_hash: i.tx_hash,
-            tx: decode_transaction(i.tx_bytes),
-        }));
+  async getTransactions(
+    request?: TransactionsRequest
+  ): Promise<TransactionsResponse[]> {
+    const tx: Transaction[] = await this.indexedDb.getAllValue('tx');
+    let data: Transaction[] = [];
+    if (request?.startHeight && request?.endHeight) {
+      data = tx.filter(
+        (i) =>
+          i.block_height >= request.startHeight &&
+          i.block_height <= request.endHeight
+      );
+    } else if (request?.startHeight && !request?.endHeight) {
+      data = tx.filter((i) => i.block_height >= request.startHeight);
+    } else {
+      data = tx;
     }
 
-    async getNoteByCommitment(noteCommitment: string) {
-        const notes = await this.getNotes();
+    return data.map((i) => {
+      return {
+        blockHeight: i.block_height as any,
+        txHash: stringToBytes(i.tx_hash),
+        tx: decode_transaction(i.tx_bytes),
+      } as TransactionsResponse;
+    });
+  }
 
-        const selectedNote = notes.find(
-            (n) => n.note_commitment === noteCommitment
-        );
+  async getFMDParameters(
+    request: FMDParametersRequest
+  ): Promise<FMDParametersResponse> {
+    const fmd: FmdParameters[] = await this.indexedDb.getAllValue(
+      'fmd_parameters'
+    );
 
-        if (!selectedNote) {
-            throw new Error('Note doesn`t exist');
-        }
-        return selectedNote;
-    }
-
-    async getFMDParameters(request: FMDParametersRequest): Promise<FMDParametersResponse> {
-        const fmd: FmdParameters[] = await this.indexedDb.getAllValue('fmd_parameters');
-
-        return new FMDParametersResponse({
-            parameters: fmd[0]
-        })
-    }
+    return {
+      parameters: fmd[0],
+    } as FMDParametersResponse;
+  }
 }
