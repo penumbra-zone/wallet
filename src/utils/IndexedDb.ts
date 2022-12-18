@@ -1,7 +1,17 @@
 import { IDBPDatabase, openDB } from 'idb';
 
-export type TableName = 'assets' | 'chainParameters' | 'notes' | 'tx' | 'fmd_parameters' | 'nct_commitments' |
-    'nct_forgotten' | 'nct_hashes' | 'nct_position' | 'spendable_notes' | 'tx_by_nullifier' ;
+export type TableName =
+  | 'assets'
+  | 'chainParameters'
+  | 'notes'
+  | 'tx'
+  | 'fmd_parameters'
+  | 'nct_commitments'
+  | 'nct_forgotten'
+  | 'nct_hashes'
+  | 'nct_position'
+  | 'spendable_notes'
+  | 'tx_by_nullifier';
 
 export class IndexedDb {
   private database: string;
@@ -18,7 +28,7 @@ export class IndexedDb {
         upgrade(db: IDBPDatabase) {
           db.createObjectStore('assets', {
             autoIncrement: true,
-            keyPath: 'denom',
+            keyPath: 'decodeId',
           });
 
           db.createObjectStore('chainParameters', {
@@ -34,10 +44,9 @@ export class IndexedDb {
             keyPath: 'tx_hash',
           });
 
-          db.createObjectStore('fmd_parameters',
-              {
-                keyPath: 'precisionBits',
-              });
+          db.createObjectStore('fmd_parameters', {
+            keyPath: 'precisionBits',
+          });
 
           db.createObjectStore('nct_commitments', {
             keyPath: 'position',
@@ -63,8 +72,6 @@ export class IndexedDb {
             autoIncrement: true,
             keyPath: 'nullifier',
           });
-
-
         },
       });
     } catch (error) {
@@ -98,7 +105,7 @@ export class IndexedDb {
     const tx = this.db.transaction(tableName, 'readwrite');
     const store = tx.objectStore(tableName);
     for (const value of values) {
-      const result = await store.put(value);
+      await store.put(value);
     }
     return this.getAllValue(tableName);
   }

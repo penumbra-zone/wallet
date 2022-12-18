@@ -30,7 +30,7 @@ import { ExtensionStorage, StorageLocalState } from './storage';
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig';
 import { IndexedDb, TableName } from './utils';
 import { CreateWalletInput, ISeedWalletInput } from './wallets';
-import {FMDParametersRequest} from "@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb";
+import { FMDParametersRequest } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb';
 
 const bgPromise = setupBackgroundService();
 
@@ -462,25 +462,25 @@ class BackgroundService extends EventEmitter {
         return this.viewProtocolService.getTransactions(startHeight, endHeight);
       },
       getNoteByCommitment: async (noteCommitment: string) => {
-         const canIUse = this.permissionsController.hasPermission(
-           origin,
-           PERMISSIONS.GET_NOTE_BY_COMMITMENT
-         );
-         if (!canIUse) {
-           throw new Error('Access denied');
-         }
-        return this.viewProtocolService.getNoteByCommitment(noteCommitment);
-      },
-      getFmdParameters: async (request: FMDParametersRequest) => {
         const canIUse = this.permissionsController.hasPermission(
-            origin,
-            PERMISSIONS.GET_FMD_PARAMETERS
+          origin,
+          PERMISSIONS.GET_NOTE_BY_COMMITMENT
         );
         if (!canIUse) {
           throw new Error('Access denied');
         }
-        return this.viewProtocolService.getFMDParameters(request);
-      }
+        return this.viewProtocolService.getNoteByCommitment(noteCommitment);
+      },
+      getFmdParameters: async () => {
+        const canIUse = this.permissionsController.hasPermission(
+          origin,
+          PERMISSIONS.GET_FMD_PARAMETERS
+        );
+        if (!canIUse) {
+          throw new Error('Access denied');
+        }
+        return this.viewProtocolService.getFMDParameters();
+      },
     };
   }
 

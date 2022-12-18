@@ -1,3 +1,5 @@
+import { Asset } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/crypto/v1alpha1/crypto_pb';
+
 export type BackgroundType = {
   addKey: (key: { [key: string]: any }) => void;
   approve: (id: string, index: number) => void;
@@ -15,7 +17,6 @@ export type BackgroundType = {
   unlock: (password: string) => void;
 };
 
-export type EncodeAsset = {
-  denom: string;
-  id: string;
+export type EncodeAsset = Asset & {
+  decodeId: string;
 };
