@@ -27,12 +27,12 @@ import { NetworkController } from './NetworkController';
 import { encode } from 'bech32-buffer';
 import { EncodeAsset } from '../types';
 import { IndexedDb } from '../utils';
-import { Asset } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/crypto/v1alpha1/crypto_pb';
 
 export type Transaction = {
-  block_height: number;
-  tx_bytes: string;
-  tx_hash: string;
+  txHashHex: string;
+  blockHeight: bigint;
+  txBytes: string;
+  txHash: Uint8Array;
 };
 
 export class ClientController {
@@ -263,9 +263,12 @@ export class ClientController {
                   statePayloadNote.note.noteCommitment.inner
                 ),
                 noteCommitment: statePayloadNote.note.noteCommitment,
+                // why we return 1 nullifier, if we have few nullifiers
+                // nullifier:{inner: new TextEncoder().encode(compactBlock.nullifiers)},
                 nullifier: compactBlock.nullifiers,
                 heightCreated: compactBlock.height,
                 source: statePayloadNote.source,
+                // addressIndex change to {inner: bytes}
                 addressIndex: BigInt(0),
                 note: {
                   noteBlinding: new TextEncoder().encode(
@@ -292,7 +295,7 @@ export class ClientController {
             }
             await this.saveTransaction(
               compactBlock.height,
-              this.toHexString(statePayloadNote.source.inner)
+              statePayloadNote.source.inner
             );
 
             const oldState = this.store.getState().lastSavedBlock;
@@ -319,21 +322,25 @@ export class ClientController {
     await this.indexedDb.putValue('fmd_parameters', fmdParameters);
   }
 
-  async saveTransaction(height: bigint, sourceHex: string) {
+  async saveTransaction(height: bigint, sourceHex: Uint8Array) {
     const { tendermint } =
       this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
 
-    const response = await fetch(`${tendermint}/tx?hash=0x${sourceHex}`, {
-      headers: {
-        'Cache-Control': 'no-cache',
-      },
-    });
+    const response = await fetch(
+      `${tendermint}/tx?hash=0x${this.toHexString(sourceHex)}`,
+      {
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      }
+    );
     const data = await response.json();
 
-    let tx: Transaction = {
-      tx_hash: sourceHex,
-      tx_bytes: data.result.tx,
-      block_height: Number(height),
+    const tx: Transaction = {
+      txHashHex: this.toHexString(sourceHex),
+      txHash: sourceHex,
+      txBytes: data.result.tx,
+      blockHeight: height,
     };
 
     await this.indexedDb.putValue('tx', tx);

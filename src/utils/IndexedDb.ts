@@ -41,7 +41,7 @@ export class IndexedDb {
           });
 
           db.createObjectStore('tx', {
-            keyPath: 'tx_hash',
+            keyPath: 'txHashHex',
           });
 
           db.createObjectStore('fmd_parameters', {

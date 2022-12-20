@@ -30,7 +30,13 @@ import { ExtensionStorage, StorageLocalState } from './storage';
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig';
 import { IndexedDb, TableName } from './utils';
 import { CreateWalletInput, ISeedWalletInput } from './wallets';
-import { FMDParametersRequest } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb';
+import {
+  AssetsRequest,
+  FMDParametersRequest,
+  NotesRequest,
+  StatusRequest,
+} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb';
+import { ChainParametersRequest } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
 
 const bgPromise = setupBackgroundService();
 
@@ -384,7 +390,7 @@ class BackgroundService extends EventEmitter {
           PERMISSIONS.APPROVED
         );
       },
-      getAssets: async () => {
+      getAssets: async (request?: AssetsRequest) => {
         const canIUse = this.permissionsController.hasPermission(
           origin,
           PERMISSIONS.GET_ASSETS
@@ -395,7 +401,7 @@ class BackgroundService extends EventEmitter {
         }
         return this.viewProtocolService.getAssets();
       },
-      getChainParameters: async () => {
+      getChainParameters: async (request?: ChainParametersRequest) => {
         const canIUse = this.permissionsController.hasPermission(
           origin,
           PERMISSIONS.GET_CHAIN_PARAMETERS
@@ -405,7 +411,7 @@ class BackgroundService extends EventEmitter {
         }
         return this.viewProtocolService.getChainParameters();
       },
-      getNotes: async () => {
+      getNotes: async (request?: NotesRequest) => {
         const canIUse = this.permissionsController.hasPermission(
           origin,
           PERMISSIONS.GET_NOTES
@@ -415,7 +421,17 @@ class BackgroundService extends EventEmitter {
         }
         return this.viewProtocolService.getNotes();
       },
-      getStatus: async () => {
+      getNoteByCommitment: async (request: object) => {
+        const canIUse = this.permissionsController.hasPermission(
+          origin,
+          PERMISSIONS.GET_NOTE_BY_COMMITMENT
+        );
+        if (!canIUse) {
+          throw new Error('Access denied');
+        }
+        return this.viewProtocolService.getNoteByCommitment(request);
+      },
+      getStatus: async (request?: StatusRequest) => {
         const canIUse = this.permissionsController.hasPermission(
           origin,
           PERMISSIONS.GET_CHAIN_CURRENT_STATUS
@@ -425,10 +441,7 @@ class BackgroundService extends EventEmitter {
         }
         return this.viewProtocolService.getStatus();
       },
-      getTransactionHashes: async (
-        startHeight?: number,
-        endHeight?: number
-      ) => {
+      getTransactionHashes: async (request: object) => {
         const canIUse = this.permissionsController.hasPermission(
           origin,
           PERMISSIONS.GET_TRANSACTION_HASHES
@@ -436,12 +449,9 @@ class BackgroundService extends EventEmitter {
         if (!canIUse) {
           throw new Error('Access denied');
         }
-        return this.viewProtocolService.getTransactionHashes(
-          startHeight,
-          endHeight
-        );
+        return this.viewProtocolService.getTransactionHashes(request);
       },
-      getTransactionByHash: async (txHash: string) => {
+      getTransactionByHash: async (request: object) => {
         const canIUse = this.permissionsController.hasPermission(
           origin,
           PERMISSIONS.GET_TRANSACTION_BY_HASH
@@ -449,9 +459,9 @@ class BackgroundService extends EventEmitter {
         if (!canIUse) {
           throw new Error('Access denied');
         }
-        return this.viewProtocolService.getTransactionByHash(txHash);
+        return this.viewProtocolService.getTransactionByHash(request);
       },
-      getTransactions: async (startHeight?: number, endHeight?: number) => {
+      getTransactions: async (request: object) => {
         const canIUse = this.permissionsController.hasPermission(
           origin,
           PERMISSIONS.GET_TRANSACTIONS
@@ -459,18 +469,9 @@ class BackgroundService extends EventEmitter {
         if (!canIUse) {
           throw new Error('Access denied');
         }
-        return this.viewProtocolService.getTransactions(startHeight, endHeight);
+        return this.viewProtocolService.getTransactions(request);
       },
-      getNoteByCommitment: async (noteCommitment: string) => {
-        const canIUse = this.permissionsController.hasPermission(
-          origin,
-          PERMISSIONS.GET_NOTE_BY_COMMITMENT
-        );
-        if (!canIUse) {
-          throw new Error('Access denied');
-        }
-        return this.viewProtocolService.getNoteByCommitment(noteCommitment);
-      },
+
       getFmdParameters: async () => {
         const canIUse = this.permissionsController.hasPermission(
           origin,
