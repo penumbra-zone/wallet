@@ -240,29 +240,59 @@ export class ClientController {
             );
             if (decryptedNote === null) continue;
 
-            decryptedNote.height = Number(compactBlock.height);
-            decryptedNote.note_commitment = this.toHexString(
-              statePayloadNote.note.noteCommitment.inner
-            );
-            decryptedNote.ephemeralKey = this.toHexString(
-              statePayloadNote.note.ephemeralKey
-            );
-            decryptedNote.amount = decryptedNote.value.amount.lo;
+            // decryptedNote.height = Number(compactBlock.height);
+            // decryptedNote.note_commitment = this.toHexString(
+            //   statePayloadNote.note.noteCommitment.inner
+            // );
+            // decryptedNote.ephemeralKey = this.toHexString(
+            //   statePayloadNote.note.ephemeralKey
+            // ); // ??
+            // decryptedNote.amount = decryptedNote.value.amount.lo; //??
 
-            decryptedNote.asset = decryptedNote.value.asset_id;
-            decryptedNote.nullifier = compactBlock.nullifiers.map((i) =>
-              this.toHexString(i.inner)
-            );
-            decryptedNote.source = this.toHexString(
-              statePayloadNote.source.inner
-            );
+            // decryptedNote.asset = decryptedNote.value.asset_id;//??
+            // decryptedNote.nullifier = compactBlock.nullifiers.map((i) =>
+            //   this.toHexString(i.inner)
+            // );//?
+            // decryptedNote.source = this.toHexString(
+            //   statePayloadNote.source.inner
+            // ); //?
 
-            if (decryptedNote.amount != 0) {
-              await this.indexedDb.putValue('notes', decryptedNote);
+            if (decryptedNote.value.amount.lo !== 0) {
+              const savedNote = {
+                noteCommitmentHex: this.toHexString(
+                  statePayloadNote.note.noteCommitment.inner
+                ),
+                noteCommitment: statePayloadNote.note.noteCommitment,
+                nullifier: compactBlock.nullifiers,
+                heightCreated: compactBlock.height,
+                source: statePayloadNote.source,
+                addressIndex: BigInt(0),
+                note: {
+                  noteBlinding: new TextEncoder().encode(
+                    decryptedNote.note_blinding
+                  ),
+                  address: {
+                    inner: new TextEncoder().encode(decryptedNote.address),
+                  },
+                  value: {
+                    amount: {
+                      lo: BigInt(decryptedNote.value.amount.lo),
+                      hi: BigInt(decryptedNote.value.amount.hi),
+                    },
+                    assetId: {
+                      inner: new TextEncoder().encode(
+                        decryptedNote.value.asset_id
+                      ),
+                    },
+                  },
+                },
+              };
+
+              await this.indexedDb.putValue('notes', savedNote);
             }
             await this.saveTransaction(
               compactBlock.height,
-              decryptedNote.source
+              this.toHexString(statePayloadNote.source.inner)
             );
 
             const oldState = this.store.getState().lastSavedBlock;

@@ -37,7 +37,7 @@ export class IndexedDb {
           });
           db.createObjectStore('notes', {
             autoIncrement: true,
-            keyPath: 'note_commitment',
+            keyPath: 'noteCommitmentHex',
           });
 
           db.createObjectStore('tx', {
