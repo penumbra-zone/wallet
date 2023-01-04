@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@buf/bufbuild_connect-web_penumbra-zone_penumbra": "^1.13.30",
+    "@buf/bufbuild_connect-web_penumbra-zone_penumbra": "^1.13.35",
     "@reduxjs/toolkit": "^1.8.6",
     "@sentry/react": "^7.16.0",
     "axios": "^1.1.3",
