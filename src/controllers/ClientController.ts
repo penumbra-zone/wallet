@@ -19,7 +19,7 @@ import {
   CompactBlock,
   FmdParameters,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
-import { decrypt_note } from 'penumbra-web-assembly';
+import {decrypt_note, ViewClient} from 'penumbra-web-assembly';
 import { WalletController } from './WalletController';
 import { extension } from '../lib';
 import { RemoteConfigController } from './RemoteConfigController';
@@ -104,6 +104,8 @@ export class ClientController {
       decodeId: encode('passet', asset.id?.inner, 'bech32m'),
     }));
 
+    console.log(encodeAsset);
+
     await this.indexedDb.putBulkValue('assets', encodeAsset);
   }
 
@@ -170,7 +172,12 @@ export class ClientController {
       for await (const response of client.compactBlockRange(
         compactBlockRangeRequest
       )) {
-        await this.scanBlock(response.compactBlock, fvk);
+        // await this.scanBlock(response.compactBlock, fvk);
+        console.log("New block ", response.compactBlock)
+        let viewClient = ViewClient.new(fvk,100n);
+        let scanResult = viewClient.scan_block(response.compactBlock);
+        console.log(scanResult);
+
         if (Number(response.compactBlock.height) < lastBlock) {
           if (Number(response.compactBlock.height) % 10000 === 0) {
             const oldState = this.store.getState().lastSavedBlock;
