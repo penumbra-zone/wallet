@@ -116,6 +116,7 @@ export class ViewProtocolService {
       'lastSavedBlock'
     );
     const lasBlock = await this.getLastExistBlock();
+
     return new StatusResponse({
       syncHeight: lastSavedBlock.testnet,
       catchingUp: lastSavedBlock.testnet === lasBlock,
@@ -283,7 +284,7 @@ export class ViewProtocolService {
         fmdClues: decodeTransaction.body.fmd_clues.map((i) => ({
           inner: new TextEncoder().encode(i),
         })),
-        //wtf
+        //TODO wtf
         // encryptedMemo: decodeTransaction.body.encrypted_memo,
       },
     };

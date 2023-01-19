@@ -40,7 +40,7 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
     <ModalWrapper
       show={show}
       onClose={onClose}
-      position={isDesktop ? "top_right": "center"}
+      position={isDesktop ? 'top_right' : 'center'}
       className={`py-[20px] px-[0px] w-[296px] ${isDesktop && 'mr-[106px]'}`}
     >
       <div className="flex flex-col">

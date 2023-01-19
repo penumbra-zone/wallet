@@ -196,7 +196,7 @@ export class ClientController {
             [this.configApi.getNetwork()]: Number(response.compactBlock.height),
           };
 
-          this.store.updateState({ lastBlockHeight, lastSavedBlock });
+          this.store.updateState({ lastSavedBlock, lastBlockHeight });
         }
       }
     } catch (error) {}

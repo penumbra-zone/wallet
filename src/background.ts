@@ -82,6 +82,16 @@ async function setupBackgroundService() {
   updateBadge();
 
   backgroundService.clientController.getCompactBlockRange();
+  //TODO add status stream
+  // setInterval(() => {
+  //   if (backgroundService.extensionStorage.getState('isLocked').isLocked) {
+  //     console.log('lastBlock');
+
+  //     console.log(backgroundService.extensionStorage.getState('isLocked'));
+
+  //     backgroundService.clientController.getLastExistBlock();
+  //   }
+  // }, 5000);
 
   // Notification window management
   const windowManager = new WindowManager({ extensionStorage });
@@ -384,6 +394,9 @@ class BackgroundService extends EventEmitter {
         await this.validatePermission(origin, connectionId);
         return await this._publicState(origin);
       },
+      getStatusStream: async () => {
+        const { lastSavedBlock, lastBlockHeight } = this.getState();
+      },
       resourceIsApproved: async () => {
         return this.permissionsController.hasPermission(
           origin,
@@ -431,6 +444,7 @@ class BackgroundService extends EventEmitter {
         }
         return this.viewProtocolService.getNoteByCommitment(request);
       },
+
       getStatus: async (request?: StatusRequest) => {
         const canIUse = this.permissionsController.hasPermission(
           origin,
