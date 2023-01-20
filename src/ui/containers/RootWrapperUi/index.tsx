@@ -39,9 +39,9 @@ export const RootWrapperUi: React.FC<RootWrapperUiProps> = ({ children }) => {
   return (
     <>
       <div className="w-[100%] min-h-[100vh] flex flex-col items-center overflow-y-hidden overflow-x-hidden">
-        <div className="w-[400px] flex flex-col">
+        <div className="w-[100%] flex flex-col">
           {isHeader && (
-            <div className="flex items-center justify-between px-[40px]  mt-[20px]">
+            <div className="flex items-center justify-between mt-[20px]">
               <Logo size="small" />
               {selectedAccount.addressByIndex &&
                 isRedirect &&

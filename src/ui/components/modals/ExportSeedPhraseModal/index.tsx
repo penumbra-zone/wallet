@@ -47,7 +47,7 @@ export const ExportSeedPhraseModal: React.FC<SuccessCreateModalProps> = ({
       show={show}
       onClose={handleCloseAndCleanKey}
       position="center"
-      className="w-[335px] px-[16px] px-[14px]"
+      className="px-[16px] px-[14px]"
     >
       <div className="flex flex-col">
         <p className="h1_ext mb-[12px]">Recovery passphrase</p>

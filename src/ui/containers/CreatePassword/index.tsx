@@ -15,7 +15,7 @@ export const CreatePassword: React.FC<CreatePasswordProps> = ({}) => {
 
   return (
     <div className="w-[100%] flex items-center justify-center">
-      <div className="w-[400px] flex flex-col items-center justify-center">
+      <div className="w-[100%] flex flex-col items-center justify-center">
         <div className="self-start">
           <Button
             mode="icon_transparent"

@@ -39,7 +39,7 @@ export const Validators = () => {
 
   return (
     <div className="w-[100%] mt-[20px] mb-[20px]">
-      <div className="w-[816px]mx-[0px] flex flex-col items-center">
+      <div className="mx-[0px] flex flex-col items-center">
         <div className="w-[100%] flex items-center justify-between rounded-[15px] bg-brown py-[24px] px-[20px] mb-[24px]">
           <div className="flex flex-col">
             <p className="h3 mb-[16px]">Total PNB Amount </p>

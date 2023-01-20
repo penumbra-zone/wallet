@@ -12,7 +12,7 @@ export const SettingsExtenion = () => {
 
   return (
     <div className="min-h-[500px] w-[100%]">
-      <div className="h-[100%] w-[calc(100%-80px)] mx-[40px] bg-brown rounded-[15px] pb-[28px]">
+      <div className="h-[100%] bg-brown rounded-[15px] pb-[28px]">
         {pathname === routesPath.SETTINGS ? (
           <></>
         ) : (

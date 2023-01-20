@@ -64,7 +64,7 @@ export const CreatePasswordForm: React.FC<CreatePasswordFormProps> = ({
   // };
 
   return (
-    <div>
+    <>
       <div className="w-[100%] mb-[24px]">
         <Input
           label="New Password"
@@ -133,6 +133,6 @@ export const CreatePasswordForm: React.FC<CreatePasswordFormProps> = ({
           onClick={onClick(password.newPass)}
         />
       </div>
-    </div>
+    </>
   );
 };

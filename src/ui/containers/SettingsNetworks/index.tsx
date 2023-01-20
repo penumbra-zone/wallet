@@ -114,7 +114,7 @@ export const SettingsNetworks = () => {
         Networks
       </p>
       <div className="w-[100%] ext:h-[100%] tablet:h-[calc(100%-74px)] flex">
-        <div className="ext:w-[100%] tablet:w-[816px]  flex rounded-[15px]">
+        <div className="ext:w-[100%] flex rounded-[15px]">
           <div className="ext:w-[100%] tablet:w-[55%]  flex flex-col justify-between pt-[24px]">
             <div>
               <Input

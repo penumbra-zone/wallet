@@ -21,7 +21,7 @@ export const ActiveMessage = () => {
   };
 
   return (
-    <div className="w-[100%] h-[100vh] flex flex-col items-center justify-between py-[30px] px-[16px] bg-brown">
+    <div className="w-[100%] h-[100vh] flex flex-col items-center justify-between py-[30px] bg-brown">
       <div className="w-[100%] flex flex-col items-center">
         <p className="h1_ext mb-[16px]">Connect with Penumbra</p>
         <p className="text_body_ext mb-[16px]">Select accounts to use</p>

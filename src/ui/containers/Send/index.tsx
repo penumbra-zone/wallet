@@ -10,7 +10,7 @@ export const Send = () => {
 
   return (
     <div className="w-[100%] flex items-center justify-center">
-      <div className="w-[400px] ext:py-[40px] tablet:py-[0px] ext:px-[40px] tablet:px-[0px] tablet:mb-[20px]">
+      <div className="ext:py-[40px] tablet:py-[0px] ext:px-[40px] tablet:px-[0px] tablet:mb-[20px]">
         {isOpenDetailTx ? (
           <DetailTxBeforeSend
             setIsOpenDetailTx={setIsOpenDetailTx}

@@ -39,7 +39,7 @@ export const SeedPhrase: React.FC<SeedPhraseProps> = ({}) => {
 
   return (
     <div className="w-[100%] flex items-center justify-center">
-      <div className="w-[504px] flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center">
         <div className="self-start">
           <Button
             mode="icon_transparent"

@@ -99,7 +99,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
   return (
     <>
       <div className="w-[100%] flex items-center justify-center">
-        <div className="w-[816px] flex flex-col  justify-center">
+        <div className="flex flex-col  justify-center">
           <div>
             <Button
               mode="icon_transparent"

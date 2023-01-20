@@ -9,7 +9,7 @@ export const Rules = () => {
 
   return (
     <div className="w-[100%] flex items-center justify-center mt-[40px] mb-[30px]">
-      <div className="w-[608px] flex flex-col justify-center">
+      <div className="flex flex-col justify-center">
         <p className="h1 mb-[16px]">Help us to improve Penumbra</p>
         <p className="text_body text-light_grey mb-[16px]">
           Penumbra would like to collect basic usage data to better understand
