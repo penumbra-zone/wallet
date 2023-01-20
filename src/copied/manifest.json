@@ -27,7 +27,8 @@
     "alarms",
     "storage",
     "unlimitedStorage",
-    "idle"
+    "idle",
+    "activeTab"
   ],
   "web_accessible_resources": [
     {
