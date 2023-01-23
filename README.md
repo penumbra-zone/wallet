@@ -3,8 +3,7 @@ Link to web store - https://chrome.google.com/webstore/detail/penumbra-wallet/lk
 ## Install Penumbra protobuf types:
     -   npm install @buf/bufbuild_es_penumbra-zone_penumbra;
 ## Copy/paste ProviderPenumbra class to your project from https://github.com/zpoken/penumbra_dapp/blob/main/src/utils/ProviderPenumbra.ts;
-## Web3 Browser Detection
--   To verify if the browser is running Penumbra, copy and paste the code snippet below in the developer console of your web browser:
+## Web3 Browser Detection(To verify if the browser is running Penumbra, copy and paste the code snippet below in the developer console of your web browser)
     const checkIsPenumbraInstalled = async () => {
         const isInstalled = await isPenumbraInstalled();
         return isInstalled;
