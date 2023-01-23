@@ -30,7 +30,7 @@ export const ActionBox: React.FC<ActionBoxProps> = ({
           </p>
         </div>
       </div>
-      <div className="w-[296px]">
+      <div className="ext:w-[100%] laptop:w-[296px]">
         <Button title={buttonTitle} mode="gradient" onClick={onClick} />
       </div>
     </div>

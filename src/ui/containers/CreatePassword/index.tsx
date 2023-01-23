@@ -15,20 +15,22 @@ export const CreatePassword: React.FC<CreatePasswordProps> = ({}) => {
 
   return (
     <div className="w-[100%] flex items-center justify-center">
-      <div className="w-[100%] flex flex-col items-center justify-center">
-        <div className="self-start">
-          <Button
-            mode="icon_transparent"
-            onClick={handleBack}
-            title="Back"
-            iconLeft={<ChevronLeftIcon stroke="#E0E0E0" />}
+      <div className="w-[400px] flex items-center justify-center">
+        <div className="w-[100%] flex flex-col items-center justify-center">
+          <div className="self-start">
+            <Button
+              mode="icon_transparent"
+              onClick={handleBack}
+              title="Back"
+              iconLeft={<ChevronLeftIcon stroke="#E0E0E0" />}
+            />
+          </div>
+          <p className="h1 mt-[40px] mb-[24px]">Create password</p>
+          <CreatePasswordForm
+            buttonTitle="Create"
+            onClick={handleSubmitPassword}
           />
         </div>
-        <p className="h1 mt-[40px] mb-[24px]">Create password</p>
-        <CreatePasswordForm
-          buttonTitle="Create"
-          onClick={handleSubmitPassword}
-        />
       </div>
     </div>
   );

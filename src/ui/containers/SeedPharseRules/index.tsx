@@ -63,12 +63,12 @@ export const SeedPharseRules = () => {
   return (
     <div className="w-[100%] flex flex-col items-center justify-center">
       <p className="h1 mb-[16px]">Protect your wallet</p>
-      <div className="flex items-stretch flex-wrap justify-center -mx-[8px]">
+      <div className="flex items-stretch flex-wrap justify-center ext:gap-[8px] tablet:gap-[16px]">
         {tips.map((i, index) => {
           return (
             <div
               key={index}
-              className="border-[1px] border-solid border-dark_grey rounded-[15px] flex-[0_0_48%] mt-[24px] mx-[8px] px-[14px] pt-[24px] pb-[48px] py-[24px] bg-brown"
+              className="ext:w-[100%] tablet:w-[calc(50%-8px)] border-[1px] border-solid border-dark_grey rounded-[15px] px-[14px] pt-[24px] pb-[48px] bg-brown"
             >
               <p className="h2 text-center mb-[16px]">{i.header}</p>
               {i.children}

@@ -35,13 +35,13 @@ module.exports = {
           DEFAULT: '#368E00',
         },
         toogle_from: {
-          DEFAULT: "rgba(139, 228, 217, 0.6)",
+          DEFAULT: 'rgba(139, 228, 217, 0.6)',
         },
         toogle_via: {
-          DEFAULT: "rgba(200, 184, 128, 0.6)",
+          DEFAULT: 'rgba(200, 184, 128, 0.6)',
         },
         toogle_to: {
-          DEFAULT: "rgba(255, 144, 47, 0.5)",
+          DEFAULT: 'rgba(255, 144, 47, 0.5)',
         },
       },
       boxShadow: {
@@ -53,6 +53,7 @@ module.exports = {
     screens: {
       ext: '0px',
       tablet: '680px',
+      laptop: '1280px',
     },
   },
 

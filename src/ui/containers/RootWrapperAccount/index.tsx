@@ -40,7 +40,7 @@ export const RootWrapperAccount: React.FC<RootWrapperAccountProps> = ({
 
   return (
     <>
-      <div className="w-[100%] min-h-[100vh] flex flex-col items-center">
+      <div className="w-[100%] min-h-[100vh] flex flex-col items-center ext:px-[40px] laptop:px-[312px]">
         <div className="w-[100%] flex flex-col">
           <div className="flex items-center justify-between">
             {isHeader && (

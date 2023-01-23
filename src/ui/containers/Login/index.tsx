@@ -23,7 +23,7 @@ export const Login: React.FC<LoginProps> = ({}) => {
 
   return (
     <div className="w-[100%] flex items-center justify-center">
-      <div className="w-[100%] ext:py-[20px] tablet:py-[0px] ext:bg-brown tablet:bg-transparent rounded-[15px] flex flex-col items-center justify-center">
+      <div className="w-[400px] ext:py-[20px] tablet:py-[0px] ext:px-[16px] tablet:px-[0px] ext:bg-brown tablet:bg-transparent rounded-[15px] flex flex-col items-center justify-center">
         <p className="h1">Welcome back!</p>
         <p className="text_body text-light_grey mb-[40px] ext:mt-[12px] tablet:mt-[16px]">
           A decentralized network awaits

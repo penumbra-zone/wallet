@@ -24,6 +24,8 @@ export const RootWrapperUi: React.FC<RootWrapperUiProps> = ({ children }) => {
   const [isOpenAccountPopup, setIsOpenAccountPopup] = useState<boolean>(false);
   const [isOpenNetworkPopup, setIsOpenNetworkPopup] = useState<boolean>(false);
 
+  console.log(pathname);
+
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
   const isRedirect = useAccountsSelector(selectRedirectToAccountPage);
   const state = useAccountsSelector(selectState);
@@ -38,7 +40,11 @@ export const RootWrapperUi: React.FC<RootWrapperUiProps> = ({ children }) => {
 
   return (
     <>
-      <div className="w-[100%] min-h-[100vh] flex flex-col items-center overflow-y-hidden overflow-x-hidden">
+      <div
+        className={`w-[100%] min-h-[100vh] flex flex-col items-center overflow-y-hidden overflow-x-hidden ${
+          pathname === '/active-message' ? '' : 'px-[40px]'
+        }`}
+      >
         <div className="w-[100%] flex flex-col">
           {isHeader && (
             <div className="flex items-center justify-between mt-[20px]">

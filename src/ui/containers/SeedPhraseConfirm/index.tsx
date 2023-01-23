@@ -100,8 +100,8 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
   const handleCloseModal = () => setIsShowModal(false);
 
   return (
-    <>
-      <div className="w-[100%] flex items-center justify-center">
+    <div className="w-[100%] flex items-center justify-center">
+      <div className="w-[400px] flex items-center justify-center">
         <div className="w-[100%] flex flex-col items-center justify-center">
           <div className="self-start">
             <Button
@@ -165,6 +165,6 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
         </div>
       </div>
       <SuccessCreateModal show={isShowModal} onClose={handleCloseModal} />
-    </>
+    </div>
   );
 };
