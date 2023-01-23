@@ -28,8 +28,8 @@ Link to web store - https://chrome.google.com/webstore/detail/penumbra-wallet/lk
 ## Query for the current chain parameters.
      penumbra.getChainParameters().then(data => console.log(data))
 ## Query for the transaction hashes in the given range of blocks.
-     penumbra.getTransactionHashes().then(data => console.log(data))
+     penumbra.getTransactionHashes({start_height,end_height}).then(data => console.log(data))
 ## Query for the full transactions in the given range of blocks.
-     penumbra.getTransactions().then(data => console.log(data))
+     penumbra.getTransactions({start_height,end_height}).then(data => console.log(data))
 ## Query for a given transaction hash.
      penumbra.getTransactionByHash({txHash}).then(data => console.log(data))
