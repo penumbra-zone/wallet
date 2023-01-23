@@ -19,7 +19,7 @@ import ObservableStore from 'obs-store';
 import {
     ChainParameters,
     CompactBlock,
-    FmdParameters,
+    FmdParameters, StatePayload,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
 import {decrypt_note, ViewClient} from 'penumbra-web-assembly';
 import {WalletController} from './WalletController';
@@ -31,6 +31,11 @@ import {EncodeAsset} from '../types';
 import {IndexedDb} from '../utils';
 
 import snakeize from 'snakeize'
+import {
+    MerkleRoot,
+    Nullifier
+} from "@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/crypto/v1alpha1/crypto_pb";
+import {BatchSwapOutputData} from "@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/dex/v1alpha1/dex_pb";
 
 
 export type Transaction = {
@@ -196,11 +201,33 @@ export class ClientController {
             for await (const response of client.compactBlockRange(
                 compactBlockRangeRequest
             )) {
-                // await this.scanBlock(response.compactBlock, fvk);
-                console.log("New block ", response.compactBlock)
-                let viewClient = new ViewClient(fvk, 100n, this.loadStoredTree());
-                let scanResult = await viewClient.scan_block(snakeize(response.compactBlock));
-                console.log(scanResult);
+
+                let storedTree = await this.loadStoredTree();
+
+
+                await this.scanBlock(response.compactBlock, fvk);
+
+                let viewClient = new ViewClient(fvk, 100n, storedTree);
+
+                console.log(response.compactBlock);
+                let snakeizeBlock = snakeize(this.convertCompactBlock(
+                    response.compactBlock));
+                console.log(snakeizeBlock);
+
+                for (let swap of snakeizeBlock.swap_outputs ) {
+                    swap.delta_1 =  swap.delta1
+                    swap.delta_2 =  swap.delta2
+                    swap.lambda_1 =  swap.lambda1
+                    swap.lambda_2 =  swap.lambda2
+                    swap.trading_pair.asset_1 =  swap.trading_pair.asset1
+                    swap.trading_pair.asset_2 =  swap.trading_pair.asset2
+
+                }
+                let scanResult = await viewClient.scan_block(snakeizeBlock, BigInt(storedTree.last_position), BigInt(storedTree.last_forgotten));
+
+                this.handleScanResult(response.compactBlock, scanResult);
+
+
 
                 if (Number(response.compactBlock.height) < lastBlock) {
                     if (Number(response.compactBlock.height) % 10000 === 0) {
@@ -231,13 +258,99 @@ export class ClientController {
                 }
             }
         } catch (error) {
+            console.error(error)
         }
     }
 
+    handleScanResult(compactBlock: CompactBlock, scanResult) {
+        console.log(compactBlock.height, scanResult)
+        if (scanResult.new_notes.length !== 0){
+            console.log(compactBlock)
+            console.log(scanResult)
 
-    loadStoredTree(): StoredTree {
+        }
+    }
 
-        return {commitments: [], hashes: [], last_forgotten: 0, last_position: 0};
+    convertCompactBlock(block: CompactBlock): CompactBlock {
+
+        // let transparentInner = this.transparentInner(block)
+        let convertedBlock = this.convertByteArraysToHex(block);
+
+        return this.fixCaseField(convertedBlock);
+    }
+
+    fixCaseField(o) {
+        for (let prop in o) {
+            if (Array.isArray(o[prop])) {
+
+                for (const element of o[prop]) {
+                    this.fixCaseField(element);
+                }
+            } else {
+                if (typeof (o[prop]) === 'object') {
+
+                    this.fixCaseField(o[prop]);
+                } else {
+                    if (prop === "case") {
+                        o[prop] = this.capitalizeFirstLetter(o[prop])
+                    }
+                }
+            }
+        }
+        return o;
+    }
+
+
+
+    convertByteArraysToHex(o) {
+        for (var prop in o) {
+
+            if (Array.isArray(o[prop])) {
+
+                for (const element of o[prop]) {
+                    this.convertByteArraysToHex(element);
+                }
+            } else {
+                if (typeof (o[prop]) === 'object' && !(o[prop] instanceof Uint8Array)) {
+                    this.convertByteArraysToHex(o[prop]);
+                } else {
+                    if (o[prop] instanceof Uint8Array) {
+                        o[prop] = this.toHexString(o[prop])
+                    }
+                }
+            }
+        }
+        return o;
+    }
+
+    capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+
+    async loadStoredTree(): Promise<StoredTree> {
+
+        const nctPosition = await this.indexedDb.getAllValue(
+            'nct_position'
+        )[0];
+
+        const nctForgotten = await this.indexedDb.getAllValue(
+            'nct_forgotten'
+        )[0];
+
+        const nctHashes: StoredHash[] = await this.indexedDb.getAllValue(
+            'nct_hashes'
+        );
+
+        const nctCommitments: StoredCommitment[] = await this.indexedDb.getAllValue(
+            'nct_commitments'
+        );
+
+        return {
+            commitments: nctCommitments, hashes: nctHashes,
+            last_forgotten: nctForgotten == undefined ? 0 : nctForgotten.forgotten,
+            last_position: nctPosition == undefined ? 0 : nctPosition.position
+        };
 
     }
 
@@ -277,6 +390,7 @@ export class ClientController {
                             this.toHexString(statePayloadNote.note.encryptedNote),
                             this.toHexString(statePayloadNote.note.ephemeralKey)
                         );
+                        console.log("decrypted note", decryptedNote)
                         if (decryptedNote === null) continue;
 
                         // decryptedNote.height = Number(compactBlock.height);
