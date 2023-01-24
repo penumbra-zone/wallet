@@ -79,7 +79,7 @@ export class IndexedDb {
         }
     }
 
-    public async getValue(tableName: TableName, id: number) {
+    public async getValue(tableName: TableName, id) {
         const tx = this.db.transaction(tableName, 'readonly');
         const store = tx.objectStore(tableName);
         const result = await store.get(id);

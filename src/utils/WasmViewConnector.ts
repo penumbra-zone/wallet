@@ -78,13 +78,13 @@ export class WasmViewConnector {
 
     async loadStoredTree(): Promise<StoredTree> {
 
-        const nctPosition = await this.indexedDb.getAllValue(
-            'nct_position'
-        )[0];
+        const nctPosition = await this.indexedDb.getValue(
+            'nct_position', "position"
+        );
 
-        const nctForgotten = await this.indexedDb.getAllValue(
-            'nct_forgotten'
-        )[0];
+        const nctForgotten = await this.indexedDb.getValue(
+            'nct_forgotten',"forgotten"
+        );
 
         const nctHashes: StoredHash[] = await this.indexedDb.getAllValue(
             'nct_hashes'
