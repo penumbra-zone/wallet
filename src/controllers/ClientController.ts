@@ -36,6 +36,7 @@ import {
     Nullifier
 } from "@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/crypto/v1alpha1/crypto_pb";
 import {BatchSwapOutputData} from "@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/dex/v1alpha1/dex_pb";
+import {StoredCommitment, StoredHash, StoredTree, WasmViewConnector} from "../utils/WasmViewConnector";
 
 
 export type Transaction = {
@@ -45,31 +46,13 @@ export type Transaction = {
     txHash: Uint8Array;
 };
 
-export type StoredTree = {
-    last_position: number;
-    last_forgotten: number;
-    hashes: StoredHash[]
-    commitments: StoredCommitment[];
-};
-
-export type StoredHash = {
-    position: number;
-    height: number;
-    hash: Uint8Array;
-};
-
-export type StoredCommitment = {
-    position: number;
-    commitment: Uint8Array;
-};
-
-
 export class ClientController {
     store;
     db;
     extensionStorage;
     indexedDb;
     private configApi;
+    private wasmViewConnector;
 
     constructor({
                     extensionStorage,
@@ -78,6 +61,7 @@ export class ClientController {
                     setNetworks,
                     getNetwork,
                     getNetworkConfig,
+                    wasmViewConnector
                 }: {
         extensionStorage: ExtensionStorage;
         indexedDb: IndexedDb;
@@ -85,6 +69,7 @@ export class ClientController {
         setNetworks: RemoteConfigController['setNetworks'];
         getNetwork: NetworkController['getNetwork'];
         getNetworkConfig: RemoteConfigController['getNetworkConfig'];
+        wasmViewConnector: WasmViewConnector
     }) {
         this.store = new ObservableStore(
             extensionStorage.getInitState({
@@ -106,6 +91,7 @@ export class ClientController {
         };
         extensionStorage.subscribe(this.store);
         this.indexedDb = indexedDb;
+        this.wasmViewConnector = wasmViewConnector
     }
 
     async saveAssets() {
@@ -202,33 +188,14 @@ export class ClientController {
                 compactBlockRangeRequest
             )) {
 
-                let storedTree = await this.loadStoredTree();
+                await this.wasmViewConnector.handleNewCompactBlock(response.compactBlock,fvk);
+                // await this.scanBlock(response.compactBlock, fvk);
 
-
-                await this.scanBlock(response.compactBlock, fvk);
-
-                let viewClient = new ViewClient(fvk, 100n, storedTree);
-
-                let snakeizeBlock = snakeize(this.convertCompactBlock(
-                    response.compactBlock));
-
-                for (let swap of snakeizeBlock.swap_outputs ) {
-                    swap.delta_1 =  swap.delta1
-                    swap.delta_2 =  swap.delta2
-                    swap.lambda_1 =  swap.lambda1
-                    swap.lambda_2 =  swap.lambda2
-                    swap.trading_pair.asset_1 =  swap.trading_pair.asset1
-                    swap.trading_pair.asset_2 =  swap.trading_pair.asset2
-
-                }
-                let scanResult = await viewClient.scan_block(snakeizeBlock, BigInt(storedTree.last_position), BigInt(storedTree.last_forgotten));
-
-                this.handleScanResult(response.compactBlock, scanResult);
 
 
 
                 if (Number(response.compactBlock.height) < lastBlock) {
-                    if (Number(response.compactBlock.height) % 10000 === 0) {
+                    if (Number(response.compactBlock.height) % 100 === 0) {
                         const oldState = this.store.getState().lastSavedBlock;
                         const lastSavedBlock = {
                             ...oldState,
@@ -260,95 +227,6 @@ export class ClientController {
         }
     }
 
-    handleScanResult(compactBlock: CompactBlock, scanResult) {
-        if (scanResult.new_notes.length !== 0 || scanResult.new_swaps.length !== 0){
-            console.log(scanResult)
-
-        }
-    }
-
-    convertCompactBlock(block: CompactBlock): CompactBlock {
-
-        // let transparentInner = this.transparentInner(block)
-        let convertedBlock = this.convertByteArraysToHex(block);
-
-        return this.fixCaseField(convertedBlock);
-    }
-
-    fixCaseField(o) {
-        for (let prop in o) {
-            if (Array.isArray(o[prop])) {
-
-                for (const element of o[prop]) {
-                    this.fixCaseField(element);
-                }
-            } else {
-                if (typeof (o[prop]) === 'object') {
-
-                    this.fixCaseField(o[prop]);
-                } else {
-                    if (prop === "case") {
-                        o[prop] = this.capitalizeFirstLetter(o[prop])
-                    }
-                }
-            }
-        }
-        return o;
-    }
-
-
-
-    convertByteArraysToHex(o) {
-        for (var prop in o) {
-
-            if (Array.isArray(o[prop])) {
-
-                for (const element of o[prop]) {
-                    this.convertByteArraysToHex(element);
-                }
-            } else {
-                if (typeof (o[prop]) === 'object' && !(o[prop] instanceof Uint8Array)) {
-                    this.convertByteArraysToHex(o[prop]);
-                } else {
-                    if (o[prop] instanceof Uint8Array) {
-                        o[prop] = this.toHexString(o[prop])
-                    }
-                }
-            }
-        }
-        return o;
-    }
-
-    capitalizeFirstLetter(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
-
-    async loadStoredTree(): Promise<StoredTree> {
-
-        const nctPosition = await this.indexedDb.getAllValue(
-            'nct_position'
-        )[0];
-
-        const nctForgotten = await this.indexedDb.getAllValue(
-            'nct_forgotten'
-        )[0];
-
-        const nctHashes: StoredHash[] = await this.indexedDb.getAllValue(
-            'nct_hashes'
-        );
-
-        const nctCommitments: StoredCommitment[] = await this.indexedDb.getAllValue(
-            'nct_commitments'
-        );
-
-        return {
-            commitments: nctCommitments, hashes: nctHashes,
-            last_forgotten: nctForgotten == undefined ? 0 : nctForgotten.forgotten,
-            last_position: nctPosition == undefined ? 0 : nctPosition.position
-        };
-
-    }
 
     async getLastExistBlock() {
         const {tendermint} =
@@ -525,6 +403,8 @@ export class ClientController {
         await this.indexedDb.resetTables('nct_position');
         await this.indexedDb.resetTables('spendable_notes');
         await this.indexedDb.resetTables('tx_by_nullifier');
+        await this.indexedDb.resetTables('swaps');
+
     }
 
     requireScanning(compactBlock: CompactBlock) {

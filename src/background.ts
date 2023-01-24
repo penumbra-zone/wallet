@@ -37,6 +37,7 @@ import {
   StatusRequest,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb';
 import { ChainParametersRequest } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
+import {WasmViewConnector} from "./utils/WasmViewConnector";
 
 const bgPromise = setupBackgroundService();
 
@@ -152,6 +153,7 @@ class BackgroundService extends EventEmitter {
   contactBookController: ContactBookController;
   permissionsController: PermissionController;
   messageController: MessageController;
+  wasmViewConnector: WasmViewConnector
 
   constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
     super();
@@ -204,6 +206,10 @@ class BackgroundService extends EventEmitter {
       vaultController: this.vaultController,
     });
 
+    this.wasmViewConnector = new WasmViewConnector({
+      indexedDb: this.indexedDb
+    })
+
     this.clientController = new ClientController({
       extensionStorage: this.extensionStorage,
       indexedDb: this.indexedDb,
@@ -213,6 +219,7 @@ class BackgroundService extends EventEmitter {
         this.remoteConfigController.setNetworks(networkName, type),
       getNetwork: () => this.networkController.getNetwork(),
       getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
+      wasmViewConnector: this.wasmViewConnector
     });
 
     this.viewProtocolService = new ViewProtocolService({
