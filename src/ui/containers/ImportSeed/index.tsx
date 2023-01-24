@@ -16,7 +16,7 @@ const bip39 = require('bip39');
 
 type ImportSeedProps = {};
 
-const options = getWordListOprions();
+export const options = getWordListOprions();
 
 const selects = [...Array(24).keys()];
 

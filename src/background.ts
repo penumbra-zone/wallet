@@ -75,7 +75,7 @@ async function setupBackgroundService() {
 
     const action = extension.action || extension.browserAction;
     action.setBadgeText({ text });
-    action.setBadgeBackgroundColor({ color: 'red' });
+    action.setBadgeBackgroundColor({ color: '#037DD6' });
   };
 
   backgroundService.messageController.on('Update badge', updateBadge);
