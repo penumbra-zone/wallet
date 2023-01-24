@@ -1,7 +1,7 @@
 import {
   generate_spend_key,
   get_address_by_index,
-  get_full_viewing_key,
+  get_full_viewing_key, get_short_address_by_index,
 } from 'penumbra-web-assembly';
 import { WalletPrivateDataOfType } from './types';
 import { Wallet } from './wallet';
@@ -23,6 +23,7 @@ export class SeedWallet extends Wallet<WalletPrivateDataOfType<'seed'>> {
   }
 
   getAccount() {
+
     return {
       type: this.data.type,
       name: this.data.name,
@@ -32,6 +33,10 @@ export class SeedWallet extends Wallet<WalletPrivateDataOfType<'seed'>> {
 
   getAddressByIndex() {
     return get_address_by_index(this.getFullViewingKey(), BigInt(0));
+  }
+
+  getShortAddressByIndex() {
+    return get_short_address_by_index(this.getFullViewingKey(), BigInt(0));
   }
 
   getSeed() {
