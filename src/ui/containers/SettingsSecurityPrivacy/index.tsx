@@ -5,6 +5,7 @@ import {
   ExportSeedPhraseModal,
   ResetWalletModal,
 } from '../../components';
+import Background from '../../services/Background';
 
 export const SettingsSecurityPrivacy = () => {
   const isDesktop = useMediaQuery();
@@ -16,10 +17,19 @@ export const SettingsSecurityPrivacy = () => {
 
   const toggleShowSeedModal = (value: boolean) => () =>
     setIsOpenSeedModal(value);
+
+  const handleConfirm = async () => {
+    await Background.resetWallet();
+    toggleShowResetWalletModal(false)();
+  };
   return (
     <>
       <div>
-        <p className={`w-[100%] px-[16px] py-[24px] border-b-[1px] border-solid border-dark_grey ${isDesktop ? 'h2': 'h1_ext'}`}>
+        <p
+          className={`w-[100%] px-[16px] py-[24px] border-b-[1px] border-solid border-dark_grey ${
+            isDesktop ? 'h2' : 'h1_ext'
+          }`}
+        >
           Security and Privacy
         </p>
         <div className="px-[16px] h-[100%]">
@@ -48,6 +58,9 @@ export const SettingsSecurityPrivacy = () => {
       <ResetWalletModal
         show={isOpenResetWallet}
         onClose={toggleShowResetWalletModal(false)}
+        handleConfirm={handleConfirm}
+        title="Do you really want to reset your wallet? All view service data will be deleted and re-synchronized."
+        warnings="YOUR PRIVATE KEYS WON'T BE LOST!"
       />
       <ExportSeedPhraseModal
         show={isOpenSeedModal}

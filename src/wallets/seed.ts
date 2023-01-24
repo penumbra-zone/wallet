@@ -28,6 +28,7 @@ export class SeedWallet extends Wallet<WalletPrivateDataOfType<'seed'>> {
       type: this.data.type,
       name: this.data.name,
       addressByIndex: this.getAddressByIndex(),
+      shortAddressByIndex: this.getShortAddressByIndex()
     };
   }
 

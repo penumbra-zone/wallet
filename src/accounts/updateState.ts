@@ -65,14 +65,6 @@ export function createUpdateState(store: AccountsStore) {
       dispatch(networkActions.setCustomGRPC(customGRPC));
     }
 
-    const customTendermint = getParam(state.customTendermint, {});
-    if (
-      customTendermint &&
-      !equals(currentState.network.customTendermint, customTendermint)
-    ) {
-      dispatch(networkActions.customTendermint(customTendermint));
-    }
-
     const currentNetwork = getParam(state.currentNetwork, '');
     if (
       currentNetwork &&

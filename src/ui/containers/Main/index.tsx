@@ -1,5 +1,4 @@
 import { useAccountsSelector } from '../../../accounts';
-import { getShortKey } from '../../../utils';
 import {
   ActivityList,
   AssetsList,
@@ -35,7 +34,7 @@ export const Main: React.FC<MainProps> = () => {
         <div className="flex flex-col items-center justify-center ext:pt-[20px] tablet:pt-[24px] ext:pb-[16px] tablet:pb-[14px]">
           <p className="h1 mb-[4px]">{selectedAccount.name}</p>
           <div className="flex items-center  text_body text-light_grey">
-            {getShortKey(selectedAccount.addressByIndex)}
+            {selectedAccount.shortAddressByIndex}
             <span
               className="ml-[7px] cursor-pointer svg_hover"
               onClick={copyToClipboard}

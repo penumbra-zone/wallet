@@ -92,6 +92,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
         type: 'seed',
         name: 'Wallet 1',
         addressByIndex: '',
+        shortAddressByIndex: ''
       })
     );
     setIsShowModal(true);

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useAccountsSelector } from '../../../accounts';
-import { getShortKey } from '../../../utils';
 import { Balance, Button, CheckBox, PlusSvg } from '../../components';
 import { selectMessages, selectSelectedAccount } from '../../redux';
 import Background from '../../services/Background';
@@ -36,9 +35,7 @@ export const ActiveMessage = () => {
               <div className="w-[35px] h-[35px] bg-brown rounded-[50%] flex items-center justify-center"></div>
             </div>
             <div className="flex flex-col justify-between ml-[8px]">
-              <p className="h2_ext">{`${account.name} (${getShortKey(
-                account.addressByIndex
-              )})`}</p>
+              <p className="h2_ext">{`${account.name} (${account.shortAddressByIndex})`}</p>
               <Balance className="text_numbers_ext" />
             </div>
           </div>
