@@ -1,18 +1,22 @@
-import Background from '../../../services/Background';
 import { Button } from '../../Button';
 import { ModalWrapper } from '../../ModalWrapper';
 import { CloseInElipseSvg } from '../../Svg';
 import { SuccessCreateModalProps } from '../SuccessCreateModal';
 
-export const ResetWalletModal: React.FC<SuccessCreateModalProps> = ({
+type ResetWalletNodalProps = {
+  title: string;
+  warnings?: string;
+  handleConfirm: () => Promise<void>;
+};
+
+export const ResetWalletModal: React.FC<SuccessCreateModalProps &
+  ResetWalletNodalProps> = ({
   show,
+  title,
+  warnings,
+  handleConfirm,
   onClose,
 }) => {
-  const handleConfirm = async () => {
-    onClose();
-    await Background.resetWallet();
-  };
-
   return (
     <ModalWrapper
       show={show}
@@ -26,10 +30,8 @@ export const ResetWalletModal: React.FC<SuccessCreateModalProps> = ({
           <p className="h1_ext mt-[16px] pb-[12px]">Are you sure?</p>
         </div>
         <div className="w-[100%] flex flex-col items-center px-[16px]">
-          <p className="text-center text_ext pt-[16px]">
-            Do you really want to reset your wallet? This process cannot be
-            undone.
-          </p>
+          <p className="text-center text_ext pt-[16px]">{title}</p>
+          <p className="text-center h2 pt-[16px]">{warnings}</p>
           <div className="w-[100%] flex mt-[70px]">
             <Button
               mode="transparent"

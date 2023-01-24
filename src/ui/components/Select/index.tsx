@@ -12,7 +12,7 @@ export type OptionType = {
 
 type SelectPropsType = {
   fieldName?: string;
-  label?: string;
+  label?: string | ReactElement;
   isLoading?: boolean;
   placeholder?: string;
   options: OptionType[];

@@ -14,7 +14,6 @@ export type NetworkType = NetworkConfigItem & {
 type Init = {
   currentNetwork: NetworkName;
   networks: NetworkType[];
-  customTendermint: Record<NetworkName, string | null | undefined>;
   customGRPC: Record<NetworkName, string | null | undefined>;
   lastSavedBlock: LastBlocks;
   lastExistBlock: LastBlocks;
@@ -23,7 +22,6 @@ type Init = {
 const init: Init = {
   currentNetwork: NetworkName.Testnet,
   networks: [],
-  customTendermint: {} as Record<NetworkName, string | null | undefined>,
   customGRPC: {} as Record<NetworkName, string | null | undefined>,
   lastSavedBlock: {
     mainnet: 0,
@@ -47,10 +45,6 @@ const network = createSlice({
       ...state,
       networks: action.payload,
     }),
-    customTendermint: (state, action) => ({
-      ...state,
-      customTendermint: action.payload,
-    }),
     setCustomGRPC: (state, action) => ({
       ...state,
       customGRPC: action.payload,
@@ -73,8 +67,6 @@ export default network.reducer;
 export const selectCurNetwork = (state: AccountsState) =>
   state.network.currentNetwork;
 export const selectNetworks = (state: AccountsState) => state.network.networks;
-export const selectCustomTendermint = (state: AccountsState) =>
-  state.network.customTendermint;
 export const selectCustomGRPC = (state: AccountsState) =>
   state.network.customGRPC;
 export const selectLastSavedBlock = (state: AccountsState) =>

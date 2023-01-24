@@ -38,7 +38,7 @@ export const BalanceAction = () => {
                 <DowmloadSvg />
               </div>
             }
-            className="rounded-[50%] w-[51px] ext:py-[14px] tablet:py-[14px]"
+            className="rounded-[50%] w-[51px]  ext:pt-[14px] tablet:pt-[14px]  ext:pb-[14px] tablet:pb-[14px]"
           />
           <p className="text_button pt-[8px]">Receive</p>
         </div>
@@ -51,7 +51,7 @@ export const BalanceAction = () => {
                 <ArrowUpRightSvg />
               </div>
             }
-            className="rounded-[50%] w-[51px] ext:py-[14px] tablet:py-[14px]"
+            className="rounded-[50%] w-[51px] ext:pt-[14px] tablet:pt-[14px]  ext:pb-[14px] tablet:pb-[14px]"
           />
           <p className="text_button pt-[8px]">Send</p>
         </div>
@@ -64,7 +64,7 @@ export const BalanceAction = () => {
                 <CachedSvg />
               </div>
             }
-            className="rounded-[50%] w-[51px] ext:py-[14px] tablet:py-[14px]"
+            className="rounded-[50%] w-[51px]  ext:pt-[14px] tablet:pt-[14px]  ext:pb-[14px] tablet:pb-[14px]"
           />
           <p className="text_button pt-[8px]">Exchange</p>
         </div>

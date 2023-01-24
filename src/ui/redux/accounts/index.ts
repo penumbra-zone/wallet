@@ -8,6 +8,7 @@ type CreateAccountInput = {
   name: string;
   seed: string;
   addressByIndex: string;
+  shortAddressByIndex: string;
 };
 
 type Init = {
