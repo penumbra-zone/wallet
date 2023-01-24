@@ -209,10 +209,8 @@ export class ClientController {
 
                 let viewClient = new ViewClient(fvk, 100n, storedTree);
 
-                console.log(response.compactBlock);
                 let snakeizeBlock = snakeize(this.convertCompactBlock(
                     response.compactBlock));
-                console.log(snakeizeBlock);
 
                 for (let swap of snakeizeBlock.swap_outputs ) {
                     swap.delta_1 =  swap.delta1
@@ -263,9 +261,7 @@ export class ClientController {
     }
 
     handleScanResult(compactBlock: CompactBlock, scanResult) {
-        console.log(compactBlock.height, scanResult)
-        if (scanResult.new_notes.length !== 0){
-            console.log(compactBlock)
+        if (scanResult.new_notes.length !== 0 || scanResult.new_swaps.length !== 0){
             console.log(scanResult)
 
         }
@@ -390,7 +386,6 @@ export class ClientController {
                             this.toHexString(statePayloadNote.note.encryptedNote),
                             this.toHexString(statePayloadNote.note.ephemeralKey)
                         );
-                        console.log("decrypted note", decryptedNote)
                         if (decryptedNote === null) continue;
 
                         // decryptedNote.height = Number(compactBlock.height);
