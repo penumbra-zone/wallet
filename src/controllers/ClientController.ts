@@ -4,12 +4,12 @@ import {
 } from '@bufbuild/connect-web';
 
 import {
-    ObliviousQueryService
+    ObliviousQueryService, TendermintProxyService
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_connectweb';
 import {ExtensionStorage} from '../storage';
 import {
     AssetListRequest,
-    AssetListResponse,
+    AssetListResponse, BroadcastTxSyncRequest,
     ChainParametersRequest,
     ChainParametersResponse,
     CompactBlockRangeRequest,
@@ -21,22 +21,25 @@ import {
     CompactBlock,
     FmdParameters, StatePayload,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
-import {decrypt_note, ViewClient} from 'penumbra-web-assembly';
+import {build_tx, decrypt_note, encode_tx, send_plan, ViewClient} from 'penumbra-web-assembly';
 import {WalletController} from './WalletController';
 import {extension} from '../lib';
 import {RemoteConfigController} from './RemoteConfigController';
 import {NetworkController} from './NetworkController';
-import {encode} from 'bech32-buffer';
+import {decode, encode} from 'bech32-buffer';
 import {EncodeAsset} from '../types';
 import {IndexedDb} from '../utils';
 
 import snakeize from 'snakeize'
 import {
+    Address,
+    Amount, AssetId,
     MerkleRoot,
-    Nullifier
+    Nullifier, Value
 } from "@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/crypto/v1alpha1/crypto_pb";
 import {BatchSwapOutputData} from "@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/dex/v1alpha1/dex_pb";
 import {StoredCommitment, StoredHash, StoredTree, WasmViewConnector} from "../utils/WasmViewConnector";
+import {randomInt} from "crypto";
 
 
 export type Transaction = {
@@ -61,11 +64,14 @@ export class ClientController {
                     setNetworks,
                     getNetwork,
                     getNetworkConfig,
-                    wasmViewConnector
+                    wasmViewConnector,
+                    getAccountSpendingKey
+
                 }: {
         extensionStorage: ExtensionStorage;
         indexedDb: IndexedDb;
         getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword'];
+        getAccountSpendingKey: WalletController['getAccountSpendingKeyWithoutPassword']
         setNetworks: RemoteConfigController['setNetworks'];
         getNetwork: NetworkController['getNetwork'];
         getNetworkConfig: RemoteConfigController['getNetworkConfig'];
@@ -88,6 +94,7 @@ export class ClientController {
             setNetworks,
             getNetwork,
             getNetworkConfig,
+            getAccountSpendingKey
         };
         extensionStorage.subscribe(this.store);
         this.indexedDb = indexedDb;
@@ -156,14 +163,19 @@ export class ClientController {
 
     async getCompactBlockRange() {
         let fvk;
+        let spending_key;
         try {
             fvk = this.configApi.getAccountFullViewingKey();
+            spending_key = this.configApi.getAccountSpendingKey();
         } catch (error) {
+            console.log(error);
             fvk = '';
         }
         if (!fvk) {
             return;
         }
+
+
 
         const {grpc, chainId} =
             this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
@@ -173,6 +185,57 @@ export class ClientController {
         const transport = createGrpcWebTransport({
             baseUrl: grpc,
         });
+
+        let note = await this.indexedDb.getValue(
+            'spendable_notes', "f2ecc366b2f3589ce9c72ea8a89a24cc6b80271957ea8136a8cf517cdd4f3006"
+        );
+        let fmd = await this.indexedDb.getValue(
+            'fmd_parameters', `fmd`);
+
+        let chain_params = await this.indexedDb.getValue(
+            'chainParameters', "penumbra-testnet-callirrhoe");
+
+        let data = {
+            notes: [note],
+            chain_parameters: snakeize(chain_params),
+            fmd_parameters: snakeize(fmd)
+            ,
+        };
+        console.log(data);
+
+
+        let sendPlan = send_plan(fvk, {
+                amount: {
+                    lo: 1000000n,
+                    hi: 0n
+                },
+                asset_id: {
+                    inner: "29EA9C2F3371F6A487E7E95C247041F4A356F983EB064E5D2B3BCF322CA96A10"
+                }
+
+            },
+            "penumbrav2t1u9aysnt5c3lfrfh7pn7qlkxtxwlzt5suqwajcn9k3ehcpqphzf22qtwz0ywcqvqd7z5ma6pdlzjc0wra8mlj36ly7llvz9wjtje3575sknhkjfky36rxnunxp5mzxu0kl9hqkv",
+            data
+        )
+
+
+        console.log("Send plan", sendPlan)
+
+        let buildTx = build_tx(spending_key, fvk, sendPlan, await this.wasmViewConnector.loadStoredTree());
+
+        console.log(buildTx)
+
+        let encodeTx = encode_tx(buildTx);
+        console.log(encodeTx);
+        const tendermint = createPromiseClient(TendermintProxyService, transport);
+
+
+        let broadcastTxSyncRequest = new BroadcastTxSyncRequest();
+        broadcastTxSyncRequest.params = encodeTx;
+        broadcastTxSyncRequest.reqId =124214123n
+        let broadcastTxSync = await tendermint.broadcastTxSync(broadcastTxSyncRequest);
+
+        console.log(broadcastTxSync);
 
         const client = createPromiseClient(ObliviousQueryService, transport);
 
@@ -188,10 +251,8 @@ export class ClientController {
                 compactBlockRangeRequest
             )) {
 
-                await this.wasmViewConnector.handleNewCompactBlock(response.compactBlock,fvk);
+                await this.wasmViewConnector.handleNewCompactBlock(response.compactBlock, fvk);
                 // await this.scanBlock(response.compactBlock, fvk);
-
-
 
 
                 if (Number(response.compactBlock.height) < lastBlock) {

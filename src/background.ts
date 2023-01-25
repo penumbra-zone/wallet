@@ -215,6 +215,7 @@ class BackgroundService extends EventEmitter {
       indexedDb: this.indexedDb,
       getAccountFullViewingKey: () =>
         this.walletController.getAccountFullViewingKeyWithoutPassword(),
+      getAccountSpendingKey: () => this.walletController.getAccountSpendingKeyWithoutPassword(),
       setNetworks: (networkName: string, type: NetworkName) =>
         this.remoteConfigController.setNetworks(networkName, type),
       getNetwork: () => this.networkController.getNetwork(),

@@ -1,4 +1,7 @@
-import {CompactBlock} from "@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb";
+import {
+    CompactBlock,
+    FmdParameters
+} from "@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb";
 import {ViewClient} from "penumbra-web-assembly";
 import snakeize from 'snakeize'
 import {
@@ -73,10 +76,13 @@ export class WasmViewConnector {
 
         this.handleScanResult(block, scanResult);
 
+        if (block.fmdParameters !== undefined)
+            await this.saveFmdParameters(block.fmdParameters)
+
     }
 
 
-    async loadStoredTree(): Promise<StoredTree> {
+    public async loadStoredTree(): Promise<StoredTree> {
 
         const nctPosition = await this.indexedDb.getValue(
             'nct_position', "position"
@@ -103,7 +109,6 @@ export class WasmViewConnector {
     }
 
     async handleScanResult(compactBlock: CompactBlock, scanResult: ScanResult) {
-        console.log("Scan result", scanResult)
 
         if (scanResult.nct_updates !== undefined) {
             if (scanResult.nct_updates.set_forgotten !== undefined) {
@@ -119,7 +124,6 @@ export class WasmViewConnector {
                 await this.storeHash(hash);
             }
             if ( scanResult.nct_updates.delete_ranges.length > 0) {
-                console.log("Delete range", scanResult)
             }
         }
 
@@ -158,6 +162,10 @@ export class WasmViewConnector {
 
     async storeSwap(swap) {
         await this.indexedDb.putValueWithId('swaps', swap, swap.swap_commitment.inner);
+    }
+
+    async saveFmdParameters(fmdParameters: FmdParameters) {
+        await this.indexedDb.putValueWithId('fmd_parameters', fmdParameters, "fmd");
     }
 
 

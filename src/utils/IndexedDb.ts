@@ -45,9 +45,7 @@ export class IndexedDb {
                         keyPath: 'txHashHex',
                     });
 
-                    db.createObjectStore('fmd_parameters', {
-                        keyPath: 'precisionBits',
-                    });
+                    db.createObjectStore('fmd_parameters' );
 
                     db.createObjectStore('nct_commitments',  {
                         autoIncrement: true,
