@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   Button,
   ChevronLeftIcon,
-  Input,
   Select,
   SuccessCreateModal,
 } from '../../components';
@@ -91,11 +90,11 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
   };
 
   const handleChangeWords = (type: 'first' | 'second' | 'third') => (
-    event: React.ChangeEvent<HTMLInputElement>
+    value: string
   ) => {
     setWords((state) => ({
       ...state,
-      [type]: event.target.value,
+      [type]: value,
     }));
   };
 
@@ -122,45 +121,33 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
             <Select
               options={options}
               fieldName="first"
-              // value={words.first}
-              // isError={words.first ? !isError.first : false}
+              isError={words.first ? !isError.first : false}
               label={
-                <p className="text_body">{`#${
-                  random.r1 + 1 < 10 ? `0${random.r1 + 1}` : random.r1 + 1
-                }`}</p>
+                random.r1 + 1 < 10 ? `0${random.r1 + 1}` : String(random.r1 + 1)
               }
-              // handleChangeWords('first')
-              // handleChange={handleChange(i)}
+              handleChange={handleChangeWords('first')}
             />
           </div>
           <div className="w-[100%] mb-[12px]">
             <Select
               options={options}
               fieldName="second"
-              // value={words.second}
-              // isError={words.second ? !isError.second : false}
+              isError={words.second ? !isError.second : false}
               label={
-                <p className="text_body">{`#${
-                  random.r1 + 1 < 10 ? `0${random.r1 + 1}` : random.r1 + 1
-                }`}</p>
+                random.r2 + 1 < 10 ? `0${random.r2 + 1}` : String(random.r2 + 1)
               }
-              // handleChangeWords('second')
-              // handleChange={handleChange(i)}
+              handleChange={handleChangeWords('second')}
             />
           </div>
           <div className="w-[100%]">
             <Select
               options={options}
               fieldName="third"
-              // value={words.third}
-              // isError={words.third ? !isError.third : false}
+              isError={words.third ? !isError.third : false}
               label={
-                <p className="text_body">{`#${
-                  random.r1 + 1 < 10 ? `0${random.r1 + 1}` : random.r1 + 1
-                }`}</p>
+                random.r3 + 1 < 10 ? `0${random.r3 + 1}` : String(random.r3 + 1)
               }
-              // handleChangeWords('third')
-              // handleChange={handleChange(i)}
+              handleChange={handleChangeWords('third')}
             />
           </div>
           <div className="w-[100%] mb-[10px] mt-[40px]">

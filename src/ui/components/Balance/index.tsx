@@ -19,7 +19,9 @@ export const Balance: React.FC<BalanceProps> = ({ className }) => {
   const dispatch = useAppDispatch();
 
   const getNotes = async () => {
-    // const data = await Background.getAllValueIndexedDB('notes');
+    const data = await Background.getAllValueIndexedDB('notes');
+    console.log(data);
+    
     // if (!data.length) return setBalance(0);
 
     // const max = data.reduce(function (prev, current) {

@@ -1,4 +1,4 @@
-import { ReactElement, Ref, useCallback, useEffect, useRef, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import SelectComponent, {
   MultiValue,
   SingleValue,
@@ -18,6 +18,7 @@ type SelectPropsType = {
   options: OptionType[];
   initialValue?: string | number;
   className?: string;
+  isError?: boolean;
   handleChange?: (value: string | number) => void;
 };
 
@@ -29,6 +30,7 @@ export const Select: React.FC<SelectPropsType> = ({
   initialValue,
   fieldName = '1',
   className,
+  isError,
   handleChange,
   ...props
 }) => {
@@ -69,7 +71,9 @@ export const Select: React.FC<SelectPropsType> = ({
         onClick={containerHandler}
         className={`w-[100%] h-[52px] rounded-[15px] flex items-center justify-center mt-[8px] rounded-[15px]
         ${
-          isFocus || values
+          isError
+            ? 'bg-red'
+            : isFocus || values
             ? 'bg-gradient-to-r from-[rgba(139,228,217,0.6)] via-[rgba(200,184,128,0.6)] to-[rgba(255,144,47,0.5)]'
             : 'input_default_border hover:bg-gradient-to-r hover:from-[rgba(139,228,217,0.6)] hover:via-[rgba(200,184,128,0.6)] hover:to-[rgba(255,144,47,0.5)]'
         }`}
