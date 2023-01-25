@@ -85,10 +85,7 @@ async function setupBackgroundService() {
   //TODO add status stream
   // setInterval(() => {
   //   if (backgroundService.extensionStorage.getState('isLocked').isLocked) {
-  //     console.log('lastBlock');
-
-  //     console.log(backgroundService.extensionStorage.getState('isLocked'));
-
+  //    
   //     backgroundService.clientController.getLastExistBlock();
   //   }
   // }, 5000);
@@ -283,7 +280,7 @@ class BackgroundService extends EventEmitter {
         network: NetworkName
       ) => this.networkController.setCustomTendermint(url, network),
       getAllValueIndexedDB: async (tableName: TableName) =>
-        this.indexedDb.getAllValue(tableName),
+        this.indexedDb.getBalance(tableName),
       // addresses
       setContact: async (contact: Contact) =>
         this.contactBookController.setContact(contact),
@@ -536,8 +533,12 @@ class BackgroundService extends EventEmitter {
       PERMISSIONS.APPROVED
     );
 
-    const { selectedAccount, isInitialized, isLocked, messages } =
-      this.getState();
+    const {
+      selectedAccount,
+      isInitialized,
+      isLocked,
+      messages,
+    } = this.getState();
 
     if (selectedAccount && canIUse) {
       const addressByIndex = selectedAccount.addressByIndex;

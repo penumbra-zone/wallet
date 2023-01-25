@@ -24,8 +24,6 @@ export const RootWrapperUi: React.FC<RootWrapperUiProps> = ({ children }) => {
   const [isOpenAccountPopup, setIsOpenAccountPopup] = useState<boolean>(false);
   const [isOpenNetworkPopup, setIsOpenNetworkPopup] = useState<boolean>(false);
 
-  console.log(pathname);
-
   const selectedAccount = useAccountsSelector(selectSelectedAccount);
   const isRedirect = useAccountsSelector(selectRedirectToAccountPage);
   const state = useAccountsSelector(selectState);

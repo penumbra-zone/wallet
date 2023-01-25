@@ -69,7 +69,7 @@ export const Select: React.FC<SelectPropsType> = ({
       <p className="text_body">{label}</p>
       <div
         onClick={containerHandler}
-        className={`w-[100%] h-[52px] rounded-[15px] flex items-center justify-center mt-[8px] rounded-[15px]
+        className={`w-[100%] h-[52px] rounded-[15px] flex items-center justify-center mt-[8px]
         ${
           isError
             ? 'bg-red'

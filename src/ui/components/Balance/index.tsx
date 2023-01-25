@@ -20,16 +20,15 @@ export const Balance: React.FC<BalanceProps> = ({ className }) => {
 
   const getNotes = async () => {
     const data = await Background.getAllValueIndexedDB('notes');
-    console.log(data);
-    
-    // if (!data.length) return setBalance(0);
 
-    // const max = data.reduce(function (prev, current) {
-    //   return prev.height > current.height ? prev : current;
-    // });
+    if (!data.length) return setBalance(0);
 
-    // dispatch(accountsActions.setBalance(Number(max.amount)));
-    // setBalance(max.amount);
+    const max = data.reduce(function(prev, current) {
+      return prev.height > current.height ? prev : current;
+    });
+
+    dispatch(accountsActions.setBalance(Number(max.amount)));
+    setBalance(max.amount);
   };
 
   useEffect(() => {

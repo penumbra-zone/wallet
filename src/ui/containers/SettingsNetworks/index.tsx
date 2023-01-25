@@ -38,7 +38,6 @@ export const SettingsNetworks = () => {
     networks
   );
   const [isOpenSubmit, setIsOpenSubmit] = useState<boolean>(false);
-  console.log({ isOpenSubmit });
 
   useEffect(() => {
     setInputsValues({

@@ -89,9 +89,24 @@ export class IndexedDb {
   public async getAllValue(tableName: TableName) {
     const tx = this.db.transaction(tableName, 'readonly');
     const store = tx.objectStore(tableName);
+
     const result = await store.getAll();
 
     return result;
+  }
+
+  public async getBalance(tableName: TableName) {
+    const tx = this.db.transaction(tableName, 'readonly');
+    const store = tx.objectStore(tableName);
+
+    const result = await store.getAll();
+
+    const balances = result.map((i) => ({
+      heightCreated: Number(i.heightCreated),
+      amount: Number(i.note.value.amount.lo),
+    }));
+
+    return balances;
   }
 
   public async putValue(tableName: TableName, value: object) {
