@@ -13,7 +13,7 @@ export const PopupButton: React.FC<PopupButtonProps> = ({
   return (
     <div
       onClick={onClick}
-      className="flex items-center justify-bettwen py-[12px] px-[18px]  cursor-pointer hover:bg-dark_grey"
+      className="flex items-center justify-bettwen py-[8px] px-[16px]  cursor-pointer hover:bg-dark_grey"
       role="button"
       tabIndex={0}
     >

@@ -21,6 +21,16 @@ export const Login: React.FC<LoginProps> = ({}) => {
     }
   };
 
+  const handleKeyDown = async (event) => {
+    if (event.key === 'Enter') {
+      try {
+        await Background.unlock(password);
+      } catch {
+        setIsError(true);
+      }
+    }
+  };
+
   return (
     <div className="w-[100%] flex items-center justify-center">
       <div className="w-[400px] ext:py-[20px] tablet:py-[0px] ext:px-[16px] tablet:px-[0px] ext:bg-brown tablet:bg-transparent rounded-[15px] flex flex-col items-center justify-center">
@@ -29,7 +39,7 @@ export const Login: React.FC<LoginProps> = ({}) => {
           A decentralized network awaits
         </p>
         <Input
-          label="New Password"
+          label="Password"
           placeholder="Password"
           isError={isError}
           helperText="Incorrect password"
@@ -37,6 +47,7 @@ export const Login: React.FC<LoginProps> = ({}) => {
           onChange={handleChangePassword}
           customType="password"
           className="w-[100%] mb-[24px]"
+          onKeyDown={handleKeyDown}
         />
         <Button
           title="Unlock"

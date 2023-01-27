@@ -28,7 +28,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
   const handleBack = () => navigate(routesPath.HOME);
 
   return (
-    <div className="flex flex-col items-start ext:py-[20px] tablet:py-[30px] bg-brown rounded-[15px]">
+    <div className="w-[100%] flex flex-col items-start ext:py-[20px] tablet:py-[30px] bg-brown rounded-[15px]">
       <Button
         mode="icon_transparent"
         onClick={handleEdit}

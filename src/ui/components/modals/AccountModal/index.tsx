@@ -35,10 +35,10 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
       show={show}
       onClose={onClose}
       position={isDesktop ? 'top_right' : 'center'}
-      className={isDesktop ? 'py-[20px] px-[0px]' : 'px-[0px]'}
+      className="py-[30px] px-[0px]"
     >
       <div className="flex flex-col">
-        <div className="flex items-center justify-between px-[18px] pb-[24px] border-b-[1px] border-solid border-dark_grey">
+        <div className="flex items-center justify-between px-[16px] pb-[16px] border-b-[1px] border-solid border-dark_grey">
           <p className="h1_ext mr-[8px]">My accounts</p>
           <div className="w-[119px]">
             <Button
@@ -49,11 +49,11 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
             />
           </div>
         </div>
-        <div className="flex items-center py-[20px] px-[18px] border-b-[1px] border-solid border-dark_grey">
-          <UserLogo className="w-[42px] h-[42px]" />
+        <div className="flex items-center py-[16px] px-[16px] border-b-[1px] border-solid border-dark_grey">
+          <UserLogo className="w-[36px] h-[36px]" />
           <div className="flex flex-col items-center  ml-[4px]">
-            <p className="h1_ext">{selectedAccount.name}</p>
-            <Balance className="text_numbers" />
+            <p className="h2_ext">{selectedAccount.name}</p>
+            <Balance className="text_numbers_ext" />
           </div>
         </div>
         <div className="pt-[24px]">

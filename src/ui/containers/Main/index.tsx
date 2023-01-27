@@ -28,7 +28,7 @@ export const Main: React.FC<MainProps> = () => {
   if (!selectedAccount.addressByIndex) return <></>;
 
   return (
-    <div className="w-[100%] mt-[10px] mb-[20px] ">
+    <div className="w-[100%] mt-[10px] mb-[20px]">
       <div className="flex flex-col justify-center bg-brown rounded-[15px] relative pb-[40px]">
         <MorePopupButton />
         <div className="flex flex-col items-center justify-center ext:pt-[20px] tablet:pt-[24px] ext:pb-[16px] tablet:pb-[14px]">

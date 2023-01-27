@@ -84,7 +84,7 @@ export const Address: React.FC<AddressProps> = ({
 
   return (
     <>
-      <div className="flex justify-center items-center ext:mb-[24px] tablet:mb-[16px]">
+      <div className="w-[100%] flex justify-center items-center ext:mb-[24px] tablet:mb-[16px]">
         <p className="h1 ml-[auto]">Send to address</p>
         <span
           className="ml-[auto] svg_hover cursor-pointer"
@@ -112,7 +112,7 @@ export const Address: React.FC<AddressProps> = ({
         helperText="Invalid recipient address"
         className="w-[100%]"
       />
-      <div className="bg-brown rounded-[15px] h-[492px]">
+      <div className="bg-brown rounded-[15px] h-[492px] w-[100%]">
         {!Object.values(isValidate).includes(false) && search ? (
           <div className="h-[100%] flex flex-col justify-between px-[12px] pt-[30px] pb-[37px]">
             <div className="flex flex-col">

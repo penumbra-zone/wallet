@@ -32,10 +32,10 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
     >
       <div className="flex items-center justify-center">
         <div
-          className={`ext:h-[100vh] tablet:h-[100vh] flex ${
+          className={`w-[100%] ext:h-[100vh] tablet:h-[100vh] flex ${
             position === 'center'
               ? 'items-center justify-center'
-              : 'items-start justify-end mt-[100px]'
+              : 'items-start justify-end mt-[100px] ext:mx-[40px] laptop:mx-[312px]'
           }`}
         >
           <div
