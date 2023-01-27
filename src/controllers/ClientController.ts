@@ -3,11 +3,15 @@ import {
   createPromiseClient,
 } from '@bufbuild/connect-web';
 
-import { ObliviousQueryService } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_connectweb';
+import {
+  ObliviousQueryService,
+  TendermintProxyService,
+} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_connectweb';
 import { ExtensionStorage } from '../storage';
 import {
   AssetListRequest,
   AssetListResponse,
+  BroadcastTxSyncRequest,
   ChainParametersRequest,
   ChainParametersResponse,
   CompactBlockRangeRequest,
@@ -20,21 +24,38 @@ import {
   FmdParameters,
   StatePayload,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
-import { decrypt_note, ViewClient } from 'penumbra-web-assembly';
+import {
+  build_tx,
+  decrypt_note,
+  encode_tx,
+  send_plan,
+  ViewClient,
+} from 'penumbra-web-assembly';
 import { WalletController } from './WalletController';
 import { extension } from '../lib';
 import { RemoteConfigController } from './RemoteConfigController';
 import { NetworkController } from './NetworkController';
-import { encode } from 'bech32-buffer';
+import { decode, encode } from 'bech32-buffer';
 import { EncodeAsset } from '../types';
 import { IndexedDb } from '../utils';
 
 import snakeize from 'snakeize';
 import {
+  Address,
+  Amount,
+  AssetId,
   MerkleRoot,
   Nullifier,
+  Value,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/crypto/v1alpha1/crypto_pb';
 import { BatchSwapOutputData } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/dex/v1alpha1/dex_pb';
+import {
+  StoredCommitment,
+  StoredHash,
+  StoredTree,
+  WasmViewConnector,
+} from '../utils/WasmViewConnector';
+import { randomInt } from 'crypto';
 
 export type Transaction = {
   txHashHex: string;
@@ -43,30 +64,13 @@ export type Transaction = {
   txHash: Uint8Array;
 };
 
-export type StoredTree = {
-  last_position: number;
-  last_forgotten: number;
-  hashes: StoredHash[];
-  commitments: StoredCommitment[];
-};
-
-export type StoredHash = {
-  position: number;
-  height: number;
-  hash: Uint8Array;
-};
-
-export type StoredCommitment = {
-  position: number;
-  commitment: Uint8Array;
-};
-
 export class ClientController {
   store;
   db;
   extensionStorage;
   indexedDb;
   private configApi;
+  private wasmViewConnector;
 
   constructor({
     extensionStorage,
@@ -75,13 +79,17 @@ export class ClientController {
     setNetworks,
     getNetwork,
     getNetworkConfig,
+    wasmViewConnector,
+    getAccountSpendingKey,
   }: {
     extensionStorage: ExtensionStorage;
     indexedDb: IndexedDb;
     getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword'];
+    getAccountSpendingKey: WalletController['getAccountSpendingKeyWithoutPassword'];
     setNetworks: RemoteConfigController['setNetworks'];
     getNetwork: NetworkController['getNetwork'];
     getNetworkConfig: RemoteConfigController['getNetworkConfig'];
+    wasmViewConnector: WasmViewConnector;
   }) {
     this.store = new ObservableStore(
       extensionStorage.getInitState({
@@ -100,9 +108,11 @@ export class ClientController {
       setNetworks,
       getNetwork,
       getNetworkConfig,
+      getAccountSpendingKey,
     };
     extensionStorage.subscribe(this.store);
     this.indexedDb = indexedDb;
+    this.wasmViewConnector = wasmViewConnector;
   }
 
   async saveAssets() {
@@ -130,6 +140,8 @@ export class ClientController {
       ...asset,
       decodeId: encode('passet', asset.id?.inner, 'bech32m'),
     }));
+
+    console.log(encodeAsset);
 
     await this.indexedDb.putBulkValue('assets', encodeAsset);
   }
@@ -169,9 +181,12 @@ export class ClientController {
 
   async getCompactBlockRange() {
     let fvk;
+    let spending_key;
     try {
       fvk = this.configApi.getAccountFullViewingKey();
+      spending_key = this.configApi.getAccountSpendingKey();
     } catch (error) {
+      console.log(error);
       fvk = '';
     }
     if (!fvk) {
@@ -188,6 +203,64 @@ export class ClientController {
       baseUrl: grpc,
     });
 
+    let note = await this.indexedDb.getValue(
+      'spendable_notes',
+      'f2ecc366b2f3589ce9c72ea8a89a24cc6b80271957ea8136a8cf517cdd4f3006'
+    );
+    let fmd = await this.indexedDb.getValue('fmd_parameters', `fmd`);
+
+    let chain_params = await this.indexedDb.getValue(
+      'chainParameters',
+      'penumbra-testnet-callirrhoe'
+    );
+
+    let data = {
+      notes: [note],
+      chain_parameters: snakeize(chain_params),
+      fmd_parameters: snakeize(fmd),
+    };
+    console.log(data);
+
+    let sendPlan = send_plan(
+      fvk,
+      {
+        amount: {
+          lo: 1000000n,
+          hi: 0n,
+        },
+        asset_id: {
+          inner:
+            '29EA9C2F3371F6A487E7E95C247041F4A356F983EB064E5D2B3BCF322CA96A10',
+        },
+      },
+      'penumbrav2t1u9aysnt5c3lfrfh7pn7qlkxtxwlzt5suqwajcn9k3ehcpqphzf22qtwz0ywcqvqd7z5ma6pdlzjc0wra8mlj36ly7llvz9wjtje3575sknhkjfky36rxnunxp5mzxu0kl9hqkv',
+      data
+    );
+
+    console.log('Send plan', sendPlan);
+
+    let buildTx = build_tx(
+      spending_key,
+      fvk,
+      sendPlan,
+      await this.wasmViewConnector.loadStoredTree()
+    );
+
+    console.log(buildTx);
+
+    let encodeTx = encode_tx(buildTx);
+    console.log(encodeTx);
+    const tendermint = createPromiseClient(TendermintProxyService, transport);
+
+    let broadcastTxSyncRequest = new BroadcastTxSyncRequest();
+    broadcastTxSyncRequest.params = encodeTx;
+    broadcastTxSyncRequest.reqId = 124214123n;
+    let broadcastTxSync = await tendermint.broadcastTxSync(
+      broadcastTxSyncRequest
+    );
+
+    console.log(broadcastTxSync);
+
     const client = createPromiseClient(ObliviousQueryService, transport);
 
     const compactBlockRangeRequest = new CompactBlockRangeRequest();
@@ -201,34 +274,14 @@ export class ClientController {
       for await (const response of client.compactBlockRange(
         compactBlockRangeRequest
       )) {
-        let storedTree = await this.loadStoredTree();
-
-        await this.scanBlock(response.compactBlock, fvk);
-
-        let viewClient = new ViewClient(fvk, 100n, storedTree);
-
-        let snakeizeBlock = snakeize(
-          this.convertCompactBlock(response.compactBlock)
+        await this.wasmViewConnector.handleNewCompactBlock(
+          response.compactBlock,
+          fvk
         );
-
-        for (let swap of snakeizeBlock.swap_outputs) {
-          swap.delta_1 = swap.delta1;
-          swap.delta_2 = swap.delta2;
-          swap.lambda_1 = swap.lambda1;
-          swap.lambda_2 = swap.lambda2;
-          swap.trading_pair.asset_1 = swap.trading_pair.asset1;
-          swap.trading_pair.asset_2 = swap.trading_pair.asset2;
-        }
-        let scanResult = await viewClient.scan_block(
-          snakeizeBlock,
-          BigInt(storedTree.last_position),
-          BigInt(storedTree.last_forgotten)
-        );
-
-        this.handleScanResult(response.compactBlock, scanResult);
+        // await this.scanBlock(response.compactBlock, fvk);
 
         if (Number(response.compactBlock.height) < lastBlock) {
-          if (Number(response.compactBlock.height) % 10000 === 0) {
+          if (Number(response.compactBlock.height) % 100 === 0) {
             const oldState = this.store.getState().lastSavedBlock;
             const lastSavedBlock = {
               ...oldState,
@@ -258,84 +311,6 @@ export class ClientController {
     } catch (error) {
       console.error(error);
     }
-  }
-
-  handleScanResult(compactBlock: CompactBlock, scanResult) {
-    if (
-      scanResult.new_notes.length !== 0 ||
-      scanResult.new_swaps.length !== 0
-    ) {
-    }
-  }
-
-  convertCompactBlock(block: CompactBlock): CompactBlock {
-    // let transparentInner = this.transparentInner(block)
-    let convertedBlock = this.convertByteArraysToHex(block);
-
-    return this.fixCaseField(convertedBlock);
-  }
-
-  fixCaseField(o) {
-    for (let prop in o) {
-      if (Array.isArray(o[prop])) {
-        for (const element of o[prop]) {
-          this.fixCaseField(element);
-        }
-      } else {
-        if (typeof o[prop] === 'object') {
-          this.fixCaseField(o[prop]);
-        } else {
-          if (prop === 'case') {
-            o[prop] = this.capitalizeFirstLetter(o[prop]);
-          }
-        }
-      }
-    }
-    return o;
-  }
-
-  convertByteArraysToHex(o) {
-    for (var prop in o) {
-      if (Array.isArray(o[prop])) {
-        for (const element of o[prop]) {
-          this.convertByteArraysToHex(element);
-        }
-      } else {
-        if (typeof o[prop] === 'object' && !(o[prop] instanceof Uint8Array)) {
-          this.convertByteArraysToHex(o[prop]);
-        } else {
-          if (o[prop] instanceof Uint8Array) {
-            o[prop] = this.toHexString(o[prop]);
-          }
-        }
-      }
-    }
-    return o;
-  }
-
-  capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
-
-  async loadStoredTree(): Promise<StoredTree> {
-    const nctPosition = await this.indexedDb.getAllValue('nct_position')[0];
-
-    const nctForgotten = await this.indexedDb.getAllValue('nct_forgotten')[0];
-
-    const nctHashes: StoredHash[] = await this.indexedDb.getAllValue(
-      'nct_hashes'
-    );
-
-    const nctCommitments: StoredCommitment[] = await this.indexedDb.getAllValue(
-      'nct_commitments'
-    );
-
-    return {
-      commitments: nctCommitments,
-      hashes: nctHashes,
-      last_forgotten: nctForgotten == undefined ? 0 : nctForgotten.forgotten,
-      last_position: nctPosition == undefined ? 0 : nctPosition.position,
-    };
   }
 
   async getLastExistBlock() {
@@ -515,6 +490,7 @@ export class ClientController {
     await this.indexedDb.resetTables('nct_position');
     await this.indexedDb.resetTables('spendable_notes');
     await this.indexedDb.resetTables('tx_by_nullifier');
+    await this.indexedDb.resetTables('swaps');
   }
 
   requireScanning(compactBlock: CompactBlock) {

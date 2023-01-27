@@ -11,7 +11,8 @@ export type TableName =
   | 'nct_hashes'
   | 'nct_position'
   | 'spendable_notes'
-  | 'tx_by_nullifier';
+  | 'tx_by_nullifier'
+  | 'swaps';
 
 export class IndexedDb {
   private database: string;
@@ -44,34 +45,29 @@ export class IndexedDb {
             keyPath: 'txHashHex',
           });
 
-          db.createObjectStore('fmd_parameters', {
-            keyPath: 'precisionBits',
-          });
+          db.createObjectStore('fmd_parameters');
 
           db.createObjectStore('nct_commitments', {
-            keyPath: 'position',
+            autoIncrement: true,
+            keyPath: 'id',
           });
 
-          db.createObjectStore('nct_forgotten', {
-            keyPath: 'forgotten',
-          });
+          db.createObjectStore('nct_forgotten');
 
           db.createObjectStore('nct_hashes', {
-            keyPath: 'position',
-          });
-          db.createObjectStore('nct_position', {
-            keyPath: 'position',
-          });
-
-          db.createObjectStore('spendable_notes', {
             autoIncrement: true,
-            keyPath: 'note_commitment',
+            keyPath: 'id',
           });
+          db.createObjectStore('nct_position');
+
+          db.createObjectStore('spendable_notes');
 
           db.createObjectStore('tx_by_nullifier', {
             autoIncrement: true,
             keyPath: 'nullifier',
           });
+
+          db.createObjectStore('swaps');
         },
       });
     } catch (error) {
@@ -79,19 +75,10 @@ export class IndexedDb {
     }
   }
 
-  public async getValue(tableName: TableName, id: number) {
+  public async getValue(tableName: TableName, id) {
     const tx = this.db.transaction(tableName, 'readonly');
     const store = tx.objectStore(tableName);
     const result = await store.get(id);
-    return result;
-  }
-
-  public async getAllValue(tableName: TableName) {
-    const tx = this.db.transaction(tableName, 'readonly');
-    const store = tx.objectStore(tableName);
-
-    const result = await store.getAll();
-
     return result;
   }
 
@@ -109,10 +96,25 @@ export class IndexedDb {
     return balances;
   }
 
+  public async getAllValue(tableName: TableName) {
+    const tx = this.db.transaction(tableName, 'readonly');
+    const store = tx.objectStore(tableName);
+    const result = await store.getAll();
+
+    return result;
+  }
+
   public async putValue(tableName: TableName, value: object) {
     const tx = this.db.transaction(tableName, 'readwrite');
     const store = tx.objectStore(tableName);
     const result = await store.put(value);
+    return result;
+  }
+
+  public async putValueWithId(tableName: TableName, value: object, id) {
+    const tx = this.db.transaction(tableName, 'readwrite');
+    const store = tx.objectStore(tableName);
+    const result = await store.put(value, id);
     return result;
   }
 
