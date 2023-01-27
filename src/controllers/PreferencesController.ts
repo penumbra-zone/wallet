@@ -12,7 +12,7 @@ export class PreferencesController extends EventEmitter {
 
     this.store = new ObservableStore(
       extensionStorage.getInitState({
-        idleOptions: { type: 'idle', interval: 0 },
+        idleOptions: { type: '1h', interval: 60 * 60 * 1000 },
         accounts: [],
         selectedAccount: undefined,
       })

@@ -41,6 +41,7 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'  http://testnet.penumbra.zone:8080 http://testnet.penumbra.zone:26657; default-src 'self';"
+    "extension_pages": "object-src 'self'; script-src 'self' 'wasm-unsafe-eval'"
+
   }
 }
