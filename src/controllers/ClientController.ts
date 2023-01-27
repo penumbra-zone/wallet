@@ -2,7 +2,6 @@ import {
   createGrpcWebTransport,
   createPromiseClient,
 } from '@bufbuild/connect-web';
-
 import {
   ObliviousQueryService,
   TendermintProxyService,
@@ -17,7 +16,6 @@ import {
   CompactBlockRangeRequest,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
 import ObservableStore from 'obs-store';
-
 import {
   ChainParameters,
   CompactBlock,
@@ -38,7 +36,6 @@ import { NetworkController } from './NetworkController';
 import { decode, encode } from 'bech32-buffer';
 import { EncodeAsset } from '../types';
 import { IndexedDb } from '../utils';
-
 import snakeize from 'snakeize';
 import {
   Address,
@@ -140,8 +137,6 @@ export class ClientController {
       ...asset,
       decodeId: encode('passet', asset.id?.inner, 'bech32m'),
     }));
-
-    console.log(encodeAsset);
 
     await this.indexedDb.putBulkValue('assets', encodeAsset);
   }
@@ -276,7 +271,7 @@ export class ClientController {
       chain_parameters: snakeize(chain_params),
       fmd_parameters: snakeize(fmd),
     };
-    console.log(data);
+    // console.log(data);
 
     let sendPlan = send_plan(
       fvk,
@@ -306,7 +301,7 @@ export class ClientController {
     console.log(buildTx);
 
     let encodeTx = encode_tx(buildTx);
-    console.log(encodeTx);
+    // console.log(encodeTx);
     const tendermint = createPromiseClient(TendermintProxyService, transport);
 
     let broadcastTxSyncRequest = new BroadcastTxSyncRequest();
@@ -316,7 +311,7 @@ export class ClientController {
       broadcastTxSyncRequest
     );
 
-    console.log(broadcastTxSync);
+    // console.log(broadcastTxSync);
 
     const client = createPromiseClient(ObliviousQueryService, transport);
 
