@@ -1,6 +1,8 @@
 import {
   createGrpcWebTransport,
   createPromiseClient,
+  ConnectError,
+  Code,
 } from '@bufbuild/connect-web';
 import {
   ObliviousQueryService,
@@ -68,6 +70,8 @@ export class ClientController {
   indexedDb;
   private configApi;
   private wasmViewConnector;
+  //abort all grpc request
+  private abortController: AbortController;
 
   constructor({
     extensionStorage,
@@ -78,6 +82,7 @@ export class ClientController {
     getNetworkConfig,
     wasmViewConnector,
     getAccountSpendingKey,
+    getCustomGRPC,
   }: {
     extensionStorage: ExtensionStorage;
     indexedDb: IndexedDb;
@@ -87,6 +92,7 @@ export class ClientController {
     getNetwork: NetworkController['getNetwork'];
     getNetworkConfig: RemoteConfigController['getNetworkConfig'];
     wasmViewConnector: WasmViewConnector;
+    getCustomGRPC: NetworkController['getCustomGRPC'];
   }) {
     this.store = new ObservableStore(
       extensionStorage.getInitState({
@@ -106,6 +112,7 @@ export class ClientController {
       getNetwork,
       getNetworkConfig,
       getAccountSpendingKey,
+      getCustomGRPC,
     };
     extensionStorage.subscribe(this.store);
     this.indexedDb = indexedDb;
@@ -119,9 +126,15 @@ export class ClientController {
 
     if (savedAssets.length) return;
 
-    const { grpc, chainId } = this.configApi.getNetworkConfig()[
+    const customGrpc = this.configApi.getCustomGRPC()[
       this.configApi.getNetwork()
     ];
+
+    const { grpc: defaultGrpc, chainId } = this.configApi.getNetworkConfig()[
+      this.configApi.getNetwork()
+    ];
+
+    const grpc = customGrpc || defaultGrpc;
 
     const transport = createGrpcWebTransport({
       baseUrl: grpc,
@@ -148,12 +161,18 @@ export class ClientController {
 
     if (savedChainParameters.length) return;
 
-    const baseUrl = this.configApi.getNetworkConfig()[
+    const customGrpc = this.configApi.getCustomGRPC()[
       this.configApi.getNetwork()
-    ].grpc;
+    ];
+
+    const { grpc: defaultGrpc } = this.configApi.getNetworkConfig()[
+      this.configApi.getNetwork()
+    ];
+
+    const grpc = customGrpc || defaultGrpc;
 
     const transport = createGrpcWebTransport({
-      baseUrl,
+      baseUrl: grpc,
     });
     const client = createPromiseClient(ObliviousQueryService, transport);
 
@@ -181,16 +200,21 @@ export class ClientController {
       fvk = this.configApi.getAccountFullViewingKey();
       spending_key = this.configApi.getAccountSpendingKey();
     } catch (error) {
-      console.log(error);
       fvk = '';
     }
     if (!fvk) {
       return;
     }
 
-    const { grpc, chainId } = this.configApi.getNetworkConfig()[
+    const customGrpc = this.configApi.getCustomGRPC()[
       this.configApi.getNetwork()
     ];
+
+    const { grpc: defaultGrpc, chainId } = this.configApi.getNetworkConfig()[
+      this.configApi.getNetwork()
+    ];
+
+    const grpc = customGrpc || defaultGrpc;
 
     const lastBlock = await this.getLastExistBlock();
 
@@ -255,64 +279,6 @@ export class ClientController {
     //
     // console.log(broadcastTxSync);
 
-    let note = await this.indexedDb.getValue(
-      'spendable_notes',
-      'f2ecc366b2f3589ce9c72ea8a89a24cc6b80271957ea8136a8cf517cdd4f3006'
-    );
-    let fmd = await this.indexedDb.getValue('fmd_parameters', `fmd`);
-
-    let chain_params = await this.indexedDb.getValue(
-      'chainParameters',
-      'penumbra-testnet-callirrhoe'
-    );
-
-    let data = {
-      notes: [note],
-      chain_parameters: snakeize(chain_params),
-      fmd_parameters: snakeize(fmd),
-    };
-    // console.log(data);
-
-    let sendPlan = send_plan(
-      fvk,
-      {
-        amount: {
-          lo: 1000000n,
-          hi: 0n,
-        },
-        asset_id: {
-          inner:
-            '29EA9C2F3371F6A487E7E95C247041F4A356F983EB064E5D2B3BCF322CA96A10',
-        },
-      },
-      'penumbrav2t1u9aysnt5c3lfrfh7pn7qlkxtxwlzt5suqwajcn9k3ehcpqphzf22qtwz0ywcqvqd7z5ma6pdlzjc0wra8mlj36ly7llvz9wjtje3575sknhkjfky36rxnunxp5mzxu0kl9hqkv',
-      data
-    );
-
-    console.log('Send plan', sendPlan);
-
-    let buildTx = build_tx(
-      spending_key,
-      fvk,
-      sendPlan,
-      await this.wasmViewConnector.loadStoredTree()
-    );
-
-    console.log(buildTx);
-
-    let encodeTx = encode_tx(buildTx);
-    // console.log(encodeTx);
-    const tendermint = createPromiseClient(TendermintProxyService, transport);
-
-    let broadcastTxSyncRequest = new BroadcastTxSyncRequest();
-    broadcastTxSyncRequest.params = encodeTx;
-    broadcastTxSyncRequest.reqId = 124214123n;
-    let broadcastTxSync = await tendermint.broadcastTxSync(
-      broadcastTxSyncRequest
-    );
-
-    // console.log(broadcastTxSync);
-
     const client = createPromiseClient(ObliviousQueryService, transport);
 
     const compactBlockRangeRequest = new CompactBlockRangeRequest();
@@ -322,18 +288,23 @@ export class ClientController {
       this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
     );
     compactBlockRangeRequest.keepAlive = true;
+    this.abortController = new AbortController();
     try {
       for await (const response of client.compactBlockRange(
-        compactBlockRangeRequest
+        compactBlockRangeRequest,
+        {
+          signal: this.abortController.signal,
+        }
       )) {
         await this.wasmViewConnector.handleNewCompactBlock(
           response.compactBlock,
           fvk
         );
+
         // await this.scanBlock(response.compactBlock, fvk);
 
         if (Number(response.compactBlock.height) < lastBlock) {
-          if (Number(response.compactBlock.height) % 100 === 0) {
+          if (Number(response.compactBlock.height) % 1000 === 0) {
             const oldState = this.store.getState().lastSavedBlock;
             const lastSavedBlock = {
               ...oldState,
@@ -357,11 +328,16 @@ export class ClientController {
             [this.configApi.getNetwork()]: Number(response.compactBlock.height),
           };
 
-          this.store.updateState({ lastBlockHeight, lastSavedBlock });
+          this.store.updateState({
+            lastBlockHeight,
+            lastSavedBlock,
+          });
         }
       }
     } catch (error) {
-      console.error(error);
+      if (error instanceof ConnectError && error.code === Code.Canceled) {
+        // this.abortController = new AbortController();
+      }
     }
   }
 
@@ -521,16 +497,6 @@ export class ClientController {
   };
 
   async resetWallet() {
-    extension.storage.local.set({
-      lastSavedBlock: {
-        mainnet: 0,
-        testnet: 0,
-      },
-      lastBlockHeight: {
-        mainnet: 0,
-        testnet: 0,
-      },
-    });
     await this.indexedDb.resetTables('notes');
     await this.indexedDb.resetTables('chainParameters');
     await this.indexedDb.resetTables('assets');
@@ -543,6 +509,27 @@ export class ClientController {
     await this.indexedDb.resetTables('spendable_notes');
     await this.indexedDb.resetTables('tx_by_nullifier');
     await this.indexedDb.resetTables('swaps');
+
+    this.store.updateState({
+      lastSavedBlock: {
+        mainnet: 0,
+        testnet: 0,
+      },
+      lastBlockHeight: {
+        mainnet: 0,
+        testnet: 0,
+      },
+    });
+    extension.storage.local.set({
+      lastSavedBlock: {
+        mainnet: 0,
+        testnet: 0,
+      },
+      lastBlockHeight: {
+        mainnet: 0,
+        testnet: 0,
+      },
+    });
   }
 
   requireScanning(compactBlock: CompactBlock) {
@@ -557,5 +544,9 @@ export class ClientController {
       (str: any, byte: any) => str + byte.toString(16).padStart(2, '0'),
       ''
     );
+  }
+
+  abortGrpcRequest() {
+    this.abortController.abort();
   }
 }

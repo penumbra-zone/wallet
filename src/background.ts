@@ -37,7 +37,7 @@ import {
   StatusRequest,
 } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb';
 import { ChainParametersRequest } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
-import {WasmViewConnector} from "./utils/WasmViewConnector";
+import { WasmViewConnector } from './utils/WasmViewConnector';
 
 const bgPromise = setupBackgroundService();
 
@@ -86,7 +86,7 @@ async function setupBackgroundService() {
   //TODO add status stream
   // setInterval(() => {
   //   if (backgroundService.extensionStorage.getState('isLocked').isLocked) {
-  //    
+  //
   //     backgroundService.clientController.getLastExistBlock();
   //   }
   // }, 5000);
@@ -113,7 +113,6 @@ async function setupBackgroundService() {
   backgroundService.walletController.on('wallet create', async () => {
     await backgroundService.clientController.saveAssets();
     await backgroundService.clientController.saveChainParameters();
-
     await backgroundService.clientController.getCompactBlockRange();
   });
 
@@ -133,6 +132,14 @@ async function setupBackgroundService() {
     }, 500);
   });
 
+  backgroundService.networkController.on('change grpc', async () => {
+    await backgroundService.clientController.abortGrpcRequest();
+    await backgroundService.clientController.resetWallet();
+    await backgroundService.clientController.saveAssets();
+    await backgroundService.clientController.saveChainParameters();
+    await backgroundService.clientController.getCompactBlockRange();
+  });
+
   return backgroundService;
 }
 
@@ -150,7 +157,7 @@ class BackgroundService extends EventEmitter {
   contactBookController: ContactBookController;
   permissionsController: PermissionController;
   messageController: MessageController;
-  wasmViewConnector: WasmViewConnector
+  wasmViewConnector: WasmViewConnector;
 
   constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
     super();
@@ -204,20 +211,22 @@ class BackgroundService extends EventEmitter {
     });
 
     this.wasmViewConnector = new WasmViewConnector({
-      indexedDb: this.indexedDb
-    })
+      indexedDb: this.indexedDb,
+    });
 
     this.clientController = new ClientController({
       extensionStorage: this.extensionStorage,
       indexedDb: this.indexedDb,
       getAccountFullViewingKey: () =>
         this.walletController.getAccountFullViewingKeyWithoutPassword(),
-      getAccountSpendingKey: () => this.walletController.getAccountSpendingKeyWithoutPassword(),
+      getAccountSpendingKey: () =>
+        this.walletController.getAccountSpendingKeyWithoutPassword(),
       setNetworks: (networkName: string, type: NetworkName) =>
         this.remoteConfigController.setNetworks(networkName, type),
       getNetwork: () => this.networkController.getNetwork(),
       getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
-      wasmViewConnector: this.wasmViewConnector
+      wasmViewConnector: this.wasmViewConnector,
+      getCustomGRPC: () => this.networkController.getCustomGRPC(),
     });
 
     this.viewProtocolService = new ViewProtocolService({

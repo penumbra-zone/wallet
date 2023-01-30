@@ -81,7 +81,8 @@ export const SettingsNetworks = () => {
     });
 
   const handleSave = async () => {
-    if (selected.grpc !== inputsValues.grpc) {
+    const grpc = customGRPC[selected.name] || selected.grpc;
+    if (grpc !== inputsValues.grpc) {
       await Background.setCustomGRPC(inputsValues.grpc, selected.name);
     }
     if (selected.chainId !== inputsValues.chainId) {
@@ -90,11 +91,12 @@ export const SettingsNetworks = () => {
   };
 
   const isDisabled = useMemo(() => {
+    const grpc = customGRPC[selected.name] || selected.grpc;
+
     return (
-      selected.grpc === inputsValues.grpc &&
-      selected.chainId === inputsValues.chainId
+      grpc === inputsValues.grpc && selected.chainId === inputsValues.chainId
     );
-  }, [selected, inputsValues]);
+  }, [selected, inputsValues, customGRPC]);
 
   const handleOpentTab = () => {
     Background.showTab(
