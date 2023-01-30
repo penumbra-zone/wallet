@@ -296,10 +296,10 @@ export class ClientController {
           signal: this.abortController.signal,
         }
       )) {
-        await this.wasmViewConnector.handleNewCompactBlock(
-          response.compactBlock,
-          fvk
-        );
+        // await this.wasmViewConnector.handleNewCompactBlock(
+        //   response.compactBlock,
+        //   fvk
+        // );
 
         // await this.scanBlock(response.compactBlock, fvk);
 

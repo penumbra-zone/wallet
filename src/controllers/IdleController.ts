@@ -5,10 +5,10 @@ import { VaultController } from './VaultController';
 
 export interface IdleOptions {
   type: string;
-  interval: number;
+  interval?: number;
 }
 
-const IDLE_INTERVAL = 60;
+const IDLE_INTERVAL = 30 * 60;
 
 export class IdleController {
   private options: IdleOptions;
@@ -26,7 +26,6 @@ export class IdleController {
     extension.idle.setDetectionInterval(IDLE_INTERVAL);
     this.options = {
       type: 'idle',
-      interval: 15 * 60 * 1000,
     };
 
     this.vaultController = vaultController;
@@ -60,22 +59,18 @@ export class IdleController {
     this.start();
   }
 
-  _tmrMode() {
-    if (this.options.type === 'idle') {
-      return;
-    }
+  private _tmrMode() {
+    if (this.options.type === 'idle') return;
 
     const time = Date.now() - this.lastUpdateIdle - this.options.interval;
-    if (time > 0) {
-      this._lock('locked');
-    }
+    if (time > 0) this._lock('locked');
 
     extension.alarms.create('idle', {
       delayInMinutes: 5 / 60,
     });
   }
 
-  _idleMode() {
+  private _idleMode() {
     if (this.options.type !== 'idle') {
       extension.idle.onStateChanged.removeListener(this._lock);
     } else {
@@ -84,6 +79,8 @@ export class IdleController {
   }
 
   _lock = (state: string) => {
+    console.log({ state });
+    
     if (['idle', 'locked'].indexOf(state) > -1) {
       this.vaultController.lock();
     }
