@@ -48,6 +48,8 @@ export type NctUpdates = {
 export class WasmViewConnector {
     private indexedDb;
 
+    private viewClient;
+
     constructor({
                     indexedDb
                 }) {
@@ -56,9 +58,11 @@ export class WasmViewConnector {
     }
 
     async handleNewCompactBlock(block: CompactBlock, fvk) {
-        let storedTree = await this.loadStoredTree();
 
-        let viewClient = new ViewClient(fvk, 719n, storedTree);
+        if (this.viewClient == undefined) {
+            let storedTree = await this.loadStoredTree();
+            this.viewClient = new ViewClient(fvk, 719n, storedTree);
+        }
 
         let snakeizeBlock = snakeize(this.convertCompactBlock(
             block));
@@ -72,9 +76,7 @@ export class WasmViewConnector {
             swap.trading_pair.asset_2 = swap.trading_pair.asset2
 
         }
-        let scanResult = await viewClient.scan_block(snakeizeBlock, storedTree.last_position, storedTree.last_forgotten);
-
-        this.handleScanResult(block, scanResult);
+        await this.viewClient.scan_block_without_updates(snakeizeBlock);
 
         if (block.fmdParameters !== undefined)
             await this.saveFmdParameters(block.fmdParameters)
@@ -108,7 +110,17 @@ export class WasmViewConnector {
 
     }
 
-    async handleScanResult(compactBlock: CompactBlock, scanResult: ScanResult) {
+    public async loadUpdates() {
+        if (this.viewClient == undefined) {
+            console.error("View client is undefined")
+        } else {
+            let storedTree = await this.loadStoredTree();
+            let updates = await this.viewClient.get_updates(storedTree.last_position, storedTree.last_forgotten);
+            await this.handleScanResult(updates)
+        }
+    }
+
+    async handleScanResult( scanResult: ScanResult) {
 
         if (scanResult.nct_updates !== undefined) {
             if (scanResult.nct_updates.set_forgotten !== undefined) {

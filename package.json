@@ -28,7 +28,7 @@
     "moment": "^2.29.4",
     "obj-multiplex": "^1.0.0",
     "obs-store": "^4.0.3",
-    "penumbra-web-assembly": "^0.41.22",
+    "penumbra-web-assembly": "^0.41.24",
     "post-message-stream": "^3.0.0",
     "pump": "^3.0.0",
     "ramda": "^0.28.0",
