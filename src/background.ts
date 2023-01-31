@@ -207,6 +207,7 @@ class BackgroundService extends EventEmitter {
 
     this.idleController = new IdleController({
       extensionStorage: this.extensionStorage,
+      preferencesController: this.preferencesController,
       vaultController: this.vaultController,
     });
 
@@ -261,6 +262,8 @@ class BackgroundService extends EventEmitter {
       getState: async <K extends keyof StorageLocalState>(params?: K[]) =>
         this.getState(params),
       updateIdle: async () => this.idleController.update(),
+      setIdleInterval: async (interval: number) =>
+        this.idleController.setIdleInterval(interval),
       getNetworks: async () => this.networkController.getNetworks(),
       showTab: async (url: string, name: string) => {
         this.emit('Show tab', url, name);

@@ -1,6 +1,5 @@
 import EventEmitter from 'events';
 import ObservableStore from 'obs-store';
-import { WalletAccount } from '../preferences';
 import { ExtensionStorage } from '../storage';
 import { ISeedWalletInput } from '../wallets';
 
@@ -12,7 +11,7 @@ export class PreferencesController extends EventEmitter {
 
     this.store = new ObservableStore(
       extensionStorage.getInitState({
-        idleOptions: { type: '1h', interval: 60 * 60 * 1000 },
+        idleInterval: 0,
         accounts: [],
         selectedAccount: undefined,
       })
@@ -28,5 +27,9 @@ export class PreferencesController extends EventEmitter {
     this.store.updateState({
       selectedAccount,
     });
+  }
+
+  setIdleInterval(idleInterval: number) {
+    this.store.updateState({ idleInterval });
   }
 }

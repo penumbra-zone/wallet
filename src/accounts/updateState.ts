@@ -4,6 +4,7 @@ import {
   accountsActions,
   messageNotificationActions,
   networkActions,
+  settingsActions,
   stateActions,
 } from '../ui/redux';
 import {
@@ -33,6 +34,10 @@ export function createUpdateState(store: AccountsStore) {
 
     if (state.lastBlockHeight) {
       dispatch(networkActions.setLastExistBlock(state.lastBlockHeight));
+    }
+
+    if (state.idleInterval >= 0) {
+      dispatch(settingsActions.setIdleInterval(state.idleInterval));
     }
 
     if (state.lastSavedBlock) {

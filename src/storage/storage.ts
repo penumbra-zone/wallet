@@ -41,6 +41,7 @@ export type StorageLocalState = {
   messages: MessageStoreItem[];
   notificationWindowId: number | undefined;
   inShowMode: boolean | undefined;
+  idleInterval: number;
 };
 
 export type StorageSessionState = {

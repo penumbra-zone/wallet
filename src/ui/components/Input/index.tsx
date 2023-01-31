@@ -40,11 +40,11 @@ export const Input: React.FC<InputProps> = ({
 
   return (
     <div className={className}>
-      <label htmlFor="" className="h2">
+      <label htmlFor="" className="h2 mb-[8px]">
         {label}
       </label>
       <div
-        className={`w-[100%] h-[52px] rounded-[15px] flex items-center justify-center mt-[8px] 
+        className={`w-[100%] h-[52px] rounded-[15px] flex items-center justify-center  
         ${
           isError
             ? 'bg-red'

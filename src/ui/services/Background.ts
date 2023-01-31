@@ -73,17 +73,17 @@ class Background {
     this._updateIdle();
   }
 
-  //   async setIdleOptions(options: { type: string }) {
-  //     try {
-  //       await this.initPromise;
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       await this._connect!();
-  //       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //       return await this.background!.setIdleOptions(options);
-  //     } catch (err) {
-  //       throw new Error(prepareErrorMessage(err));
-  //     }
-  //   }
+  async setIdleInterval(interval: number) {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.setIdleInterval(interval);
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
+    }
+  }
 
   //   async allowOrigin(origin: string) {
   //     try {
@@ -121,28 +121,28 @@ class Background {
     }
   }
 
-  async setPermission(origin: string, permission: PermissionType){
-     try {
-       await this.initPromise;
-       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-       await this._connect!();
-       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-       return await this.background!.setPermission(origin, permission);
-     } catch (err) {
-       throw new Error(prepareErrorMessage(err));
-     }
+  async setPermission(origin: string, permission: PermissionType) {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.setPermission(origin, permission);
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
+    }
   }
 
-   async deletePermission(origin: string, permission: PermissionType){
-     try {
-       await this.initPromise;
-       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-       await this._connect!();
-       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-       return await this.background!.deletePermission(origin, permission);
-     } catch (err) {
-       throw new Error(prepareErrorMessage(err));
-     }
+  async deletePermission(origin: string, permission: PermissionType) {
+    try {
+      await this.initPromise;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this._connect!();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return await this.background!.deletePermission(origin, permission);
+    } catch (err) {
+      throw new Error(prepareErrorMessage(err));
+    }
   }
 
   //   async setAutoSign(

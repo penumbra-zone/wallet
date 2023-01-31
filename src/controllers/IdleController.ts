@@ -1,33 +1,27 @@
 import ObservableStore from 'obs-store';
 import { extension } from '../lib';
 import { ExtensionStorage } from '../storage';
+import { PreferencesController } from './PreferencesController';
 import { VaultController } from './VaultController';
 
-export interface IdleOptions {
-  type: string;
-  interval?: number;
-}
-
-const IDLE_INTERVAL = 30 * 60;
-
 export class IdleController {
-  private options: IdleOptions;
+  private idleInterval;
+  private preferencesController;
   private vaultController;
   private store;
   private lastUpdateIdle;
 
   constructor({
     extensionStorage,
+    preferencesController,
     vaultController,
   }: {
     extensionStorage: ExtensionStorage;
+    preferencesController: PreferencesController;
     vaultController: VaultController;
   }) {
-    extension.idle.setDetectionInterval(IDLE_INTERVAL);
-    this.options = {
-      type: 'idle',
-    };
-
+    this.preferencesController = preferencesController;
+    this.idleInterval = preferencesController.store.getState().idleInterval;
     this.vaultController = vaultController;
     this.store = new ObservableStore(
       extensionStorage.getInitState({ lastUpdateIdle: Date.now() })
@@ -43,13 +37,15 @@ export class IdleController {
     });
   }
 
-  setOptions(options: IdleOptions) {
-    this.options = { ...this.options, ...options };
+  setIdleInterval(interval: number) {
+    this.lastUpdateIdle = Date.now();
+    this.store.updateState({ lastUpdateIdle: this.lastUpdateIdle });
+    this.idleInterval = interval * 60 * 1000;
+    this.preferencesController.setIdleInterval(this.idleInterval);
     this.start();
   }
 
   start() {
-    this._idleMode();
     this._tmrMode();
   }
 
@@ -60,29 +56,20 @@ export class IdleController {
   }
 
   private _tmrMode() {
-    if (this.options.type === 'idle') return;
+    if (!this.idleInterval) return;
 
-    const time = Date.now() - this.lastUpdateIdle - this.options.interval;
-    if (time > 0) this._lock('locked');
+    const time = Date.now() - this.lastUpdateIdle - this.idleInterval;
 
-    extension.alarms.create('idle', {
-      delayInMinutes: 5 / 60,
-    });
-  }
-
-  private _idleMode() {
-    if (this.options.type !== 'idle') {
-      extension.idle.onStateChanged.removeListener(this._lock);
+    if (time > 0) {
+      this._lock();
     } else {
-      extension.idle.onStateChanged.addListener(this._lock);
+      extension.alarms.create('idle', {
+        delayInMinutes: 5 / 60,
+      });
     }
   }
 
-  _lock = (state: string) => {
-    console.log({ state });
-    
-    if (['idle', 'locked'].indexOf(state) > -1) {
-      this.vaultController.lock();
-    }
-  };
+  _lock() {
+    this.vaultController.lock();
+  }
 }
