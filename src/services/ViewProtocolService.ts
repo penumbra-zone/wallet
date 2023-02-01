@@ -1,7 +1,4 @@
-import {
-    ChainParameters,
-    FmdParameters,
-} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
+
 import {ClientController, Transaction} from '../controllers';
 import {ExtensionStorage} from '../storage';
 import {EncodeAsset} from '../types';
@@ -23,12 +20,18 @@ import {
     TransactionHashesRequest,
     TransactionHashesResponse,
     TransactionsRequest,
-    TransactionsResponse, WitnessRequest, WitnessResponse,
-} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb';
+    TransactionsResponse,
+    WitnessRequest,
+    WitnessResponse
+} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb";
 import {
     ChainParametersRequest,
-    ChainParametersResponse,
-} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
+    ChainParametersResponse
+} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb";
+import {
+    ChainParameters,
+    FmdParameters
+} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb";
 
 const areEqual = (first, second) =>
     first.length === second.length &&
@@ -53,7 +56,7 @@ export class ViewProtocolService {
         this.getLastExistBlock = getLastExistBlock;
     }
 
-    async getAssets(request?: AssetsRequest) {
+    async getAssets({request}: { request?: AssetsRequest }) {
         const assets: EncodeAsset[] = await this.indexedDb.getAllValue('assets');
 
         const response = assets.map((i) => {

@@ -219,6 +219,7 @@ class Background {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return await this.background!.addWallet(data);
     } catch (err) {
+      console.error(err);
       throw new Error(prepareErrorMessage(err));
     }
   }
@@ -414,13 +415,13 @@ class Background {
     }
   }
 
-  async getAllValueIndexedDB(tableName: string) {
+  async getBalances() {
     try {
       await this.initPromise;
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       await this._connect!();
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return await this.background!.getAllValueIndexedDB(tableName);
+      return await this.background!.getBalances();
     } catch (err) {
       throw new Error(prepareErrorMessage(err));
     }

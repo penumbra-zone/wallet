@@ -1,4 +1,6 @@
 import { IDBPDatabase, openDB } from 'idb';
+import {Nullifier} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb";
+import {SpendableNoteRecord} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb";
 
 export type TableName =
   | 'assets'
@@ -80,6 +82,37 @@ export class IndexedDb {
     const store = tx.objectStore(tableName);
     const result = await store.get(id);
     return result;
+  }
+
+  public async updateNotes(nullifier: Nullifier, height: bigint ) {
+    const tx = this.db.transaction('spendable_notes', 'readwrite');
+    const store = tx.objectStore('spendable_notes');
+    const result = await store.getAll();
+
+    for (const note of result) {
+
+      if (JSON.stringify(note.nullifier) == JSON.stringify(nullifier))  {
+        console.log("detected spend nullifier")
+        note.heightSpent = height;
+        await store.put(note, note.noteCommitment.inner)
+      }
+    }
+
+
+  }
+
+  public async getBalances() {
+    const tx = this.db.transaction('spendable_notes', 'readwrite');
+    const store = tx.objectStore('spendable_notes');
+    const result = await store.getAll();
+
+    const balances = result
+        .filter( (note) => note.heightSpent === undefined)
+        .map( (note) => ({
+          assetId: note.note.value.assetId.inner,
+          amount: note.note.value.amount.lo
+        }))
+    return balances;
   }
 
   public async getBalance(tableName: TableName) {
