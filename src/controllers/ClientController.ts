@@ -4,26 +4,10 @@ import {
   ConnectError,
   Code,
 } from '@bufbuild/connect-web';
-import {
-  ObliviousQueryService,
-  TendermintProxyService,
-} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_connectweb';
+
 import { ExtensionStorage } from '../storage';
-import {
-  AssetListRequest,
-  AssetListResponse,
-  BroadcastTxSyncRequest,
-  ChainParametersRequest,
-  ChainParametersResponse,
-  CompactBlockRangeRequest,
-} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
+
 import ObservableStore from 'obs-store';
-import {
-  ChainParameters,
-  CompactBlock,
-  FmdParameters,
-  StatePayload,
-} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb';
 import {
   build_tx,
   decrypt_note,
@@ -38,23 +22,21 @@ import { NetworkController } from './NetworkController';
 import { decode, encode } from 'bech32-buffer';
 import { EncodeAsset } from '../types';
 import { IndexedDb } from '../utils';
-import snakeize from 'snakeize';
+import { WasmViewConnector } from '../utils/WasmViewConnector';
+import { ObliviousQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb';
 import {
-  Address,
-  Amount,
-  AssetId,
-  MerkleRoot,
-  Nullifier,
-  Value,
-} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/crypto/v1alpha1/crypto_pb';
-import { BatchSwapOutputData } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/dex/v1alpha1/dex_pb';
+  AssetListRequest,
+  AssetListResponse,
+  ChainParametersRequest,
+  ChainParametersResponse,
+  CompactBlockRangeRequest,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb';
+
 import {
-  StoredCommitment,
-  StoredHash,
-  StoredTree,
-  WasmViewConnector,
-} from '../utils/WasmViewConnector';
-import { randomInt } from 'crypto';
+  ChainParameters,
+  CompactBlock,
+  FmdParameters,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb';
 
 export type Transaction = {
   txHashHex: string;
@@ -317,6 +299,7 @@ export class ClientController {
             });
           }
         } else {
+          await this.wasmViewConnector.loadUpdates();
           const oldState = this.store.getState().lastSavedBlock;
           const lastSavedBlock = {
             ...oldState,

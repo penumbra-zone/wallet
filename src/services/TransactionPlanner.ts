@@ -1,6 +1,8 @@
 import { ViewProtocolService } from './ViewProtocolService';
-import { TransactionPlan } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/transaction/v1alpha1/transaction_pb';
-import { ChainParametersResponse } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
+import {ChainParametersResponse} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb";
+import {
+  TransactionPlan
+} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb";
 
 export class TransactionPlanner {
   private viewService: ViewProtocolService;
@@ -17,7 +19,7 @@ export class TransactionPlanner {
     );
 
     let transactionPlan = new TransactionPlan();
-    transactionPlan.chainId = chainParameters.chainParameters.chainId;
+    transactionPlan.chainId = chainParameters.parameters.chainId;
 
     return;
   }

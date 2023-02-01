@@ -30,14 +30,13 @@ import { ExtensionStorage, StorageLocalState } from './storage';
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig';
 import { IndexedDb, TableName } from './utils';
 import { CreateWalletInput, ISeedWalletInput } from './wallets';
+import {WasmViewConnector} from "./utils/WasmViewConnector";
 import {
   AssetsRequest,
-  FMDParametersRequest,
   NotesRequest,
-  StatusRequest,
-} from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb';
-import { ChainParametersRequest } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
-import { WasmViewConnector } from './utils/WasmViewConnector';
+  StatusRequest
+} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb";
+import {ChainParametersRequest} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb";
 
 const bgPromise = setupBackgroundService();
 
@@ -299,8 +298,8 @@ class BackgroundService extends EventEmitter {
         url: string | null | undefined,
         network: NetworkName
       ) => this.networkController.setCustomTendermint(url, network),
-      getAllValueIndexedDB: async (tableName: TableName) =>
-        this.indexedDb.getBalance(tableName),
+      getBalances: async () =>
+          this.indexedDb.getBalances(),
       // addresses
       setContact: async (contact: Contact) =>
         this.contactBookController.setContact(contact),
@@ -429,7 +428,7 @@ class BackgroundService extends EventEmitter {
         if (!canIUse) {
           throw new Error('Access denied');
         }
-        return this.viewProtocolService.getAssets();
+        return this.viewProtocolService.getAssets({});
       },
       getChainParameters: async (request?: ChainParametersRequest) => {
         const canIUse = this.permissionsController.hasPermission(

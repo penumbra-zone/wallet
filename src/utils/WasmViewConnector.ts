@@ -1,14 +1,10 @@
+import {ViewClient} from "penumbra-web-assembly";
+import snakeize from 'snakeize'
+import {SpendableNoteRecord, SwapRecord} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb";
 import {
     CompactBlock,
     FmdParameters
-} from "@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/chain/v1alpha1/chain_pb";
-import {ViewClient} from "penumbra-web-assembly";
-import snakeize from 'snakeize'
-import {
-    SpendableNoteRecord,
-    SwapRecord
-} from "@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/view/v1alpha1/view_pb";
-
+} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb";
 
 export type StoredTree = {
     last_position: number;
@@ -48,6 +44,8 @@ export type NctUpdates = {
 export class WasmViewConnector {
     private indexedDb;
 
+    private viewClient;
+
     constructor({
                     indexedDb
                 }) {
@@ -56,26 +54,20 @@ export class WasmViewConnector {
     }
 
     async handleNewCompactBlock(block: CompactBlock, fvk) {
-        let storedTree = await this.loadStoredTree();
 
-        let viewClient = new ViewClient(fvk, 719n, storedTree);
-
-        let snakeizeBlock = snakeize(this.convertCompactBlock(
-            block));
-
-        for (let swap of snakeizeBlock.swap_outputs) {
-            swap.delta_1 = swap.delta1
-            swap.delta_2 = swap.delta2
-            swap.lambda_1 = swap.lambda1
-            swap.lambda_2 = swap.lambda2
-            swap.trading_pair.asset_1 = swap.trading_pair.asset1
-            swap.trading_pair.asset_2 = swap.trading_pair.asset2
-
+        console.debug("new block", block)
+        if (this.viewClient == undefined) {
+            let storedTree = await this.loadStoredTree();
+            this.viewClient = new ViewClient(fvk, 719n, storedTree);
         }
-        let scanResult = await viewClient.scan_block(snakeizeBlock, storedTree.last_position, storedTree.last_forgotten);
+        await this.viewClient.scan_block_without_updates(block.toJson());
 
-        this.handleScanResult(block, scanResult);
 
+        if (block.nullifiers.length > 0) {
+            for (const nullifier of block.nullifiers) {
+                await this.indexedDb.updateNotes(nullifier, block.height)
+            }
+        }
         if (block.fmdParameters !== undefined)
             await this.saveFmdParameters(block.fmdParameters)
 
@@ -89,7 +81,7 @@ export class WasmViewConnector {
         );
 
         const nctForgotten = await this.indexedDb.getValue(
-            'nct_forgotten',"forgotten"
+            'nct_forgotten', "forgotten"
         );
 
         const nctHashes: StoredHash[] = await this.indexedDb.getAllValue(
@@ -108,7 +100,17 @@ export class WasmViewConnector {
 
     }
 
-    async handleScanResult(compactBlock: CompactBlock, scanResult: ScanResult) {
+    public async loadUpdates() {
+        if (this.viewClient == undefined) {
+            console.error("View client is undefined")
+        } else {
+            let storedTree = await this.loadStoredTree();
+            let updates = await this.viewClient.get_updates(storedTree.last_position, storedTree.last_forgotten);
+            await this.handleScanResult(updates)
+        }
+    }
+
+    async handleScanResult(scanResult: ScanResult) {
 
         if (scanResult.nct_updates !== undefined) {
             if (scanResult.nct_updates.set_forgotten !== undefined) {
@@ -123,7 +125,7 @@ export class WasmViewConnector {
             for (const hash of scanResult.nct_updates.store_hashes) {
                 await this.storeHash(hash);
             }
-            if ( scanResult.nct_updates.delete_ranges.length > 0) {
+            if (scanResult.nct_updates.delete_ranges.length > 0) {
             }
         }
 
@@ -153,15 +155,23 @@ export class WasmViewConnector {
     }
 
     async storeHash(hash) {
-        await this.indexedDb.putValue( 'nct_hashes', hash);
+        await this.indexedDb.putValue('nct_hashes', hash);
     }
 
     async storeNote(note) {
-        await this.indexedDb.putValueWithId('spendable_notes',note, note.note_commitment.inner);
+        let storedNote = await this.indexedDb.getValue("spendable_notes", note.noteCommitment.inner);
+        if (storedNote == undefined)
+            await this.indexedDb.putValueWithId('spendable_notes', note, note.noteCommitment.inner);
+        else
+            console.debug("note already stored", note.noteCommitment.inner)
     }
 
     async storeSwap(swap) {
-        await this.indexedDb.putValueWithId('swaps', swap, swap.swap_commitment.inner);
+        let storedSwap = await this.indexedDb.getValue("swaps", swap.swapCommitment.inner);
+        if (storedSwap == undefined)
+            await this.indexedDb.putValueWithId('swaps', swap, swap.swapCommitment.inner);
+        else
+            console.debug("swap already stored", swap.swapCommitment.inner)
     }
 
     async saveFmdParameters(fmdParameters: FmdParameters) {

@@ -5,12 +5,15 @@ import {
   createGrpcWebTransport,
   createPromiseClient,
 } from '@bufbuild/connect-web';
-import { ObliviousQueryService } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_connectweb';
-import { ValidatorInfoRequest } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/client/v1alpha1/client_pb';
 import { useAccountsSelector } from '../../../accounts';
 import { selectNetworks } from '../../redux';
-import { ValidatorInfo } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/stake/v1alpha1/stake_pb';
 import { MyValidators } from '../MyValidators';
+import {ValidatorInfo} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/stake/v1alpha1/stake_pb";
+import {
+  ObliviousQueryService
+} from "@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb";
+import {ValidatorInfoRequest} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb";
+ "@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb";
 
 export const Validators = () => {
   const networks = useAccountsSelector(selectNetworks);

@@ -1,4 +1,3 @@
-import { ValidatorInfo } from '@buf/bufbuild_connect-web_penumbra-zone_penumbra/penumbra/core/stake/v1alpha1/stake_pb';
 import { BigNumber } from 'big-integer';
 import { useEffect, useState } from 'react';
 import { useAccountsSelector } from '../../../accounts';
@@ -11,6 +10,7 @@ import {
   ValidatorTable,
 } from '../../components';
 import { selectNetworks } from '../../redux';
+import {ValidatorInfo} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/stake/v1alpha1/stake_pb";
 
 type AllValidatorsProps = {
   validators: ValidatorInfo[];
