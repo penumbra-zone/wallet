@@ -278,15 +278,16 @@ export class ClientController {
           signal: this.abortController.signal,
         }
       )) {
-        // await this.wasmViewConnector.handleNewCompactBlock(
-        //   response.compactBlock,
-        //   fvk
-        // );
+        await this.wasmViewConnector.handleNewCompactBlock(
+          response.compactBlock,
+          fvk
+        );
 
         // await this.scanBlock(response.compactBlock, fvk);
 
         if (Number(response.compactBlock.height) < lastBlock) {
           if (Number(response.compactBlock.height) % 1000 === 0) {
+            await this.wasmViewConnector.loadUpdates();
             const oldState = this.store.getState().lastSavedBlock;
             const lastSavedBlock = {
               ...oldState,
