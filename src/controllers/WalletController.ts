@@ -97,7 +97,6 @@ export class WalletController extends EventEmitter {
     try {
       return this.wallets[0].getFullViewingKey();
     } catch (error) {
-      console.error(error);
       return '';
     }
   }

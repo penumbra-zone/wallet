@@ -177,13 +177,14 @@ export class ClientController {
 
   async getCompactBlockRange() {
     let fvk;
-    let spending_key;
+    // let spending_key;
     try {
       fvk = this.configApi.getAccountFullViewingKey();
-      spending_key = this.configApi.getAccountSpendingKey();
+      // spending_key = this.configApi.getAccountSpendingKey();
     } catch (error) {
       fvk = '';
     }
+
     if (!fvk) {
       return;
     }

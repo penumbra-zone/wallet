@@ -23,7 +23,12 @@ export const Balance: React.FC<BalanceProps> = ({ className }) => {
 
     if (!data.length) return setBalance(0);
 
+    console.log(data);
+    
+
     const sum = data.reduce((a, b) => a.amount + b.amount, 0);
+    console.log(sum);
+    
 
     dispatch(accountsActions.setBalance(Number(sum)));
     setBalance(sum);
