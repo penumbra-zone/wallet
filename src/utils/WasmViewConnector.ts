@@ -1,10 +1,22 @@
-import {ViewClient} from "penumbra-web-assembly";
+import {decode_nct_root, ViewClient} from "penumbra-web-assembly";
 import snakeize from 'snakeize'
 import {SpendableNoteRecord, SwapRecord} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb";
 import {
     CompactBlock,
     FmdParameters
 } from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb";
+import {
+    ObliviousQueryService,
+    SpecificQueryService
+} from "@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb";
+import {
+    CompactBlockRangeRequest,
+    KeyValueRequest
+} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb";
+import {
+    createPromiseClient,
+} from '@bufbuild/connect-web';
+import {base64encode} from "./base64";
 
 export type StoredTree = {
     last_position: number;
@@ -53,7 +65,7 @@ export class WasmViewConnector {
 
     }
 
-    async handleNewCompactBlock(block: CompactBlock, fvk) {
+    async handleNewCompactBlock(block: CompactBlock, fvk,transport )  {
 
         console.debug("new block", block)
         if (this.viewClient == undefined) {
@@ -71,7 +83,30 @@ export class WasmViewConnector {
         if (block.fmdParameters !== undefined)
             await this.saveFmdParameters(block.fmdParameters)
 
+        let ntcRoot = this.viewClient.get_nct_root();
+
+        const client = createPromiseClient(SpecificQueryService, transport);
+
+        const keyValueRequest : KeyValueRequest = new KeyValueRequest();
+        keyValueRequest.key = "shielded_pool/anchor/" + block.height
+        let keyValue = await client.keyValue(keyValueRequest);
+
+        let decodeNctRoot = decode_nct_root(this.toHexString(keyValue.value));
+
+        // if (decodeNctRoot.inner != decodeNctRoot.inner ) {
+            console.log(block)
+            console.log("Nct root ", ntcRoot)
+            console.log("expected root",decodeNctRoot)
+        // }
+
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+
+
+
     }
+
+
 
 
     public async loadStoredTree(): Promise<StoredTree> {

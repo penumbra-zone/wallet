@@ -37,6 +37,7 @@ import {
   StatusRequest
 } from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb";
 import {ChainParametersRequest} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb";
+import {TransactionController} from "./controllers/TransactionController";
 
 const bgPromise = setupBackgroundService();
 
@@ -158,6 +159,8 @@ class BackgroundService extends EventEmitter {
   messageController: MessageController;
   wasmViewConnector: WasmViewConnector;
 
+  transactionController: TransactionController;
+
   constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
     super();
 
@@ -213,6 +216,20 @@ class BackgroundService extends EventEmitter {
     this.wasmViewConnector = new WasmViewConnector({
       indexedDb: this.indexedDb,
     });
+
+    this.transactionController = new TransactionController({
+      indexedDb: this.indexedDb,
+      getAccountFullViewingKey: () =>
+          this.walletController.getAccountFullViewingKeyWithoutPassword(),
+      getAccountSpendingKey: () =>
+          this.walletController.getAccountSpendingKeyWithoutPassword(),
+      setNetworks: (networkName: string, type: NetworkName) =>
+          this.remoteConfigController.setNetworks(networkName, type),
+      getNetwork: () => this.networkController.getNetwork(),
+      getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
+      wasmViewConnector: this.wasmViewConnector,
+      getCustomGRPC: () => this.networkController.getCustomGRPC(),
+    })
 
     this.clientController = new ClientController({
       extensionStorage: this.extensionStorage,
@@ -329,6 +346,8 @@ class BackgroundService extends EventEmitter {
         this.permissionsController.setPermission(origin, permission),
       deletePermission: async (origin: string, permission: PermissionType) =>
         this.permissionsController.deletePermission(origin, permission),
+      sendTransaction: async (destAddress: string, amount: number) =>
+          this.transactionController.sendTransaction(destAddress,amount),
     };
   }
 
