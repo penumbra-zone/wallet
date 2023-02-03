@@ -83,24 +83,24 @@ export class WasmViewConnector {
         if (block.fmdParameters !== undefined)
             await this.saveFmdParameters(block.fmdParameters)
 
-        let ntcRoot = this.viewClient.get_nct_root();
-
-        const client = createPromiseClient(SpecificQueryService, transport);
-
-        const keyValueRequest : KeyValueRequest = new KeyValueRequest();
-        keyValueRequest.key = "shielded_pool/anchor/" + block.height
-        let keyValue = await client.keyValue(keyValueRequest);
-
-        let decodeNctRoot = decode_nct_root(this.toHexString(keyValue.value));
-
-        // if (decodeNctRoot.inner != decodeNctRoot.inner ) {
-            console.log(block)
-            console.log("Nct root ", ntcRoot)
-            console.log("expected root",decodeNctRoot)
-        // }
-
-        const delay = ms => new Promise(res => setTimeout(res, ms));
-
+        // let ntcRoot = this.viewClient.get_nct_root();
+        //
+        // const client = createPromiseClient(SpecificQueryService, transport);
+        //
+        // const keyValueRequest : KeyValueRequest = new KeyValueRequest();
+        // keyValueRequest.key = "shielded_pool/anchor/" + block.height
+        // let keyValue = await client.keyValue(keyValueRequest);
+        //
+        // let decodeNctRoot = decode_nct_root(this.toHexString(keyValue.value));
+        //
+        // // if (decodeNctRoot.inner != decodeNctRoot.inner ) {
+        //     console.log(block)
+        //     console.log("Nct root ", ntcRoot)
+        //     console.log("expected root",decodeNctRoot)
+        // // }
+        //
+        // const delay = ms => new Promise(res => setTimeout(res, ms));
+        //
 
 
 
@@ -165,7 +165,7 @@ export class WasmViewConnector {
         }
 
         if (scanResult.new_notes.length > 0 || scanResult.new_swaps.length > 0)
-            console.log("New notes or swaps", scanResult)
+            // console.log("New notes or swaps", scanResult)
 
         for (const note of scanResult.new_notes) {
             await this.storeNote(note);

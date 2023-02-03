@@ -214,7 +214,8 @@ export class ClientController {
 
         compactBlockRangeRequest.chainId = chainId;
         compactBlockRangeRequest.startHeight = BigInt(
-            this.store.getState().lastSavedBlock[this.configApi.getNetwork()]+1
+            this.store.getState().lastSavedBlock[this.configApi.getNetwork()] ===0 ? 0 :
+                this.store.getState().lastSavedBlock[this.configApi.getNetwork()] +1
         );
         compactBlockRangeRequest.keepAlive = true;
         this.abortController = new AbortController();
