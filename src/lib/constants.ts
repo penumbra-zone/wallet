@@ -12,7 +12,7 @@ export const DEFAULT_LEGACY_CONFIG = {
   NETWORK_CONFIG: {
     testnet: {
       grpc: 'http://localhost:8080',
-      tendermint: 'http://testnet.penumbra.zone:26657',
+      tendermint: 'http://localhost:26657',
     },
   },
   MESSAGES_CONFIG: {
