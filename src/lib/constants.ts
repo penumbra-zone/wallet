@@ -11,7 +11,7 @@ export const DEFAULT_LEGACY_CONFIG = {
   NETWORKS: ['testnet'],
   NETWORK_CONFIG: {
     testnet: {
-      grpc: 'http://testnet.penumbra.zone:8080',
+      grpc: 'http://localhost:8080',
       tendermint: 'http://testnet.penumbra.zone:26657',
     },
   },
@@ -37,7 +37,7 @@ export const DEFAULT_LEGACY_CONFIG = {
   },
 };
 
-export const TESTNET_URL = 'http://testnet.penumbra.zone:8080';
+export const TESTNET_URL = 'http://localhost:8080';
 
 export const columnsAllValidator: Array<
   ColumnDefinitionType<
