@@ -95,7 +95,7 @@ export class TransactionController {
         let notes = await this.indexedDb.getAllValue('spendable_notes');
 
         let note = notes
-            .find( (note) => note.heightSpent !== undefined);
+            .find( (note) => note.heightSpent === undefined);
 
         if (note === undefined) {
             console.error("No notes found to spend")
