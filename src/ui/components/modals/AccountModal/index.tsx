@@ -1,24 +1,41 @@
-import { useAccountsSelector } from '../../../../accounts';
-import { selectSelectedAccount } from '../../../redux';
 import { Button } from '../../Button';
 import { ModalWrapper } from '../../ModalWrapper';
-import { SettingsSvg, SupportSvg } from '../../Svg';
-import { UserLogo } from '../../UserLogo';
+import {
+  AccountDetailSvg,
+  DowmloadSvg,
+  PermissionsSvg,
+  PlusSvg,
+  SettingsSvg,
+  SupportSvg,
+} from '../../Svg';
 import { SuccessCreateModalProps } from '../SuccessCreateModal';
 import Background from '../../../services/Background';
 import { PopupButton } from '../../PopupButton';
 import { useNavigate } from 'react-router-dom';
 import { routesPath } from '../../../../utils';
 import { useMediaQuery } from '../../../../hooks';
-import { Balance } from '../../Balance';
+import { useState } from 'react';
+import { ConnectedSitesModal } from '../ConnectedSitesModal';
+import { AccountDetailModal } from '../AccountDetailModal';
+import { KeysModalType } from '../../MorePopupButton';
+import { MoreModal } from '../MoreModal';
+import { ExportKeyModal } from '../ExportKeyModal';
 
 export const AccountModal: React.FC<SuccessCreateModalProps> = ({
   show,
   onClose,
 }) => {
+  const [isOpenConnectedSites, setIsOpenConnectedSites] = useState<boolean>(
+    false
+  );
+  const [isOpenDetailPopup, setIsOpenDetailPopup] = useState<boolean>(false);
+  const [keyModalType, setKeyModalType] = useState<KeysModalType>('');
+  const [isOpenMorePopup, setIsOpenMorePopup] = useState<boolean>(false);
+
   const isDesktop = useMediaQuery();
   const navigate = useNavigate();
-  const selectedAccount = useAccountsSelector(selectSelectedAccount);
+
+  const toggleMorePopup = (value: boolean) => () => setIsOpenMorePopup(value);
 
   const handleBlock = async () => {
     await Background.lock();
@@ -30,41 +47,100 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
     navigate(routesPath.SETTINGS);
   };
 
+  const handleConnectedSites = () => {
+    onClose();
+    setIsOpenConnectedSites(true);
+  };
+
+  const toggleConnectedSitesPopup = (value: boolean) => () =>
+    setIsOpenConnectedSites(value);
+
+  const handleAccountDetail = () => {
+    onClose();
+    setIsOpenDetailPopup(true);
+  };
+
+  const toggleDetailPopup = (value: boolean) => () =>
+    setIsOpenDetailPopup(value);
+
+  const changeKeyModalType = (type: KeysModalType) => () => {
+    setKeyModalType(type);
+    onClose();
+  };
+
+   const handleBackExportPopup = () => {
+     setIsOpenDetailPopup(true);
+     setKeyModalType('');
+   };
+
   return (
-    <ModalWrapper
-      show={show}
-      onClose={onClose}
-      position={isDesktop ? 'top_right' : 'center'}
-      className="py-[30px] px-[0px]"
-    >
-      <div className="flex flex-col">
-        <div className="flex items-center justify-between px-[16px] pb-[16px] border-b-[1px] border-solid border-dark_grey">
-          <p className="h1_ext mr-[8px]">My accounts</p>
-          <div className="w-[119px]">
-            <Button
-              title="Block"
-              mode="gradient"
-              onClick={handleBlock}
-              className="tablet:py-[7px]"
+    <>
+      <ModalWrapper
+        show={show}
+        onClose={onClose}
+        position={isDesktop ? 'top_right' : 'center'}
+        className="py-[20px] px-[0px] w-[300px]"
+      >
+        <>
+          <div className="flex flex-col pb-[24px] border-b-[1px] border-dark_grey">
+            <PopupButton
+              svg={<PlusSvg width="20" height="20" />}
+              text="Create an account"
+            />
+            <PopupButton
+              svg={<DowmloadSvg width="20" height="20" />}
+              text="Import an account"
+            />
+            <PopupButton
+              onClick={handleAccountDetail}
+              svg={<AccountDetailSvg />}
+              text="Account details"
+            />
+            <PopupButton
+              onClick={handleConnectedSites}
+              svg={<PermissionsSvg />}
+              text="Connected sites"
             />
           </div>
-        </div>
-        <div className="flex items-center py-[16px] px-[16px] border-b-[1px] border-solid border-dark_grey">
-          <UserLogo className="w-[36px] h-[36px]" />
-          <div className="flex flex-col items-center  ml-[4px]">
-            <p className="h2_ext">{selectedAccount.name}</p>
-            <Balance className="text_numbers_ext" />
+          <div className="py-[24px] border-b-[1px] border-dark_grey">
+            <PopupButton svg={<SupportSvg />} text="Support" />
+            <PopupButton
+              svg={<SettingsSvg />}
+              text="Settings"
+              onClick={handleSettings}
+            />
           </div>
-        </div>
-        <div className="pt-[24px]">
-          <PopupButton svg={<SupportSvg />} text="Support" />
-          <PopupButton
-            svg={<SettingsSvg />}
-            text="Settings"
-            onClick={handleSettings}
-          />
-        </div>
-      </div>
-    </ModalWrapper>
+          <div className="w-[100%] px-[16px]">
+            <Button
+              title="Block account"
+              mode="gradient"
+              onClick={handleBlock}
+              className="ext:py-[7px] tablet:py-[7px] mt-[40px] "
+            />
+          </div>
+        </>
+      </ModalWrapper>
+      <ConnectedSitesModal
+        show={isOpenConnectedSites}
+        onClose={toggleConnectedSitesPopup(false)}
+      />
+      <AccountDetailModal
+        show={isOpenDetailPopup}
+        onClose={toggleDetailPopup(false)}
+        changeKeyModalType={changeKeyModalType}
+      />
+      <MoreModal
+        show={isOpenMorePopup}
+        onClose={toggleMorePopup(false)}
+        handleAccountDetail={handleAccountDetail}
+        handleConnectedSites={handleConnectedSites}
+      />
+      <ExportKeyModal
+        type={keyModalType}
+        show={Boolean(keyModalType)}
+        onClose={changeKeyModalType('')}
+        handleBack={handleBackExportPopup}
+      />
+    </>
   );
 };
