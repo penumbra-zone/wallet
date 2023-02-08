@@ -347,7 +347,7 @@ class BackgroundService extends EventEmitter {
       deletePermission: async (origin: string, permission: PermissionType) =>
         this.permissionsController.deletePermission(origin, permission),
       sendTransaction: async (destAddress: string, amount: number) =>
-          this.transactionController.sendTransaction(destAddress,amount),
+          this.transactionController.sendTransaction(destAddress,amount, "KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA="),
     };
   }
 

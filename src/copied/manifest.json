@@ -28,7 +28,8 @@
     "storage",
     "unlimitedStorage",
     "idle",
-    "activeTab"
+    "activeTab",
+    "notifications"
   ],
   "web_accessible_resources": [
     {
