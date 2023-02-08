@@ -17,7 +17,11 @@ import {RemoteConfigController} from "./RemoteConfigController";
 import {NetworkController} from "./NetworkController";
 import {build_tx, encode_tx, send_plan} from "penumbra-web-assembly";
 import {WasmViewConnector} from "../utils/WasmViewConnector";
-import {BroadcastTxSyncRequest} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb";
+import {
+    BroadcastTxAsyncRequest,
+    BroadcastTxSyncRequest
+} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb";
+import bigInt from "big-integer";
 
 
 export class TransactionController {
@@ -60,7 +64,9 @@ export class TransactionController {
         this.wasmViewConnector = wasmViewConnector;
     }
 
-    async sendTransaction(destAddress: string, amount: number) {
+    async sendTransaction(destAddress: string,
+                          amount: number,
+                          assetId: string) {
         let fvk;
         let spending_key;
         try {
@@ -88,24 +94,42 @@ export class TransactionController {
             baseUrl: grpc,
         });
 
-        let note = await this.indexedDb.getValue(
-            'spendable_notes', "zH5DfVO/cnYl2tHRSrNYev1ZgApFI28pwaWaXDFUlAA="
-        );
+        let notes = await this.indexedDb.getAllValue('spendable_notes');
+
+        notes = notes
+            .filter( (note) => note.heightSpent === undefined)
+            .filter (note => note.note.value.assetId.inner === assetId)
+
+        if (notes.length === 0) {
+            console.error("No notes found to spend")
+        }
+
+
         let fmd: FmdParameters = await this.indexedDb.getValue(
             'fmd_parameters', `fmd`);
 
-        let chain_params: ChainParameters = await this.indexedDb.getValue(
-            'chainParameters', "penumbra-testnet-adraste");
+        if (fmd === undefined) {
+            console.error("No found FmdParameters")
+        }
 
 
-        console.log(chain_params);
+        let chain_params_records =  await  this.indexedDb.getAllValue(
+            'chainParameters');
+        let chain_params = await chain_params_records[0]
+
+        if (fmd === undefined) {
+            console.error("No found chain parameters")
+        }
+
+
+
+
         let data = {
-            notes: [note],
+            notes: notes,
             chain_parameters: chain_params,
             fmd_parameters: fmd
             ,
         };
-        console.log(data);
 
 
         let sendPlan = send_plan(fvk, {
@@ -113,7 +137,7 @@ export class TransactionController {
                     lo: amount * 1000000,
                     hi: 0n
                 },
-                assetId: note.note.value.assetId
+                assetId: notes[0].note.value.assetId
 
             },
             destAddress,
@@ -121,35 +145,36 @@ export class TransactionController {
         )
 
 
-        console.log("Send plan", sendPlan)
-        console.log("Send plan JSON", JSON.stringify(sendPlan))
+        console.log("Transaction plan", sendPlan)
 
 
         let buildTx = build_tx(spending_key, fvk, sendPlan, await this.wasmViewConnector.loadStoredTree());
 
-        console.log(buildTx)
-        console.log("Tx JSON", JSON.stringify(buildTx))
+        console.log("Transaction",buildTx)
 
-
-        let encodeTx = encode_tx(buildTx);
-        console.log("encoded tx ", encodeTx);
-
-        console.log("hex", this.toHexString(encodeTx))
-
-        const tendermint = createPromiseClient(TendermintProxyService, transport);
-
+        let encodeTx = await encode_tx(buildTx);
+        console.log("encoded transaction ", encodeTx);
+        console.log("encoded transaction (hex)", this.toHexString(encodeTx))
 
         let resp = await this.broadcastTx(bytesToBase64(encodeTx));
 
         console.log(resp);
 
-        let broadcastTxSyncRequest = new BroadcastTxSyncRequest();
-        broadcastTxSyncRequest.params = encodeTx;
-        broadcastTxSyncRequest.reqId = 124214123n
-        let broadcastTxSync = await tendermint.broadcastTxSync(broadcastTxSyncRequest);
-
-        console.log(broadcastTxSync);
+        // const tendermint = createPromiseClient(TendermintProxyService, transport);
+        // let broadcastTxSyncRequest = new BroadcastTxSyncRequest();
+        // broadcastTxSyncRequest.params = encodeTx;
+        // broadcastTxSyncRequest.reqId = BigInt(id)
+        // console.log("Tendermint proxy  request", broadcastTxSyncRequest);
+        //
+        // let broadcastTxSync = await tendermint.broadcastTxSync(broadcastTxSyncRequest);
+        //
+        // console.log("Tendermint proxy  response", broadcastTxSync);
     }
+
+    getRandomInt() {
+        return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+    }
+
 
     toHexString(bytes: any) {
         return bytes.reduce(
@@ -169,7 +194,7 @@ export class TransactionController {
             body: JSON.stringify({
                 "method": "broadcast_tx_sync",
                 "params": [tx_bytes_hex],
-                "id": 31221,
+                "id":      this.getRandomInt()
             })
         });
         const content = await broadcastResponse.json();

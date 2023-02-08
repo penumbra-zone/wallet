@@ -63,20 +63,20 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
         <p className="text_numbers">{amount}</p>
       </div>
       <div className="w-[100%] flex flex-col ext:px-[10px] tablet:px-[16px] ext:mb-[24px] tablet:mb-[16px]">
-        <div className="flex justify-between items-center ext:mb-[16px] tablet:mb-[8px] mb-[16px]">
-          <p className="text_body">Estimated gas fee:</p>
-          <div>
-            <p className="text_numbers_s text-light_grey text-right">0</p>
-            <p className="text_numbers text-light_grey  text-right">
-              0 {currency}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <p className="text-body text-green">Probably in 30 seconds</p>
-          <p className="text-body text-light_grey">Max fee:</p>
-          <p className="text_numbers_s text-light_grey">0 {currency}</p>
-        </div>
+        {/*<div className="flex justify-between items-center ext:mb-[16px] tablet:mb-[8px] mb-[16px]">*/}
+        {/*  <p className="text_body">Estimated gas fee:</p>*/}
+        {/*  <div>*/}
+        {/*    <p className="text_numbers_s text-light_grey text-right">0</p>*/}
+        {/*    <p className="text_numbers text-light_grey  text-right">*/}
+        {/*      0 {currency}*/}
+        {/*    </p>*/}
+        {/*  </div>*/}
+        {/*</div>*/}
+        {/*<div className="flex items-center justify-between">*/}
+        {/*  <p className="text-body text-green">Probably in 30 seconds</p>*/}
+        {/*  <p className="text-body text-light_grey">Max fee:</p>*/}
+        {/*  <p className="text_numbers_s text-light_grey">0 {currency}</p>*/}
+        {/*</div>*/}
       </div>
       <div className="w-[100%] flex flex-col ext:px-[10px] tablet:px-[16px] border-y-[1px] border-solid border-dark_grey ext:pt-[16px] ext:pb-[24px] tablet:pt-[24px] tablet:pb-[16px] mb-[40px]">
         <div className="flex justify-between items-center ext:mb-[16px] tablet:mb-[8px] mb-[16px]">
