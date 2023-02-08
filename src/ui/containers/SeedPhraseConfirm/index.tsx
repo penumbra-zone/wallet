@@ -57,6 +57,9 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
     third: '',
   });
 
+  console.log(words);
+  
+
   const [random, setRandom] = useState<{
     r1: number;
     r2: number;
@@ -98,6 +101,18 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
     }));
   };
 
+  const onInputChange = (type: 'first' | 'second' | 'third') => (
+    value: string
+  ) => {
+    const typedValue = options.find((i) => i.value === value);
+
+    if (!typedValue) return;
+    setWords((state) => ({
+      ...state,
+      [type]: typedValue.value,
+    }));
+  };
+
   const handleCloseModal = () => setIsShowModal(false);
 
   return (
@@ -126,6 +141,8 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
                 random.r1 + 1 < 10 ? `0${random.r1 + 1}` : String(random.r1 + 1)
               }
               handleChange={handleChangeWords('first')}
+              onInputChange={onInputChange('first')}
+              initialValue={words['first']}
             />
           </div>
           <div className="w-[100%] mb-[12px]">
@@ -137,6 +154,8 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
                 random.r2 + 1 < 10 ? `0${random.r2 + 1}` : String(random.r2 + 1)
               }
               handleChange={handleChangeWords('second')}
+              onInputChange={onInputChange('second')}
+              initialValue={words['second']}
             />
           </div>
           <div className="w-[100%]">
@@ -148,6 +167,8 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
                 random.r3 + 1 < 10 ? `0${random.r3 + 1}` : String(random.r3 + 1)
               }
               handleChange={handleChangeWords('third')}
+              onInputChange={onInputChange('third')}
+              initialValue={words['third']}
             />
           </div>
           <div className="w-[100%] mb-[10px] mt-[40px]">

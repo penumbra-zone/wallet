@@ -20,6 +20,7 @@ type SelectPropsType = {
   className?: string;
   isError?: boolean;
   handleChange?: (value: string | number) => void;
+  onInputChange?: (value: string) => void;
 };
 
 export const Select: React.FC<SelectPropsType> = ({
