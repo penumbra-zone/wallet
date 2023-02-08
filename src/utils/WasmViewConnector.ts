@@ -72,8 +72,9 @@ export class WasmViewConnector {
             let storedTree = await this.loadStoredTree();
             this.viewClient = new ViewClient(fvk, 719n, storedTree);
         }
-        await this.viewClient.scan_block_without_updates(block.toJson());
+        let result: ScanResult = await this.viewClient.scan_block_without_updates(block.toJson());
 
+        await this.handleScanResult(result);
 
         if (block.nullifiers.length > 0) {
             for (const nullifier of block.nullifiers) {
