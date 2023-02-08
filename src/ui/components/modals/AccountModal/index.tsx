@@ -135,12 +135,12 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
         handleAccountDetail={handleAccountDetail}
         handleConnectedSites={handleConnectedSites}
       />
-      <ExportKeyModal
+      {/* <ExportKeyModal
         type={keyModalType}
         show={Boolean(keyModalType)}
         onClose={changeKeyModalType('')}
         handleBack={handleBackExportPopup}
-      />
+      /> */}
     </>
   );
 };

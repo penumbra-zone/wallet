@@ -5,6 +5,7 @@ import { useMediaQuery } from '../../../../hooks';
 import { getShortKey, routesPath } from '../../../../utils';
 import { Button, ChevronLeftIcon, UserLogo } from '../../../components';
 import { selectNewAccount } from '../../../redux';
+import Background from '../../../services/Background';
 
 type DetailTxBeforeSendProps = {
   recipient: string;
@@ -25,7 +26,13 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 
   const handleEdit = () => setIsOpenDetailTx(false);
 
-  const handleBack = () => navigate(routesPath.HOME);
+  console.log({ recipient, amoun: Number(amount) });
+
+  const handleBack = async () => {
+    await Background.sendTransaction(recipient, Number(amount));
+    navigate(routesPath.HOME);
+  };
+  //
 
   return (
     <div className="w-[100%] flex flex-col items-start ext:py-[20px] tablet:py-[30px] bg-brown rounded-[15px]">

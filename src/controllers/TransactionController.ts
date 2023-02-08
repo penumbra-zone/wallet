@@ -22,6 +22,7 @@ import {
     BroadcastTxSyncRequest
 } from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb";
 import bigInt from "big-integer";
+import { extension } from '../lib';
 
 
 export class TransactionController {
@@ -160,23 +161,30 @@ export class TransactionController {
 
         console.log(resp);
 
-        if (resp.result.code === 0) {
-            chrome.notifications.create(resp.id, {
-                type: 'basic',
-                iconUrl: 'assets/img/logo.png',
-                title: 'Transaction Confirmed',
-                message: 'Transaction with hash 0x' +resp.result.hash +' successfully confirmed' ,
-                priority: 1
-            })
-        } else  {
-            chrome.notifications.create(resp.id, {
-                type: 'basic',
-                iconUrl: 'assets/img/logo.png',
-                title: 'Transaction Error',
-                message: 'Error submitting transaction: code ' + resp.result.code + ', log: ' + resp.result.log ,
-                priority: 1
-            })
-        }
+        // if (resp.result.code === 0) {
+        //     extension.notifications.create(resp.id, {
+        //       type: 'basic',
+        //       iconUrl: 'assets/img/logo.png',
+        //       title: 'Transaction Confirmed',
+        //       message:
+        //         'Transaction with hash 0x' +
+        //         resp.result.hash +
+        //         ' successfully confirmed',
+        //       priority: 1,
+        //     });
+        // } else  {
+        //     extension.notifications.create(resp.id, {
+        //       type: 'basic',
+        //       iconUrl: 'assets/img/logo.png',
+        //       title: 'Transaction Error',
+        //       message:
+        //         'Error submitting transaction: code ' +
+        //         resp.result.code +
+        //         ', log: ' +
+        //         resp.result.log,
+        //       priority: 1,
+        //     });
+        // }
 
 
         // const tendermint = createPromiseClient(TendermintProxyService, transport);
