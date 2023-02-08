@@ -4,7 +4,6 @@ import {
   AssetsList,
   BalanceAction,
   CopySvg,
-  MorePopupButton,
   Tabs,
 } from '../../components';
 import { selectSelectedAccount, selectState } from '../../redux';

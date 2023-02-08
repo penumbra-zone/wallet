@@ -6,7 +6,6 @@ import {
   BalanceAction,
   Button,
   ChevronLeftIcon,
-  MorePopupButton,
 } from '../../components';
 import { selectNewAccount } from '../../redux';
 
