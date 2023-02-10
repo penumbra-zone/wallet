@@ -40,7 +40,7 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                           key={c.address}
                           onClick={handleSelect(c)}
                         >
-                          <div className="w-[36px] h-[36px] border-[1px] border-solid border-[#282626] rounded-[50%] mr-[8px]"></div>
+                          <div className="w-[36px] h-[36px] border-[1px] border-solid border-dark_grey rounded-[50%] mr-[8px]"></div>
                           <div className="flex flex-col">
                             <p
                               className={`${
@@ -50,7 +50,7 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                               {getShortName(c.name)}
                             </p>
                             <p className="text_body text-light_grey">
-                              {getShortKey(c.address)}
+                              {getShortName(c.address)}
                             </p>
                           </div>
                         </div>

@@ -126,7 +126,6 @@ export const ManageValidatorModal = ({
             {!showDelegeta && (
               <Button
                 mode="transparent"
-                onClick={() => console.log('asd')}
                 title="Redelegate"
                 className="w-[120px] tablet:py-[9px]"
               />

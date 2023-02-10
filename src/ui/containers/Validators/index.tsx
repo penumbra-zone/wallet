@@ -56,13 +56,11 @@ export const Validators = () => {
           <div className="flex">
             <Button
               mode="transparent"
-              onClick={() => console.log('asd')}
               title="Send"
               className="w-[110px] tablet:py-[9px]"
             />
             <Button
               mode="gradient"
-              onClick={() => console.log('asd')}
               title="Deposit"
               className="w-[110px] ml-[16px] tablet:py-[9px]"
             />
@@ -85,7 +83,6 @@ export const Validators = () => {
           </div>
           <Button
             mode="gradient"
-            onClick={() => console.log('asd')}
             title="Claim"
             className="w-[110px] ml-[16px] tablet:py-[9px]"
           />

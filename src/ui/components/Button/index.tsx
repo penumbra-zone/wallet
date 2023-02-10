@@ -7,7 +7,7 @@ type ButtonProps = {
   className?: string;
   iconLeft?: JSX.Element;
   iconRight?: JSX.Element;
-  onClick: () => void;
+  onClick?: () => void;
 };
 
 export const Button: React.FC<ButtonProps> = ({

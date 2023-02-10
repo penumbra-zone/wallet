@@ -14,21 +14,20 @@ Link to web store - https://chrome.google.com/webstore/detail/penumbra-wallet/lk
 ## Connect dapp to wallet:
     const handleConnect = async () => {
         const data = await penumbra.login();
-        console.log(data);
     };
 ## Get current status of chain sync
-    penumbra.getStatus().then(data => console.log(data))
+    penumbra.getStatus()
 ## Queries for notes that have been accepted by the core.chain.v1alpha1.
-     penumbra.getNotes().then(data => console.log(data))
+     penumbra.getNotes()
 ## Query for a note by its note commitment, optionally waiting until the note is detected.
-     penumbra.getNoteByCommitment({noteCommitment}).then(data => console.log(data))
+     penumbra.getNoteByCommitment({noteCommitment})
 ## Queries for assets.
-     penumbra.getAssets().then(data => console.log(data))
+     penumbra.getAssets()
 ## Query for the current chain parameters.
-     penumbra.getChainParameters().then(data => console.log(data))
+     penumbra.getChainParameters()
 ## Query for the transaction hashes in the given range of blocks.
-     penumbra.getTransactionHashes({start_height,end_height}).then(data => console.log(data))
+     penumbra.getTransactionHashes({start_height,end_height})
 ## Query for the full transactions in the given range of blocks.
-     penumbra.getTransactions({start_height,end_height}).then(data => console.log(data))
+     penumbra.getTransactions({start_height,end_height})
 ## Query for a given transaction hash.
-     penumbra.getTransactionByHash({txHash}).then(data => console.log(data))
+     penumbra.getTransactionByHash({txHash})

@@ -46,7 +46,6 @@ export const ActiveMessage = () => {
           <p className="text_body_ext">Connect only to sites you trust</p>
           <Button
             mode="icon_transparent"
-            onClick={() => console.log('asd')}
             title="More"
             iconLeft={<PlusSvg width="16" height="16" stroke="#FFFFFF" />}
             className="text-white text_button_ext"

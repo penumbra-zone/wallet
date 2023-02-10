@@ -103,7 +103,6 @@ export const ActivityList = () => {
       </div>
       <Button
         mode="gradient"
-        onClick={() => console.log('asd')}
         title="More"
         className="ext:w-[96px] tablet:w-[192px]"
       />

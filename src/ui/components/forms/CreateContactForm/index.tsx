@@ -22,47 +22,80 @@ export const CreateContactForm: React.FC<CreateContactFormProps> = ({
   const [isValidate, setIsValidate] = useState<AddressValidatorsType>(
     {} as AddressValidatorsType
   );
+  const [helperText, setHelperText] = useState<{
+    name: string;
+    address: string;
+  }>({ name: '', address: '' });
 
-  const handleChangeValues =
-    (type: 'name' | 'address') =>
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setValues((state) => ({
-        ...state,
-        [type]: event.target.value,
-      }));
-
-      if (type === 'address') {
-        const validators = validateAddress(event.target.value);
-        setIsValidate((state) => ({
-          ...state,
-          ...validators,
-        }));
-        if (!event.target.value) setIsValidate({} as AddressValidatorsType);
-      }
-    };
+  const handleChangeValues = (type: 'name' | 'address') => (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setIsValidate({} as AddressValidatorsType);
+    setHelperText({ name: '', address: '' });
+    setValues((state) => ({
+      ...state,
+      [type]: event.target.value,
+    }));
+  };
 
   const handleSave = async () => {
-    await Background.setContact(values);
-    handleCancel();
+    const validators = validateAddress(values.address);
+
+    if (Object.values(validators).includes(false)) {
+      setIsValidate((state) => ({
+        ...state,
+        ...validators,
+      }));
+      setHelperText((state) => ({
+        ...state,
+        address: Object.values(validators).includes(false)
+          ? 'Invalid address'
+          : '',
+      }));
+      return;
+    }
+
+    try {
+      await Background.setContact(values);
+      handleCancel();
+    } catch (error) {
+      const typeError =
+        error.message === 'Contact with this name exist' ? 'name' : 'address';
+      setHelperText((state) => ({
+        ...state,
+        [typeError]: error.message,
+      }));
+      setIsValidate((state) => ({
+        ...state,
+        uniqueName: typeError === 'name',
+        uniqueAddress: typeError === 'address',
+      }));
+    }
   };
 
   return (
-    <div className="w-[100%] h-[100%] px-[16px] ext:pt-[24px] ext:pb-[32px] tablet:py-[24px] flex flex-col justify-between">
+    <div className="w-[100%] px-[16px] ext:pt-[24px] ext:pb-[32px] tablet:py-[24px] flex flex-col justify-between">
       <div className="flex flex-col">
         <Input
-          label={<p className={`${isDesktop ? 'h3' : 'h2_ext'}`}>User name</p>}
-          value={values.note}
+          labelClassName={`${isDesktop ? 'h3' : 'h2_ext'}`}
+          label="User name"
+          value={values.name}
           onChange={handleChangeValues('name')}
-          className="mb-[24px]"
+          isError={
+            helperText.name ? Object.values(isValidate).includes(false) : false
+          }
+          helperText={helperText.name || 'Invalid address'}
         />
         <Input
-          label={
-            <p className={`${isDesktop ? 'h3' : 'h2_ext'}`}>
-              Penumbra's address
-            </p>
+          labelClassName={`${isDesktop ? 'h3' : 'h2_ext'}`}
+          label="
+              Penumbra's address"
+          isError={
+            helperText.address
+              ? Object.values(isValidate).includes(false)
+              : false
           }
-          isError={Object.values(isValidate).includes(false)}
-          helperText="Invalid address"
+          helperText={helperText.address || 'Invalid address'}
           value={values.address}
           onChange={handleChangeValues('address')}
         />

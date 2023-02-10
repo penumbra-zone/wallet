@@ -1,10 +1,14 @@
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Contact } from '../../../../controllers';
 import { useMediaQuery } from '../../../../hooks';
 import toast from 'react-hot-toast';
 import Background from '../../../services/Background';
 import { Button, CopySvg, Input } from '../../../components';
-import { AddressValidatorsType, validateAddress } from '../../../../utils';
+import {
+  AddressValidatorsType,
+  getShortName,
+  validateAddress,
+} from '../../../../utils';
 
 type DetailContactCardProps = {
   contact: Contact;
@@ -23,6 +27,14 @@ export const DetailContactCard: React.FC<DetailContactCardProps> = ({
   const [isValidate, setIsValidate] = useState<AddressValidatorsType>(
     {} as AddressValidatorsType
   );
+  const [helperText, setHelperText] = useState<{
+    name: string;
+    address: string;
+  }>({ name: '', address: '' });
+
+  useEffect(() => {
+    setValues(contact);
+  }, [contact]);
 
   const handleEdit = () => setIsEdit(true);
 
@@ -33,23 +45,16 @@ export const DetailContactCard: React.FC<DetailContactCardProps> = ({
     });
   };
 
-  const handleChangeValues =
-    (type: 'name' | 'address' | 'note') =>
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setValues((state) => ({
-        ...state,
-        [type]: event.target.value,
-      }));
-
-      if (type === 'address') {
-        const validators = validateAddress(event.target.value);
-        setIsValidate((state) => ({
-          ...state,
-          ...validators,
-        }));
-        if (!event.target.value) setIsValidate({} as AddressValidatorsType);
-      }
-    };
+  const handleChangeValues = (type: 'name' | 'address' | 'note') => (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setIsValidate({} as AddressValidatorsType);
+    setHelperText({ name: '', address: '' });
+    setValues((state) => ({
+      ...state,
+      [type]: event.target.value,
+    }));
+  };
 
   const handleCancelBtn = () => setIsEdit(false);
 
@@ -60,12 +65,42 @@ export const DetailContactCard: React.FC<DetailContactCardProps> = ({
     setIsEdit(false);
   };
 
-  const handleSave = () => {
-    Background.updateContact(values, contact.address);
-    handleCancel();
-    setSelectedContact(null);
-    setIsEdit(false);
-  }
+  const handleSave = async () => {
+    const validators = validateAddress(values.address);
+
+    if (Object.values(validators).includes(false)) {
+      setIsValidate((state) => ({
+        ...state,
+        ...validators,
+      }));
+      setHelperText((state) => ({
+        ...state,
+        address: Object.values(validators).includes(false)
+          ? 'Invalid address'
+          : '',
+      }));
+
+      return;
+    }
+    try {
+      await Background.updateContact(values, contact.address);
+      handleCancel();
+      setSelectedContact(null);
+      setIsEdit(false);
+    } catch (error) {
+      const typeError =
+        error.message === 'Contact with this name exist' ? 'name' : 'address';
+      setIsValidate((state) => ({
+        ...state,
+        uniqueName: typeError === 'name',
+        uniqueAddress: typeError === 'address',
+      }));
+      setHelperText((state) => ({
+        ...state,
+        [typeError]: error.message,
+      }));
+    }
+  };
 
   return (
     <div className="py-[24px] w-[100%] flex flex-col px-[16px]">
@@ -84,14 +119,18 @@ export const DetailContactCard: React.FC<DetailContactCardProps> = ({
       </div>
       {!isEdit ? (
         <p className={`mb-[24px] ${isDesktop ? 'h3' : 'h2_ext'}`}>
-          {contact.name}
+          {getShortName(contact.name)}
         </p>
       ) : (
         <Input
-          label={<p className={`${isDesktop ? 'h3' : 'h2_ext'}`}>User name</p>}
+          labelClassName={`${isDesktop ? 'h3' : 'h2_ext'} pb-[16px]`}
+          label="User name"
           value={values.name}
+          helperText={helperText.name || 'Invalid address'}
+          isError={
+            helperText.name ? Object.values(isValidate).includes(false) : false
+          }
           onChange={handleChangeValues('name')}
-          className="mb-[24px]"
         />
       )}
       {!isEdit && (
@@ -119,40 +158,21 @@ export const DetailContactCard: React.FC<DetailContactCardProps> = ({
         </div>
       ) : (
         <Input
-          label={
-            <p className={`${isDesktop ? 'h3' : 'h2_ext'}`}>
-              Penumbra's address
-            </p>
-          }
+          labelClassName={`${isDesktop ? 'h3' : 'h2_ext'} pb-[16px]`}
+          label="Penumbra's address"
           value={values.address}
           onChange={handleChangeValues('address')}
-          className="-mb-[6px]"
-          isError={Object.values(isValidate).includes(false)}
-          helperText="Invalid address"
+          isError={
+            helperText.address
+              ? Object.values(isValidate).includes(false)
+              : false
+          }
+          helperText={helperText.address || 'Invalid address'}
         />
       )}
 
-      {!isEdit ? (
-        <>
-          {contact.note && (
-            <div className="flex flex-col mb-[24px]">
-              <p className="text_body mb-[16px]">Note</p>
-              <div className="flex items-center py-[8px] ext:px-[16px] tablet:px-[10px] bg-dark_grey rounded-[15px]">
-                <p className="break-all text_body">{contact.note}</p>
-              </div>
-            </div>
-          )}
-        </>
-      ) : (
-        <Input
-          label={<p className={`${isDesktop ? 'h3' : 'h2_ext'}`}>Note</p>}
-          value={values.note}
-          onChange={handleChangeValues('note')}
-          className="mb-[24px]"
-        />
-      )}
       {isEdit && (
-        <div className="w-[100%] flex mt-[72px]">
+        <div className="w-[100%] flex">
           <Button
             mode="transparent"
             onClick={handleCancelBtn}

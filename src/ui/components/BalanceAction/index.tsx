@@ -22,17 +22,12 @@ export const BalanceAction = () => {
   const handleNavigate = (url: string) => () => navigate(url);
   return (
     <div className="w-[100%] flex flex-col items-center">
-      <div className="ext:w-[40px] ext:h-[40px] tablet:w-[51px] tablet:h-[51px] li_gradient rounded-[50%] flex  items-center justify-center">
-        <div className="ext:w-[39px] ext:h-[39px] tablet:w-[50px] tablet:h-[50px] bg-brown rounded-[50%] flex items-center justify-center">
-          PNB
-        </div>
-      </div>
+      <div className="relative ext:w-[40px] ext:h-[40px] tablet:w-[51px] tablet:h-[51px] bg-brown rounded-[50%] li_gradient text_body before:content-['PNB'] before:absolute before:top-[0.5px] before:left-[0.5px] before:w-[calc(100%-1px)] before:h-[calc(100%-1px)] before:bg-brown before:rounded-[50%] before:flex before:items-center before:justify-center"></div>
       <Balance className="pt-[16px] pb-[24px] text_numbers" />
       <div className="flex ext:gap-x-[30px]  tablet:gap-x-[69px] ext:mb-[24px] tablet:mb-[40px]">
         <div className="flex flex-col items-center">
           <Button
             mode="gradient"
-            onClick={() => console.log('asd')}
             title={
               <div className="flex items-center justify-center">
                 <DowmloadSvg />
@@ -58,7 +53,6 @@ export const BalanceAction = () => {
         <div className="flex flex-col items-center">
           <Button
             mode="gradient"
-            onClick={() => console.log('asd')}
             title={
               <div className="flex items-center justify-center">
                 <CachedSvg />
