@@ -9,6 +9,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLElement> {
   className?: string;
   leftSvg?: ReactElement;
   rightElement?: ReactElement;
+  labelClassName?:string
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -20,6 +21,7 @@ export const Input: React.FC<InputProps> = ({
   className,
   leftSvg,
   rightElement,
+  labelClassName='h2 mb-[8px]',
   ...props
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -40,9 +42,9 @@ export const Input: React.FC<InputProps> = ({
 
   return (
     <div className={className}>
-      <label htmlFor="" className="h2 mb-[8px]">
+      <p className={labelClassName}>
         {label}
-      </label>
+      </p>
       <div
         className={`w-[100%] h-[52px] rounded-[15px] flex items-center justify-center  
         ${

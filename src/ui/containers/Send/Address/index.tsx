@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccountsSelector } from '../../../../accounts';
+import { Contact } from '../../../../controllers';
 import { useMediaQuery } from '../../../../hooks';
 import {
   AddressValidatorsType,
@@ -11,11 +12,12 @@ import {
   Balance,
   Button,
   CloseSvg,
+  ContactsList,
   Input,
   SearchSvg,
   Select,
 } from '../../../components';
-import { selectBalance } from '../../../redux';
+import { selectBalance, selectContacts } from '../../../redux';
 
 type AddressProps = {
   search: string;
@@ -39,6 +41,7 @@ export const Address: React.FC<AddressProps> = ({
   const navigate = useNavigate();
   const isDesktop = useMediaQuery();
   const balance = useAccountsSelector(selectBalance);
+  const contacts = useAccountsSelector(selectContacts);
 
   const [isValidate, setIsValidate] = useState<AddressValidatorsType>(
     {} as AddressValidatorsType
@@ -82,9 +85,21 @@ export const Address: React.FC<AddressProps> = ({
 
   const handleNext = () => setIsOpenDetailTx(true);
 
+  const list = contacts.reduce((result, item: Contact) => {
+    let letter = item.name[0].toUpperCase();
+    if (!result[letter]) {
+      result[letter] = [];
+    }
+
+    result[letter].push(item);
+    return result;
+  }, {});
+
+  const handleSelectContact = (contact: Contact) => () => setSearch(contact.address);
+
   return (
     <>
-      <div className="w-[100%] flex justify-center items-center ext:mb-[24px] tablet:mb-[16px]">
+      <div className="w-[100%] flex justify-center items-center ext:mb-[4px] laptop:mb-[16px]">
         <p className="h1 ml-[auto]">Send to address</p>
         <span
           className="ml-[auto] svg_hover cursor-pointer"
@@ -112,29 +127,27 @@ export const Address: React.FC<AddressProps> = ({
         helperText="Invalid recipient address"
         className="w-[100%]"
       />
-      <div className="bg-brown rounded-[15px] h-[492px] w-[100%]">
+      <div className={`bg-brown rounded-[15px] w-[100%]`}>
         {!Object.values(isValidate).includes(false) && search ? (
           <div className="h-[100%] flex flex-col justify-between px-[12px] pt-[30px] pb-[37px]">
             <div className="flex flex-col">
               <Select
-                label="Assets:"
+                labelClassName={`${
+                  isDesktop ? 'h3' : 'h2_ext'
+                } text-light_grey mb-[16px]`}
+                label="Assets :"
                 options={options}
                 handleChange={handleChangeSelect}
                 initialValue={select}
               />
               <Input
-                label={
-                  <p
-                    className={`${
-                      isDesktop ? 'h3' : 'h2_ext'
-                    }} text-light_grey`}
-                  >
-                    Total :
-                  </p>
-                }
+                labelClassName={`${
+                  isDesktop ? 'h3' : 'h2_ext'
+                } text-light_grey mb-[16px]`}
+                label="Total :"
                 value={amount}
                 onChange={handleChangeAmout}
-                className="ext:mt-[40px] tablet:mt-[22px]"
+                className="mt-[24px]"
                 rightElement={
                   <div
                     className="flex items-center bg-dark_grey h-[50px] px-[25px] rounded-r-[15px] text_button_ext cursor-pointer"
@@ -145,7 +158,7 @@ export const Address: React.FC<AddressProps> = ({
                 }
               />
             </div>
-            <div className="w-[100%] flex">
+            <div className="w-[100%] flex mt-[24px]">
               <Button
                 mode="transparent"
                 onClick={handleBack}
@@ -162,7 +175,9 @@ export const Address: React.FC<AddressProps> = ({
             </div>
           </div>
         ) : (
-          <></>
+          <div className="h-[320px] w-[100%]">
+            <ContactsList list={list} handleSelect={handleSelectContact} />
+          </div>
         )}
       </div>
     </>

@@ -57,9 +57,6 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
     third: '',
   });
 
-  console.log(words);
-  
-
   const [random, setRandom] = useState<{
     r1: number;
     r2: number;

@@ -19,6 +19,7 @@ type SelectPropsType = {
   initialValue?: string | number;
   className?: string;
   isError?: boolean;
+  labelClassName?: string;
   handleChange?: (value: string | number) => void;
   onInputChange?: (value: string) => void;
 };
@@ -32,6 +33,7 @@ export const Select: React.FC<SelectPropsType> = ({
   fieldName = '1',
   className,
   isError,
+  labelClassName,
   handleChange,
   ...props
 }) => {
@@ -67,10 +69,10 @@ export const Select: React.FC<SelectPropsType> = ({
 
   return (
     <div className={className}>
-      <p className="text_body">{label}</p>
+      <p className={labelClassName}>{label}</p>
       <div
         onClick={containerHandler}
-        className={`w-[100%] h-[52px] rounded-[15px] flex items-center justify-center mt-[8px]
+        className={`w-[100%] h-[52px] rounded-[15px] flex items-center justify-center
         ${
           isError
             ? 'bg-red'
