@@ -12,7 +12,6 @@ export const SettingsContacts = () => {
   const contacts = useAccountsSelector(selectContacts);
 
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
-  console.log({selectedContact});
 
   const [mode, setMode] = useState<'show' | 'create' | ''>('');
 
@@ -71,13 +70,12 @@ export const SettingsContacts = () => {
       </div>
       <div className="w-[100%] h-[calc(100%-74px]] flex justify-between ">
         <div
-          className={` ${
-            mode
+          className={` ${mode
               ? !isDesktop
                 ? 'w-[100%] h-[100%]'
                 : 'w-[50%] tablet:border-r-[1px] tablet:border-solid tablet:border-dark_grey'
               : 'w-[100%]'
-          }`}
+            }`}
         >
           {isDesktop ? (
             <ContactsList
