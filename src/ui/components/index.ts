@@ -35,6 +35,7 @@ export * from './modals/ExportSeedPhraseModal';
 export * from './modals/ManageValidatorModal';
 export * from './modals/PermissionsModal';
 export * from './modals/ConnectedSitesModal';
+export * from './modals/CreateContactModal';
 
 //forms
 export * from './forms/CreatePasswordForm';

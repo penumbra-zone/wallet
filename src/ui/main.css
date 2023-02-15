@@ -181,6 +181,14 @@ select {
     line-height: 22px;
 }
 
+.text_body_ext {
+    font-family: 'Devanagari Sangam Regular';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 18px;
+}
+
 .text_numbers_s {
     font-family: "Faktum Medium";
     font-style: normal;

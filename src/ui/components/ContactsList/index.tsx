@@ -1,13 +1,13 @@
 import { Contact } from '../../../controllers';
 import { useMediaQuery } from '../../../hooks';
-import { getShortKey } from '../../../utils';
+import { getShortKey, getShortName } from '../../../utils';
 import { Button } from '../Button';
 import { AccountSvg } from '../Svg';
 
 type ContactsListProps = {
   list: { [key: string]: Contact[] };
-  handleSelect: (c: Contact) => () => void;
-  handleCreate: () => void;
+  handleSelect?: (c: Contact) => () => void;
+  handleCreate?: () => void;
 };
 
 export const ContactsList: React.FC<ContactsListProps> = ({
@@ -40,15 +40,17 @@ export const ContactsList: React.FC<ContactsListProps> = ({
                           key={c.address}
                           onClick={handleSelect(c)}
                         >
-                          <div className="w-[36px] h-[36px] li_gradient rounded-[50%] flex items-center justify-center mr-[8px]">
-                            <div className="w-[35px] h-[35px]  bg-brown rounded-[50%] flex items-center justify-center"></div>
-                          </div>
+                          <div className="w-[36px] h-[36px] border-[1px] border-solid border-dark_grey rounded-[50%] mr-[8px]"></div>
                           <div className="flex flex-col">
-                            <p className={`${isDesktop ? 'h3' : 'h2_ext'}`}>
-                              {c.name}
+                            <p
+                              className={`${
+                                isDesktop ? 'h3' : 'h2_ext'
+                              } break-all`}
+                            >
+                              {getShortName(c.name)}
                             </p>
                             <p className="text_body text-light_grey">
-                              {getShortKey(c.address)}
+                              {getShortName(c.address)}
                             </p>
                           </div>
                         </div>

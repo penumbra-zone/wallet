@@ -2,9 +2,9 @@ import { Dispatch, SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccountsSelector } from '../../../../accounts';
 import { useMediaQuery } from '../../../../hooks';
-import { getShortKey, routesPath } from '../../../../utils';
+import { getShortKey, getShortName, routesPath } from '../../../../utils';
 import { Button, ChevronLeftIcon, UserLogo } from '../../../components';
-import { selectNewAccount } from '../../../redux';
+import { selectContacts, selectNewAccount } from '../../../redux';
 import Background from '../../../services/Background';
 
 type DetailTxBeforeSendProps = {
@@ -23,16 +23,14 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
   const navigate = useNavigate();
   const isDesktop = useMediaQuery();
   const selectAccount = useAccountsSelector(selectNewAccount);
+  const contacts = useAccountsSelector(selectContacts);
 
   const handleEdit = () => setIsOpenDetailTx(false);
-
-  console.log({ recipient, amoun: Number(amount) });
 
   const handleBack = async () => {
     await Background.sendTransaction(recipient, Number(amount));
     navigate(routesPath.HOME);
   };
-  //
 
   return (
     <div className="w-[100%] flex flex-col items-start ext:py-[20px] tablet:py-[30px] bg-brown rounded-[15px]">
@@ -43,23 +41,27 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
         iconLeft={<ChevronLeftIcon stroke="#E0E0E0" />}
         className="ext:ml-[10px] tablet:ml-[16px] mb-[24px]"
       />
-      <div className="w-[100%] flex items-center justify-between ext:px-[10px] tablet:px-[16px] mb-[24px]">
-        <div className="flex items-center w-[45%]">
-          <UserLogo className="ext:w-[30px] ext:h-[30px] tablet:w-[36px] tablet:h-[36px]" />
+      <div className="w-[100%] flex items-center justify-start ext:px-[10px] tablet:px-[16px] mb-[24px]">
+        <div className="flex items-center w-[48%]">
+          <div>
+            <div className="ext:w-[30px] ext:h-[30px] tablet:w-[36px] tablet:h-[36px] rounded-[50%] border-[1px] border-solid border-dark_grey"></div>
+          </div>
           <p className="h2 ext:ml-[8px] tablet:ml-[16px]">
             {selectAccount.name}
           </p>
         </div>
-        <span className="rotate-180">
+        <span className="rotate-180 w-[4%]">
           <ChevronLeftIcon
             width={isDesktop ? '24' : '16'}
             height={isDesktop ? '24' : '16'}
           />
         </span>
-        <div className="flex items-center w-[45%]">
-          <UserLogo className="ext:w-[30px] ext:h-[30px] tablet:w-[36px] tablet:h-[36px]" />
+        <div className="flex items-center w-[48%]">
+          <div>
+            <div className="ext:w-[30px] ext:h-[30px] tablet:w-[36px] tablet:h-[36px] rounded-[50%] border-[1px] border-solid border-dark_grey"></div>
+          </div>
           <p className="h2 ext:ml-[8px] tablet:ml-[16px]">
-            {getShortKey(recipient)}
+            {getShortName(recipient)}
           </p>
         </div>
       </div>

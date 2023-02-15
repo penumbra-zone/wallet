@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccountsSelector } from '../../../../accounts';
+import { Contact } from '../../../../controllers';
 import { useMediaQuery } from '../../../../hooks';
 import {
   AddressValidatorsType,
@@ -11,11 +12,15 @@ import {
   Balance,
   Button,
   CloseSvg,
+  ContactsList,
+  CreateContactModal,
+  DoneSvg,
   Input,
+  PlusSvg,
   SearchSvg,
   Select,
 } from '../../../components';
-import { selectBalance } from '../../../redux';
+import { selectBalance, selectContacts } from '../../../redux';
 
 type AddressProps = {
   search: string;
@@ -39,10 +44,12 @@ export const Address: React.FC<AddressProps> = ({
   const navigate = useNavigate();
   const isDesktop = useMediaQuery();
   const balance = useAccountsSelector(selectBalance);
+  const contacts = useAccountsSelector(selectContacts);
 
   const [isValidate, setIsValidate] = useState<AddressValidatorsType>(
     {} as AddressValidatorsType
   );
+  const [isShowModal, setIsShowModal] = useState<boolean>(false);
 
   const handleBack = () => navigate(routesPath.HOME);
 
@@ -82,9 +89,32 @@ export const Address: React.FC<AddressProps> = ({
 
   const handleNext = () => setIsOpenDetailTx(true);
 
+  const list = contacts.reduce((result, item: Contact) => {
+    let letter = item.name[0].toUpperCase();
+    if (!result[letter]) {
+      result[letter] = [];
+    }
+
+    result[letter].push(item);
+    return result;
+  }, {});
+
+  const handleSelectContact = (contact: Contact) => () =>
+    setSearch(contact.address);
+
+  const handleClearSelect = () => {
+    setSearch('');
+    setAmount('');
+    setSelect('PNB');
+  };
+
+  const handleCloseModal = () => setIsShowModal(false);
+
+  const handleOpenModal = () => setIsShowModal(true);
+
   return (
     <>
-      <div className="w-[100%] flex justify-center items-center ext:mb-[24px] tablet:mb-[16px]">
+      <div className="w-[100%] flex justify-center items-center ext:mb-[4px] laptop:mb-[16px]">
         <p className="h1 ml-[auto]">Send to address</p>
         <span
           className="ml-[auto] svg_hover cursor-pointer"
@@ -99,42 +129,78 @@ export const Address: React.FC<AddressProps> = ({
           />
         </span>
       </div>
-      <Input
-        placeholder="Search, address..."
-        value={search}
-        isError={Object.values(isValidate).includes(false)}
-        onChange={handleChangeSearch}
-        leftSvg={
-          <span className="ml-[24px] mr-[9px]">
-            <SearchSvg />
-          </span>
-        }
-        helperText="Invalid recipient address"
-        className="w-[100%]"
-      />
-      <div className="bg-brown rounded-[15px] h-[492px] w-[100%]">
+      {!Object.values(isValidate).includes(false) && search ? (
+        <div className="flex items-center p-[16px] bg-brown rounded-[15px] mb-[16px]">
+          <div className="ext:mr-[8px] tablet:mr-[10px]">
+            <DoneSvg width="24" height="24" />
+          </div>
+          <div className="flex flex-col">
+            <p className="break-all h2">
+              {contacts.find((i) => i.address === search)
+                ? contacts.find((i) => i.address === search).name
+                : ''}
+            </p>
+            <p className="break-all text_body text-light_grey">{search}</p>
+          </div>
+          <div
+            className="ext:ml-[16px] tablet:ml-[10px] cursor-pointer"
+            onClick={handleClearSelect}
+          >
+            <CloseSvg width="24" height="24" fill="#E0E0E0" />
+          </div>
+        </div>
+      ) : (
+        <Input
+          placeholder="Search, address..."
+          value={search}
+          isError={Object.values(isValidate).includes(false)}
+          onChange={handleChangeSearch}
+          leftSvg={
+            <span className="ml-[24px] mr-[9px]">
+              <SearchSvg />
+            </span>
+          }
+          helperText="Invalid recipient address"
+          className="w-[100%]"
+        />
+      )}
+      <div className={`bg-brown rounded-[15px] w-[100%]`}>
         {!Object.values(isValidate).includes(false) && search ? (
-          <div className="h-[100%] flex flex-col justify-between px-[12px] pt-[30px] pb-[37px]">
+          <div className="h-[100%] flex flex-col justify-between px-[16px] py-[24px]">
+            {!contacts.find((i) => i.address === search) ? (
+              <div
+                className="flex justify-between items-center bg-dark_grey py-[8px] px-[16px] rounded-[15px] mb-[24px] cursor-pointer"
+                onClick={handleOpenModal}
+              >
+                <p className="text_body">
+                  New address found! Click here to add this address to your
+                  address book.
+                </p>
+                <div>
+                  <PlusSvg width="20" height="20" stroke="#524B4B" />
+                </div>
+              </div>
+            ) : (
+              <></>
+            )}
             <div className="flex flex-col">
               <Select
-                label="Assets:"
+                labelClassName={`${
+                  isDesktop ? 'h3' : 'h2_ext'
+                } text-light_grey mb-[16px]`}
+                label="Assets :"
                 options={options}
                 handleChange={handleChangeSelect}
                 initialValue={select}
               />
               <Input
-                label={
-                  <p
-                    className={`${
-                      isDesktop ? 'h3' : 'h2_ext'
-                    }} text-light_grey`}
-                  >
-                    Total :
-                  </p>
-                }
+                labelClassName={`${
+                  isDesktop ? 'h3' : 'h2_ext'
+                } text-light_grey mb-[16px]`}
+                label="Total :"
                 value={amount}
                 onChange={handleChangeAmout}
-                className="ext:mt-[40px] tablet:mt-[22px]"
+                className="mt-[24px]"
                 rightElement={
                   <div
                     className="flex items-center bg-dark_grey h-[50px] px-[25px] rounded-r-[15px] text_button_ext cursor-pointer"
@@ -145,7 +211,7 @@ export const Address: React.FC<AddressProps> = ({
                 }
               />
             </div>
-            <div className="w-[100%] flex">
+            <div className="w-[100%] flex mt-[24px]">
               <Button
                 mode="transparent"
                 onClick={handleBack}
@@ -162,9 +228,20 @@ export const Address: React.FC<AddressProps> = ({
             </div>
           </div>
         ) : (
-          <></>
+          <div className="min-h-[320px] w-[100%]">
+            {contacts.length ? (
+              <ContactsList list={list} handleSelect={handleSelectContact} />
+            ) : (
+              <></>
+            )}
+          </div>
         )}
       </div>
+      <CreateContactModal
+        show={isShowModal}
+        onClose={handleCloseModal}
+        address={search}
+      />
     </>
   );
 };

@@ -1,5 +1,3 @@
-import { useAccountsSelector } from '../../../accounts';
-import { selectSelectedAccount } from '../../redux';
 import { DotsSvg } from '../Svg';
 
 type UserLogoProps = {
@@ -8,7 +6,6 @@ type UserLogoProps = {
 };
 
 export const UserLogo: React.FC<UserLogoProps> = ({ className, onClick }) => {
-   const selectedAccount = useAccountsSelector(selectSelectedAccount);
   return (
     <div
       onClick={onClick}

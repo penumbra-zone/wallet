@@ -1,6 +1,8 @@
 export type AddressValidatorsType = {
   hasRightStart: boolean;
   hasRightLength: boolean;
+  uniqueName: boolean;
+  uniqueAddress: boolean;
 };
 
 export const validateAddress = (value: string) => {

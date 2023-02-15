@@ -24,8 +24,6 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-
-
   const [seed, setSeed] = useState({
     1: 'under',
     2: 'magnet',
@@ -52,7 +50,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
     23: 'act',
     24: 'end',
   });
-  
+
   const [isValidMnemonic, setIsValidMnemonic] = useState<boolean>(true);
   const [isShowModal, setIsShowModal] = useState<boolean>(false);
 
@@ -62,10 +60,21 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
   }, []);
 
   const handleBack = () => navigate(routesPath.SELECT_ACTION);
+
   const handleChange = (index: number) => (value: string) => {
     setSeed((state) => ({
       ...state,
-      [index]: value,
+      [index + 1]: value,
+    }));
+  };
+
+  const onInputChange = (index: number) => (value: string) => {
+    const typedValue = options.find((i) => i.value === value);
+
+    if (!typedValue) return;
+    setSeed((state) => ({
+      ...state,
+      [index + 1]: typedValue.value,
     }));
   };
 
@@ -92,7 +101,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
         type: 'seed',
         name: 'Wallet 1',
         addressByIndex: '',
-        shortAddressByIndex: ''
+        shortAddressByIndex: '',
       })
     );
     setIsShowModal(true);
@@ -127,6 +136,8 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
                   fieldName={String(i)}
                   label={`#${i + 1 < 10 ? `0${i + 1}` : i + 1}`}
                   handleChange={handleChange(i)}
+                  onInputChange={onInputChange(i)}
+                  initialValue={seed[i + 1]}
                 />
               </div>
             ))}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAccountsSelector } from '../../../accounts';
 import { Contact } from '../../../controllers';
 import { useMediaQuery } from '../../../hooks';
+import { getShortName } from '../../../utils';
 import { Button, ContactsList, CreateContactForm } from '../../components';
 import { selectContacts } from '../../redux';
 import { DetailContactCard } from './DetailContactCard';
@@ -11,6 +12,7 @@ export const SettingsContacts = () => {
   const contacts = useAccountsSelector(selectContacts);
 
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  console.log({selectedContact});
 
   const [mode, setMode] = useState<'show' | 'create' | ''>('');
 
@@ -53,7 +55,7 @@ export const SettingsContacts = () => {
           </p>
 
           <p className="ml-[6px]">
-            {selectedContact ? ' / ' + selectedContact.name : ''}
+            {selectedContact ? ' / ' + getShortName(selectedContact.name) : ''}
           </p>
         </div>
         {contacts.length && !selectedContact ? (
