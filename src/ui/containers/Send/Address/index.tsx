@@ -6,6 +6,7 @@ import { useMediaQuery } from '../../../../hooks';
 import {
   AddressValidatorsType,
   routesPath,
+  setOnlyNumberInput,
   validateAddress,
 } from '../../../../utils';
 import {
@@ -84,8 +85,12 @@ export const Address: React.FC<AddressProps> = ({
     setSelect(value);
   };
 
-  const handleChangeAmout = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setAmount(event.target.value);
+  const handleChangeAmout = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, notShow, valueFloat } = setOnlyNumberInput(event.target.value);
+    if (isNaN(valueFloat) || notShow)
+      return;
+    setAmount(value);
+  }
 
   const handleNext = () => setIsOpenDetailTx(true);
 
@@ -185,22 +190,22 @@ export const Address: React.FC<AddressProps> = ({
             )}
             <div className="flex flex-col">
               <Select
-                labelClassName={`${
-                  isDesktop ? 'h3' : 'h2_ext'
-                } text-light_grey mb-[16px]`}
+                labelClassName={`${isDesktop ? 'h3' : 'h2_ext'
+                  } text-light_grey mb-[16px]`}
                 label="Assets :"
                 options={options}
                 handleChange={handleChangeSelect}
                 initialValue={select}
               />
               <Input
-                labelClassName={`${
-                  isDesktop ? 'h3' : 'h2_ext'
-                } text-light_grey mb-[16px]`}
+                labelClassName={`${isDesktop ? 'h3' : 'h2_ext'
+                  } text-light_grey mb-[16px]`}
                 label="Total :"
                 value={amount}
+                isError={balance < Number(amount)}
                 onChange={handleChangeAmout}
                 className="mt-[24px]"
+                helperText={'You do not have enough token'}
                 rightElement={
                   <div
                     className="flex items-center bg-dark_grey h-[50px] px-[25px] rounded-r-[15px] text_button_ext cursor-pointer"
@@ -211,7 +216,7 @@ export const Address: React.FC<AddressProps> = ({
                 }
               />
             </div>
-            <div className="w-[100%] flex mt-[24px]">
+            <div className="w-[100%] flex">
               <Button
                 mode="transparent"
                 onClick={handleBack}
@@ -223,7 +228,7 @@ export const Address: React.FC<AddressProps> = ({
                 onClick={handleNext}
                 title="Next"
                 className="py-[7px] w-[50%] ml-[8px]"
-                disabled={!amount}
+                disabled={!Number(amount) || balance < Number(amount)}
               />
             </div>
           </div>

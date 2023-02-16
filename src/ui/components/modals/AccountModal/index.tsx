@@ -3,6 +3,7 @@ import { ModalWrapper } from '../../ModalWrapper';
 import {
   AccountDetailSvg,
   DowmloadSvg,
+  ExpandSvg,
   PermissionsSvg,
   PlusSvg,
   SettingsSvg,
@@ -68,10 +69,17 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
     onClose();
   };
 
-   const handleBackExportPopup = () => {
-     setIsOpenDetailPopup(true);
-     setKeyModalType('');
-   };
+  const handleBackExportPopup = () => {
+    setIsOpenDetailPopup(true);
+    setKeyModalType('');
+  };
+
+  const handleExpand = () => {
+    Background.showTab(
+      `${window.location.origin}/accounts.html`,
+      'accounts'
+    );
+  };
 
   return (
     <>
@@ -83,14 +91,19 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
       >
         <>
           <div className="flex flex-col pb-[24px] border-b-[1px] border-dark_grey">
-            <PopupButton
+            {/* <PopupButton
               svg={<PlusSvg width="20" height="20" />}
               text="Create an account"
             />
             <PopupButton
               svg={<DowmloadSvg width="20" height="20" />}
               text="Import an account"
-            />
+            /> */}
+            {!isDesktop && <PopupButton
+              onClick={handleExpand}
+              svg={<ExpandSvg />}
+              text='Expand view'
+            />}
             <PopupButton
               onClick={handleAccountDetail}
               svg={<AccountDetailSvg />}

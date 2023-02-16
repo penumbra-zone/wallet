@@ -83,16 +83,17 @@ export const routes: RouteObject[] = [
         path: routesPath.SETTINGS,
         element: <Settings />,
         children: [
-          {
-            path: routesPath.SETTINGS,
-            element: <h2>SUPPORT</h2>,
-          },
+          // {
+          //   path: routesPath.SETTINGS,
+          //   element: <h2>SUPPORT</h2>,
+          // },
           {
             path: routesPath.SETTINGS_ADDITIONALLY,
             element: <h2>SETTINGS_ADDITIONALLY</h2>,
           },
           {
-            path: routesPath.SETTINGS_CONTACTS,
+            path: routesPath.SETTINGS,
+            // path: routesPath.SETTINGS_CONTACTS,
             element: <SettingsContacts />,
           },
           {

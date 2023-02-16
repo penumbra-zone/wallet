@@ -31,7 +31,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
     await Background.sendTransaction(recipient, Number(amount));
     navigate(routesPath.HOME);
   };
-
+  
   return (
     <div className="w-[100%] flex flex-col items-start ext:py-[20px] tablet:py-[30px] bg-brown rounded-[15px]">
       <Button
@@ -43,9 +43,9 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
       />
       <div className="w-[100%] flex items-center justify-start ext:px-[10px] tablet:px-[16px] mb-[24px]">
         <div className="flex items-center w-[48%]">
-          <div>
+          {/* <div>
             <div className="ext:w-[30px] ext:h-[30px] tablet:w-[36px] tablet:h-[36px] rounded-[50%] border-[1px] border-solid border-dark_grey"></div>
-          </div>
+          </div> */}
           <p className="h2 ext:ml-[8px] tablet:ml-[16px]">
             {selectAccount.name}
           </p>
@@ -57,11 +57,11 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
           />
         </span>
         <div className="flex items-center w-[48%]">
-          <div>
+          {/* <div>
             <div className="ext:w-[30px] ext:h-[30px] tablet:w-[36px] tablet:h-[36px] rounded-[50%] border-[1px] border-solid border-dark_grey"></div>
-          </div>
+          </div> */}
           <p className="h2 ext:ml-[8px] tablet:ml-[16px]">
-            {getShortName(recipient)}
+            {contacts.find(i => i.address === recipient) ? contacts.find(i=> i.address ===recipient).name : getShortName(recipient)}
           </p>
         </div>
       </div>
