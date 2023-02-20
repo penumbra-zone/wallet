@@ -1,3 +1,3 @@
-require("@babel/register")({
-    presets: [ "@babel/env" ],
-});
+require('@babel/register')({
+	presets: ['@babel/env'],
+})

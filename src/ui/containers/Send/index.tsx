@@ -1,35 +1,43 @@
-import { useState } from 'react';
-import { Address } from './Address';
-import { DetailTxBeforeSend } from './DetailTxBeforeSend';
+import { useState } from 'react'
+import { TransactionPlanType } from '../../../types/transacrion'
+import Background from '../../services/Background'
+import { Address } from './Address'
+import { DetailTxBeforeSend } from './DetailTxBeforeSend'
 
 export const Send = () => {
-  const [search, setSearch] = useState<string>('');
-  const [amount, setAmount] = useState<string>('');
-  const [select, setSelect] = useState<string>('PNB');
-  const [isOpenDetailTx, setIsOpenDetailTx] = useState<boolean>(false);
+	const [search, setSearch] = useState<string>('')
+	const [amount, setAmount] = useState<string>('')
+	const [select, setSelect] = useState<string>('PNB')
+	const [sendPlan, setSendPlan] = useState<TransactionPlanType | null>(null)
 
-  return (
-    <div className="w-[100%]  flex flex-col items-center justify-center ext:py-[40px] tablet:py-[0px] tablet:mb-[20px]">
-      <div className="ext:w-[100%] laptop:w-[400px]">
-        {isOpenDetailTx ? (
-          <DetailTxBeforeSend
-            setIsOpenDetailTx={setIsOpenDetailTx}
-            recipient={search}
-            currency={select}
-            amount={amount}
-          />
-        ) : (
-          <Address
-            search={search}
-            select={select}
-            amount={amount}
-            setAmount={setAmount}
-            setSearch={setSearch}
-            setSelect={setSelect}
-            setIsOpenDetailTx={setIsOpenDetailTx}
-          />
-        )}
-      </div>
-    </div>
-  );
-};
+	const handleNext = async () => {
+		const sendPlan = await Background.getTransactionPlan(search, Number(amount))
+		setSendPlan(sendPlan)
+	}
+
+	return (
+		<div className='w-[100%]  flex flex-col items-center justify-center ext:py-[40px] tablet:py-[0px] tablet:mb-[20px]'>
+			<div className='ext:w-[100%] laptop:w-[400px]'>
+				{sendPlan ? (
+					<DetailTxBeforeSend
+						setSendPlan={setSendPlan}
+						recipient={search}
+						currency={select}
+						amount={amount}
+						sendPlan={sendPlan}
+					/>
+				) : (
+					<Address
+						search={search}
+						select={select}
+						amount={amount}
+						setAmount={setAmount}
+						setSearch={setSearch}
+						setSelect={setSelect}
+						handleNext={handleNext}
+					/>
+				)}
+			</div>
+		</div>
+	)
+}

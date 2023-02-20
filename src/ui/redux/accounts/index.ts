@@ -1,72 +1,72 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { AccountsState } from '../../../accounts/rootReducer';
-import { Contact } from '../../../controllers';
-import Background from '../../services/Background';
+import { createSlice } from '@reduxjs/toolkit'
+import { AccountsState } from '../../../accounts/rootReducer'
+import { Contact } from '../../../controllers'
+import Background from '../../services/Background'
 
 type CreateAccountInput = {
-  type: 'seed';
-  name: string;
-  seed: string;
-  addressByIndex: string;
-  shortAddressByIndex: string;
-};
+	type: 'seed'
+	name: string
+	seed: string
+	addressByIndex: string
+	shortAddressByIndex: string
+}
 
 type Init = {
-  selectedAccount: CreateAccountInput;
-  isRedirectToAccountPage: boolean;
-  balance: number;
-  contacts: Contact[];
-};
+	selectedAccount: CreateAccountInput
+	isRedirectToAccountPage: boolean
+	balance: number
+	contacts: Contact[]
+}
 
 const init: Init = {
-  selectedAccount: {} as CreateAccountInput,
-  isRedirectToAccountPage: true,
-  balance: 0,
-  contacts: [],
-};
+	selectedAccount: {} as CreateAccountInput,
+	isRedirectToAccountPage: true,
+	balance: 0,
+	contacts: [],
+}
 
 const accounts = createSlice({
-  name: 'accounts',
-  initialState: init,
-  reducers: {
-    setSelectedAccount: (state, action) => ({
-      ...state,
-      selectedAccount: action.payload,
-    }),
-    setRedirectAccountPage: (state, action) => ({
-      ...state,
-      isRedirectToAccountPage: action.payload,
-    }),
-    setBalance: (state, action) => ({
-      ...state,
-      balance: action.payload,
-    }),
-    setContacts: (state, action) => ({
-      ...state,
-      contacts: action.payload,
-    }),
-  },
-});
+	name: 'accounts',
+	initialState: init,
+	reducers: {
+		setSelectedAccount: (state, action) => ({
+			...state,
+			selectedAccount: action.payload,
+		}),
+		setRedirectAccountPage: (state, action) => ({
+			...state,
+			isRedirectToAccountPage: action.payload,
+		}),
+		setBalance: (state, action) => ({
+			...state,
+			balance: action.payload,
+		}),
+		setContacts: (state, action) => ({
+			...state,
+			contacts: action.payload,
+		}),
+	},
+})
 
-export const accountsActions = accounts.actions;
+export const accountsActions = accounts.actions
 
-export default accounts.reducer;
-const { setSelectedAccount } = accountsActions;
+export default accounts.reducer
+const { setSelectedAccount } = accountsActions
 
 export function createAccount(account: CreateAccountInput) {
-  return async (dispatch) => {
-    const lastAccount = await Background.addWallet({
-      ...account,
-    });
+	return async dispatch => {
+		const lastAccount = await Background.addWallet({
+			...account,
+		})
 
-    dispatch(setSelectedAccount(lastAccount));
-    await Background.selectAccount(lastAccount);
-  };
+		dispatch(setSelectedAccount(lastAccount))
+		await Background.selectAccount(lastAccount)
+	}
 }
 
 export const selectSelectedAccount = (state: AccountsState) =>
-  state.accounts.selectedAccount;
+	state.accounts.selectedAccount
 export const selectRedirectToAccountPage = (state: AccountsState) =>
-  state.accounts.isRedirectToAccountPage;
-export const selectBalance = (state: AccountsState) => state.accounts.balance;
-export const selectContacts = (state: AccountsState) => state.accounts.contacts;
+	state.accounts.isRedirectToAccountPage
+export const selectBalance = (state: AccountsState) => state.accounts.balance
+export const selectContacts = (state: AccountsState) => state.accounts.contacts

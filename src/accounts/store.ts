@@ -1,16 +1,16 @@
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
-import { AccountsState, rootReducer } from './rootReducer';
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+import { configureStore } from '@reduxjs/toolkit'
+import { AccountsState, rootReducer } from './rootReducer'
 
 export function createAccountsStore() {
-  return configureStore({
-    reducer: rootReducer,
-  });
+	return configureStore({
+		reducer: rootReducer,
+	})
 }
 
 export const useAccountsSelector: TypedUseSelectorHook<AccountsState> =
-  useSelector;
+	useSelector
 
-export type AccountsStore = ReturnType<typeof createAccountsStore>;
+export type AccountsStore = ReturnType<typeof createAccountsStore>
 
-export const useAppDispatch = () => useDispatch<AccountsStore['dispatch']>();
+export const useAppDispatch = () => useDispatch<AccountsStore['dispatch']>()

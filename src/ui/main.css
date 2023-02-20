@@ -4,38 +4,38 @@
 
 /* fonts */
 @font-face {
-    font-family: "Faktum Bold";
-    src: local("Faktum Bold"),
-        url("/src/assets/fonts/Faktum-Bold.ttf") format("truetype");
+	font-family: 'Faktum Bold';
+	src: local('Faktum Bold'),
+		url('/src/assets/fonts/Faktum-Bold.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: "Faktum Medium";
-    src: local("Faktum Medium"),
-        url("/src/assets/fonts/Faktum-Medium.ttf") format("truetype");
+	font-family: 'Faktum Medium';
+	src: local('Faktum Medium'),
+		url('/src/assets/fonts/Faktum-Medium.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: "Faktum SemiBold";
-    src: local("Faktum SemiBold"),
-        url("/src/assets/fonts/Faktum-SemiBold.ttf") format("truetype");
+	font-family: 'Faktum SemiBold';
+	src: local('Faktum SemiBold'),
+		url('/src/assets/fonts/Faktum-SemiBold.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: "Devanagari Sangam Regular";
-    src: local("Devanagari Sangam Regular"),
-        url("/src/assets/fonts/Devanagari-Sangam-Regular.ttf") format("truetype");
+	font-family: 'Devanagari Sangam Regular';
+	src: local('Devanagari Sangam Regular'),
+		url('/src/assets/fonts/Devanagari-Sangam-Regular.ttf') format('truetype');
 }
 
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 ul[class],
 ol[class] {
-    padding: 0;
+	padding: 0;
 }
 
 body,
@@ -52,372 +52,393 @@ figcaption,
 blockquote,
 dl,
 dd {
-    margin: 0;
+	margin: 0;
 }
 
 body {
-    min-height: 100vh;
-    scroll-behavior: smooth;
-    text-rendering: optimizeSpeed;
-    line-height: 1.5;
-    color: #ffffff;
-    background-color: #000000;
+	min-height: 100vh;
+	scroll-behavior: smooth;
+	text-rendering: optimizeSpeed;
+	line-height: 1.5;
+	color: #ffffff;
+	background-color: #000000;
 }
 
 ul[class],
 ol[class] {
-    list-style: none;
+	list-style: none;
 }
 
 a:not([class]) {
-    text-decoration-skip-ink: auto;
+	text-decoration-skip-ink: auto;
 }
 
 img {
-    max-width: 100%;
-    display: block;
+	max-width: 100%;
+	display: block;
 }
 
-article>*+* {
-    margin-top: 1em;
+article > * + * {
+	margin-top: 1em;
 }
 
 input,
 button,
 textarea,
 select {
-    font: inherit;
+	font: inherit;
 }
 
 /* font styles */
 
 .h1 {
-    font-family: 'Faktum SemiBold';
-    font-style: normal;
-    font-weight: 600;
-    font-size: 24px;
-    line-height: 36px;
+	font-family: 'Faktum SemiBold';
+	font-style: normal;
+	font-weight: 600;
+	font-size: 24px;
+	line-height: 36px;
 }
 
 .h2 {
-    font-family: 'Faktum SemiBold';
-    font-style: normal;
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 26px;
+	font-family: 'Faktum SemiBold';
+	font-style: normal;
+	font-weight: 600;
+	font-size: 18px;
+	line-height: 26px;
 }
 
 .h2_ext {
-    font-family: 'Faktum Medium';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 20px;
+	font-family: 'Faktum Medium';
+	font-style: normal;
+	font-weight: 500;
+	font-size: 14px;
+	line-height: 20px;
 }
 
-
 .h1_ext {
-    font-family: 'Faktum SemiBold';
-    font-style: normal;
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 22px;
+	font-family: 'Faktum SemiBold';
+	font-style: normal;
+	font-weight: 600;
+	font-size: 15px;
+	line-height: 22px;
 }
 
 .h3 {
-    font-family: "Faktum Medium";
-    font-style: normal;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 24px;
+	font-family: 'Faktum Medium';
+	font-style: normal;
+	font-weight: 500;
+	font-size: 16px;
+	line-height: 24px;
 }
 
-
 .text_ext {
-    font-family: "Faktum Bold";
-    font-style: normal;
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 18px;
+	font-family: 'Faktum Bold';
+	font-style: normal;
+	font-weight: 500;
+	font-size: 12px;
+	line-height: 18px;
 }
 
 .text_button {
-    font-family: "Faktum Bold";
-    font-style: normal;
-    font-weight: 700;
-    font-size: 15px;
-    line-height: 22px;
+	font-family: 'Faktum Bold';
+	font-style: normal;
+	font-weight: 700;
+	font-size: 15px;
+	line-height: 22px;
 }
 
 .text_button_ext {
-    font-family: "Faktum Bold";
-    font-style: normal;
-    font-weight: 700;
-    font-size: 12px;
-    line-height: 18px;
+	font-family: 'Faktum Bold';
+	font-style: normal;
+	font-weight: 700;
+	font-size: 12px;
+	line-height: 18px;
 }
 
 .text_numbers {
-    font-family: "Faktum Medium";
-    font-style: normal;
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 30px;
+	font-family: 'Faktum Medium';
+	font-style: normal;
+	font-weight: 500;
+	font-size: 20px;
+	line-height: 30px;
 }
 
 .text_numbers_ext {
-    font-family: 'Faktum SemiBold';
-    font-style: normal;
-    font-weight: 600;
-    font-size: 12px;
-    line-height: 18px;
+	font-family: 'Faktum SemiBold';
+	font-style: normal;
+	font-weight: 600;
+	font-size: 12px;
+	line-height: 18px;
 }
 
 .text_body {
-    font-family: 'Devanagari Sangam Regular';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 15px;
-    line-height: 22px;
+	font-family: 'Devanagari Sangam Regular';
+	font-style: normal;
+	font-weight: 400;
+	font-size: 15px;
+	line-height: 22px;
 }
 
 .text_body_ext {
-    font-family: 'Devanagari Sangam Regular';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 18px;
+	font-family: 'Devanagari Sangam Regular';
+	font-style: normal;
+	font-weight: 400;
+	font-size: 12px;
+	line-height: 18px;
 }
 
 .text_numbers_s {
-    font-family: "Faktum Medium";
-    font-style: normal;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 24px;
+	font-family: 'Faktum Medium';
+	font-style: normal;
+	font-weight: 500;
+	font-size: 16px;
+	line-height: 24px;
 }
 
 .link_website {
-    font-family: 'Faktum Medium';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 18px;
+	font-family: 'Faktum Medium';
+	font-style: normal;
+	font-weight: 500;
+	font-size: 12px;
+	line-height: 18px;
 
-    text-decoration-line: underline;
+	text-decoration-line: underline;
 }
 
 @media (max-width: 480px) {
-    .h1 {
-        font-family: 'Faktum SemiBold';
-        font-style: normal;
-        font-weight: 600;
-        font-size: 20px;
-        line-height: 30px;
-    }
+	.h1 {
+		font-family: 'Faktum SemiBold';
+		font-style: normal;
+		font-weight: 600;
+		font-size: 20px;
+		line-height: 30px;
+	}
 
-    .h2 {
-        font-family: 'Faktum Medium';
-        font-style: normal;
-        font-weight: 500;
-        font-size: 14px;
-        line-height: 20px;
-    }
+	.h2 {
+		font-family: 'Faktum Medium';
+		font-style: normal;
+		font-weight: 500;
+		font-size: 14px;
+		line-height: 20px;
+	}
 
-    .text_button {
-        font-family: "Faktum Bold";
-        font-style: normal;
-        font-weight: 500;
-        font-size: 12px;
-        line-height: 18px;
-    }
+	.text_button {
+		font-family: 'Faktum Bold';
+		font-style: normal;
+		font-weight: 500;
+		font-size: 12px;
+		line-height: 18px;
+	}
 
-    .text_numbers {
-        font-family: "Faktum SemiBold";
-        font-style: normal;
-        font-weight: 600;
-        font-size: 12px;
-        line-height: 18px;
-    }
+	.text_numbers {
+		font-family: 'Faktum SemiBold';
+		font-style: normal;
+		font-weight: 600;
+		font-size: 12px;
+		line-height: 18px;
+	}
 
-    .text_numbers_s {
-        font-family: "Faktum Medium";
-        font-style: normal;
-        font-weight: 500;
-        font-size: 10px;
-        line-height: 16px;
-    }
+	.text_numbers_s {
+		font-family: 'Faktum Medium';
+		font-style: normal;
+		font-weight: 500;
+		font-size: 10px;
+		line-height: 16px;
+	}
 
-    .text_body {
-        font-family: 'Devanagari Sangam Regular';
-        font-style: normal;
-        font-weight: 400;
-        font-size: 12px;
-        line-height: 18px;
-    }
+	.text_body {
+		font-family: 'Devanagari Sangam Regular';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 12px;
+		line-height: 18px;
+	}
 }
 
 /* colors */
 
 .button_gradient {
-    background-size: 300% 300%;
-    background-image: linear-gradient(to right, rgba(139, 228, 217, 0.6) 0%, rgba(255, 144, 47, 0.5) 50%, rgba(139, 228, 217, 0.6) 100%);
-    transition: 0.5s;
+	background-size: 300% 300%;
+	background-image: linear-gradient(
+		to right,
+		rgba(139, 228, 217, 0.6) 0%,
+		rgba(255, 144, 47, 0.5) 50%,
+		rgba(139, 228, 217, 0.6) 100%
+	);
+	transition: 0.5s;
 }
 
 .button_gradient:hover {
-    background-position: right center;
+	background-position: right center;
 }
 
-
 .button_gradient_disabled {
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
-        linear-gradient(90deg, rgba(139, 228, 217, 0.6) 0%, rgba(255, 144, 47, 0.5) 111.15%);
+	background: linear-gradient(0deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
+		linear-gradient(
+			90deg,
+			rgba(139, 228, 217, 0.6) 0%,
+			rgba(255, 144, 47, 0.5) 111.15%
+		);
 }
 
 .input_default_border {
-    background: linear-gradient(180deg, rgba(139, 228, 217, 0.15) 0%, rgba(255, 144, 47, 0.15) 100%)
+	background: linear-gradient(
+		180deg,
+		rgba(139, 228, 217, 0.15) 0%,
+		rgba(255, 144, 47, 0.15) 100%
+	);
 }
 
 .input_typing_bg {
-    background: linear-gradient(90deg, rgba(139, 228, 217, 0.05) 0%, rgba(255, 144, 47, 0.05) 100%);
+	background: linear-gradient(
+		90deg,
+		rgba(139, 228, 217, 0.05) 0%,
+		rgba(255, 144, 47, 0.05) 100%
+	);
 }
 
 .li_gradient {
-    background: linear-gradient(90deg, rgba(139, 228, 217, 0.6) 0%, rgba(200, 184, 128, 0.6) 58.47%, rgba(255, 144, 47, 0.5) 111.15%);
+	background: linear-gradient(
+		90deg,
+		rgba(139, 228, 217, 0.6) 0%,
+		rgba(200, 184, 128, 0.6) 58.47%,
+		rgba(255, 144, 47, 0.5) 111.15%
+	);
 }
 
 .tab_gradient {
-    background: linear-gradient(90deg, rgba(139, 228, 217, 0.6) 0%, rgba(200, 184, 128, 0.6) 58.47%, rgba(255, 144, 47, 0.5) 111.15%);
+	background: linear-gradient(
+		90deg,
+		rgba(139, 228, 217, 0.6) 0%,
+		rgba(200, 184, 128, 0.6) 58.47%,
+		rgba(255, 144, 47, 0.5) 111.15%
+	);
 }
 
-
-
-
 .checkbox {
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    height: 1px;
-    overflow: hidden;
-    position: absolute;
-    white-space: nowrap;
-    width: 1px;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
 }
 
 /* select */
 
 .custom_select__control {
-    background-color: #141212 !important;
-    border: none !important;
-    border: 0 !important;
-    border-radius: 15px !important;
-    box-shadow: none !important;
-    height: 50px !important;
+	background-color: #141212 !important;
+	border: none !important;
+	border: 0 !important;
+	border-radius: 15px !important;
+	box-shadow: none !important;
+	height: 50px !important;
 }
 
-.custom_select__control--menu-is-open {}
+.custom_select__control--menu-is-open {
+}
 
 .custom_select__control--menu-is-open .custom_select__dropdown-indicator svg {
-    fill: #FFFFFF;
-    transform: rotate(180deg) !important;
-    transition: 0.3s ease transform !important;
+	fill: #ffffff;
+	transform: rotate(180deg) !important;
+	transition: 0.3s ease transform !important;
 }
 
 .custom_select__dropdown-indicator svg {
-    transform: rotate(0deg) !important;
-    transition: 0.3s ease transform !important;
+	transform: rotate(0deg) !important;
+	transition: 0.3s ease transform !important;
 }
 
 .custom_select__value-container {
-    padding: 0 !important;
-    padding-left: 20px !important;
-    cursor: text !important;
+	padding: 0 !important;
+	padding-left: 20px !important;
+	cursor: text !important;
 }
 
 .custom_select__input-container {
-    color: #FFFFFF !important;
-    font-family: 'Devanagari Sangam Regular' !important;
-    font-style: normal !important;
-    font-weight: 400 !important;
-    font-size: 15px !important;
-    line-height: 22px !important;
+	color: #ffffff !important;
+	font-family: 'Devanagari Sangam Regular' !important;
+	font-style: normal !important;
+	font-weight: 400 !important;
+	font-size: 15px !important;
+	line-height: 22px !important;
 }
 
-.custom_select__input-container::placeholder {}
+.custom_select__input-container::placeholder {
+}
 
 .custom_select__indicator-separator {
-    display: none !important;
+	display: none !important;
 }
 
 .custom_select__indicator {
-    color: #FFFFFF !important;
+	color: #ffffff !important;
 }
 
 .custom_select__indicator:hover {
-    color: #999aa5 !important;
+	color: #999aa5 !important;
 }
 
 .custom_select__single-value {
-    color: #FFFFFF !important;
-    font-family: 'Devanagari Sangam Regular' !important;
-    font-style: normal !important;
-    font-weight: 400 !important;
-    font-size: 15px !important;
-    line-height: 22px !important;
-
+	color: #ffffff !important;
+	font-family: 'Devanagari Sangam Regular' !important;
+	font-style: normal !important;
+	font-weight: 400 !important;
+	font-size: 15px !important;
+	line-height: 22px !important;
 }
 
-
 .custom_select__placeholder {
-    font-family: 'Devanagari Sangam Regular' !important;
-    font-style: normal !important;
-    font-weight: 400 !important;
-    font-size: 15px !important;
-    line-height: 22px !important;
+	font-family: 'Devanagari Sangam Regular' !important;
+	font-style: normal !important;
+	font-weight: 400 !important;
+	font-size: 15px !important;
+	line-height: 22px !important;
 }
 
 .custom_select__menu {
-    background-color: #141212 !important;
-    color: #FFFFFF !important;
-    /* animation: scaleIn 0.35s ease-in-out; */
+	background-color: #141212 !important;
+	color: #ffffff !important;
+	/* animation: scaleIn 0.35s ease-in-out; */
 }
 
 .custom_select__option {
-    cursor: pointer !important;
-    font-family: 'Devanagari Sangam Regular' !important;
-    font-style: normal !important;
-    font-weight: 400 !important;
-    font-size: 15px !important;
-    line-height: 22px !important;
+	cursor: pointer !important;
+	font-family: 'Devanagari Sangam Regular' !important;
+	font-style: normal !important;
+	font-weight: 400 !important;
+	font-size: 15px !important;
+	line-height: 22px !important;
 }
 
 .custom_select__option--is-focused {
-    background-color: #282626 !important;
+	background-color: #282626 !important;
 }
 
 .custom_select__option--is-selected {
-    background-color: #282626 !important;
+	background-color: #282626 !important;
 }
 
 .custom_select-container div {
-    outline: none !important;
-    box-shadow: none !important;
+	outline: none !important;
+	box-shadow: none !important;
 }
 
 .custom_select-container:hover,
 .custom_select-container--menu-is-open {
-    border-color: #ced4da !important;
+	border-color: #ced4da !important;
 }
 
 .svg_notActive_link svg path {
-    fill: #524B4B;
-    stroke: #524B4B;
+	fill: #524b4b;
+	stroke: #524b4b;
 }
 
 .svg_notActive_link_stroke svg path {
-    stroke: #524B4B;
+	stroke: #524b4b;
 }
 
 .svg_hover:hover svg path {
-    fill: #FFFFFF;
+	fill: #ffffff;
 }

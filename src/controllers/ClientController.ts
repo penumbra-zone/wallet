@@ -269,9 +269,6 @@ export class ClientController {
       }
     } catch (error) {
         console.error(error);
-      if (error instanceof ConnectError && error.code === Code.Canceled) {
-        // this.abortController = new AbortController();
-      }
     }
   }
 

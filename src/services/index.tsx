@@ -1,1 +1,1 @@
-export * from './ViewProtocolService';
+export * from './ViewProtocolService'

@@ -1,214 +1,304 @@
-import {
-  ChainParameters,
-  FmdParameters,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb';
-import {
-  createGrpcWebTransport,
-  createPromiseClient,
-} from '@bufbuild/connect-web';
-import { TendermintProxyService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb';
-import { bytesToBase64 } from '../utils/base64';
-import { ExtensionStorage } from '../storage';
-import { IndexedDb } from '../utils';
-import { WalletController } from './WalletController';
-import { RemoteConfigController } from './RemoteConfigController';
-import { NetworkController } from './NetworkController';
-import { build_tx, encode_tx, send_plan } from 'penumbra-web-assembly';
-import { WasmViewConnector } from '../utils/WasmViewConnector';
-import {
-  BroadcastTxAsyncRequest,
-  BroadcastTxSyncRequest,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb';
-import bigInt from 'big-integer';
-import { extension } from '../lib';
+import { FmdParameters } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
+import { createGrpcWebTransport } from '@bufbuild/connect-web'
+import { build_tx, encode_tx, send_plan } from 'penumbra-web-assembly'
+import { ActionType, TransactionPlanType } from '../types/transacrion'
+import { IndexedDb } from '../utils'
+import { bytesToBase64 } from '../utils/base64'
+import { WasmViewConnector } from '../utils/WasmViewConnector'
+import { NetworkController } from './NetworkController'
+import { RemoteConfigController } from './RemoteConfigController'
+import { WalletController } from './WalletController'
 
 export class TransactionController {
-  indexedDb;
+	indexedDb
 
-  private configApi;
+	private configApi
 
-  private wasmViewConnector;
+	private wasmViewConnector
 
-  constructor({
-    indexedDb,
-    getAccountFullViewingKey,
-    setNetworks,
-    getNetwork,
-    getNetworkConfig,
-    getAccountSpendingKey,
-    getCustomGRPC,
-    wasmViewConnector,
-  }: {
-    indexedDb: IndexedDb;
-    getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword'];
-    getAccountSpendingKey: WalletController['getAccountSpendingKeyWithoutPassword'];
-    setNetworks: RemoteConfigController['setNetworks'];
-    getNetwork: NetworkController['getNetwork'];
-    getNetworkConfig: RemoteConfigController['getNetworkConfig'];
-    getCustomGRPC: NetworkController['getCustomGRPC'];
-    wasmViewConnector: WasmViewConnector;
-  }) {
-    this.configApi = {
-      getAccountFullViewingKey,
-      setNetworks,
-      getNetwork,
-      getNetworkConfig,
-      getAccountSpendingKey,
-      getCustomGRPC,
-    };
-    this.indexedDb = indexedDb;
-    this.wasmViewConnector = wasmViewConnector;
-  }
+	constructor({
+		indexedDb,
+		getAccountFullViewingKey,
+		setNetworks,
+		getNetwork,
+		getNetworkConfig,
+		getAccountSpendingKey,
+		getCustomGRPC,
+		wasmViewConnector,
+	}: {
+		indexedDb: IndexedDb
+		getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword']
+		getAccountSpendingKey: WalletController['getAccountSpendingKeyWithoutPassword']
+		setNetworks: RemoteConfigController['setNetworks']
+		getNetwork: NetworkController['getNetwork']
+		getNetworkConfig: RemoteConfigController['getNetworkConfig']
+		getCustomGRPC: NetworkController['getCustomGRPC']
+		wasmViewConnector: WasmViewConnector
+	}) {
+		this.configApi = {
+			getAccountFullViewingKey,
+			setNetworks,
+			getNetwork,
+			getNetworkConfig,
+			getAccountSpendingKey,
+			getCustomGRPC,
+		}
+		this.indexedDb = indexedDb
+		this.wasmViewConnector = wasmViewConnector
+	}
 
-  async sendTransaction(destAddress: string, amount: number, assetId: string) {
-    let fvk;
-    let spending_key;
-    try {
-      fvk = this.configApi.getAccountFullViewingKey();
-      spending_key = this.configApi.getAccountSpendingKey();
-    } catch (error) {
-      fvk = '';
-    }
+	async getTransactionPlan(
+		destAddress: string,
+		amount: number,
+		assetId: string
+	): Promise<TransactionPlanType> {
+		let fvk
+		let spending_key
+		try {
+			fvk = this.configApi.getAccountFullViewingKey()
+			spending_key = this.configApi.getAccountSpendingKey()
+		} catch (error) {
+			fvk = ''
+		}
 
-    if (!fvk) {
-      return;
-    }
+		if (!fvk) {
+			return
+		}
 
-    const customGrpc =
-      this.configApi.getCustomGRPC()[this.configApi.getNetwork()];
+		return {
+			actions: [
+				{
+					output: {
+						value: {
+							amount: {
+								lo: '1000000',
+							},
+							assetId: {
+								inner: 'KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA=',
+							},
+						},
+						destAddress: {
+							inner:
+								'3iv0Cm4pCQYyHber+XRJoWzYEtsf0X9ALoUP+lC6lNPXuWaE9On5QSu1zhWhDx1W1XznPAkjvUGtGkWPm4uKGOyHvWa5Vh0FmtlbS4LUGMQ=',
+						},
+						rseed: 'nOAVUV3t6pmn8kKu5HobmiBNqi7bfp+swoTxLEWCYvA=',
+						valueBlinding: 'TGqx7/xAk1PuGOLTxR6eC4ECnujM3dDOWkH9+8PkjgM=',
+					},
+				},
+				{
+					spend: {
+						note: {
+							value: {
+								amount: {
+									lo: '999000000',
+								},
+								assetId: {
+									inner: 'KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA=',
+								},
+							},
+							rseed: 'bBynjvZozmXa79AyrhAIkJc0br0rUj/TFsMktPe2nWY=',
+							address: {
+								inner:
+									'ppZYRg/x9IvKYbKfKXXZATPWJywLfDtImP/5QC8s5wmiyLU6SaQFDgr+raMI+/lNuOj9onDxCDGUV+BkFoLDNzFiGVXzmSVH8YUqhvMKOWo=',
+							},
+						},
+						position: '90221903873',
+						randomizer: 'iuJnEZsTqF2JEL5VNpxEW3bMa+o+WisAe+vCD3RRxgI=',
+						valueBlinding: '4GVwfalfxmDBEaZKtf2KZW9YFlfbxYigxePT2QzsuwE=',
+					},
+				},
+				{
+					output: {
+						value: {
+							amount: {
+								lo: '998000000',
+							},
+							assetId: {
+								inner: 'KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA=',
+							},
+						},
+						destAddress: {
+							inner:
+								'ppZYRg/x9IvKYbKfKXXZATPWJywLfDtImP/5QC8s5wmiyLU6SaQFDgr+raMI+/lNuOj9onDxCDGUV+BkFoLDNzFiGVXzmSVH8YUqhvMKOWo=',
+						},
+						rseed: 'G3N89005k5AYbKHz3MCUgAG+/LEyTXAQd9q0WgGdkUE=',
+						valueBlinding: 'hQNn+C44I8KpJCck9F5LF1jg5dIH11EoDaO2mb0cRgQ=',
+					},
+				},
+			] as ActionType[],
+			chainId: 'penumbra-testnet-adraste',
+			fee: {
+				amount: {} as any,
+			},
+			cluePlans: [
+				{
+					address: {
+						inner:
+							'3iv0Cm4pCQYyHber+XRJoWzYEtsf0X9ALoUP+lC6lNPXuWaE9On5QSu1zhWhDx1W1XznPAkjvUGtGkWPm4uKGOyHvWa5Vh0FmtlbS4LUGMQ=',
+					},
+					rseed: 'G4M8W2UwslquVJeFI0YEjK1xYKXs6gAapONyBA5Wx3M=',
+				},
+				{
+					address: {
+						inner:
+							'ppZYRg/x9IvKYbKfKXXZATPWJywLfDtImP/5QC8s5wmiyLU6SaQFDgr+raMI+/lNuOj9onDxCDGUV+BkFoLDNzFiGVXzmSVH8YUqhvMKOWo=',
+					},
+					rseed: 'sYt4PXtqzD2Qm13H8kvYw+ks37Jkrv3mD4KHGoo1XWc=',
+				},
+			],
+			memoPlan: {
+				key: 'KKktzf2RPkr7GluYC9JHLLh1r0CXGP5RbLDU2ZBel7o=',
+			},
+		}
 
-    const { grpc: defaultGrpc, chainId } =
-      this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
+		let notes = await this.indexedDb.getAllValue('spendable_notes')
 
-    const grpc = customGrpc || defaultGrpc;
+		notes = notes
+			.filter(note => note.heightSpent === undefined)
+			.filter(note => note.note.value.assetId.inner === assetId)
 
-    const transport = createGrpcWebTransport({
-      baseUrl: grpc,
-    });
+		if (notes.length === 0) {
+			console.error('No notes found to spend')
+		}
 
-    let notes = await this.indexedDb.getAllValue('spendable_notes');
+		let fmd_parameters: FmdParameters = await this.indexedDb.getValue(
+			'fmd_parameters',
+			`fmd`
+		)
 
-    notes = notes
-      .filter((note) => note.heightSpent === undefined)
-      .filter((note) => note.note.value.assetId.inner === assetId);
+		if (fmd_parameters === undefined) {
+			console.error('No found FmdParameters')
+		}
 
-    if (notes.length === 0) {
-      console.error('No notes found to spend');
-    }
+		let chain_params_records = await this.indexedDb.getAllValue(
+			'chainParameters'
+		)
+		let chain_parameters = await chain_params_records[0]
 
-    let fmd: FmdParameters = await this.indexedDb.getValue(
-      'fmd_parameters',
-      `fmd`
-    );
+		if (fmd_parameters === undefined) {
+			console.error('No found chain parameters')
+		}
 
-    if (fmd === undefined) {
-      console.error('No found FmdParameters');
-    }
+		let data = {
+			notes,
+			chain_parameters,
+			fmd_parameters,
+		}
 
-    let chain_params_records = await this.indexedDb.getAllValue(
-      'chainParameters'
-    );
-    let chain_params = await chain_params_records[0];
+		let sendPlan = send_plan(
+			fvk,
+			{
+				amount: {
+					lo: amount * 1000000,
+					hi: 0n,
+				},
+				assetId: notes[0].note.value.assetId,
+			},
+			destAddress,
+			data
+		)
 
-    if (fmd === undefined) {
-      console.error('No found chain parameters');
-    }
+		return sendPlan
+	}
 
-    let data = {
-      notes: notes,
-      chain_parameters: chain_params,
-      fmd_parameters: fmd,
-    };
+	async sendTransaction(sendPlan: TransactionPlanType) {
+		let fvk
+		let spending_key
+		try {
+			fvk = this.configApi.getAccountFullViewingKey()
+			spending_key = this.configApi.getAccountSpendingKey()
+		} catch (error) {
+			fvk = ''
+		}
 
-    let sendPlan = send_plan(
-      fvk,
-      {
-        amount: {
-          lo: amount * 1000000,
-          hi: 0n,
-        },
-        assetId: notes[0].note.value.assetId,
-      },
-      destAddress,
-      data
-    );
+		if (!fvk) {
+			return
+		}
 
-    console.log(sendPlan);
-    
-    // sendPlan - action array
+		const customGrpc =
+			this.configApi.getCustomGRPC()[this.configApi.getNetwork()]
 
-    let buildTx = build_tx(
-      spending_key,
-      fvk,
-      sendPlan,
-      await this.wasmViewConnector.loadStoredTree()
-    );
+		const { grpc: defaultGrpc, chainId } =
+			this.configApi.getNetworkConfig()[this.configApi.getNetwork()]
 
-    let encodeTx = await encode_tx(buildTx);
+		const grpc = customGrpc || defaultGrpc
 
-    let resp = await this.broadcastTx(bytesToBase64(encodeTx));
+		const transport = createGrpcWebTransport({
+			baseUrl: grpc,
+		})
 
-    // if (resp.result.code === 0) {
-    //     extension.notifications.create(resp.id, {
-    //       type: 'basic',
-    //       iconUrl: 'assets/img/logo.png',
-    //       title: 'Transaction Confirmed',
-    //       message:
-    //         'Transaction with hash 0x' +
-    //         resp.result.hash +
-    //         ' successfully confirmed',
-    //       priority: 1,
-    //     });
-    // } else  {
-    //     extension.notifications.create(resp.id, {
-    //       type: 'basic',
-    //       iconUrl: 'assets/img/logo.png',
-    //       title: 'Transaction Error',
-    //       message:
-    //         'Error submitting transaction: code ' +
-    //         resp.result.code +
-    //         ', log: ' +
-    //         resp.result.log,
-    //       priority: 1,
-    //     });
-    // }
+		let buildTx = build_tx(
+			spending_key,
+			fvk,
+			sendPlan,
+			await this.wasmViewConnector.loadStoredTree()
+		)
 
-    // const tendermint = createPromiseClient(TendermintProxyService, transport);
-    // let broadcastTxSyncRequest = new BroadcastTxSyncRequest();
-    // broadcastTxSyncRequest.params = encodeTx;
-    // broadcastTxSyncRequest.reqId = BigInt(id)
-    // let broadcastTxSync = await tendermint.broadcastTxSync(broadcastTxSyncRequest);
-  }
+		let encodeTx = await encode_tx(buildTx)
 
-  getRandomInt() {
-    return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
-  }
+		let resp = await this.broadcastTx(bytesToBase64(encodeTx))
 
-  toHexString(bytes: any) {
-    return bytes.reduce(
-      (str: any, byte: any) => str + byte.toString(16).padStart(2, '0'),
-      ''
-    );
-  }
+		// if (resp.result.code === 0) {
+		//     extension.notifications.create(resp.id, {
+		//       type: 'basic',
+		//       iconUrl: 'assets/img/logo.png',
+		//       title: 'Transaction Confirmed',
+		//       message:
+		//         'Transaction with hash 0x' +
+		//         resp.result.hash +
+		//         ' successfully confirmed',
+		//       priority: 1,
+		//     });
+		// } else  {
+		//     extension.notifications.create(resp.id, {
+		//       type: 'basic',
+		//       iconUrl: 'assets/img/logo.png',
+		//       title: 'Transaction Error',
+		//       message:
+		//         'Error submitting transaction: code ' +
+		//         resp.result.code +
+		//         ', log: ' +
+		//         resp.result.log,
+		//       priority: 1,
+		//     });
+		// }
 
-  async broadcastTx(tx_bytes_hex: string) {
-    const broadcastResponse = await fetch(
-      'http://testnet.penumbra.zone:26657',
-      {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          method: 'broadcast_tx_sync',
-          params: [tx_bytes_hex],
-          id: this.getRandomInt(),
-        }),
-      }
-    );
-    const content = await broadcastResponse.json();
+		// const tendermint = createPromiseClient(TendermintProxyService, transport);
+		// let broadcastTxSyncRequest = new BroadcastTxSyncRequest();
+		// broadcastTxSyncRequest.params = encodeTx;
+		// broadcastTxSyncRequest.reqId = BigInt(id)
+		// let broadcastTxSync = await tendermint.broadcastTxSync(broadcastTxSyncRequest);
+	}
 
-    return content;
-  }
+	getRandomInt() {
+		return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+	}
+
+	toHexString(bytes: any) {
+		return bytes.reduce(
+			(str: any, byte: any) => str + byte.toString(16).padStart(2, '0'),
+			''
+		)
+	}
+
+	async broadcastTx(tx_bytes_hex: string) {
+		const broadcastResponse = await fetch(
+			'http://testnet.penumbra.zone:26657',
+			{
+				method: 'POST',
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					method: 'broadcast_tx_sync',
+					params: [tx_bytes_hex],
+					id: this.getRandomInt(),
+				}),
+			}
+		)
+		const content = await broadcastResponse.json()
+
+		return content
+	}
 }

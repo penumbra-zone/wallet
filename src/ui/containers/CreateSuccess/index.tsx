@@ -1,5 +1,5 @@
-import React from 'react';
+import React from 'react'
 
 export const CreateSuccess = () => {
-  return <div>Create Success</div>;
-};
+	return <div>Create Success</div>
+}

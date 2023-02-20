@@ -1,109 +1,109 @@
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom/client'
 import {
-  cbToPromise,
-  extension,
-  PortStream,
-  setupDnode,
-  transformMethods,
-} from '../lib';
-import { createAccountsStore } from './store';
+	cbToPromise,
+	extension,
+	PortStream,
+	setupDnode,
+	transformMethods,
+} from '../lib'
+import { createAccountsStore } from './store'
 import backgroundService, {
-  BackgroundGetStateResult,
-  BackgroundUiApi,
-} from '../ui/services/Background';
-import { createMemoryRouter, RouterProvider } from 'react-router-dom';
-import { routes } from './routes';
-import { createUpdateState } from './updateState';
-import { Provider } from 'react-redux';
-import '../ui/main.css';
+	BackgroundGetStateResult,
+	BackgroundUiApi,
+} from '../ui/services/Background'
+import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { routes } from './routes'
+import { createUpdateState } from './updateState'
+import { Provider } from 'react-redux'
+import '../ui/main.css'
 
-startUi();
+startUi()
 
 async function startUi() {
-  const store = createAccountsStore();
+	const store = createAccountsStore()
 
-  const updateState = createUpdateState(store);
+	const updateState = createUpdateState(store)
 
-  extension.storage.onChanged.addListener(async (changes, area) => {
-    if (area !== 'local') {
-      return;
-    }
+	extension.storage.onChanged.addListener(async (changes, area) => {
+		if (area !== 'local') {
+			return
+		}
 
-    const stateChanges: Partial<Record<string, unknown>> &
-      Partial<BackgroundGetStateResult> = await backgroundService.getState([
-      'isInitialized',
-      'isLocked',
-    ]);
+		const stateChanges: Partial<Record<string, unknown>> &
+			Partial<BackgroundGetStateResult> = await backgroundService.getState([
+			'isInitialized',
+			'isLocked',
+		])
 
-    for (const key in changes) {
-      stateChanges[key] = changes[key].newValue;
-    }
+		for (const key in changes) {
+			stateChanges[key] = changes[key].newValue
+		}
 
-    updateState(stateChanges);
-  });
+		updateState(stateChanges)
+	})
 
-  const emitterApi = {
-    closePopupWindow: async () => {
-      const popup = extension.extension
-        .getViews({ type: 'popup' })
-        .find((w) => w.location.pathname === '/popup.html');
+	const emitterApi = {
+		closePopupWindow: async () => {
+			const popup = extension.extension
+				.getViews({ type: 'popup' })
+				.find(w => w.location.pathname === '/popup.html')
 
-      if (popup) {
-        popup.close();
-      }
-    },
-  };
+			if (popup) {
+				popup.close()
+			}
+		},
+	}
 
-  const connect = async () => {
-    const port = extension.runtime.connect();
+	const connect = async () => {
+		const port = extension.runtime.connect()
 
-    port.onDisconnect.addListener(() => {
-      backgroundService.setConnect(async () => {
-        const newBackground = await connect();
-        backgroundService.init(newBackground);
-      });
-    });
+		port.onDisconnect.addListener(() => {
+			backgroundService.setConnect(async () => {
+				const newBackground = await connect()
+				backgroundService.init(newBackground)
+			})
+		})
 
-    const connectionStream = new PortStream(port);
-    const dnode = setupDnode(connectionStream, emitterApi, 'api');
+		const connectionStream = new PortStream(port)
+		const dnode = setupDnode(connectionStream, emitterApi, 'api')
 
-    return await new Promise<BackgroundUiApi>((resolve) => {
-      dnode.once('remote', (background: Record<string, unknown>) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any---
-        resolve(transformMethods(cbToPromise, background) as any);
-      });
-    });
-  };
+		return await new Promise<BackgroundUiApi>(resolve => {
+			dnode.once('remote', (background: Record<string, unknown>) => {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any---
+				resolve(transformMethods(cbToPromise, background) as any)
+			})
+		})
+	}
 
-  const background = await connect();
+	const background = await connect()
 
-  const [state, networks] = await Promise.all([
-    background.getState(),
-    background.getNetworks(),
-  ]);
+	const [state, networks] = await Promise.all([
+		background.getState(),
+		background.getNetworks(),
+	])
 
-  updateState({ ...state, networks });
+	updateState({ ...state, networks })
 
-  backgroundService.init(background);
+	backgroundService.init(background)
 
-  document.addEventListener('mousemove', () => backgroundService.updateIdle());
-  document.addEventListener('keyup', () => backgroundService.updateIdle());
-  document.addEventListener('mousedown', () => backgroundService.updateIdle());
-  document.addEventListener('focus', () => backgroundService.updateIdle());
+	document.addEventListener('mousemove', () => backgroundService.updateIdle())
+	document.addEventListener('keyup', () => backgroundService.updateIdle())
+	document.addEventListener('mousedown', () => backgroundService.updateIdle())
+	document.addEventListener('focus', () => backgroundService.updateIdle())
 
-  const pageFromHash = window.location.hash.split('#')[1];
+	const pageFromHash = window.location.hash.split('#')[1]
 
-  const router = createMemoryRouter(routes, {
-    initialEntries: [pageFromHash || '/'],
-  });
+	const router = createMemoryRouter(routes, {
+		initialEntries: [pageFromHash || '/'],
+	})
 
-  const root = ReactDOM.createRoot(
-    document.getElementById('accounts') as HTMLElement
-  );
+	const root = ReactDOM.createRoot(
+		document.getElementById('accounts') as HTMLElement
+	)
 
-  root.render(
-    <Provider store={store}>
-      <RouterProvider router={router} />
-    </Provider>
-  );
+	root.render(
+		<Provider store={store}>
+			<RouterProvider router={router} />
+		</Provider>
+	)
 }

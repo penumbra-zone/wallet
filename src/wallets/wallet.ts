@@ -1,19 +1,18 @@
-import { WalletAccount } from '../preferences';
-import { WalletPrivateData } from './types';
-
+import { WalletAccount } from '../preferences'
+import { WalletPrivateData } from './types'
 
 export abstract class Wallet<TData extends WalletPrivateData> {
-  readonly data: TData;
-  constructor(data: TData) {
-    this.data = data;
-  }
+	readonly data: TData
+	constructor(data: TData) {
+		this.data = data
+	}
 
-  abstract getAccount(): WalletAccount;
-  abstract getSeed(): string;
-  abstract getFullViewingKey(): string;
-  abstract getSpendKey(): string;
+	abstract getAccount(): WalletAccount
+	abstract getSeed(): string
+	abstract getFullViewingKey(): string
+	abstract getSpendKey(): string
 
-  serialize() {
-    return this.data;
-  }
+	serialize() {
+		return this.data
+	}
 }
