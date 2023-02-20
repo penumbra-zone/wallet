@@ -119,7 +119,7 @@ export const Address: React.FC<AddressProps> = ({
 
   return (
     <>
-      <div className="w-[100%] flex justify-center items-center ext:mb-[4px] laptop:mb-[16px]">
+      <div className="w-[100%] flex justify-center items-center mb-[8px]">
         <p className="h1 ml-[auto]">Send to address</p>
         <span
           className="ml-[auto] svg_hover cursor-pointer"
@@ -188,7 +188,7 @@ export const Address: React.FC<AddressProps> = ({
             ) : (
               <></>
             )}
-            <div className="flex flex-col">
+            <div className="flex flex-col ext:max-h-[180px] tablet:max-h-[180px] overflow-y-scroll">
               <Select
                 labelClassName={`${isDesktop ? 'h3' : 'h2_ext'
                   } text-light_grey mb-[16px]`}
@@ -221,13 +221,13 @@ export const Address: React.FC<AddressProps> = ({
                 mode="transparent"
                 onClick={handleBack}
                 title="Cancel"
-                className="py-[7px] w-[50%] mr-[8px]"
+                className="ext:py-[7px] tablet:py-[7px] w-[50%] mr-[8px]"
               />
               <Button
                 mode="gradient"
                 onClick={handleNext}
                 title="Next"
-                className="py-[7px] w-[50%] ml-[8px]"
+                className="ext:py-[7px] tablet:py-[7px] w-[50%] ml-[8px]"
                 disabled={!Number(amount) || balance < Number(amount)}
               />
             </div>

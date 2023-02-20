@@ -2,22 +2,25 @@ import { CircularProgressbar } from 'react-circular-progressbar';
 
 type ProgressBarProps = {
   percent: number
+  width: string
 };
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({ percent }) => {
+export const ProgressBar: React.FC<ProgressBarProps> = ({ percent, width }) => {
   return (
     <CircularProgressbar
       value={percent}
       text={`${percent}%`}
       styles={{
-        root: {},
+        root: {
+          width
+        },
         path: {
           stroke: `#00FFDF`,
           strokeLinecap: 'butt',
           transition: 'stroke-dashoffset 0.5s ease 0s',
           transform: 'rotate(0.25turn)',
           transformOrigin: 'center center',
-          width: '124px'
+          // width: '124px'
         },
         trail: {
           stroke: '#282626',

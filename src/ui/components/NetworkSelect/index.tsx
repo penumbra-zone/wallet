@@ -24,7 +24,7 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
   className,
   onClick,
 }) => {
-  const isDesktop = useMediaQuery();
+  const isTablet = useMediaQuery('(min-width: 680px)');
 
   const networks = useAccountsSelector(selectNetworks);
   const currentNetwork = useAccountsSelector(selectCurNetwork);
@@ -44,18 +44,18 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`ext:h-[36px] ext:w-[152px] tablet:h-[52px] tablet:w-[296px] ext:px-[10px] tablet:px-[21px] bg-brown rounded-[15px] border-[1px] border-solid border-dark_grey flex items-center justify-between cursor-pointer
+      className={`ext:h-[36px] ext:w-[152px] tablet:h-[52px] tablet:w-[296px] ext:px-[10px] tablet:px-[21px] bg-brown rounded-[15px] border-[1px] border-solid border-dark_grey flex items-center cursor-pointer
       ${className}`}
     >
       {percent > 100 ? (
         <></>
       ) : (
         <div className="ext:w-[25px] ext:h-[25px] tablet:w-[35px] tablet:h-[35px] ext:mr-[6px] tablet:mr-[16px] flex items-center">
-          <ProgressBar percent={percent} />
+            <ProgressBar percent={percent} width={isTablet ? '35px': '25px'} />
         </div>
       )}
       <p className="text_button">
-        {isDesktop
+        {isTablet
           ? currrentNetwork().chainId
           : kitcut(12, currrentNetwork().chainId)}
       </p>

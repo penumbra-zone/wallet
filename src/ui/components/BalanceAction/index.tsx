@@ -58,7 +58,7 @@ export const BalanceAction = () => {
                 <CachedSvg />
               </div>
             }
-            className="rounded-[50%] w-[51px]  ext:pt-[14px] tablet:pt-[14px]  ext:pb-[14px] tablet:pb-[14px]"
+            className="rounded-[50%] w-[51px]  ext:pt-[14px] tablet:pt-[14px] ext:pb-[14px] tablet:pb-[14px]"
           />
           <p className="text_button pt-[8px]">Exchange</p>
         </div>
@@ -69,10 +69,10 @@ export const BalanceAction = () => {
           {/* <p className="text_body text-light_grey">Earn to 21% per year</p> */}
         </div>
         <Button
-          mode="gradient"
+          mode='transparent'
           onClick={handleStake}
           title="Stake"
-          className="w-[119px]"
+          className="w-[119px] ext:py-[7px] tablet:py-[7px]"
           disabled
         />
       </div>

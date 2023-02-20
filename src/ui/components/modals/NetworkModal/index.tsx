@@ -53,7 +53,7 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
               <PopupButton
                 svg={
                   <div className="w-[20px] h-[20px]">
-                    <ProgressBar percent={percent} />
+                    <ProgressBar percent={percent} width='20px' />
                   </div>
                 }
                 rightChild={

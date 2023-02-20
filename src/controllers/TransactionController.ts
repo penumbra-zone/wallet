@@ -74,13 +74,11 @@ export class TransactionController {
       return;
     }
 
-    const customGrpc = this.configApi.getCustomGRPC()[
-      this.configApi.getNetwork()
-    ];
+    const customGrpc =
+      this.configApi.getCustomGRPC()[this.configApi.getNetwork()];
 
-    const { grpc: defaultGrpc, chainId } = this.configApi.getNetworkConfig()[
-      this.configApi.getNetwork()
-    ];
+    const { grpc: defaultGrpc, chainId } =
+      this.configApi.getNetworkConfig()[this.configApi.getNetwork()];
 
     const grpc = customGrpc || defaultGrpc;
 
@@ -135,6 +133,10 @@ export class TransactionController {
       data
     );
 
+    console.log(sendPlan);
+    
+    // sendPlan - action array
+
     let buildTx = build_tx(
       spending_key,
       fvk,
@@ -176,7 +178,7 @@ export class TransactionController {
     // broadcastTxSyncRequest.params = encodeTx;
     // broadcastTxSyncRequest.reqId = BigInt(id)
     // let broadcastTxSync = await tendermint.broadcastTxSync(broadcastTxSyncRequest);
-    }
+  }
 
   getRandomInt() {
     return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
