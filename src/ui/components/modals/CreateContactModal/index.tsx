@@ -61,13 +61,13 @@ export const CreateContactModal: React.FC<CreateContactModalProps> = ({
             mode="transparent"
             onClick={onClose}
             title="Cancel"
-            className="w-[50%] mr-[8px]"
+            className="w-[50%] mr-[8px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]"
           />
           <Button
             mode="gradient"
             onClick={handleSave}
             title="Save"
-            className="w-[50%] ml-[8px]"
+            className="w-[50%] ml-[8px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]"
             disabled={!nickname}
           />
         </div>

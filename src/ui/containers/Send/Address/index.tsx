@@ -217,18 +217,18 @@ export const Address: React.FC<AddressProps> = ({
 								}
 							/>
 						</div>
-						<div className='w-[100%] flex'>
+						<div className='w-[100%] flex pt-[8px]'>
 							<Button
 								mode='transparent'
 								onClick={handleBack}
 								title='Cancel'
-								className='ext:py-[7px] tablet:py-[7px] w-[50%] mr-[8px]'
+								className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] mr-[8px]'
 							/>
 							<Button
 								mode='gradient'
 								onClick={handleNext}
 								title='Next'
-								className='ext:py-[7px] tablet:py-[7px] w-[50%] ml-[8px]'
+								className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
 								// disabled={!Number(amount) || balance < Number(amount)}
 							/>
 						</div>

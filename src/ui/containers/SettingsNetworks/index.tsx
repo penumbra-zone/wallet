@@ -152,7 +152,7 @@ export const SettingsNetworks = () => {
 									title='Add network'
 									mode='gradient'
 									onClick={handleOpentTab}
-									className='w-[calc(100%-32px)] py-[7px] mx-[16px] mb-[24px]'
+									className='w-[calc(100%-32px)] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] mx-[16px] mb-[24px]'
 								/>
 							)}
 						</div>
@@ -174,14 +174,14 @@ export const SettingsNetworks = () => {
 										title='Cancel'
 										mode='transparent'
 										onClick={handleCancel}
-										className='w-[100%] py-[7px] mr-[4px]'
+										className='w-[100%] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] mr-[4px]'
 										disabled={isDisabled}
 									/>
 									<Button
 										title='Save'
 										mode='gradient'
 										onClick={toggleShowSubmitModal(true)}
-										className='w-[100%] py-[7px] ml-[4px]'
+										className='w-[100%] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] ml-[4px]'
 										disabled={isDisabled}
 									/>
 								</div>

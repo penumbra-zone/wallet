@@ -33,7 +33,7 @@ type SpendActionType = {
 	valueBlinding: string
 }
 
-export type ActionType = SpendActionType | OutputActionType
+export type ActionArrayType = SpendActionType | OutputActionType
 
 export type TransactionPlanType = {
 	chainId: string
@@ -47,11 +47,13 @@ export type TransactionPlanType = {
 	fee: {
 		amount: ValueType
 	}
-	actions: ActionType[]
+	actions: ActionArrayType[]
 }
 
+export type ActionType = 'receive' | 'send' | 'spend'
+
 export type ParsedActions = {
-	label: string
+	type: ActionType
 	amount: number
 	asset: string
 	isOwnAddress?: boolean

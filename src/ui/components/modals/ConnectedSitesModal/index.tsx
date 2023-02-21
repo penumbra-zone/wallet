@@ -69,13 +69,13 @@ export const ConnectedSitesModal: React.FC<SuccessCreateModalProps> = ({
 								mode='transparent'
 								onClick={handleRevoke(null)}
 								title='Cancel'
-								className='w-[50%] mr-[4px]  ext:py-[7px] tablet:py-[7px] text_button_ext mr-[8px]'
+								className='w-[50%] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] text_button_ext mr-[8px]'
 							/>
 							<Button
 								mode='gradient'
 								onClick={handleConfirmRevoke}
 								title='Revoke'
-								className='w-[50%] ext:py-[7px] tablet:py-[7px] text_button_ext ml-[8px]'
+								className='w-[50%] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] text_button_ext ml-[8px]'
 							/>
 						</div>
 					) : (
@@ -99,13 +99,13 @@ export const ConnectedSitesModal: React.FC<SuccessCreateModalProps> = ({
 												mode='transparent'
 												onClick={handleRevoke(i)}
 												title='Revoke'
-												className='w-[60px] mr-[4px]  ext:py-[7px] tablet:py-[7px]  text_button_ext'
+												className='w-[60px] mr-[4px]  ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]  text_button_ext'
 											/>
 											<Button
 												mode='gradient'
 												onClick={handleEdit(i)}
 												title='Edit'
-												className='w-[60px] ext:py-[7px] tablet:py-[7px] text_button_ext'
+												className='w-[60px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] text_button_ext'
 											/>
 										</div>
 									</div>

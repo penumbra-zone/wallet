@@ -71,7 +71,7 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
 							title='Change'
 							mode='gradient'
 							onClick={handleChange}
-							className='py-[7px]'
+							className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
 						/>
 					</div>
 				</div>

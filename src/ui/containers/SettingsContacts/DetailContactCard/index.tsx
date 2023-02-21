@@ -113,7 +113,7 @@ export const DetailContactCard: React.FC<DetailContactCardProps> = ({
 						title='Delete'
 						mode='gradient'
 						onClick={handleDelete}
-						className='w-[152px] tablet:py-[7px]'
+						className='w-[152px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
 					/>
 				)}
 			</div>

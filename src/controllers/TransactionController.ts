@@ -9,6 +9,7 @@ import {
 	send_plan,
 } from 'penumbra-web-assembly'
 import {
+	ActionArrayType,
 	ActionType,
 	ParsedActions,
 	TransactionPlanType,
@@ -57,11 +58,11 @@ export class TransactionController {
 	}
 
 	async parseActions(
-		actions: ActionType[],
+		actions: ActionArrayType[],
 		fvk: string
 	): Promise<ParsedActions[]> {
 		return Promise.all(
-			actions.map(async (i: ActionType) => {
+			actions.map(async (i: ActionArrayType) => {
 				const key = Object.keys(i)[0]
 				const value = Object.values(i)[0]
 
@@ -103,7 +104,7 @@ export class TransactionController {
 				}
 
 				return {
-					label: key === 'output' ? (isOwnAddress ? 'receive' : 'send') : key,
+					type: key === 'output' ? (isOwnAddress ? 'receive' : 'send') : key as ActionType,
 					amount,
 					asset,
 					isOwnAddress: key === 'spend' ? undefined : Boolean(isOwnAddress),
@@ -194,7 +195,7 @@ export class TransactionController {
 						valueBlinding: 'hQNn+C44I8KpJCck9F5LF1jg5dIH11EoDaO2mb0cRgQ=',
 					},
 				},
-			] as ActionType[],
+			] as ActionArrayType[],
 			chainId: 'penumbra-testnet-adraste',
 			fee: {
 				amount: {} as any,

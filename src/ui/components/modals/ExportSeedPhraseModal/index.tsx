@@ -47,7 +47,7 @@ export const ExportSeedPhraseModal: React.FC<SuccessCreateModalProps> = ({
 			show={show}
 			onClose={handleCloseAndCleanKey}
 			position='center'
-			className='px-[16px] px-[14px]'
+			className='px-[16px] w-[335px]'
 		>
 			<div className='flex flex-col'>
 				<p className='h1_ext mb-[12px]'>Recovery passphrase</p>
@@ -112,21 +112,19 @@ export const ExportSeedPhraseModal: React.FC<SuccessCreateModalProps> = ({
 				)}
 				{!seed && (
 					<div className='flex mt-[40px]'>
-						<div className='w-[50%] mr-[8px]'>
 							<Button
 								mode='transparent'
 								onClick={handleCloseAndCleanKey}
 								title='Cancel'
+								className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] mr-[8px]'
 							/>
-						</div>
-						<div className='w-[50%] ml-[8px]'>
 							<Button
 								mode='gradient'
 								onClick={handleConfirm}
 								title='Confirm'
 								disabled={!password}
+								className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
 							/>
-						</div>
 					</div>
 				)}
 			</div>

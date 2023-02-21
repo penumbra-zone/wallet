@@ -49,6 +49,9 @@ export const Button: React.FC<ButtonProps> = ({
 			</button>
 		)
 
+		console.log(cn);
+		
+
 	return (
 		<button disabled={disabled} onClick={onClick} className={`${cn}`}>
 			{title}

@@ -37,13 +37,13 @@ export const AccountDetailModal: React.FC<
 						title='Export full viewing key'
 						mode='gradient'
 						onClick={changeKeyModalType('full_viewing_key')}
-						className='w-[100%] py-[7px]'
+						className='w-[100%] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
 					/>
 					<Button
 						title='Export spending key'
 						mode='gradient'
 						onClick={changeKeyModalType('spending_key')}
-						className='w-[100%] py-[7px] mt-[24px]'
+						className='w-[100%] mt-[24px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
 					/>
 				</div>
 			</div>

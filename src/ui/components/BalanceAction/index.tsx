@@ -72,7 +72,7 @@ export const BalanceAction = () => {
 					mode='transparent'
 					onClick={handleStake}
 					title='Stake'
-					className='w-[119px] ext:py-[7px] tablet:py-[7px]'
+					className='w-[119px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
 					disabled
 				/>
 			</div>
