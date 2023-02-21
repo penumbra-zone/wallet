@@ -1,19 +1,28 @@
 import { FmdParameters } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import { createGrpcWebTransport } from '@bufbuild/connect-web'
-import { build_tx, encode_tx, send_plan } from 'penumbra-web-assembly'
-import { ActionType, TransactionPlanType } from '../types/transacrion'
+import { encode } from 'bech32-buffer'
+import {
+	base64_to_bech32,
+	build_tx,
+	encode_tx,
+	is_controlled_address,
+	send_plan,
+} from 'penumbra-web-assembly'
+import {
+	ActionType,
+	ParsedActions,
+	TransactionPlanType,
+} from '../types/transaction'
 import { IndexedDb } from '../utils'
-import { bytesToBase64 } from '../utils/base64'
+import { base64ToBytes, bytesToBase64 } from '../utils/base64'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
 import { NetworkController } from './NetworkController'
 import { RemoteConfigController } from './RemoteConfigController'
 import { WalletController } from './WalletController'
 
 export class TransactionController {
-	indexedDb
-
+	indexedDb: IndexedDb
 	private configApi
-
 	private wasmViewConnector
 
 	constructor({
@@ -47,11 +56,71 @@ export class TransactionController {
 		this.wasmViewConnector = wasmViewConnector
 	}
 
+	async parseActions(
+		actions: ActionType[],
+		fvk: string
+	): Promise<ParsedActions[]> {
+		return Promise.all(
+			actions.map(async (i: ActionType) => {
+				const key = Object.keys(i)[0]
+				const value = Object.values(i)[0]
+
+				const amount =
+					Number(
+						key === 'spend' ? value.note.value.amount.lo : value.value.amount.lo
+					) /
+					10 ** 6
+				const assetId =
+					key === 'spend'
+						? value.note.value.assetId.inner
+						: value.value.assetId.inner
+				const destAddress = key === 'spend' ? '' : value.destAddress.inner
+
+				//find asset name
+				const encodeAssetId = encode(
+					'passet',
+					base64ToBytes(assetId),
+					'bech32m'
+				)
+				const detailAsset = await this.indexedDb.getValue(
+					'assets',
+					encodeAssetId
+				)
+				const asset = detailAsset.denom.denom
+
+				//encode recipinet address
+				const encodeRecipientAddress = destAddress
+					? base64_to_bech32('penumbrav2t', destAddress)
+					: ''
+				//check is recipient address is exist for current user
+				let isOwnAddress: undefined | { inner: string }
+				try {
+					if (key !== 'spend') {
+						isOwnAddress = is_controlled_address(fvk, encodeRecipientAddress)
+					}
+				} catch (error) {
+					console.log('is_controlled_address', error)
+				}
+
+				return {
+					label: key === 'output' ? (isOwnAddress ? 'receive' : 'send') : key,
+					amount,
+					asset,
+					isOwnAddress: key === 'spend' ? undefined : Boolean(isOwnAddress),
+					recipient: encodeRecipientAddress,
+				}
+			})
+		)
+	}
+
 	async getTransactionPlan(
 		destAddress: string,
 		amount: number,
 		assetId: string
-	): Promise<TransactionPlanType> {
+	): Promise<{
+		transactionPlan: TransactionPlanType
+		actions: ParsedActions[]
+	}> {
 		let fvk
 		let spending_key
 		try {
@@ -65,7 +134,7 @@ export class TransactionController {
 			return
 		}
 
-		return {
+		const transactionPlan = {
 			actions: [
 				{
 					output: {
@@ -150,6 +219,10 @@ export class TransactionController {
 				key: 'KKktzf2RPkr7GluYC9JHLLh1r0CXGP5RbLDU2ZBel7o=',
 			},
 		}
+
+		const actions = await this.parseActions(transactionPlan.actions, fvk)
+
+		return { transactionPlan, actions }
 
 		let notes = await this.indexedDb.getAllValue('spendable_notes')
 

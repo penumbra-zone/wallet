@@ -34,7 +34,7 @@ import { MessageInput, MessageStoreItem } from './messages/types'
 import { PreferencesAccount } from './preferences'
 import { ViewProtocolService } from './services'
 import { ExtensionStorage, StorageLocalState } from './storage'
-import { TransactionPlanType } from './types/transacrion'
+import { TransactionPlanType } from './types/transaction'
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
 import { IndexedDb, TableName } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
@@ -159,7 +159,6 @@ class BackgroundService extends EventEmitter {
 	permissionsController: PermissionController
 	messageController: MessageController
 	wasmViewConnector: WasmViewConnector
-
 	transactionController: TransactionController
 
 	constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {

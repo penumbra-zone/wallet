@@ -2,7 +2,7 @@ import { __BackgroundUiApiDirect } from '../../background'
 import { Contact, NetworkName, PermissionType } from '../../controllers'
 import { PreferencesAccount } from '../../preferences'
 import { StorageLocalState } from '../../storage'
-import { TransactionPlanType } from '../../types/transacrion'
+import { ParsedActions, TransactionPlanType } from '../../types/transaction'
 import { TableName } from '../../utils'
 import { CreateWalletInput, ISeedWalletInput } from '../../wallets'
 import { PENUMBRAWALLET_DEBUG } from '../appConfig'
@@ -433,7 +433,10 @@ class Background {
 		destAddress: string,
 		amount: number,
 		assetId?: string
-	) {
+	): Promise<{
+		transactionPlan: TransactionPlanType
+		actions: ParsedActions[]
+	}>  {
 		try {
 			await this.initPromise
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion

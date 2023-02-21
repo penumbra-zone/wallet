@@ -49,3 +49,11 @@ export type TransactionPlanType = {
 	}
 	actions: ActionType[]
 }
+
+export type ParsedActions = {
+	label: string
+	amount: number
+	asset: string
+	isOwnAddress?: boolean
+	recipient: string
+}
