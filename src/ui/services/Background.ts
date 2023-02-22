@@ -2,7 +2,11 @@ import { __BackgroundUiApiDirect } from '../../background'
 import { Contact, NetworkName, PermissionType } from '../../controllers'
 import { PreferencesAccount } from '../../preferences'
 import { StorageLocalState } from '../../storage'
-import { ParsedActions, TransactionPlanType } from '../../types/transaction'
+import {
+	ParsedActions,
+	TransactionPlanType,
+	TransactionResponseType,
+} from '../../types/transaction'
 import { TableName } from '../../utils'
 import { CreateWalletInput, ISeedWalletInput } from '../../wallets'
 import { PENUMBRAWALLET_DEBUG } from '../appConfig'
@@ -436,7 +440,7 @@ class Background {
 	): Promise<{
 		transactionPlan: TransactionPlanType
 		actions: ParsedActions[]
-	}>  {
+	}> {
 		try {
 			await this.initPromise
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -452,7 +456,9 @@ class Background {
 		}
 	}
 
-	async sendTransaction(sendPlan: TransactionPlanType) {
+	async sendTransaction(
+		sendPlan: TransactionPlanType
+	): Promise<TransactionResponseType> {
 		try {
 			await this.initPromise
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion

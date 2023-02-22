@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 
 type ModalWrapperPropsType = {
 	show: boolean
-	onClose: () => void
+	onClose?: () => void
 	className?: string
 	children: React.ReactElement
 	position?: 'center' | 'top_right'
