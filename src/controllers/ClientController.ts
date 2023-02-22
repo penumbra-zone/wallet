@@ -271,9 +271,8 @@ export class ClientController {
 	}
 
 	async saveTransaction(height: bigint, sourceHex: Uint8Array) {
-		const { tendermint } =
-			this.configApi.getNetworkConfig()[this.configApi.getNetwork()]
-
+		const tendermint = this.getTendermint()
+		
 		const response = await fetch(
 			`${tendermint}/tx?hash=0x${this.toHexString(sourceHex)}`,
 			{
