@@ -11,7 +11,6 @@ import ObservableStore from 'obs-store';
 import {
   build_tx,
   decode_transaction,
-  decrypt_note,
   encode_tx,
   send_plan,
   ViewClient,
@@ -318,96 +317,6 @@ export class ClientController {
     return lastBlock;
   }
 
-  async scanBlock(compactBlock: CompactBlock, fvk: string) {
-    if (this.requireScanning(compactBlock)) {
-      for (const statePayload of compactBlock.statePayloads) {
-        try {
-          if (statePayload.statePayload.case === 'note') {
-            let statePayloadNote = statePayload.statePayload.value;
-
-            let decryptedNote = decrypt_note(
-              fvk,
-              this.toHexString(statePayloadNote.note.encryptedNote),
-              this.toHexString(statePayloadNote.note.ephemeralKey)
-            );
-            if (decryptedNote === null) continue;
-
-            // decryptedNote.height = Number(compactBlock.height);
-            // decryptedNote.note_commitment = this.toHexString(
-            //   statePayloadNote.note.noteCommitment.inner
-            // );
-            // decryptedNote.ephemeralKey = this.toHexString(
-            //   statePayloadNote.note.ephemeralKey
-            // ); // ??
-            // decryptedNote.amount = decryptedNote.value.amount.lo; //??
-
-            // decryptedNote.asset = decryptedNote.value.asset_id;//??
-            // decryptedNote.nullifier = compactBlock.nullifiers.map((i) =>
-            //   this.toHexString(i.inner)
-            // );//?
-            // decryptedNote.source = this.toHexString(
-            //   statePayloadNote.source.inner
-            // ); //?
-
-            if (decryptedNote.value.amount.lo !== 0) {
-              const savedNote = {
-                noteCommitmentHex: this.toHexString(
-                  statePayloadNote.note.noteCommitment.inner
-                ),
-                noteCommitment: statePayloadNote.note.noteCommitment,
-                // why we return 1 nullifier, if we have few nullifiers
-                // nullifier:{inner: new TextEncoder().encode(compactBlock.nullifiers)},
-                nullifier: compactBlock.nullifiers,
-                heightCreated: compactBlock.height,
-                source: statePayloadNote.source,
-                // addressIndex change to {inner: bytes}
-                addressIndex: BigInt(0),
-                note: {
-                  noteBlinding: new TextEncoder().encode(
-                    decryptedNote.note_blinding
-                  ),
-                  address: {
-                    inner: new TextEncoder().encode(decryptedNote.address),
-                  },
-                  value: {
-                    amount: {
-                      lo: BigInt(decryptedNote.value.amount.lo),
-                      hi: BigInt(decryptedNote.value.amount.hi),
-                    },
-                    assetId: {
-                      inner: new TextEncoder().encode(
-                        decryptedNote.value.asset_id
-                      ),
-                    },
-                  },
-                },
-              };
-
-              await this.indexedDb.putValue('notes', savedNote);
-            }
-            await this.saveTransaction(
-              compactBlock.height,
-              statePayloadNote.source.inner
-            );
-
-            const oldState = this.store.getState().lastSavedBlock;
-
-            const lastSavedBlock = {
-              ...oldState,
-              [this.configApi.getNetwork()]: Number(compactBlock.height),
-            };
-            extension.storage.local.set({
-              lastSavedBlock,
-            });
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      }
-      if (compactBlock.fmdParameters !== undefined)
-        await this.saveFmdParameters(compactBlock.fmdParameters);
-    }
-  }
 
   async saveFmdParameters(fmdParameters: FmdParameters) {
     await this.indexedDb.resetTables('fmd_parameters');

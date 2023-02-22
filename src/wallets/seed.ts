@@ -31,11 +31,11 @@ export class SeedWallet extends Wallet<WalletPrivateDataOfType<'seed'>> {
 	}
 
 	getAddressByIndex() {
-		return get_address_by_index(this.getFullViewingKey(), BigInt(0))
+		return get_address_by_index(this.getFullViewingKey(),0)
 	}
 
 	getShortAddressByIndex() {
-		return get_short_address_by_index(this.getFullViewingKey(), BigInt(0))
+		return get_short_address_by_index(this.getFullViewingKey(),0)
 	}
 
 	getSeed() {
