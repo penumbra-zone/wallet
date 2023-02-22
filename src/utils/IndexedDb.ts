@@ -1,6 +1,5 @@
 import { IDBPDatabase, openDB } from 'idb'
 import { Nullifier } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
-import { SpendableNoteRecord } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 export type TableName =
 	| 'assets'
@@ -91,7 +90,6 @@ export class IndexedDb {
 
 		for (const note of result) {
 			if (JSON.stringify(note.nullifier) == JSON.stringify(nullifier)) {
-				console.log('detected spend nullifier')
 				note.heightSpent = height
 				await store.put(note, note.noteCommitment.inner)
 			}
@@ -162,15 +160,14 @@ export class IndexedDb {
 		const store = tx.objectStore(tableName)
 		const result = await store.get(id)
 		if (!result) {
-			console.log('Id not found', id)
+			console.error('Id not found', id)
 			return result
 		}
 		await store.delete(id)
-		console.log('Deleted Data', id)
 		return id
 	}
 
-	public async resetTables(tableName: string[]) {
+	public async resetTables(tableName: string) {
 		const tx = this.db.transaction([tableName], 'readwrite')
 		const store = tx.objectStore(tableName)
 		await store.clear()

@@ -47,7 +47,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 				{sendPlan.actions.map((i, index) => {
 					let text;
 					if(i.type === 'send'){
-						text = `${i.amount} ${i.asset} to ${getShortKey(i.recipient)}`
+						text = `${i.amount} ${i.asset} to ${getShortKey(i.destAddress)}`
 					}
 					else {
 						text = `${i.amount} ${i.asset}`

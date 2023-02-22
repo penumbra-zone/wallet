@@ -84,13 +84,6 @@ async function setupBackgroundService() {
 	updateBadge()
 
 	backgroundService.clientController.getCompactBlockRange()
-	//TODO add status stream
-	// setInterval(() => {
-	//   if (backgroundService.extensionStorage.getState('isLocked').isLocked) {
-	//
-	//     backgroundService.clientController.getLastExistBlock();
-	//   }
-	// }, 5000);
 
 	// Notification window management
 	const windowManager = new WindowManager({ extensionStorage })
@@ -124,13 +117,11 @@ async function setupBackgroundService() {
 	})
 
 	backgroundService.walletController.on('reset wallet', async () => {
+		await backgroundService.clientController.abortGrpcRequest()
 		await backgroundService.remoteConfigController.resetWallet()
 		await backgroundService.clientController.resetWallet()
 		await backgroundService.networkController.resetWallet()
 		await backgroundService.vaultController.lock()
-		setTimeout(() => {
-			extension.runtime.reload()
-		}, 500)
 	})
 
 	backgroundService.networkController.on('change grpc', async () => {

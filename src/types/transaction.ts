@@ -57,5 +57,5 @@ export type ParsedActions = {
 	amount: number
 	asset: string
 	isOwnAddress?: boolean
-	recipient: string
+	destAddress: string
 }
