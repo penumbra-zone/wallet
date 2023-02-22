@@ -4,7 +4,6 @@ import {
 } from '@bufbuild/connect-web'
 import { ExtensionStorage } from '../storage'
 import ObservableStore from 'obs-store'
-import { decrypt_note } from 'penumbra-web-assembly'
 import { WalletController } from './WalletController'
 import { extension } from '../lib'
 import { RemoteConfigController } from './RemoteConfigController'
