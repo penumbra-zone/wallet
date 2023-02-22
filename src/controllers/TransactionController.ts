@@ -12,6 +12,7 @@ import {
 	ActionType,
 	ParsedActions,
 	TransactionPlanType,
+	TransactionResponseType,
 } from '../types/transaction'
 import { IndexedDb } from '../utils'
 import { base64ToBytes, bytesToBase64 } from '../utils/base64'
@@ -170,7 +171,9 @@ export class TransactionController {
 		return { transactionPlan, actions }
 	}
 
-	async sendTransaction(sendPlan: TransactionPlanType) {
+	async sendTransaction(
+		sendPlan: TransactionPlanType
+	): Promise<TransactionResponseType> {
 		let fvk
 		let spendingKey
 		try {
@@ -196,6 +199,8 @@ export class TransactionController {
 		)
 		const encodeTx = await encode_tx(buildTx)
 		const resp = await this.broadcastTx(bytesToBase64(encodeTx))
+
+		return resp
 
 		// if (resp.result.code === 0) {
 		//     extension.notifications.create(resp.id, {

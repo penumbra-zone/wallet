@@ -272,4 +272,11 @@ export class WasmViewConnector {
 			''
 		)
 	}
+
+	resetWallet() {
+		if (this.viewClient) {
+			this.viewClient.free()
+		}
+		this.viewClient = undefined
+	}
 }
