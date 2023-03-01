@@ -229,7 +229,7 @@ export const Address: React.FC<AddressProps> = ({
 								onClick={handleNext}
 								title='Next'
 								className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
-								// disabled={!Number(amount) || balance < Number(amount)}
+								disabled={!Number(amount) || balance < Number(amount)}
 							/>
 						</div>
 					</div>
