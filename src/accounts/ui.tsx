@@ -1,7 +1,10 @@
 import ReactDOM from 'react-dom/client'
 import {
 	cbToPromise,
+	createIpcCallProxy,
 	extension,
+	fromPort,
+	handleMethodCallRequests,
 	PortStream,
 	setupDnode,
 	transformMethods,
@@ -16,6 +19,8 @@ import { routes } from './routes'
 import { createUpdateState } from './updateState'
 import { Provider } from 'react-redux'
 import '../ui/main.css'
+import pipe from 'callbag-pipe'
+import subscribe from 'callbag-subscribe'
 
 startUi()
 
@@ -42,40 +47,38 @@ async function startUi() {
 		updateState(stateChanges)
 	})
 
-	const emitterApi = {
-		closePopupWindow: async () => {
-			const popup = extension.extension
-				.getViews({ type: 'popup' })
-				.find(w => w.location.pathname === '/popup.html')
+	const connect = () => {
+		const uiApi = {
+			closePopupWindow: async () => {
+				const popup = extension.extension
+					.getViews({ type: 'popup' })
+					.find(w => w.location.pathname === '/popup.html')
 
-			if (popup) {
-				popup.close()
-			}
-		},
+				if (popup) {
+					popup.close()
+				}
+			},
+		}
+		let port: chrome.runtime.Port | null = extension.runtime.connect()
+		pipe(
+			fromPort(port),
+			handleMethodCallRequests(uiApi, res => port.postMessage(res)),
+			subscribe({
+				complete: () => {
+					backgroundService.setConnect(() => {
+						port = null
+						backgroundService.init(connect())
+					})
+				},
+			})
+		)
+		return createIpcCallProxy<keyof BackgroundUiApi, BackgroundUiApi>(
+      request => port?.postMessage(request),
+      fromPort(port)
+    );
 	}
 
-	const connect = async () => {
-		const port = extension.runtime.connect()
-
-		port.onDisconnect.addListener(() => {
-			backgroundService.setConnect(async () => {
-				const newBackground = await connect()
-				backgroundService.init(newBackground)
-			})
-		})
-
-		const connectionStream = new PortStream(port)
-		const dnode = setupDnode(connectionStream, emitterApi, 'api')
-
-		return await new Promise<BackgroundUiApi>(resolve => {
-			dnode.once('remote', (background: Record<string, unknown>) => {
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any---
-				resolve(transformMethods(cbToPromise, background) as any)
-			})
-		})
-	}
-
-	const background = await connect()
+	const background = connect()
 
 	const [state, networks] = await Promise.all([
 		background.getState(),

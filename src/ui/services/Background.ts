@@ -24,7 +24,7 @@ class Background {
 	background: any
 	initPromise: Promise<void>
 	updatedByUser = false
-	_connect: (() => void | Promise<void>) | undefined
+	_connect: () => void
 	_defer: {
 		resolve?: () => void
 		reject?: () => void
@@ -34,6 +34,7 @@ class Background {
 	_tmr: ReturnType<typeof setTimeout> | undefined
 
 	constructor() {
+		 this._connect = () => undefined;
 		this._defer = {}
 		this.initPromise = new Promise((res, rej) => {
 			this._defer.resolve = res
@@ -42,23 +43,19 @@ class Background {
 		this._defer.promise = this.initPromise
 	}
 
-	init(background: any) {
+	init(background: BackgroundUiApi) {
 		this.background = background
-
+		this._connect = () => undefined;
 		// global access to service on debug
 		if (PENUMBRAWALLET_DEBUG) {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			;(global as any).background = background
 		}
-
-		this._connect = () => {
-			// do nothing
-		}
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		this._defer.resolve!()
 	}
 
-	setConnect(connect: () => Promise<void>) {
+	setConnect(connect: () => void) {
 		this._connect = connect
 	}
 

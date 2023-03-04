@@ -1,88 +1,152 @@
-import LocalMessageDuplexStream from 'post-message-stream'
-import { extension, PortStream } from './lib'
+import pipe from 'callbag-pipe'
+import subscribe from 'callbag-subscribe'
+import {
+	extension,
+	filterIpcRequests,
+	fromPort,
+	fromPostMessage,
+} from './lib'
 
-if (shouldInject()) {
-	injectBundle()
-	setupConnection()
-}
+if (document.documentElement.tagName === 'HTML') {
+	const getPort = (() => {
+		let port
+		return () => {
+			if (!port) {
+				port = extension.runtime.connect({ name: 'contentscript' })
 
-function injectBundle() {
+				pipe(
+					fromPort(port),
+					subscribe({
+						next: msg => {
+							postMessage(msg, location.origin)
+						},
+						complete: () => {
+							port = undefined
+						},
+					})
+				)
+			}
+			return port
+		}
+	})()
+
 	const container = document.head || document.documentElement
-	const script = document.createElement('script')
-	script.src = extension.runtime.getURL('inpage.js')
-	container.insertBefore(script, container.children[0])
+	container.appendChild(
+		Object.assign(document.createElement('script'), {
+			src: extension.runtime.getURL('inpage.js'),
+			onload: () => {
+				pipe(
+					fromPostMessage(),
+					filterIpcRequests,
+					subscribe(data => {
+						getPort().postMessage(data)
+					})
+				)
 
-	script.onload = () => {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		script.parentElement!.removeChild(script)
-	}
+				extension.storage.onChanged.addListener(data => {
+					if (data.lastBlockHeight && data.lastSavedBlock) {
+						postMessage({ penumbraMethod: 'updateStatus' }, 	location.origin)
+					} else {
+						postMessage(
+							{ penumbraMethod: 'updatePublicState' },
+							location.origin
+						)
+					}
+				})
+			},
+		})
+	)
 }
 
-function setupConnection() {
-	//stream from contentscript to inpage
-	const inpageStream = new LocalMessageDuplexStream({
-		name: 'penumbra_content',
-		target: 'penumbra_page',
-	})
+// import LocalMessageDuplexStream from 'post-message-stream'
+// import { extension, PortStream } from './lib'
 
-	extension.storage.onChanged.addListener(() => {
-		inpageStream.write({ name: 'updatePublicState' })
-	})
+// if (shouldInject()) {
+// 	injectBundle()
+// 	setupConnection()
+// }
 
-	const connect = () => {
-		//stream from contentscript to background
-		const backgroundPort = extension.runtime.connect({ name: 'contentscript' })
-		const backgroundStream = new PortStream(backgroundPort)
+// function injectBundle() {
+// 	const container = document.head || document.documentElement
+// 	const script = document.createElement('script')
+// 	script.src = extension.runtime.getURL('inpage.js')
+// 	container.insertBefore(script, container.children[0])
 
-		//stream from inpage to background
-		inpageStream.pipe(backgroundStream).pipe(inpageStream)
+// 	script.onload = () => {
+// 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+// 		script.parentElement!.removeChild(script)
+// 	}
+// }
 
-		const onDisconnect = (port: chrome.runtime.Port) => {
-			port.onDisconnect.removeListener(onDisconnect)
-			// delete stream inpage to background
-			inpageStream.unpipe(backgroundStream)
-			// delete stream background to inpage
-			backgroundStream.unpipe(inpageStream)
+// function setupConnection() {
+// 	//stream from contentscript to inpage
+// 	const inpageStream = new LocalMessageDuplexStream({
+// 		name: 'penumbra_content',
+// 		target: 'penumbra_page',
+// 	})
 
-			backgroundStream.destroy()
-			connect()
-		}
+// 	extension.storage.onChanged.addListener(changedData => {
+// 		if (changedData.lastBlockHeight && changedData.lastSavedBlock) {
+// 			inpageStream.write({ name: 'updateStatus' })
+// 		} else {
+// 			inpageStream.write({ name: 'updatePublicState' })
+// 		}
+// 	})
 
-		backgroundPort.onDisconnect.addListener(onDisconnect)
-	}
-	connect()
-}
+// 	const connect = () => {
+// 		//stream from contentscript to background
+// 		const backgroundPort = extension.runtime.connect({ name: 'contentscript' })
+// 		const backgroundStream = new PortStream(backgroundPort)
 
-function shouldInject() {
-	return doctypeCheck() && suffixCheck() && documentElementCheck()
-}
+// 		//stream from inpage to background
+// 		inpageStream.pipe(backgroundStream).pipe(inpageStream)
 
-function doctypeCheck() {
-	const doctype = window.document.doctype
-	if (doctype) {
-		return doctype.name === 'html'
-	} else {
-		return true
-	}
-}
+// 		const onDisconnect = (port: chrome.runtime.Port) => {
+// 			port.onDisconnect.removeListener(onDisconnect)
+// 			// delete stream inpage to background
+// 			inpageStream.unpipe(backgroundStream)
+// 			// delete stream background to inpage
+// 			backgroundStream.unpipe(inpageStream)
 
-function suffixCheck() {
-	const prohibitedTypes = ['xml', 'pdf']
-	const currentUrl = window.location.href
-	let currentRegex
-	for (let i = 0; i < prohibitedTypes.length; i++) {
-		currentRegex = new RegExp(`\\.${prohibitedTypes[i]}$`)
-		if (currentRegex.test(currentUrl)) {
-			return false
-		}
-	}
-	return true
-}
+// 			backgroundStream.destroy()
+// 			connect()
+// 		}
 
-function documentElementCheck() {
-	const documentElement = document.documentElement.nodeName
-	if (documentElement) {
-		return documentElement.toLowerCase() === 'html'
-	}
-	return true
-}
+// 		backgroundPort.onDisconnect.addListener(onDisconnect)
+// 	}
+// 	connect()
+// }
+
+// function shouldInject() {
+// 	return doctypeCheck() && suffixCheck() && documentElementCheck()
+// }
+
+// function doctypeCheck() {
+// 	const doctype = window.document.doctype
+// 	if (doctype) {
+// 		return doctype.name === 'html'
+// 	} else {
+// 		return true
+// 	}
+// }
+
+// function suffixCheck() {
+// 	const prohibitedTypes = ['xml', 'pdf']
+// 	const currentUrl = window.location.href
+// 	let currentRegex
+// 	for (let i = 0; i < prohibitedTypes.length; i++) {
+// 		currentRegex = new RegExp(`\\.${prohibitedTypes[i]}$`)
+// 		if (currentRegex.test(currentUrl)) {
+// 			return false
+// 		}
+// 	}
+// 	return true
+// }
+
+// function documentElementCheck() {
+// 	const documentElement = document.documentElement.nodeName
+// 	if (documentElement) {
+// 		return documentElement.toLowerCase() === 'html'
+// 	}
+// 	return true
+// }

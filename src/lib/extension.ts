@@ -28,7 +28,7 @@ const hasChrome = typeof chrome !== 'undefined'
 const hasWindow = typeof window !== 'undefined'
 const hasBrowser = typeof browser !== 'undefined'
 
-class Extension {
+export class Extension {
 	action!: typeof chrome.action
 	alarms!: typeof chrome.alarms
 	api: unknown

@@ -4,7 +4,10 @@ import {
 	NotesRequest,
 	StatusRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import pipe from 'callbag-pipe'
+import subscribe from 'callbag-subscribe'
 import EventEmitter from 'events'
+import { nanoid } from 'nanoid'
 import { v4 as uuidv4 } from 'uuid'
 import {
 	ClientController,
@@ -25,6 +28,9 @@ import {
 import { TransactionController } from './controllers/TransactionController'
 import {
 	extension,
+	fromPort,
+	handleMethodCallRequests,
+	MethodCallRequestPayload,
 	PortStream,
 	setupDnode,
 	TabsManager,
@@ -44,7 +50,6 @@ const bgPromise = setupBackgroundService()
 
 extension.runtime.onConnect.addListener(async remotePort => {
 	const bgService = await bgPromise
-
 	if (remotePort.name === 'contentscript') {
 		bgService.setupPageConnection(remotePort)
 	} else {
@@ -245,15 +250,42 @@ class BackgroundService extends EventEmitter {
 		})
 	}
 
-	setupPageConnection(remotePort: chrome.runtime.Port) {
-		const { sender } = remotePort
+	setupPageConnection(sourcePort: chrome.runtime.Port) {
+		let port: chrome.runtime.Port | null = sourcePort
+		const { sender } = port
 
 		if (!sender || !sender.url) return
 
 		const origin = new URL(sender.url).hostname
-		const connectionId = uuidv4()
+		const connectionId = nanoid()
 		const inpageApi = this.getInpageApi(origin, connectionId)
-		const dnode = setupDnode(new PortStream(remotePort), inpageApi, 'inpageApi')
+		
+
+		pipe(
+			fromPort(port),
+			handleMethodCallRequests(inpageApi, res => port.postMessage(res)),
+			subscribe({
+				complete: () => {
+					port = null
+					// this.messageController.removeMessagesFromConnection(connectionId);
+
+					// const selectedAccount =
+					//   this.preferencesController.getSelectedAccount();
+
+					// const notificationsCount = selectedAccount
+					//   ? this.notificationsController.getNotifications(selectedAccount)
+					//       .length
+					//   : 0;
+
+					// const unapprovedMessagesCount =
+					//   this.messageController.getUnapproved().length;
+
+					// if (unapprovedMessagesCount === 0 && notificationsCount === 0) {
+					//   this.emit('Close notification');
+					// }
+				},
+			})
+		)
 	}
 
 	getState<K extends keyof StorageLocalState>(params?: K | K[]) {
@@ -426,6 +458,7 @@ class BackgroundService extends EventEmitter {
 			},
 			getStatusStream: async () => {
 				const { lastSavedBlock, lastBlockHeight } = this.getState()
+				return { lastSavedBlock, lastBlockHeight }
 			},
 			resourceIsApproved: async () => {
 				return this.permissionsController.hasPermission(
@@ -529,19 +562,33 @@ class BackgroundService extends EventEmitter {
 		}
 	}
 
-	setupUiConnection(remotePort: chrome.runtime.Port) {
-		const dnode = setupDnode(new PortStream(remotePort), this.getApi(), 'api')
+	setupUiConnection(sourcePort: chrome.runtime.Port) {
+		let port: chrome.runtime.Port | null = sourcePort
+		const api = this.getApi()
 
-		const remoteHandler = (remote: any) => {
-			const closePopupWindow = remote.closePopupWindow.bind(remote)
-			this.on('closePopupWindow', closePopupWindow)
-
-			dnode.on('end', () => {
-				this.removeListener('closePopupWindow', closePopupWindow)
+		pipe(
+			fromPort(port),
+			handleMethodCallRequests(api, result => port?.postMessage(result)),
+			subscribe({
+				complete: () => {
+					port = null
+					// this.off('ledger:signRequest', ui.ledgerSignRequest)
+					// this.off('closePopupWindow', ui.closePopupWindow)
+				},
 			})
-		}
+		)
+		// const dnode = setupDnode(new PortStream(remotePort), this.getApi(), 'api')
 
-		dnode.on('remote', remoteHandler)
+		// const remoteHandler = (remote: any) => {
+		// 	const closePopupWindow = remote.closePopupWindow.bind(remote)
+		// 	this.on('closePopupWindow', closePopupWindow)
+
+		// 	dnode.on('end', () => {
+		// 		this.removeListener('closePopupWindow', closePopupWindow)
+		// 	})
+		// }
+
+		// dnode.on('remote', remoteHandler)
 	}
 
 	_getCurrentNetwork(account: PreferencesAccount | undefined) {
@@ -595,3 +642,7 @@ class BackgroundService extends EventEmitter {
 }
 
 export type __BackgroundUiApiDirect = ReturnType<BackgroundService['getApi']>
+
+export type __BackgroundPageApiDirect = ReturnType<
+	BackgroundService['getInpageApi']
+>
