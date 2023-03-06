@@ -259,7 +259,6 @@ class BackgroundService extends EventEmitter {
 		const origin = new URL(sender.url).hostname
 		const connectionId = nanoid()
 		const inpageApi = this.getInpageApi(origin, connectionId)
-		
 
 		pipe(
 			fromPort(port),
@@ -267,22 +266,6 @@ class BackgroundService extends EventEmitter {
 			subscribe({
 				complete: () => {
 					port = null
-					// this.messageController.removeMessagesFromConnection(connectionId);
-
-					// const selectedAccount =
-					//   this.preferencesController.getSelectedAccount();
-
-					// const notificationsCount = selectedAccount
-					//   ? this.notificationsController.getNotifications(selectedAccount)
-					//       .length
-					//   : 0;
-
-					// const unapprovedMessagesCount =
-					//   this.messageController.getUnapproved().length;
-
-					// if (unapprovedMessagesCount === 0 && notificationsCount === 0) {
-					//   this.emit('Close notification');
-					// }
 				},
 			})
 		)

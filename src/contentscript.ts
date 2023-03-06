@@ -1,11 +1,6 @@
 import pipe from 'callbag-pipe'
 import subscribe from 'callbag-subscribe'
-import {
-	extension,
-	filterIpcRequests,
-	fromPort,
-	fromPostMessage,
-} from './lib'
+import { extension, filterIpcRequests, fromPort, fromPostMessage } from './lib'
 
 if (document.documentElement.tagName === 'HTML') {
 	const getPort = (() => {
@@ -45,7 +40,10 @@ if (document.documentElement.tagName === 'HTML') {
 
 				extension.storage.onChanged.addListener(data => {
 					if (data.lastBlockHeight && data.lastSavedBlock) {
-						postMessage({ penumbraMethod: 'updateStatus' }, 	location.origin)
+						postMessage(
+							{ penumbraMethod: 'updateStatus', data },
+							location.origin
+						)
 					} else {
 						postMessage(
 							{ penumbraMethod: 'updatePublicState' },

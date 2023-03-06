@@ -105,13 +105,18 @@ export class ClientController {
 		const assetRequest = new AssetListRequest()
 		assetRequest.chainId = chainId
 
-		const asset: AssetListResponse = await client.assetList(assetRequest)
+		const asset = (await client.assetList(assetRequest)).assetList.assets.map(
+			i => i.toJsonString()
+		)
 
-		const encodeAsset = asset.assetList.assets.map(asset => ({
-			...asset,
-			decodeId: encode('passet', asset.id?.inner, 'bech32m'),
-		}))
-
+		const encodeAsset = asset.map(asset => {
+			const parseAsset = JSON.parse(asset)
+			console.log(parseAsset)
+			return {
+				...parseAsset,
+				decodeId: parseAsset.id.inner,
+			}
+		})
 		await this.indexedDb.putBulkValue('assets', encodeAsset)
 	}
 
@@ -272,7 +277,7 @@ export class ClientController {
 
 	async saveTransaction(height: bigint, sourceHex: Uint8Array) {
 		const tendermint = this.getTendermint()
-		
+
 		const response = await fetch(
 			`${tendermint}/tx?hash=0x${this.toHexString(sourceHex)}`,
 			{
