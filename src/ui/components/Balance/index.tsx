@@ -18,21 +18,12 @@ export const Balance: React.FC<BalanceProps> = ({ className }) => {
 
 	const dispatch = useAppDispatch()
 
-	const getBalances = async () => {
-		const data = await Background.getBalances()
-
-		if (!data.length) return setBalance(0)
-
-		const sum = data.reduce((a, b) => a + Number(b.amount), 0) / 10 ** 6
-
-		dispatch(accountsActions.setBalance(Number(sum)))
-		setBalance(sum)
-	}
+	
 
 	useEffect(() => {
 		if (lastSavedBlock.testnet !== lastExistBlock.testnet) return
 
-		getBalances()
+		// getBalances()
 	}, [lastExistBlock, lastSavedBlock])
 	return <p className={className}>{balance.toLocaleString('en-US')} PNB</p>
 }

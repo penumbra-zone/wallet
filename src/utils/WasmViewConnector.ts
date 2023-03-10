@@ -8,7 +8,9 @@ import {
 	FmdParameters,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import { base64ToBytes } from './base64'
-import { Transaction } from '../controllers'
+import { CurrentAccountController, Transaction } from '../controllers'
+import { Nullifier } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
+import { IndexedDb } from './IndexedDb'
 
 export type StoredTree = {
 	last_position: number
@@ -45,11 +47,39 @@ export type NctUpdates = {
 
 export class WasmViewConnector {
 	private indexedDb
-
 	private viewClient
+	private configApi
 
-	constructor({ indexedDb }) {
+	constructor({
+		indexedDb,
+		updateAssetBalance,
+	}: {
+		indexedDb: IndexedDb
+		updateAssetBalance: CurrentAccountController['updateAssetBalance']
+	}) {
 		this.indexedDb = indexedDb
+		this.configApi = {
+			updateAssetBalance,
+		}
+	}
+
+	async updateNotes(nullifier: Nullifier, height: bigint) {
+		const result = await this.indexedDb.getAllValue('spendable_notes')
+
+		for (const note of result) {
+			if (JSON.stringify(note.nullifier) == JSON.stringify(nullifier)) {
+				note.heightSpent = height
+				await this.indexedDb.putValueWithId(
+					'spendable_notes',
+					note,
+					note.noteCommitment.inner
+				)
+				await this.configApi.updateAssetBalance(
+					note.note.value.assetId.inner,
+					Number(note.note.value.amount.lo) * -1
+				)
+			}
+		}
 	}
 
 	async handleNewCompactBlock(block: CompactBlock, fvk, transport) {
@@ -65,7 +95,7 @@ export class WasmViewConnector {
 
 		if (block.nullifiers.length > 0) {
 			for (const nullifier of block.nullifiers) {
-				await this.indexedDb.updateNotes(nullifier, block.height)
+				await this.updateNotes(nullifier, block.height)
 			}
 		}
 		if (block.fmdParameters !== undefined)
@@ -181,12 +211,28 @@ export class WasmViewConnector {
 			'spendable_notes',
 			note.noteCommitment.inner
 		)
+
+		// 		value
+		// :
+		// amount
+		// :
+		// {lo: '1000000000'}
+		// assetId
+		// :
+		// inner
+		// :
+		// "KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA="
 		if (storedNote == undefined) {
 			await this.indexedDb.putValueWithId(
 				'spendable_notes',
 				note,
 				note.noteCommitment.inner
 			)
+			await this.configApi.updateAssetBalance(
+				note.note.value.assetId.inner,
+				Number(note.note.value.amount.lo)
+			)
+
 			let sourceHex = this.toHexString(base64ToBytes(note.source.inner))
 
 			const tx: Transaction = {

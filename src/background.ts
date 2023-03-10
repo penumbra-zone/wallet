@@ -13,6 +13,7 @@ import {
 	ClientController,
 	Contact,
 	ContactBookController,
+	CurrentAccountController,
 	IdleController,
 	MessageController,
 	NetworkController,
@@ -40,7 +41,9 @@ import { MessageInput, MessageStoreItem } from './messages/types'
 import { PreferencesAccount } from './preferences'
 import { ViewProtocolService } from './services'
 import { ExtensionStorage, StorageLocalState } from './storage'
+import { IAsset } from './types/asset'
 import { TransactionPlanType } from './types/transaction'
+import { BalanceByAddressReq } from './types/viewService'
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
 import { IndexedDb, TableName } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
@@ -157,6 +160,7 @@ class BackgroundService extends EventEmitter {
 	messageController: MessageController
 	wasmViewConnector: WasmViewConnector
 	transactionController: TransactionController
+	currentAccountController: CurrentAccountController
 
 	constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
 		super()
@@ -212,6 +216,8 @@ class BackgroundService extends EventEmitter {
 
 		this.wasmViewConnector = new WasmViewConnector({
 			indexedDb: this.indexedDb,
+			updateAssetBalance: (assetId: string, amount: number) =>
+				this.currentAccountController.updateAssetBalance(assetId, amount),
 		})
 
 		this.transactionController = new TransactionController({
@@ -226,6 +232,10 @@ class BackgroundService extends EventEmitter {
 			getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
 			wasmViewConnector: this.wasmViewConnector,
 			getCustomGRPC: () => this.networkController.getCustomGRPC(),
+		})
+
+		this.currentAccountController = new CurrentAccountController({
+			extensionStorage: this.extensionStorage,
 		})
 
 		this.clientController = new ClientController({
@@ -318,7 +328,7 @@ class BackgroundService extends EventEmitter {
 				url: string | null | undefined,
 				network: NetworkName
 			) => this.networkController.setCustomTendermint(url, network),
-			getBalances: async () => this.indexedDb.getBalances(),
+
 			getValueById: async (tableName: TableName, id: string) =>
 				this.indexedDb.getValue(tableName, id),
 			setContact: async (contact: Contact) =>
@@ -439,10 +449,6 @@ class BackgroundService extends EventEmitter {
 				await this.validatePermission(origin, connectionId)
 				return await this._publicState(origin)
 			},
-			getStatusStream: async () => {
-				const { lastSavedBlock, lastBlockHeight } = this.getState()
-				return { lastSavedBlock, lastBlockHeight }
-			},
 			resourceIsApproved: async () => {
 				return this.permissionsController.hasPermission(
 					origin,
@@ -458,7 +464,7 @@ class BackgroundService extends EventEmitter {
 				if (!canIUse) {
 					throw new Error('Access denied')
 				}
-				return this.viewProtocolService.getAssets({})
+				return this.viewProtocolService.getAssets()
 			},
 			getChainParameters: async (request?: ChainParametersRequest) => {
 				const canIUse = this.permissionsController.hasPermission(
@@ -501,6 +507,7 @@ class BackgroundService extends EventEmitter {
 				}
 				return this.viewProtocolService.getStatus()
 			},
+			getStatusStream: async () => this.viewProtocolService.getStatusStream(),
 			getTransactionHashes: async (request: object) => {
 				const canIUse = this.permissionsController.hasPermission(
 					origin,
@@ -521,7 +528,7 @@ class BackgroundService extends EventEmitter {
 				}
 				return this.viewProtocolService.getTransactionByHash(request)
 			},
-			getTransactions: async (request: object) => {
+			getTransactions: async (request?: object) => {
 				const canIUse = this.permissionsController.hasPermission(
 					origin,
 					PERMISSIONS.GET_TRANSACTIONS
@@ -542,6 +549,8 @@ class BackgroundService extends EventEmitter {
 				}
 				return this.viewProtocolService.getFMDParameters()
 			},
+			getBalanceByAddress: async (arg: BalanceByAddressReq) =>
+				this.viewProtocolService.getBalanceByAddress(arg),
 		}
 	}
 

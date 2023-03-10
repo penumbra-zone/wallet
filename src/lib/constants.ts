@@ -100,3 +100,21 @@ export const columnsMyValidator: Array<
 		sortable: false,
 	},
 ]
+
+
+export const STATUS = 'STATUS'
+export const STATE = 'STATE'
+export const BALANCE = 'BALANCE'
+
+export const ASSET_TABLE_NAME = 'assets'
+export const CHAIN_PARAMETERS_TABLE_NAME = 'chain_parameters'
+export const NOTES_TABLE_NAME = 'notes'
+export const TRANSACTION_TABLE_NAME = 'tx'
+export const FMD_PARAMETERS_TABLE_NAME = 'fmd_parameters'
+export const NCT_COMMITMENTS_TABLE_NAME = 'nct_commitments'
+export const NCT_FORGOTTEN_TABLE_NAME = 'nct_forgotten'
+export const NCT_HASHES_TABLE_NAME = 'nct_hashes'
+export const NCT_POSITION_TABLE_NAME = 'nct_position'
+export const SPENDABLE_NOTES_TABLE_NAME = 'spendable_notes'
+export const TRANSACTION_BY_NULLIFIER_TABLE_NAME = 'tx_by_nullifier'
+export const SWAP_TABLE_NAME = 'swaps'

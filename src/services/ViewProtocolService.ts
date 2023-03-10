@@ -1,6 +1,7 @@
 import { ClientController, Transaction } from '../controllers'
 import { ExtensionStorage } from '../storage'
 import { EncodeAsset } from '../types'
+import { IAsset } from '../types/asset'
 import { IndexedDb } from '../utils'
 import { decode_transaction } from 'penumbra-web-assembly'
 import {
@@ -14,6 +15,7 @@ import {
 	NotesResponse,
 	StatusRequest,
 	StatusResponse,
+	StatusStreamRequest,
 	TransactionByHashRequest,
 	TransactionByHashResponse,
 	TransactionHashesRequest,
@@ -31,6 +33,8 @@ import {
 	ChainParameters,
 	FmdParameters,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
+import { BalanceByAddressReq, BalanceByAddressRes } from '../types/viewService'
+import { CHAIN_PARAMETERS_TABLE_NAME } from '../lib'
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -55,16 +59,58 @@ export class ViewProtocolService {
 		this.getLastExistBlock = getLastExistBlock
 	}
 
-	async getAssets({ request }: { request?: AssetsRequest }) {
+	async getBalanceByAddress(
+		request?: BalanceByAddressReq
+	): Promise<BalanceByAddressRes[]> {
+		const { balance } = await this.extensionStorage.getState('balance')
+		const assets: IAsset[] = await this.indexedDb.getAllValue('assets')
+		const res = Object.entries(balance).map((i: [string, number]) => {
+			return {
+				amount: {
+					lo: i[1],
+					//TODO add hi
+					// hi:
+				},
+				asset: {
+					inner: assets.find(asset => asset.id.inner === i[0]).id.inner,
+				},
+			}
+		})
+		return res
+	}
+
+	async getStatus(request?: StatusRequest) {
+		const { lastSavedBlock } = await this.extensionStorage.getState(
+			'lastSavedBlock'
+		)
+		const lasBlock = await this.getLastExistBlock()
+		return {
+			syncHeight: lastSavedBlock.testnet,
+			catchingUp: lastSavedBlock.testnet === lasBlock,
+		}
+	}
+
+	async getStatusStream(request?: StatusStreamRequest) {
+		const { lastSavedBlock } = await this.extensionStorage.getState(
+			'lastSavedBlock'
+		)
+		const lasBlock = await this.getLastExistBlock()
+		return {
+			syncHeight: lastSavedBlock.testnet,
+			latestKnownBlockHeight: lasBlock,
+		}
+	}
+
+	async getAssets(request?: AssetsRequest) {
 		const assets: EncodeAsset[] = await this.indexedDb.getAllValue('assets')
 
 		const response = assets.map(i => {
-			return new AssetsResponse({
+			return {
 				asset: {
 					denom: i.denom,
 					id: i.id,
 				},
-			}).toBinary()
+			}
 		})
 
 		return response
@@ -110,17 +156,6 @@ export class ViewProtocolService {
 		}
 		return new NoteByCommitmentResponse({
 			spendableNote: { ...selectedNote, noteCommitmentHex: undefined },
-		}).toBinary()
-	}
-
-	async getStatus(request?: StatusRequest) {
-		const { lastSavedBlock } = await this.extensionStorage.getState(
-			'lastSavedBlock'
-		)
-		const lasBlock = await this.getLastExistBlock()
-		return new StatusResponse({
-			syncHeight: lastSavedBlock.testnet,
-			catchingUp: lastSavedBlock.testnet === lasBlock,
 		}).toBinary()
 	}
 
@@ -171,11 +206,13 @@ export class ViewProtocolService {
 		}).toBinary()
 	}
 
-	async getTransactions(request: object) {
+	async getTransactions(request?: object) {
 		const tx: Transaction[] = await this.indexedDb.getAllValue('tx')
-		const decodeRequest = new TransactionsRequest().fromBinary(
-			new Uint8Array(Object.values(request))
-		)
+		const decodeRequest = request
+			? new TransactionsRequest().fromBinary(
+					new Uint8Array(Object.values(request))
+			  )
+			: ({} as TransactionsRequest)
 
 		let data: Transaction[] = []
 		if (decodeRequest.startHeight && decodeRequest.endHeight) {
@@ -191,11 +228,11 @@ export class ViewProtocolService {
 		}
 
 		return data.map(i => {
-			return new TransactionsResponse({
+			return {
 				blockHeight: i.blockHeight,
 				txHash: i.txHash,
 				tx: this.mapTransaction(decode_transaction(i.txBytes)),
-			}).toBinary()
+			}
 		})
 	}
 

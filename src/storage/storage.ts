@@ -47,6 +47,7 @@ export type StorageLocalState = {
 	notificationWindowId: number | undefined
 	inShowMode: boolean | undefined
 	idleInterval: number
+	balance: Record<string, number>
 }
 
 export type StorageSessionState = {

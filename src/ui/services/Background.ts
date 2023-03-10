@@ -418,17 +418,6 @@ class Background {
 		}
 	}
 
-	async getBalances() {
-		try {
-			await this.initPromise
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			await this._connect!()
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			return await this.background!.getBalances()
-		} catch (err) {
-			throw new Error(prepareErrorMessage(err))
-		}
-	}
 
 	async getTransactionPlan(
 		destAddress: string,
