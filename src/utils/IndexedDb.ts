@@ -18,10 +18,12 @@ export type TableName =
 export class IndexedDb {
 	private database: string
 	private db: any
+	private observer
 
 	constructor() {
 		this.database = 'penumbra'
 		this.createObjectStore()
+		this.observer = null;
 	}
 
 	public async createObjectStore() {
@@ -136,6 +138,9 @@ export class IndexedDb {
 		const tx = this.db.transaction(tableName, 'readwrite')
 		const store = tx.objectStore(tableName)
 		const result = await store.put(value)
+		if (this.observer) {
+			this.observer(tableName, value);
+		}
 		return result
 	}
 
@@ -172,4 +177,12 @@ export class IndexedDb {
 		const store = tx.objectStore(tableName)
 		await store.clear()
 	}
+
+	addObserver(callback) {
+    this.observer = callback;
+  }
+
+  removeObserver() {
+    this.observer = null;
+  }
 }

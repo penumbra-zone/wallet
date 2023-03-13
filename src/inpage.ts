@@ -18,6 +18,7 @@ declare global {
 						| __BackgroundPageApiDirect['getStatusStream']
 						| __BackgroundPageApiDirect['getBalanceByAddress']
 						| __BackgroundPageApiDirect['getTransactions']
+						| __BackgroundPageApiDirect['getAssets']
 					>
 				>
 			) => void,
@@ -62,12 +63,6 @@ globalThis.penumbra = {
 			for (let i = 0; i < data.length; i++) {
 				cb(data[i] as any)
 			}
-		} else if (event === 'transactions') {
-			const txs = await penumbra.getTransactions()
-
-			for (let i = 0; i < txs.length; i++) {
-				cb(txs[i] as any)
-			}
 		}
 
 		pipe(
@@ -75,10 +70,13 @@ globalThis.penumbra = {
 			filter((data: { penumbraMethod: string }) => {
 				return data.penumbraMethod === event.toUpperCase()
 			}),
-			subscribe(async () => {
+			subscribe(async data => {
 				if (event === 'status') {
 					const updatedValue = await penumbra.getStatusStream()
+					// console.log(new Uint8Array([1, 2, 3]))
+
 					cb(updatedValue)
+					// cb(new Uint8Array([1, 2, 3]) as any)
 				} else if (event === 'state') {
 					const updatedValue = await penumbra.publicState()
 					cb(updatedValue)
@@ -88,10 +86,7 @@ globalThis.penumbra = {
 						cb(updatedValue[i] as any)
 					}
 				} else if (event === 'assets') {
-					const data = await penumbra.getAssets()
-					for (let i = 0; i < data.length; i++) {
-						cb(data[i] as any)
-					}
+					cb({ asset: (data as any).data } as any)
 				}
 			})
 		)

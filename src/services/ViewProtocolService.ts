@@ -6,7 +6,6 @@ import { IndexedDb } from '../utils'
 import { decode_transaction } from 'penumbra-web-assembly'
 import {
 	AssetsRequest,
-	AssetsResponse,
 	FMDParametersRequest,
 	FMDParametersResponse,
 	NoteByCommitmentRequest,
@@ -14,14 +13,12 @@ import {
 	NotesRequest,
 	NotesResponse,
 	StatusRequest,
-	StatusResponse,
 	StatusStreamRequest,
 	TransactionByHashRequest,
 	TransactionByHashResponse,
 	TransactionHashesRequest,
 	TransactionHashesResponse,
 	TransactionsRequest,
-	TransactionsResponse,
 	WitnessRequest,
 	WitnessResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'

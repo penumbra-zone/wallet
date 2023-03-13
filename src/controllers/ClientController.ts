@@ -117,7 +117,8 @@ export class ClientController {
 				decodeId: parseAsset.id.inner,
 			}
 		})
-		await this.indexedDb.putBulkValue('assets', encodeAsset)
+		encodeAsset.forEach(async i => await this.indexedDb.putValue('assets', i))
+		// await this.indexedDb.putBulkValue('assets', encodeAsset)
 	}
 
 	async saveChainParameters() {

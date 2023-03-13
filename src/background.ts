@@ -270,9 +270,22 @@ class BackgroundService extends EventEmitter {
 		const connectionId = nanoid()
 		const inpageApi = this.getInpageApi(origin, connectionId)
 
+		this.indexedDb.addObserver((action, data) => {
+			console.log({ action, data })
+
+			return port.postMessage({
+				penumbraMethod: action.toUpperCase(),
+				origin,
+				data,
+			})
+		})
+
 		pipe(
 			fromPort(port),
-			handleMethodCallRequests(inpageApi, res => port.postMessage(res)),
+			handleMethodCallRequests(inpageApi, res => {
+				console.log({ res })
+				return port.postMessage(res)
+			}),
 			subscribe({
 				complete: () => {
 					port = null
@@ -368,6 +381,7 @@ class BackgroundService extends EventEmitter {
 				),
 			sendTransaction: async (sendPlan: TransactionPlanType) =>
 				this.transactionController.sendTransaction(sendPlan),
+			saveAsset: async (asset: any) => this.indexedDb.putValue('assets', asset),
 		}
 	}
 
