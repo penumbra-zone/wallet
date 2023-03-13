@@ -6,6 +6,7 @@ import { IndexedDb } from '../utils'
 import { decode_transaction } from 'penumbra-web-assembly'
 import {
 	AssetsRequest,
+	AssetsResponse,
 	FMDParametersRequest,
 	FMDParametersResponse,
 	NoteByCommitmentRequest,
@@ -31,7 +32,7 @@ import {
 	FmdParameters,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import { BalanceByAddressReq, BalanceByAddressRes } from '../types/viewService'
-import { CHAIN_PARAMETERS_TABLE_NAME } from '../lib'
+import { ASSET_TABLE_NAME, CHAIN_PARAMETERS_TABLE_NAME } from '../lib'
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -60,7 +61,7 @@ export class ViewProtocolService {
 		request?: BalanceByAddressReq
 	): Promise<BalanceByAddressRes[]> {
 		const { balance } = await this.extensionStorage.getState('balance')
-		const assets: IAsset[] = await this.indexedDb.getAllValue('assets')
+		const assets: IAsset[] = await this.indexedDb.getAllValue(ASSET_TABLE_NAME)
 		const res = Object.entries(balance).map((i: [string, number]) => {
 			return {
 				amount: {
@@ -98,18 +99,14 @@ export class ViewProtocolService {
 		}
 	}
 
-	async getAssets(request?: AssetsRequest) {
-		const assets: EncodeAsset[] = await this.indexedDb.getAllValue('assets')
+	async getAssets(request?: AssetsRequest): Promise<AssetsResponse[]> {
+		const assets = await this.indexedDb.getAllValue(ASSET_TABLE_NAME)
 
 		const response = assets.map(i => {
-			return {
-				asset: {
-					denom: i.denom,
-					id: i.id,
-				},
-			}
+			return new AssetsResponse().fromJson({ asset: i })
 		})
-
+		console.log(response);
+		
 		return response
 	}
 

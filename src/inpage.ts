@@ -4,6 +4,7 @@ import pipe from 'callbag-pipe'
 import filter from 'callbag-filter'
 import subscribe from 'callbag-subscribe'
 import { BalanceByAddressReq } from './types/viewService'
+import { AssetsResponse } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 type Events = 'state' | 'status' | 'balance' | 'assets' | 'transactions'
 
@@ -12,15 +13,17 @@ declare global {
 		on(
 			event: Events,
 			cd: (
-				state: Awaited<
-					ReturnType<
-						| __BackgroundPageApiDirect['publicState']
-						| __BackgroundPageApiDirect['getStatusStream']
-						| __BackgroundPageApiDirect['getBalanceByAddress']
-						| __BackgroundPageApiDirect['getTransactions']
-						| __BackgroundPageApiDirect['getAssets']
-					>
-				>
+				state:
+					| Awaited<
+							ReturnType<
+								| __BackgroundPageApiDirect['publicState']
+								| __BackgroundPageApiDirect['getStatusStream']
+								| __BackgroundPageApiDirect['getBalanceByAddress']
+								| __BackgroundPageApiDirect['getTransactions']
+								// | __BackgroundPageApiDirect['getAssets']
+							>
+					  >
+					| AssetsResponse
 			) => void,
 			args: any
 		): void
@@ -61,7 +64,7 @@ globalThis.penumbra = {
 		if (event === 'assets') {
 			const data = await penumbra.getAssets()
 			for (let i = 0; i < data.length; i++) {
-				cb(data[i] as any)
+				cb(new AssetsResponse().fromJson(data[i] as any))
 			}
 		}
 

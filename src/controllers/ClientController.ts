@@ -5,7 +5,7 @@ import {
 import { ExtensionStorage } from '../storage'
 import ObservableStore from 'obs-store'
 import { WalletController } from './WalletController'
-import { extension } from '../lib'
+import { ASSET_TABLE_NAME, extension } from '../lib'
 import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
 import { encode } from 'bech32-buffer'
@@ -88,9 +88,7 @@ export class ClientController {
 	}
 
 	async saveAssets() {
-		const savedAssets: EncodeAsset[] = await this.indexedDb.getAllValue(
-			'assets'
-		)
+		const savedAssets = await this.indexedDb.getAllValue(ASSET_TABLE_NAME)
 
 		if (savedAssets.length) return
 
@@ -104,21 +102,13 @@ export class ClientController {
 
 		const assetRequest = new AssetListRequest()
 		assetRequest.chainId = chainId
+		const assetList = await client.assetList(assetRequest)
 
-		const asset = (await client.assetList(assetRequest)).assetList.assets.map(
-			i => i.toJsonString()
+		const assets = assetList.assetList.assets.map(i => i.toJsonString())
+		assets.forEach(
+			async i =>
+				await this.indexedDb.putValue(ASSET_TABLE_NAME, { ...JSON.parse(i) })
 		)
-
-		const encodeAsset = asset.map(asset => {
-			const parseAsset = JSON.parse(asset)
-
-			return {
-				...parseAsset,
-				decodeId: parseAsset.id.inner,
-			}
-		})
-		encodeAsset.forEach(async i => await this.indexedDb.putValue('assets', i))
-		// await this.indexedDb.putBulkValue('assets', encodeAsset)
 	}
 
 	async saveChainParameters() {
@@ -311,7 +301,7 @@ export class ClientController {
 	async resetWallet() {
 		await this.indexedDb.resetTables('notes')
 		await this.indexedDb.resetTables('chainParameters')
-		await this.indexedDb.resetTables('assets')
+		await this.indexedDb.resetTables(ASSET_TABLE_NAME)
 		await this.indexedDb.resetTables('tx')
 		await this.indexedDb.resetTables('fmd_parameters')
 		await this.indexedDb.resetTables('nct_commitments')

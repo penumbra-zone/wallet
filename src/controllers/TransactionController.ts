@@ -7,6 +7,7 @@ import {
 	is_controlled_address,
 	send_plan,
 } from 'penumbra-web-assembly'
+import { ASSET_TABLE_NAME } from '../lib'
 import {
 	ActionArrayType,
 	ActionType,
@@ -86,7 +87,7 @@ export class TransactionController {
 					'bech32m'
 				)
 				const detailAsset = await this.indexedDb.getValue(
-					'assets',
+					ASSET_TABLE_NAME,
 					encodeAssetId
 				)
 				const asset = detailAsset.denom.denom

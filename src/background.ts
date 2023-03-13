@@ -381,7 +381,6 @@ class BackgroundService extends EventEmitter {
 				),
 			sendTransaction: async (sendPlan: TransactionPlanType) =>
 				this.transactionController.sendTransaction(sendPlan),
-			saveAsset: async (asset: any) => this.indexedDb.putValue('assets', asset),
 		}
 	}
 

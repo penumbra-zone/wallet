@@ -1,8 +1,9 @@
 import { IDBPDatabase, openDB } from 'idb'
 import { Nullifier } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
+import { ASSET_TABLE_NAME } from '../lib'
 
 export type TableName =
-	| 'assets'
+	| typeof ASSET_TABLE_NAME
 	| 'chainParameters'
 	| 'notes'
 	| 'tx'
@@ -30,9 +31,9 @@ export class IndexedDb {
 		try {
 			this.db = await openDB(this.database, 2, {
 				upgrade(db: IDBPDatabase) {
-					db.createObjectStore('assets', {
+					db.createObjectStore(ASSET_TABLE_NAME, {
 						autoIncrement: true,
-						keyPath: 'decodeId',
+						keyPath: 'id.inner',
 					})
 
 					db.createObjectStore('chainParameters', {
