@@ -111,7 +111,7 @@ export class ClientController {
 
 		const encodeAsset = asset.map(asset => {
 			const parseAsset = JSON.parse(asset)
-			console.log(parseAsset)
+
 			return {
 				...parseAsset,
 				decodeId: parseAsset.id.inner,

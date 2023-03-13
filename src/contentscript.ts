@@ -41,6 +41,9 @@ if (document.documentElement.tagName === 'HTML') {
 				)
 
 				extension.storage.onChanged.addListener(data => {
+
+					console.log(data);
+					
 					
 					if (data.lastBlockHeight && data.lastSavedBlock) {
 						postMessage(

@@ -66,8 +66,6 @@ globalThis.penumbra = {
 			const txs = await penumbra.getTransactions()
 
 			for (let i = 0; i < txs.length; i++) {
-				console.log(txs[i]);
-				
 				cb(txs[i] as any)
 			}
 		}
