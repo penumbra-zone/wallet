@@ -54,22 +54,21 @@ export const Address: React.FC<AddressProps> = ({
 
 	const handleBack = () => navigate(routesPath.HOME)
 
-	const options = [
-		{
-			value: 'PNB',
-			label: (
-				<div className='flex flex-col'>
-					<p className='text_numbers'>PNB</p>
-					<div className='flex items-center'>
-						<p className='text_body text-light_grey'>Balance:</p>
-						<Balance className='text_numbers_s text-light_grey ml-[16px]' />
-					</div>
+	const options = Object.values(balance).map(i => ({
+		value: 'PNB',
+		label: (
+			<div className='flex flex-col'>
+				<p className='text_numbers'>PNB</p>
+				<div className='flex items-center'>
+					<p className='text_body text-light_grey'>Balance:</p>
+					<Balance className='text_numbers_s text-light_grey ml-[16px]' />
 				</div>
-			),
-		},
-	]
+			</div>
+		),
+	}))
 
-	const handleMax = () => setAmount(String(balance))
+	const handleMax = () =>
+		setAmount(String(Number(Object.values(balance)[0]) / 10 ** 6))
 
 	const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearch(event.target.value)

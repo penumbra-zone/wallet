@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAccountsSelector, useAppDispatch } from '../../../accounts'
 import {
 	accountsActions,
+	selectBalance,
 	selectLastExistBlock,
 	selectLastSavedBlock,
 } from '../../redux'
@@ -12,18 +13,11 @@ type BalanceProps = {
 }
 
 export const Balance: React.FC<BalanceProps> = ({ className }) => {
-	const [balance, setBalance] = useState<number>(0)
-	const lastSavedBlock = useAccountsSelector(selectLastSavedBlock)
-	const lastExistBlock = useAccountsSelector(selectLastExistBlock)
+	const balance = useAccountsSelector(selectBalance)
 
-	const dispatch = useAppDispatch()
-
-	
-
-	useEffect(() => {
-		if (lastSavedBlock.testnet !== lastExistBlock.testnet) return
-
-		// getBalances()
-	}, [lastExistBlock, lastSavedBlock])
-	return <p className={className}>{balance.toLocaleString('en-US')} PNB</p>
+	return (
+		<p className={className}>
+			{Number(Object.values(balance)[0] / 10**6).toLocaleString('en-US')} PNB
+		</p>
+	)
 }
