@@ -271,8 +271,6 @@ class BackgroundService extends EventEmitter {
 		const inpageApi = this.getInpageApi(origin, connectionId)
 
 		this.indexedDb.addObserver((action, data) => {
-			console.log({ action, data })
-
 			return port.postMessage({
 				penumbraMethod: action.toUpperCase(),
 				origin,

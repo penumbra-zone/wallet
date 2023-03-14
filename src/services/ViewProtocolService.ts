@@ -102,13 +102,10 @@ export class ViewProtocolService {
 	async getAssets(request?: AssetsRequest): Promise<AssetsResponse[]> {
 		const assets = await this.indexedDb.getAllValue(ASSET_TABLE_NAME)
 
-		console.log(assets);
 		const response = assets.map(i => {
-			console.log(i);
-			return new AssetsResponse({asset: i})
+			return new AssetsResponse().fromJson({ asset: i })
 		})
-		console.log(response);
-		
+
 		return response
 	}
 
