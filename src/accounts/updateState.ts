@@ -32,6 +32,10 @@ export function createUpdateState(store: AccountsStore) {
 		const currentState = store.getState()
 		const dispatch = store.dispatch
 
+		if(state.balance){
+			dispatch(accountsActions.setBalance(state.balance))
+		}
+
 		if (state.lastBlockHeight) {
 			dispatch(networkActions.setLastExistBlock(state.lastBlockHeight))
 		}

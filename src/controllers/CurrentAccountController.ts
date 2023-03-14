@@ -1,6 +1,5 @@
 import ObservableStore from 'obs-store'
 import { ExtensionStorage } from '../storage'
-import { IAsset } from '../types/asset'
 
 export class CurrentAccountController {
 	private store
@@ -23,5 +22,9 @@ export class CurrentAccountController {
 		}
 
 		this.store.updateState({ balance: updatedBalances })
+	}
+
+	async resetWallet() {
+		await this.store.updateState({ balance: {} })
 	}
 }

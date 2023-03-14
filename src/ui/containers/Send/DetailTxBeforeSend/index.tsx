@@ -41,6 +41,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 		if (txResponse.result.code === 0) {
 			interval = setInterval(async () => {
 				const hash = txResponse.result.hash.toLowerCase()
+
 				const tx = await Background.getValueById('tx', hash)
 				if (tx) {
 					setLoading(false)

@@ -80,16 +80,8 @@ export class TransactionController {
 
 				const destAddress = key === 'spend' ? '' : value.destAddress.inner
 
-				//find asset name
-				const encodeAssetId = encode(
-					'passet',
-					base64ToBytes(assetId),
-					'bech32m'
-				)
-				const detailAsset = await this.indexedDb.getValue(
-					ASSET_TABLE_NAME,
-					encodeAssetId
-				)
+				const detailAsset = await this.indexedDb.getValue('assets', assetId)
+
 				const asset = detailAsset.denom.denom
 
 				//encode recipinet address
@@ -198,7 +190,9 @@ export class TransactionController {
 			sendPlan,
 			await this.wasmViewConnector.loadStoredTree()
 		)
+
 		const encodeTx = await encode_tx(buildTx)
+
 		const resp = await this.broadcastTx(bytesToBase64(encodeTx))
 
 		return resp

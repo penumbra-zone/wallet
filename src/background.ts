@@ -130,6 +130,7 @@ async function setupBackgroundService() {
 		await backgroundService.clientController.resetWallet()
 		await backgroundService.networkController.resetWallet()
 		await backgroundService.wasmViewConnector.resetWallet()
+		await backgroundService.currentAccountController.resetWallet()
 		await backgroundService.vaultController.lock()
 	})
 
