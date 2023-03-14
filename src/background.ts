@@ -468,97 +468,97 @@ class BackgroundService extends EventEmitter {
 				)
 			},
 			getAssets: async (request?: AssetsRequest) => {
-				const canIUse = this.permissionsController.hasPermission(
-					origin,
-					PERMISSIONS.GET_ASSETS
-				)
+				// const canIUse = this.permissionsController.hasPermission(
+				// 	origin,
+				// 	PERMISSIONS.GET_ASSETS
+				// )
 
-				if (!canIUse) {
-					throw new Error('Access denied')
-				}
+				// if (!canIUse) {
+				// 	throw new Error('Access denied')
+				// }
 				return this.viewProtocolService.getAssets()
 			},
 			getChainParameters: async (request?: ChainParametersRequest) => {
-				const canIUse = this.permissionsController.hasPermission(
-					origin,
-					PERMISSIONS.GET_CHAIN_PARAMETERS
-				)
-				if (!canIUse) {
-					throw new Error('Access denied')
-				}
+				// const canIUse = this.permissionsController.hasPermission(
+				// 	origin,
+				// 	PERMISSIONS.GET_CHAIN_PARAMETERS
+				// )
+				// if (!canIUse) {
+				// 	throw new Error('Access denied')
+				// }
 				return this.viewProtocolService.getChainParameters()
 			},
 			getNotes: async (request?: NotesRequest) => {
-				const canIUse = this.permissionsController.hasPermission(
-					origin,
-					PERMISSIONS.GET_NOTES
-				)
-				if (!canIUse) {
-					throw new Error('Access denied')
-				}
+				// const canIUse = this.permissionsController.hasPermission(
+				// 	origin,
+				// 	PERMISSIONS.GET_NOTES
+				// )
+				// if (!canIUse) {
+				// 	throw new Error('Access denied')
+				// }
 				return this.viewProtocolService.getNotes()
 			},
 			getNoteByCommitment: async (request: object) => {
-				const canIUse = this.permissionsController.hasPermission(
-					origin,
-					PERMISSIONS.GET_NOTE_BY_COMMITMENT
-				)
-				if (!canIUse) {
-					throw new Error('Access denied')
-				}
+				// const canIUse = this.permissionsController.hasPermission(
+				// 	origin,
+				// 	PERMISSIONS.GET_NOTE_BY_COMMITMENT
+				// )
+				// if (!canIUse) {
+				// 	throw new Error('Access denied')
+				// }
 				return this.viewProtocolService.getNoteByCommitment(request)
 			},
 
 			getStatus: async (request?: StatusRequest) => {
-				const canIUse = this.permissionsController.hasPermission(
-					origin,
-					PERMISSIONS.GET_CHAIN_CURRENT_STATUS
-				)
-				if (!canIUse) {
-					throw new Error('Access denied')
-				}
+				// const canIUse = this.permissionsController.hasPermission(
+				// 	origin,
+				// 	PERMISSIONS.GET_CHAIN_CURRENT_STATUS
+				// )
+				// if (!canIUse) {
+				// 	throw new Error('Access denied')
+				// }
 				return this.viewProtocolService.getStatus()
 			},
 			getStatusStream: async () => this.viewProtocolService.getStatusStream(),
 			getTransactionHashes: async (request: object) => {
-				const canIUse = this.permissionsController.hasPermission(
-					origin,
-					PERMISSIONS.GET_TRANSACTION_HASHES
-				)
-				if (!canIUse) {
-					throw new Error('Access denied')
-				}
+				// const canIUse = this.permissionsController.hasPermission(
+				// 	origin,
+				// 	PERMISSIONS.GET_TRANSACTION_HASHES
+				// )
+				// if (!canIUse) {
+				// 	throw new Error('Access denied')
+				// }
 				return this.viewProtocolService.getTransactionHashes(request)
 			},
 			getTransactionByHash: async (request: object) => {
-				const canIUse = this.permissionsController.hasPermission(
-					origin,
-					PERMISSIONS.GET_TRANSACTION_BY_HASH
-				)
-				if (!canIUse) {
-					throw new Error('Access denied')
-				}
+				// const canIUse = this.permissionsController.hasPermission(
+				// 	origin,
+				// 	PERMISSIONS.GET_TRANSACTION_BY_HASH
+				// )
+				// if (!canIUse) {
+				// 	throw new Error('Access denied')
+				// }
 				return this.viewProtocolService.getTransactionByHash(request)
 			},
 			getTransactions: async (request?: object) => {
-				const canIUse = this.permissionsController.hasPermission(
-					origin,
-					PERMISSIONS.GET_TRANSACTIONS
-				)
-				if (!canIUse) {
-					throw new Error('Access denied')
-				}
+				// const canIUse = this.permissionsController.hasPermission(
+				// 	origin,
+				// 	PERMISSIONS.GET_TRANSACTIONS
+				// )
+				// if (!canIUse) {
+				// 	throw new Error('Access denied')
+				// }
 				return this.viewProtocolService.getTransactions(request)
 			},
 
 			getFmdParameters: async () => {
-				const canIUse = this.permissionsController.hasPermission(
-					origin,
-					PERMISSIONS.GET_FMD_PARAMETERS
-				)
-				if (!canIUse) {
-					throw new Error('Access denied')
-				}
+				// const canIUse = this.permissionsController.hasPermission(
+				// 	origin,
+				// 	PERMISSIONS.GET_FMD_PARAMETERS
+				// )
+				// if (!canIUse) {
+				// 	throw new Error('Access denied')
+				// }
 				return this.viewProtocolService.getFMDParameters()
 			},
 			getBalanceByAddress: async (arg: BalanceByAddressReq) =>
