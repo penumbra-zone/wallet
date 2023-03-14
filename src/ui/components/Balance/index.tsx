@@ -1,12 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useAccountsSelector, useAppDispatch } from '../../../accounts'
-import {
-	accountsActions,
-	selectBalance,
-	selectLastExistBlock,
-	selectLastSavedBlock,
-} from '../../redux'
-import Background from '../../services/Background'
+import { useAccountsSelector } from '../../../accounts'
+import { selectBalance } from '../../redux'
 
 type BalanceProps = {
 	className?: string
@@ -17,7 +10,10 @@ export const Balance: React.FC<BalanceProps> = ({ className }) => {
 
 	return (
 		<p className={className}>
-			{Number(Object.values(balance)[0] / 10**6).toLocaleString('en-US')} PNB
+			{Number(Number(Object.values(balance)[0] || 0) / 10 ** 6).toLocaleString(
+				'en-US'
+			)}{' '}
+			PNB
 		</p>
 	)
 }
