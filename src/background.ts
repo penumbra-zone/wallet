@@ -568,6 +568,7 @@ class BackgroundService extends EventEmitter {
 			},
 			getBalanceByAddress: async (arg: BalanceByAddressRequest) =>
 				this.viewProtocolService.getBalanceByAddress(arg),
+				
 		}
 	}
 
@@ -609,7 +610,7 @@ class BackgroundService extends EventEmitter {
 	}
 
 	_publicState(originReq: string) {
-		let account: PreferencesAccount | null = null
+		let account = null
 
 		let msg: Array<{
 			id: MessageStoreItem['id']
@@ -625,11 +626,13 @@ class BackgroundService extends EventEmitter {
 		const { selectedAccount, isInitialized, isLocked, messages } =
 			this.getState()
 
+		const fvk = this.walletController.getAccountFullViewingKeyWithoutPassword()
+
 		if (selectedAccount && canIUse) {
 			const addressByIndex = selectedAccount.addressByIndex
 			account = {
 				...selectedAccount,
-				// balance: 0,
+				fvk
 			}
 			msg = messages
 				.filter(

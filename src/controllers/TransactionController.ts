@@ -149,7 +149,7 @@ export class TransactionController {
 			CHAIN_PARAMETERS_TABLE_NAME
 		)
 		const chainParameters = await chainParamsRecords[0]
-		if (!fmdParameters) console.error('No found chain parameters')
+		if (!chainParameters) console.error('No found chain parameters')
 
 		const data = {
 			notes,
