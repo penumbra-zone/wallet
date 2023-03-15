@@ -107,6 +107,7 @@ async function startUi() {
 		contacts: state.contacts,
 		messages: state.messages,
 		origins: state.origins,
+		...state
 	})
 
 	backgroundService.init(background)

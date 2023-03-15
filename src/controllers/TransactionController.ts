@@ -7,7 +7,11 @@ import {
 	is_controlled_address,
 	send_plan,
 } from 'penumbra-web-assembly'
-import { ASSET_TABLE_NAME } from '../lib'
+import {
+	CHAIN_PARAMETERS_TABLE_NAME,
+	FMD_PARAMETERS_TABLE_NAME,
+	SPENDABLE_NOTES_TABLE_NAME,
+} from '../lib'
 import {
 	ActionArrayType,
 	ActionType,
@@ -129,17 +133,20 @@ export class TransactionController {
 		} catch {}
 		if (!fvk) return
 
-		let notes = await this.indexedDb.getAllValue('spendable_notes')
+		let notes = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
 		notes = notes
 			.filter(note => note.heightSpent === undefined)
 			.filter(note => note.note.value.assetId.inner === assetId)
 		if (!notes.length) console.error('No notes found to spend')
 
-		const fmdParameters = await this.indexedDb.getValue('fmd_parameters', `fmd`)
+		const fmdParameters = await this.indexedDb.getValue(
+			FMD_PARAMETERS_TABLE_NAME,
+			`fmd`
+		)
 		if (!fmdParameters) console.error('No found FmdParameters')
 
 		const chainParamsRecords = await this.indexedDb.getAllValue(
-			'chainParameters'
+			CHAIN_PARAMETERS_TABLE_NAME
 		)
 		const chainParameters = await chainParamsRecords[0]
 		if (!fmdParameters) console.error('No found chain parameters')

@@ -1,18 +1,22 @@
 import { IDBPDatabase, openDB } from 'idb'
 import { Nullifier } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
-import { ASSET_TABLE_NAME } from '../lib'
+import {
+	ASSET_TABLE_NAME,
+	CHAIN_PARAMETERS_TABLE_NAME,
+	FMD_PARAMETERS_TABLE_NAME,
+	SPENDABLE_NOTES_TABLE_NAME,
+} from '../lib'
 
 export type TableName =
 	| typeof ASSET_TABLE_NAME
-	| 'chainParameters'
-	| 'notes'
+	| typeof CHAIN_PARAMETERS_TABLE_NAME
 	| 'tx'
-	| 'fmd_parameters'
+	| typeof FMD_PARAMETERS_TABLE_NAME
 	| 'nct_commitments'
 	| 'nct_forgotten'
 	| 'nct_hashes'
 	| 'nct_position'
-	| 'spendable_notes'
+	| typeof SPENDABLE_NOTES_TABLE_NAME
 	| 'tx_by_nullifier'
 	| 'swaps'
 
@@ -24,7 +28,7 @@ export class IndexedDb {
 	constructor() {
 		this.database = 'penumbra'
 		this.createObjectStore()
-		this.observer = null;
+		this.observer = null
 	}
 
 	public async createObjectStore() {
@@ -36,20 +40,16 @@ export class IndexedDb {
 						keyPath: 'id.inner',
 					})
 
-					db.createObjectStore('chainParameters', {
+					db.createObjectStore(CHAIN_PARAMETERS_TABLE_NAME, {
 						autoIncrement: true,
 						keyPath: 'chainId',
-					})
-					db.createObjectStore('notes', {
-						autoIncrement: true,
-						keyPath: 'noteCommitmentHex',
 					})
 
 					db.createObjectStore('tx', {
 						keyPath: 'txHashHex',
 					})
 
-					db.createObjectStore('fmd_parameters')
+					db.createObjectStore(FMD_PARAMETERS_TABLE_NAME)
 
 					db.createObjectStore('nct_commitments', {
 						autoIncrement: true,
@@ -64,7 +64,7 @@ export class IndexedDb {
 					})
 					db.createObjectStore('nct_position')
 
-					db.createObjectStore('spendable_notes')
+					db.createObjectStore(SPENDABLE_NOTES_TABLE_NAME)
 
 					db.createObjectStore('tx_by_nullifier', {
 						autoIncrement: true,
@@ -86,47 +86,6 @@ export class IndexedDb {
 		return result
 	}
 
-	public async updateNotes(nullifier: Nullifier, height: bigint) {
-		const tx = this.db.transaction('spendable_notes', 'readwrite')
-		const store = tx.objectStore('spendable_notes')
-		const result = await store.getAll()
-
-		for (const note of result) {
-			if (JSON.stringify(note.nullifier) == JSON.stringify(nullifier)) {
-				note.heightSpent = height
-				await store.put(note, note.noteCommitment.inner)
-			}
-		}
-	}
-
-	public async getBalances() {
-		const tx = this.db.transaction('spendable_notes', 'readwrite')
-		const store = tx.objectStore('spendable_notes')
-		const result = await store.getAll()
-
-		const balances = result
-			.filter(note => note.heightSpent === undefined)
-			.map(note => ({
-				assetId: note.note.value.assetId.inner,
-				amount: note.note.value.amount.lo,
-			}))
-		return balances
-	}
-
-	public async getBalance(tableName: TableName) {
-		const tx = this.db.transaction(tableName, 'readonly')
-		const store = tx.objectStore(tableName)
-
-		const result = await store.getAll()
-
-		const balances = result.map(i => ({
-			heightCreated: Number(i.heightCreated),
-			amount: Number(i.note.value.amount.lo),
-		}))
-
-		return balances
-	}
-
 	public async getAllValue(tableName: TableName) {
 		const tx = this.db.transaction(tableName, 'readonly')
 		const store = tx.objectStore(tableName)
@@ -140,7 +99,7 @@ export class IndexedDb {
 		const store = tx.objectStore(tableName)
 		const result = await store.put(value)
 		if (this.observer) {
-			this.observer(tableName, value);
+			this.observer(tableName, value)
 		}
 		return result
 	}
@@ -149,6 +108,9 @@ export class IndexedDb {
 		const tx = this.db.transaction(tableName, 'readwrite')
 		const store = tx.objectStore(tableName)
 		const result = await store.put(value, id)
+		if (this.observer) {
+			this.observer(tableName, value)
+		}
 		return result
 	}
 
@@ -180,10 +142,10 @@ export class IndexedDb {
 	}
 
 	addObserver(callback) {
-    this.observer = callback;
-  }
+		this.observer = callback
+	}
 
-  removeObserver() {
-    this.observer = null;
-  }
+	removeObserver() {
+		this.observer = null
+	}
 }

@@ -1,12 +1,15 @@
 import { ClientController, Transaction } from '../controllers'
 import { ExtensionStorage } from '../storage'
-import { EncodeAsset } from '../types'
 import { IAsset } from '../types/asset'
 import { IndexedDb } from '../utils'
 import { decode_transaction } from 'penumbra-web-assembly'
 import {
 	AssetsRequest,
 	AssetsResponse,
+	BalanceByAddressRequest,
+	BalanceByAddressResponse,
+	ChainParametersRequest,
+	ChainParametersResponse,
 	FMDParametersRequest,
 	FMDParametersResponse,
 	NoteByCommitmentRequest,
@@ -14,7 +17,9 @@ import {
 	NotesRequest,
 	NotesResponse,
 	StatusRequest,
+	StatusResponse,
 	StatusStreamRequest,
+	StatusStreamResponse,
 	TransactionByHashRequest,
 	TransactionByHashResponse,
 	TransactionHashesRequest,
@@ -23,16 +28,14 @@ import {
 	WitnessRequest,
 	WitnessResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+
+import { FmdParameters } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import {
-	ChainParametersRequest,
-	ChainParametersResponse,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
-import {
-	ChainParameters,
-	FmdParameters,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
-import { BalanceByAddressReq, BalanceByAddressRes } from '../types/viewService'
-import { ASSET_TABLE_NAME, CHAIN_PARAMETERS_TABLE_NAME } from '../lib'
+	ASSET_TABLE_NAME,
+	CHAIN_PARAMETERS_TABLE_NAME,
+	FMD_PARAMETERS_TABLE_NAME,
+	SPENDABLE_NOTES_TABLE_NAME,
+} from '../lib'
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -58,12 +61,13 @@ export class ViewProtocolService {
 	}
 
 	async getBalanceByAddress(
-		request?: BalanceByAddressReq
-	): Promise<BalanceByAddressRes[]> {
+		request?: BalanceByAddressRequest
+	): Promise<BalanceByAddressResponse[]> {
 		const { balance } = await this.extensionStorage.getState('balance')
 		const assets: IAsset[] = await this.indexedDb.getAllValue(ASSET_TABLE_NAME)
+
 		const res = Object.entries(balance).map((i: [string, number]) => {
-			return {
+			return new BalanceByAddressResponse().fromJson({
 				amount: {
 					lo: i[1],
 					//TODO add hi
@@ -72,31 +76,34 @@ export class ViewProtocolService {
 				asset: {
 					inner: assets.find(asset => asset.id.inner === i[0]).id.inner,
 				},
-			}
+			})
 		})
 		return res
 	}
 
-	async getStatus(request?: StatusRequest) {
+	async getStatus(request?: StatusRequest): Promise<StatusResponse> {
 		const { lastSavedBlock } = await this.extensionStorage.getState(
 			'lastSavedBlock'
 		)
 		const lasBlock = await this.getLastExistBlock()
-		return {
+		return new StatusResponse().fromJson({
 			syncHeight: lastSavedBlock.testnet,
 			catchingUp: lastSavedBlock.testnet === lasBlock,
-		}
+		})
 	}
 
-	async getStatusStream(request?: StatusStreamRequest) {
+	async getStatusStream(
+		request?: StatusStreamRequest
+	): Promise<StatusStreamResponse> {
 		const { lastSavedBlock } = await this.extensionStorage.getState(
 			'lastSavedBlock'
 		)
 		const lasBlock = await this.getLastExistBlock()
-		return {
+
+		return new StatusStreamResponse().fromJson({
 			syncHeight: lastSavedBlock.testnet,
 			latestKnownBlockHeight: lasBlock,
-		}
+		})
 	}
 
 	async getAssets(request?: AssetsRequest): Promise<AssetsResponse[]> {
@@ -109,25 +116,21 @@ export class ViewProtocolService {
 		return response
 	}
 
-	async getChainParameters(request?: ChainParametersRequest) {
-		const chainParameters: ChainParameters[] = await this.indexedDb.getAllValue(
-			'chainParameters'
+	async getChainParameters(
+		request?: ChainParametersRequest
+	): Promise<ChainParametersResponse> {
+		const chainParameters = await this.indexedDb.getAllValue(
+			CHAIN_PARAMETERS_TABLE_NAME
 		)
-		const response = new ChainParametersResponse({
-			chainParameters: chainParameters[0],
-		}).toBinary()
-
+		const response = new ChainParametersResponse().fromJson({
+			parameters: chainParameters[0],
+		})
 		return response
 	}
 
-	async getNotes(request?: NotesRequest) {
-		const notes = await this.indexedDb.getAllValue('notes')
-
-		return notes.map(i => {
-			return new NotesResponse({
-				noteRecord: { ...i, noteCommitmentHex: undefined },
-			}).toBinary()
-		})
+	async getNotes(request?: NotesRequest): Promise<NotesResponse[]> {
+		const notes = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
+		return notes.map(i => new NotesResponse().fromJson({ noteRecord: i }))
 	}
 
 	async getNoteByCommitment(request: object) {
@@ -135,7 +138,7 @@ export class ViewProtocolService {
 			new Uint8Array(Object.values(request))
 		)
 
-		const notes = await this.indexedDb.getAllValue('notes')
+		const notes = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
 
 		const selectedNote = notes.find(i => {
 			return areEqual(
@@ -229,14 +232,14 @@ export class ViewProtocolService {
 		})
 	}
 
-	async getFMDParameters(request?: FMDParametersRequest) {
-		const fmd: FmdParameters[] = await this.indexedDb.getAllValue(
-			'fmd_parameters'
-		)
+	async getFMDParameters(
+		request?: FMDParametersRequest
+	): Promise<FMDParametersResponse> {
+		const fmd = await this.indexedDb.getAllValue(FMD_PARAMETERS_TABLE_NAME)
 
-		return new FMDParametersResponse({
+		return new FMDParametersResponse().fromJson({
 			parameters: fmd[0],
-		}).toBinary()
+		})
 	}
 
 	async getWitness(request?: WitnessRequest) {

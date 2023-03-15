@@ -1,6 +1,7 @@
 import { ChainParametersRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import {
 	AssetsRequest,
+	BalanceByAddressRequest,
 	NotesRequest,
 	StatusRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
@@ -271,9 +272,14 @@ class BackgroundService extends EventEmitter {
 		const connectionId = nanoid()
 		const inpageApi = this.getInpageApi(origin, connectionId)
 
+		const actionObj = {
+			assets: 'ASSETS',
+			spendable_notes: 'NOTES',
+		}
+
 		this.indexedDb.addObserver((action, data) => {
 			return port.postMessage({
-				penumbraMethod: action.toUpperCase(),
+				penumbraMethod: actionObj[action],
 				origin,
 				data,
 			})
@@ -282,7 +288,6 @@ class BackgroundService extends EventEmitter {
 		pipe(
 			fromPort(port),
 			handleMethodCallRequests(inpageApi, res => {
-				console.log({ res })
 				return port.postMessage(res)
 			}),
 			subscribe({
@@ -509,7 +514,7 @@ class BackgroundService extends EventEmitter {
 				return this.viewProtocolService.getNoteByCommitment(request)
 			},
 
-			getStatus: async (request?: StatusRequest) => {
+			getStatus: async () => {
 				// const canIUse = this.permissionsController.hasPermission(
 				// 	origin,
 				// 	PERMISSIONS.GET_CHAIN_CURRENT_STATUS
@@ -561,7 +566,7 @@ class BackgroundService extends EventEmitter {
 				// }
 				return this.viewProtocolService.getFMDParameters()
 			},
-			getBalanceByAddress: async (arg: BalanceByAddressReq) =>
+			getBalanceByAddress: async (arg: BalanceByAddressRequest) =>
 				this.viewProtocolService.getBalanceByAddress(arg),
 		}
 	}

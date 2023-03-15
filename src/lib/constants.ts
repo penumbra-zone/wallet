@@ -108,7 +108,6 @@ export const BALANCE = 'BALANCE'
 
 export const ASSET_TABLE_NAME = 'assets'
 export const CHAIN_PARAMETERS_TABLE_NAME = 'chain_parameters'
-export const NOTES_TABLE_NAME = 'notes'
 export const TRANSACTION_TABLE_NAME = 'tx'
 export const FMD_PARAMETERS_TABLE_NAME = 'fmd_parameters'
 export const NCT_COMMITMENTS_TABLE_NAME = 'nct_commitments'

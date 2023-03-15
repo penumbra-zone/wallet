@@ -5,26 +5,25 @@ import {
 import { ExtensionStorage } from '../storage'
 import ObservableStore from 'obs-store'
 import { WalletController } from './WalletController'
-import { ASSET_TABLE_NAME, extension } from '../lib'
+import {
+	ASSET_TABLE_NAME,
+	CHAIN_PARAMETERS_TABLE_NAME,
+	extension,
+	FMD_PARAMETERS_TABLE_NAME,
+	SPENDABLE_NOTES_TABLE_NAME,
+} from '../lib'
 import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
-import { encode } from 'bech32-buffer'
-import { EncodeAsset } from '../types'
+
 import { IndexedDb } from '../utils'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
 import { ObliviousQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb'
 import {
 	AssetListRequest,
-	AssetListResponse,
 	ChainParametersRequest,
-	ChainParametersResponse,
 	CompactBlockRangeRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
-import {
-	ChainParameters,
-	CompactBlock,
-	FmdParameters,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
+import { CompactBlock } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 
 export type Transaction = {
 	txHashHex: string
@@ -112,8 +111,9 @@ export class ClientController {
 	}
 
 	async saveChainParameters() {
-		const savedChainParameters: ChainParameters[] =
-			await this.indexedDb.getAllValue('chainParameters')
+		const savedChainParameters = await this.indexedDb.getAllValue(
+			CHAIN_PARAMETERS_TABLE_NAME
+		)
 
 		if (savedChainParameters.length) return
 
@@ -126,12 +126,11 @@ export class ClientController {
 
 		const chainParametersRequest = new ChainParametersRequest()
 
-		const chainParameters: ChainParametersResponse =
-			await client.chainParameters(chainParametersRequest)
+		const chainParameters = await client.chainParameters(chainParametersRequest)
 
 		await this.indexedDb.putValue(
-			'chainParameters',
-			chainParameters.chainParameters
+			CHAIN_PARAMETERS_TABLE_NAME,
+			JSON.parse(chainParameters.chainParameters.toJsonString())
 		)
 
 		await this.configApi.setNetworks(
@@ -261,11 +260,6 @@ export class ClientController {
 		return lastBlock
 	}
 
-	async saveFmdParameters(fmdParameters: FmdParameters) {
-		await this.indexedDb.resetTables('fmd_parameters')
-		await this.indexedDb.putValue('fmd_parameters', fmdParameters)
-	}
-
 	async saveTransaction(height: bigint, sourceHex: Uint8Array) {
 		const tendermint = this.getTendermint()
 
@@ -299,16 +293,15 @@ export class ClientController {
 	}
 
 	async resetWallet() {
-		await this.indexedDb.resetTables('notes')
-		await this.indexedDb.resetTables('chainParameters')
+		await this.indexedDb.resetTables(CHAIN_PARAMETERS_TABLE_NAME)
 		await this.indexedDb.resetTables(ASSET_TABLE_NAME)
 		await this.indexedDb.resetTables('tx')
-		await this.indexedDb.resetTables('fmd_parameters')
+		await this.indexedDb.resetTables(FMD_PARAMETERS_TABLE_NAME)
 		await this.indexedDb.resetTables('nct_commitments')
 		await this.indexedDb.resetTables('nct_forgotten')
 		await this.indexedDb.resetTables('nct_hashes')
 		await this.indexedDb.resetTables('nct_position')
-		await this.indexedDb.resetTables('spendable_notes')
+		await this.indexedDb.resetTables(SPENDABLE_NOTES_TABLE_NAME)
 		await this.indexedDb.resetTables('tx_by_nullifier')
 		await this.indexedDb.resetTables('swaps')
 

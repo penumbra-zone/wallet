@@ -11,6 +11,7 @@ import { base64ToBytes } from './base64'
 import { CurrentAccountController, Transaction } from '../controllers'
 import { Nullifier } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { IndexedDb } from './IndexedDb'
+import { FMD_PARAMETERS_TABLE_NAME, SPENDABLE_NOTES_TABLE_NAME } from '../lib'
 
 export type StoredTree = {
 	last_position: number
@@ -64,13 +65,13 @@ export class WasmViewConnector {
 	}
 
 	async updateNotes(nullifier: Nullifier, height: bigint) {
-		const result = await this.indexedDb.getAllValue('spendable_notes')
+		const result = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
 
 		for (const note of result) {
 			if (JSON.stringify(note.nullifier) == JSON.stringify(nullifier)) {
-				note.heightSpent = height
+				note.heightSpent = String(height)
 				await this.indexedDb.putValueWithId(
-					'spendable_notes',
+					SPENDABLE_NOTES_TABLE_NAME,
 					note,
 					note.noteCommitment.inner
 				)
@@ -99,7 +100,9 @@ export class WasmViewConnector {
 			}
 		}
 		if (block.fmdParameters !== undefined)
-			await this.saveFmdParameters(block.fmdParameters)
+			await this.saveFmdParameters(
+				JSON.parse(block.fmdParameters.toJsonString())
+			)
 
 		// let ntcRoot = this.viewClient.get_nct_root();
 		//
@@ -208,23 +211,13 @@ export class WasmViewConnector {
 
 	async storeNote(note) {
 		let storedNote = await this.indexedDb.getValue(
-			'spendable_notes',
+			SPENDABLE_NOTES_TABLE_NAME,
 			note.noteCommitment.inner
 		)
 
-		// 		value
-		// :
-		// amount
-		// :
-		// {lo: '1000000000'}
-		// assetId
-		// :
-		// inner
-		// :
-		// "KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA="
 		if (storedNote == undefined) {
 			await this.indexedDb.putValueWithId(
-				'spendable_notes',
+				SPENDABLE_NOTES_TABLE_NAME,
 				note,
 				note.noteCommitment.inner
 			)
@@ -260,7 +253,11 @@ export class WasmViewConnector {
 	}
 
 	async saveFmdParameters(fmdParameters: FmdParameters) {
-		await this.indexedDb.putValueWithId('fmd_parameters', fmdParameters, 'fmd')
+		await this.indexedDb.putValueWithId(
+			FMD_PARAMETERS_TABLE_NAME,
+			fmdParameters,
+			'fmd'
+		)
 	}
 
 	convertCompactBlock(block: CompactBlock): CompactBlock {
