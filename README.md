@@ -1,3 +1,16 @@
+### Local installation of wallet extension in chrome
+1. `   npm install
+`
+
+2. `npm run start
+`
+3. Go to extensions management page in chrome [chrome://extensions/
+](chrome://extensions/)
+4. Enable Developer mode 
+5. Use **Load Unpacked** and choose  path to `wallet/dist`
+
+
+
 Link to web store - https://chrome.google.com/webstore/detail/penumbra-wallet/lkpmkhpnhknhmibgnmmhdhgdilepfghe/related?hl=uk
 
 ## Install Penumbra protobuf types:
