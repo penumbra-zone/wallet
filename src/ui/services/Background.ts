@@ -3,6 +3,7 @@ import { Contact, NetworkName, PermissionType } from '../../controllers'
 import { PreferencesAccount } from '../../preferences'
 import { StorageLocalState } from '../../storage'
 import {
+	ActionArrayType,
 	ParsedActions,
 	TransactionPlanType,
 	TransactionResponseType,
@@ -34,7 +35,7 @@ class Background {
 	_tmr: ReturnType<typeof setTimeout> | undefined
 
 	constructor() {
-		 this._connect = () => undefined;
+		this._connect = () => undefined
 		this._defer = {}
 		this.initPromise = new Promise((res, rej) => {
 			this._defer.resolve = res
@@ -45,7 +46,7 @@ class Background {
 
 	init(background: BackgroundUiApi) {
 		this.background = background
-		this._connect = () => undefined;
+		this._connect = () => undefined
 		// global access to service on debug
 		if (PENUMBRAWALLET_DEBUG) {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -418,7 +419,6 @@ class Background {
 		}
 	}
 
-
 	async getTransactionPlan(
 		destAddress: string,
 		amount: number,
@@ -441,6 +441,23 @@ class Background {
 			throw new Error(prepareErrorMessage(err))
 		}
 	}
+
+	async parseActions(transactionPlan: TransactionPlanType): Promise<{
+		transactionPlan: TransactionPlanType
+		actions: ParsedActions[]
+	}> {
+		try {
+			await this.initPromise
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			await this._connect!()
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			return await this.background!.parseActions(transactionPlan)
+		} catch (err) {
+			throw new Error(prepareErrorMessage(err))
+		}
+	}
+
+	//parseActions
 
 	async sendTransaction(
 		sendPlan: TransactionPlanType
@@ -526,6 +543,18 @@ class Background {
 			await this._connect!()
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			return await this.background!.approve(messageId, address)
+		} catch (err) {
+			throw new Error(prepareErrorMessage(err))
+		}
+	}
+
+	async deleteAllMessages(): Promise<void> {
+		try {
+			await this.initPromise
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			await this._connect!()
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			return await this.background!.deleteAllMessages()
 		} catch (err) {
 			throw new Error(prepareErrorMessage(err))
 		}

@@ -54,6 +54,7 @@ const proxy = createIpcCallProxy<
 
 //@ts-ignore
 globalThis.penumbra = {
+	signTransaction: proxy.signTransaction,
 	publicState: proxy.publicState,
 	getBalanceByAddress: (arg: BalanceByAddressRequest) =>
 		proxy.getBalanceByAddress(arg),
@@ -112,8 +113,9 @@ globalThis.penumbra = {
 					cb(updatedValue)
 				} else if (event === 'balance') {
 					const updatedValue = await penumbra.getBalanceByAddress(args)
+
 					for (let i = 0; i < updatedValue.length; i++) {
-						cb(new BalanceByAddressResponse().fromJson(data[i] as any))
+						cb(new BalanceByAddressResponse().fromJson(updatedValue[i] as any))
 					}
 				} else if (event === 'assets') {
 					cb(new AssetsResponse().fromJson({ asset: (data as any).data }))

@@ -16,17 +16,19 @@ type DetailTxBeforeSendProps = {
 		transactionPlan: TransactionPlanType
 		actions: ParsedActions[]
 	}
-	setSendPlan: Dispatch<
+	setSendPlan?: Dispatch<
 		SetStateAction<{
 			transactionPlan: TransactionPlanType
 			actions: ParsedActions[]
 		} | null>
 	>
+	handleCancel?: () => Promise<void>
 }
 
 export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 	sendPlan,
 	setSendPlan,
+	handleCancel,
 }) => {
 	const [txResponse, setTxResponse] = useState<null | TransactionResponseType>(
 		null
@@ -46,6 +48,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 				if (tx) {
 					setLoading(false)
 					navigate(routesPath.HOME)
+					await Background.deleteAllMessages()
 				}
 			}, 500)
 		} else {
@@ -53,12 +56,16 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 				position: 'top-right',
 			})
 			setLoading(false)
+			
 		}
 
 		return () => clearInterval(interval)
 	}, [txResponse])
 
-	const handleEdit = () => setSendPlan(null)
+	const handleEdit = () => {
+		if (handleCancel) handleCancel()
+		else setSendPlan(null)
+	}
 
 	const handleConfirm = async () => {
 		setLoading(true)
@@ -71,13 +78,15 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 	return (
 		<>
 			<div className='w-[100%] flex flex-col items-start ext:py-[20px] tablet:py-[30px] bg-brown rounded-[15px] px-[16px]'>
-				<Button
-					mode='icon_transparent'
-					onClick={handleEdit}
-					title='Edit'
-					iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
-					className='mb-[24px]'
-				/>
+				{setSendPlan && (
+					<Button
+						mode='icon_transparent'
+						onClick={handleEdit}
+						title='Edit'
+						iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
+						className='mb-[24px]'
+					/>
+				)}
 				<div className='w-[100%] max-h-[280px] overflow-y-scroll'>
 					{sendPlan.actions.map((i, index) => {
 						let text

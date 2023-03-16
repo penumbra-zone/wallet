@@ -7,20 +7,25 @@ import { RemoteConfigController } from './RemoteConfigController'
 import { extension } from '../lib'
 import { PreferencesAccount } from '../preferences'
 import { PermissionController, PERMISSIONS } from './PermissionController'
+import { nanoid } from 'nanoid'
+import { TransactionController } from './TransactionController'
 
 export class MessageController extends EventEmitter {
 	private messages
 	private store
 	private getMessagesConfig
 	setPermission
+	parseActions
 	constructor({
 		extensionStorage,
 		getMessagesConfig,
 		setPermission,
+		parseActions,
 	}: {
 		extensionStorage: ExtensionStorage
 		getMessagesConfig: RemoteConfigController['getMessagesConfig']
 		setPermission: PermissionController['setPermission']
+		parseActions: TransactionController['parseActions']
 	}) {
 		super()
 
@@ -33,14 +38,15 @@ export class MessageController extends EventEmitter {
 
 		this.getMessagesConfig = getMessagesConfig
 		this.setPermission = setPermission
+		this.parseActions = parseActions
 
-		// extension.alarms.onAlarm.addListener(({ name }) => {
-		//   if (name === 'rejectMessages') {
-		//     this.rejectAllByTime();
-		//   }
-		// });
+		extension.alarms.onAlarm.addListener(({ name }) => {
+		  if (name === 'rejectMessages') {
+		    this.rejectAllByTime();
+		  }
+		});
 
-		// this.rejectAllByTime();
+		this.rejectAllByTime();
 
 		this._updateBadge()
 	}
@@ -84,6 +90,10 @@ export class MessageController extends EventEmitter {
 		return this._deleteMessage(id)
 	}
 
+	deleteAllMessages() {
+		this.store.updateState({ messages: [] })
+	}
+
 	rejectAllByTime() {
 		const { message_expiration_ms } = this.getMessagesConfig()
 		const time = Date.now()
@@ -120,16 +130,6 @@ export class MessageController extends EventEmitter {
 
 		try {
 			await this._signMessage(message)
-
-			// if (
-			//   message.broadcast &&
-			//   (message.type === 'transaction' ||
-			//     message.type === 'order' ||
-			//     message.type === 'cancelOrder')
-			// ) {
-			//   message.result = await this.broadcast(message);
-			//   message.status = MSG_STATUSES.PUBLISHED;
-			// }
 
 			if (message.successPath) {
 				const url = new URL(message.successPath)
@@ -264,6 +264,14 @@ export class MessageController extends EventEmitter {
 					...message,
 					successPath: message.data.successPath || undefined,
 				}
+			case 'transaction': {
+				const messageTx = await this.parseActions(message.data)
+				return {
+					...message,
+					successPath: message.data.successPath || undefined,
+					data: messageTx,
+				}
+			}
 		}
 	}
 

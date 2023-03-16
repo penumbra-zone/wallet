@@ -50,6 +50,11 @@ export type MessageInput = {
 				type?: never
 			}
 	  }
+	| {
+			type: 'transaction'
+			origin: string
+			data: any
+	  }
 )
 
 export type MessageStoreItem = {
@@ -103,5 +108,12 @@ export type MessageStoreItem = {
 				type?: never
 				data?: unknown
 			}
+	  }
+	| {
+			type: 'transaction'
+			origin: string
+			result?: { approved: 'OK' }
+			messageHash?: never
+			data: any
 	  }
 )

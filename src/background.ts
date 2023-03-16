@@ -43,7 +43,7 @@ import { PreferencesAccount } from './preferences'
 import { ViewProtocolService } from './services'
 import { ExtensionStorage, StorageLocalState } from './storage'
 import { IAsset } from './types/asset'
-import { TransactionPlanType } from './types/transaction'
+import { ActionArrayType, TransactionPlanType } from './types/transaction'
 import { BalanceByAddressReq } from './types/viewService'
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
 import { IndexedDb, TableName } from './utils'
@@ -81,7 +81,7 @@ async function setupBackgroundService() {
 	const updateBadge = () => {
 		const messages = backgroundService.messageController.getUnapproved()
 
-		const msg = messages.length
+		const msg = [].length
 		const text = msg ? String(msg) : ''
 
 		const action = extension.action || extension.browserAction
@@ -203,13 +203,6 @@ class BackgroundService extends EventEmitter {
 			wallet: this.walletController,
 		})
 
-		this.messageController = new MessageController({
-			extensionStorage: this.extensionStorage,
-			getMessagesConfig: () => this.remoteConfigController.getMessagesConfig(),
-			setPermission: (origin: string, permission: PermissionType) =>
-				this.permissionsController.setPermission(origin, permission),
-		})
-
 		this.idleController = new IdleController({
 			extensionStorage: this.extensionStorage,
 			preferencesController: this.preferencesController,
@@ -234,6 +227,15 @@ class BackgroundService extends EventEmitter {
 			getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
 			wasmViewConnector: this.wasmViewConnector,
 			getCustomGRPC: () => this.networkController.getCustomGRPC(),
+		})
+
+		this.messageController = new MessageController({
+			extensionStorage: this.extensionStorage,
+			getMessagesConfig: () => this.remoteConfigController.getMessagesConfig(),
+			setPermission: (origin: string, permission: PermissionType) =>
+				this.permissionsController.setPermission(origin, permission),
+			parseActions: async (data: any) =>
+				this.transactionController.parseActions(data),
 		})
 
 		this.currentAccountController = new CurrentAccountController({
@@ -264,6 +266,7 @@ class BackgroundService extends EventEmitter {
 
 	setupPageConnection(sourcePort: chrome.runtime.Port) {
 		let port: chrome.runtime.Port | null = sourcePort
+
 		const { sender } = port
 
 		if (!sender || !sender.url) return
@@ -278,6 +281,7 @@ class BackgroundService extends EventEmitter {
 		}
 
 		this.indexedDb.addObserver((action, data) => {
+			if (!port) return
 			return port.postMessage({
 				penumbraMethod: actionObj[action],
 				origin,
@@ -383,8 +387,11 @@ class BackgroundService extends EventEmitter {
 					amount,
 					assetId || 'KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA='
 				),
+			parseActions: async (transactionPlan: TransactionPlanType) =>
+				this.transactionController.parseActions(transactionPlan),
 			sendTransaction: async (sendPlan: TransactionPlanType) =>
 				this.transactionController.sendTransaction(sendPlan),
+			deleteAllMessages: async () => this.messageController.deleteAllMessages(),
 		}
 	}
 
@@ -448,6 +455,11 @@ class BackgroundService extends EventEmitter {
 		}
 	}
 	getInpageApi(origin: string, connectionId: string) {
+		const showNotification = () => {
+			this.emit('Show notification')
+		}
+
+		const commonMessageInput = { connectionId, origin }
 		return {
 			publicState: async () => {
 				const { selectedAccount, isInitialized } = this.getState([
@@ -471,6 +483,23 @@ class BackgroundService extends EventEmitter {
 					origin,
 					PERMISSIONS.APPROVED
 				)
+			},
+			signTransaction: async (data: any) => {
+				const { selectedAccount } = this.getState(['selectedAccount'])
+			
+
+				await this.validatePermission(origin, connectionId)
+
+				const message = await this.messageController.newMessage({
+					...commonMessageInput,
+					account: selectedAccount,
+					broadcast: false,
+					data,
+					// options,
+					type: 'transaction',
+				})
+
+				showNotification()
 			},
 			getAssets: async (request?: AssetsRequest) => {
 				// const canIUse = this.permissionsController.hasPermission(
@@ -568,7 +597,6 @@ class BackgroundService extends EventEmitter {
 			},
 			getBalanceByAddress: async (arg: BalanceByAddressRequest) =>
 				this.viewProtocolService.getBalanceByAddress(arg),
-				
 		}
 	}
 
@@ -587,18 +615,6 @@ class BackgroundService extends EventEmitter {
 				},
 			})
 		)
-		// const dnode = setupDnode(new PortStream(remotePort), this.getApi(), 'api')
-
-		// const remoteHandler = (remote: any) => {
-		// 	const closePopupWindow = remote.closePopupWindow.bind(remote)
-		// 	this.on('closePopupWindow', closePopupWindow)
-
-		// 	dnode.on('end', () => {
-		// 		this.removeListener('closePopupWindow', closePopupWindow)
-		// 	})
-		// }
-
-		// dnode.on('remote', remoteHandler)
 	}
 
 	_getCurrentNetwork(account: PreferencesAccount | undefined) {
@@ -632,7 +648,7 @@ class BackgroundService extends EventEmitter {
 			const addressByIndex = selectedAccount.addressByIndex
 			account = {
 				...selectedAccount,
-				fvk
+				fvk,
 			}
 			msg = messages
 				.filter(
