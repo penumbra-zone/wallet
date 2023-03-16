@@ -1,24 +1,30 @@
 import { IDBPDatabase, openDB } from 'idb'
-import { Nullifier } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import {
 	ASSET_TABLE_NAME,
 	CHAIN_PARAMETERS_TABLE_NAME,
 	FMD_PARAMETERS_TABLE_NAME,
+	NCT_COMMITMENTS_TABLE_NAME,
+	NCT_FORGOTTEN_TABLE_NAME,
+	NCT_HASHES_TABLE_NAME,
+	NCT_POSITION_TABLE_NAME,
 	SPENDABLE_NOTES_TABLE_NAME,
+	SWAP_TABLE_NAME,
+	TRANSACTION_BY_NULLIFIER_TABLE_NAME,
+	TRANSACTION_TABLE_NAME,
 } from '../lib'
 
 export type TableName =
 	| typeof ASSET_TABLE_NAME
 	| typeof CHAIN_PARAMETERS_TABLE_NAME
-	| 'tx'
+	| typeof TRANSACTION_TABLE_NAME
 	| typeof FMD_PARAMETERS_TABLE_NAME
-	| 'nct_commitments'
-	| 'nct_forgotten'
-	| 'nct_hashes'
-	| 'nct_position'
+	| typeof NCT_COMMITMENTS_TABLE_NAME
+	| typeof NCT_FORGOTTEN_TABLE_NAME
+	| typeof NCT_HASHES_TABLE_NAME
+	| typeof NCT_POSITION_TABLE_NAME
 	| typeof SPENDABLE_NOTES_TABLE_NAME
-	| 'tx_by_nullifier'
-	| 'swaps'
+	| typeof TRANSACTION_BY_NULLIFIER_TABLE_NAME
+	| typeof SWAP_TABLE_NAME
 
 export class IndexedDb {
 	private database: string
@@ -45,33 +51,33 @@ export class IndexedDb {
 						keyPath: 'chainId',
 					})
 
-					db.createObjectStore('tx', {
+					db.createObjectStore(TRANSACTION_TABLE_NAME, {
 						keyPath: 'txHashHex',
 					})
 
 					db.createObjectStore(FMD_PARAMETERS_TABLE_NAME)
 
-					db.createObjectStore('nct_commitments', {
+					db.createObjectStore(NCT_COMMITMENTS_TABLE_NAME, {
 						autoIncrement: true,
 						keyPath: 'id',
 					})
 
-					db.createObjectStore('nct_forgotten')
+					db.createObjectStore(NCT_FORGOTTEN_TABLE_NAME)
 
-					db.createObjectStore('nct_hashes', {
+					db.createObjectStore(NCT_HASHES_TABLE_NAME, {
 						autoIncrement: true,
 						keyPath: 'id',
 					})
-					db.createObjectStore('nct_position')
+					db.createObjectStore(NCT_POSITION_TABLE_NAME)
 
 					db.createObjectStore(SPENDABLE_NOTES_TABLE_NAME)
 
-					db.createObjectStore('tx_by_nullifier', {
+					db.createObjectStore(TRANSACTION_BY_NULLIFIER_TABLE_NAME, {
 						autoIncrement: true,
 						keyPath: 'nullifier',
 					})
 
-					db.createObjectStore('swaps')
+					db.createObjectStore(SWAP_TABLE_NAME)
 				},
 			})
 		} catch (error) {
@@ -135,7 +141,7 @@ export class IndexedDb {
 		return id
 	}
 
-	public async resetTables(tableName: string) {
+	public async resetTables(tableName: TableName) {
 		const tx = this.db.transaction([tableName], 'readwrite')
 		const store = tx.objectStore(tableName)
 		await store.clear()

@@ -11,7 +11,16 @@ import { base64ToBytes } from './base64'
 import { CurrentAccountController, Transaction } from '../controllers'
 import { Nullifier } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { IndexedDb } from './IndexedDb'
-import { FMD_PARAMETERS_TABLE_NAME, SPENDABLE_NOTES_TABLE_NAME } from '../lib'
+import {
+	FMD_PARAMETERS_TABLE_NAME,
+	NCT_COMMITMENTS_TABLE_NAME,
+	NCT_FORGOTTEN_TABLE_NAME,
+	NCT_HASHES_TABLE_NAME,
+	NCT_POSITION_TABLE_NAME,
+	SPENDABLE_NOTES_TABLE_NAME,
+	SWAP_TABLE_NAME,
+	TRANSACTION_TABLE_NAME,
+} from '../lib'
 
 export type StoredTree = {
 	last_position: number
@@ -123,21 +132,21 @@ export class WasmViewConnector {
 
 	public async loadStoredTree(): Promise<StoredTree> {
 		const nctPosition = await this.indexedDb.getValue(
-			'nct_position',
+			NCT_POSITION_TABLE_NAME,
 			'position'
 		)
 
 		const nctForgotten = await this.indexedDb.getValue(
-			'nct_forgotten',
+			NCT_FORGOTTEN_TABLE_NAME,
 			'forgotten'
 		)
 
 		const nctHashes: StoredHash[] = await this.indexedDb.getAllValue(
-			'nct_hashes'
+			NCT_HASHES_TABLE_NAME
 		)
 
 		const nctCommitments: StoredCommitment[] = await this.indexedDb.getAllValue(
-			'nct_commitments'
+			NCT_COMMITMENTS_TABLE_NAME
 		)
 
 		return {
@@ -191,22 +200,22 @@ export class WasmViewConnector {
 
 	async updateForgotten(setForgotten) {
 		await this.indexedDb.putValueWithId(
-			'nct_forgotten',
+			NCT_FORGOTTEN_TABLE_NAME,
 			setForgotten,
 			'forgotten'
 		)
 	}
 
 	async updatePosition(setPosition) {
-		await this.indexedDb.putValueWithId('nct_position', setPosition, 'position')
+		await this.indexedDb.putValueWithId(NCT_POSITION_TABLE_NAME, setPosition, 'position')
 	}
 
 	async storeCommitment(commitment) {
-		await this.indexedDb.putValue('nct_commitments', commitment)
+		await this.indexedDb.putValue(NCT_COMMITMENTS_TABLE_NAME, commitment)
 	}
 
 	async storeHash(hash) {
-		await this.indexedDb.putValue('nct_hashes', hash)
+		await this.indexedDb.putValue(NCT_HASHES_TABLE_NAME, hash)
 	}
 
 	async storeNote(note) {
@@ -234,18 +243,18 @@ export class WasmViewConnector {
 				txBytes: note.source,
 				blockHeight: note.heightCreated,
 			}
-			await this.indexedDb.putValue('tx', tx)
+			await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, tx)
 		} else console.debug('note already stored', note.noteCommitment.inner)
 	}
 
 	async storeSwap(swap) {
 		let storedSwap = await this.indexedDb.getValue(
-			'swaps',
+			SWAP_TABLE_NAME,
 			swap.swapCommitment.inner
 		)
 		if (storedSwap == undefined)
 			await this.indexedDb.putValueWithId(
-				'swaps',
+				SWAP_TABLE_NAME,
 				swap,
 				swap.swapCommitment.inner
 			)

@@ -35,6 +35,7 @@ import {
 	CHAIN_PARAMETERS_TABLE_NAME,
 	FMD_PARAMETERS_TABLE_NAME,
 	SPENDABLE_NOTES_TABLE_NAME,
+	TRANSACTION_TABLE_NAME,
 } from '../lib'
 
 const areEqual = (first, second) =>
@@ -156,7 +157,9 @@ export class ViewProtocolService {
 	}
 
 	async getTransactionHashes(request?: object) {
-		const tx: Transaction[] = await this.indexedDb.getAllValue('tx')
+		const tx: Transaction[] = await this.indexedDb.getAllValue(
+			TRANSACTION_TABLE_NAME
+		)
 		const decodeRequest = new TransactionHashesRequest().fromBinary(
 			new Uint8Array(Object.values(request))
 		)
@@ -183,7 +186,9 @@ export class ViewProtocolService {
 	}
 
 	async getTransactionByHash(request: object) {
-		const tx: Transaction[] = await this.indexedDb.getAllValue('tx')
+		const tx: Transaction[] = await this.indexedDb.getAllValue(
+			TRANSACTION_TABLE_NAME
+		)
 
 		const decodeRequest = new TransactionByHashRequest().fromBinary(
 			new Uint8Array(Object.values(request))
@@ -203,7 +208,9 @@ export class ViewProtocolService {
 	}
 
 	async getTransactions(request?: object) {
-		const tx: Transaction[] = await this.indexedDb.getAllValue('tx')
+		const tx: Transaction[] = await this.indexedDb.getAllValue(
+			TRANSACTION_TABLE_NAME
+		)
 		const decodeRequest = request
 			? new TransactionsRequest().fromBinary(
 					new Uint8Array(Object.values(request))

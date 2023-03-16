@@ -10,6 +10,7 @@ import { Button, ChevronLeftIcon, ModalWrapper } from '../../../components'
 import Background from '../../../services/Background'
 import toast from 'react-hot-toast'
 import loader from '../../../../assets/gif/loader.gif'
+import { TRANSACTION_TABLE_NAME } from '../../../../lib'
 
 type DetailTxBeforeSendProps = {
 	sendPlan: {
@@ -44,7 +45,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 			interval = setInterval(async () => {
 				const hash = txResponse.result.hash.toLowerCase()
 
-				const tx = await Background.getValueById('tx', hash)
+				const tx = await Background.getValueById(TRANSACTION_TABLE_NAME, hash)
 				if (tx) {
 					setLoading(false)
 					navigate(routesPath.HOME)

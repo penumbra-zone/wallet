@@ -10,7 +10,14 @@ import {
 	CHAIN_PARAMETERS_TABLE_NAME,
 	extension,
 	FMD_PARAMETERS_TABLE_NAME,
+	NCT_COMMITMENTS_TABLE_NAME,
+	NCT_FORGOTTEN_TABLE_NAME,
+	NCT_HASHES_TABLE_NAME,
+	NCT_POSITION_TABLE_NAME,
 	SPENDABLE_NOTES_TABLE_NAME,
+	SWAP_TABLE_NAME,
+	TRANSACTION_BY_NULLIFIER_TABLE_NAME,
+	TRANSACTION_TABLE_NAME,
 } from '../lib'
 import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
@@ -280,7 +287,7 @@ export class ClientController {
 			blockHeight: height,
 		}
 
-		await this.indexedDb.putValue('tx', tx)
+		await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, tx)
 	}
 
 	byteArrayToLong = function (/*byte[]*/ byteArray) {
@@ -295,15 +302,15 @@ export class ClientController {
 	async resetWallet() {
 		await this.indexedDb.resetTables(CHAIN_PARAMETERS_TABLE_NAME)
 		await this.indexedDb.resetTables(ASSET_TABLE_NAME)
-		await this.indexedDb.resetTables('tx')
+		await this.indexedDb.resetTables(TRANSACTION_TABLE_NAME)
 		await this.indexedDb.resetTables(FMD_PARAMETERS_TABLE_NAME)
-		await this.indexedDb.resetTables('nct_commitments')
-		await this.indexedDb.resetTables('nct_forgotten')
-		await this.indexedDb.resetTables('nct_hashes')
-		await this.indexedDb.resetTables('nct_position')
+		await this.indexedDb.resetTables(NCT_COMMITMENTS_TABLE_NAME)
+		await this.indexedDb.resetTables(NCT_FORGOTTEN_TABLE_NAME)
+		await this.indexedDb.resetTables(NCT_HASHES_TABLE_NAME)
+		await this.indexedDb.resetTables(NCT_POSITION_TABLE_NAME)
 		await this.indexedDb.resetTables(SPENDABLE_NOTES_TABLE_NAME)
-		await this.indexedDb.resetTables('tx_by_nullifier')
-		await this.indexedDb.resetTables('swaps')
+		await this.indexedDb.resetTables(TRANSACTION_BY_NULLIFIER_TABLE_NAME)
+		await this.indexedDb.resetTables(SWAP_TABLE_NAME)
 
 		this.store.updateState({
 			lastSavedBlock: {
