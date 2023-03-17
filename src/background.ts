@@ -3,13 +3,11 @@ import {
 	AssetsRequest,
 	BalanceByAddressRequest,
 	NotesRequest,
-	StatusRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import pipe from 'callbag-pipe'
 import subscribe from 'callbag-subscribe'
 import EventEmitter from 'events'
 import { nanoid } from 'nanoid'
-import { v4 as uuidv4 } from 'uuid'
 import {
 	ClientController,
 	Contact,
@@ -32,19 +30,14 @@ import {
 	extension,
 	fromPort,
 	handleMethodCallRequests,
-	MethodCallRequestPayload,
-	PortStream,
-	setupDnode,
 	TabsManager,
 	WindowManager,
 } from './lib'
-import { MessageInput, MessageStoreItem } from './messages/types'
+import { Message, MessageInputOfType, MessageStatus } from './messages/types'
 import { PreferencesAccount } from './preferences'
 import { ViewProtocolService } from './services'
 import { ExtensionStorage, StorageLocalState } from './storage'
-import { IAsset } from './types/asset'
-import { ActionArrayType, TransactionPlanType } from './types/transaction'
-import { BalanceByAddressReq } from './types/viewService'
+import { TransactionPlan } from './types/transaction'
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
 import { IndexedDb, TableName } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
@@ -81,7 +74,7 @@ async function setupBackgroundService() {
 	const updateBadge = () => {
 		const messages = backgroundService.messageController.getUnapproved()
 
-		const msg = [].length
+		const msg = messages.length
 		const text = msg ? String(msg) : ''
 
 		const action = extension.action || extension.browserAction
@@ -234,8 +227,8 @@ class BackgroundService extends EventEmitter {
 			getMessagesConfig: () => this.remoteConfigController.getMessagesConfig(),
 			setPermission: (origin: string, permission: PermissionType) =>
 				this.permissionsController.setPermission(origin, permission),
-			parseActions: async (data: any) =>
-				this.transactionController.parseActions(data),
+			getTransactionMessageData: async (data: TransactionPlan) =>
+				this.transactionController.getTransactionMessageData(data),
 		})
 
 		this.currentAccountController = new CurrentAccountController({
@@ -364,11 +357,11 @@ class BackgroundService extends EventEmitter {
 				this.emit('Close notification')
 			},
 			reject: async (messageId: string, forever?: boolean) =>
-				this.messageController.reject(messageId, forever),
+				this.messageController.reject(messageId),
 			deleteMessage: async (id: string) =>
 				this.messageController.deleteMessage(id),
-			approve: async (messageId: string, account: PreferencesAccount) => {
-				const message = await this.messageController.approve(messageId, account)
+			approve: async (messageId: string) => {
+				const message = await this.messageController.approve(messageId)
 				return message.result
 			},
 			deleteOrigin: async (origin: string) =>
@@ -387,96 +380,121 @@ class BackgroundService extends EventEmitter {
 					amount,
 					assetId || 'KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA='
 				),
-			parseActions: async (transactionPlan: TransactionPlanType) =>
-				this.transactionController.parseActions(transactionPlan),
-			sendTransaction: async (sendPlan: TransactionPlanType) =>
+			parseActions: async (transactionPlan: TransactionPlan) =>
+				this.transactionController.getTransactionMessageData(transactionPlan),
+			sendTransaction: async (sendPlan: TransactionPlan) =>
 				this.transactionController.sendTransaction(sendPlan),
-			deleteAllMessages: async () => this.messageController.deleteAllMessages(),
+			clearMessages: async () => {
+				this.messageController.clearMessages(),
+					this.permissionsController.clearStore()
+			},
 		}
 	}
 
 	async validatePermission(origin: string, connectionId: string) {
-		const { selectedAccount } = this.getState('selectedAccount')
-		if (!selectedAccount) throw new Error('Add Keeper Wallet account')
+		const { selectedAccount, isInitialized } = this.getState([
+			'selectedAccount',
+			'isInitialized',
+		])
 
-		const canIUse = this.permissionsController.hasPermission(
+		if (!selectedAccount)
+			throw new Error(
+				!isInitialized
+					? 'Init Penumbra Wallet and add account'
+					: 'Add Penumbra Wallet account'
+			)
+
+		const hasPermission = this.permissionsController.hasPermission(
 			origin,
 			PERMISSIONS.APPROVED
 		)
 
-		if (canIUse === null) {
-			let messageId = this.permissionsController.getMessageIdAccess(origin)
+		if (hasPermission) return { selectedAccount }
 
-			if (messageId) {
-				try {
-					const message = this.messageController.getMessageById(messageId)
+		if (hasPermission === false) throw 'API denied'
 
-					if (
-						!message ||
-						message.account.address !== selectedAccount.addressByIndex
-					) {
-						messageId = null
-					}
-				} catch (e) {
+		let messageId = this.permissionsController.getMessageIdAccess(origin)
+
+		if (messageId) {
+			try {
+				const message = this.messageController.getMessageById(messageId)
+
+				if (
+					!message ||
+					message.account.addressByIndex !== selectedAccount.addressByIndex
+				) {
 					messageId = null
 				}
-			}
-
-			if (!messageId) {
-				const messageData: MessageInput = {
-					origin,
-					connectionId,
-					title: null,
-					options: {},
-					broadcast: false,
-					data: { origin },
-					type: 'authOrigin',
-					account: selectedAccount,
+				if(message.status === MessageStatus.Rejected){
+					messageId = null
 				}
-				const result = await this.messageController.newMessage(messageData)
-				messageId = result.id
-
-				this.permissionsController.setMessageIdAccess(origin, messageId)
+			} catch (e) {
+				messageId = null
 			}
-			this.emit('Show notification')
+		}
 
-			await this.messageController
-				.getMessageResult(messageId)
-				.then(() => {
-					this.messageController.setPermission(origin, PERMISSIONS.APPROVED)
-				})
-				.catch(e => {
-					if (e.data === 'rejected') {
-						// user rejected single permission request
-						this.permissionsController.setMessageIdAccess(origin, null)
-					}
-					return Promise.reject(e)
-				})
+		if (!messageId) {
+			const message = await this.messageController.newMessage({
+				origin,
+				connectionId,
+				data: { origin },
+				type: 'authOrigin',
+				account: selectedAccount,
+			})
+			messageId = message.id
+
+			this.permissionsController.setMessageIdAccess(origin, message.id)
 		}
+		this.emit('Show notification')
+
+		try {
+			await this.messageController.getMessageResult(messageId)
+			this.messageController.setPermission(origin, PERMISSIONS.APPROVED)
+		} catch (e) {
+			if (e.data === MessageStatus.Rejected) {
+				this.permissionsController.setMessageIdAccess(origin, null)
+			}
+			throw e
+		}
+		return { selectedAccount }
 	}
+
 	getInpageApi(origin: string, connectionId: string) {
-		const showNotification = () => {
-			this.emit('Show notification')
-		}
+		const showNotification = () => this.emit('Show notification')
 
 		const commonMessageInput = { connectionId, origin }
 		return {
 			publicState: async () => {
-				const { selectedAccount, isInitialized } = this.getState([
-					'selectedAccount',
-					'isInitialized',
-				])
+				const { selectedAccount } = await this.validatePermission(
+					origin,
+					connectionId
+				)
 
-				if (!selectedAccount) {
-					throw new Error(
-						!isInitialized
-							? 'Init Penumbra Wallet and add account'
-							: 'Add Penumbra Wallet account'
-					)
+				const { isInitialized, isLocked, messages } = this.getState()
+				const fvk =
+					this.walletController.getAccountFullViewingKeyWithoutPassword()
+
+				return {
+					account: {
+						...selectedAccount,
+						fvk,
+					},
+					isInitialized,
+					isLocked,
+					messages: messages
+						.filter(
+							message =>
+								message.account.addressByIndex ===
+									selectedAccount.addressByIndex && message.origin === origin
+						)
+						.map(message => ({
+							id: message.id,
+							status: message.status,
+							uid: message.extUuid,
+						})),
+					network: this._getCurrentNetwork(selectedAccount),
+					version: extension.runtime.getManifest().version,
 				}
-
-				await this.validatePermission(origin, connectionId)
-				return await this._publicState(origin)
 			},
 			resourceIsApproved: async () => {
 				return this.permissionsController.hasPermission(
@@ -484,23 +502,26 @@ class BackgroundService extends EventEmitter {
 					PERMISSIONS.APPROVED
 				)
 			},
-			signTransaction: async (data: any) => {
-				const { selectedAccount } = this.getState(['selectedAccount'])
-			
-
-				await this.validatePermission(origin, connectionId)
+			signTransaction: async (
+				data: MessageInputOfType<'transaction'>['data']
+			) => {
+				const { selectedAccount } = await this.validatePermission(
+					origin,
+					connectionId
+				)
 
 				const message = await this.messageController.newMessage({
 					...commonMessageInput,
 					account: selectedAccount,
 					broadcast: false,
 					data,
-					// options,
 					type: 'transaction',
 				})
 
 				showNotification()
+				return this.messageController.getMessageResult(message.id)
 			},
+
 			getAssets: async (request?: AssetsRequest) => {
 				// const canIUse = this.permissionsController.hasPermission(
 				// 	origin,
@@ -623,49 +644,6 @@ class BackgroundService extends EventEmitter {
 			tendermint: this.networkController.getNetworkTendermint(),
 		}
 		return !account ? null : networks
-	}
-
-	_publicState(originReq: string) {
-		let account = null
-
-		let msg: Array<{
-			id: MessageStoreItem['id']
-			status: MessageStoreItem['status']
-			uid: MessageStoreItem['ext_uuid']
-		}> = []
-
-		const canIUse = this.permissionsController.hasPermission(
-			originReq,
-			PERMISSIONS.APPROVED
-		)
-
-		const { selectedAccount, isInitialized, isLocked, messages } =
-			this.getState()
-
-		const fvk = this.walletController.getAccountFullViewingKeyWithoutPassword()
-
-		if (selectedAccount && canIUse) {
-			const addressByIndex = selectedAccount.addressByIndex
-			account = {
-				...selectedAccount,
-				fvk,
-			}
-			msg = messages
-				.filter(
-					({ account, origin }) =>
-						account.addressByIndex === addressByIndex && origin === originReq
-				)
-				.map(({ id, status, ext_uuid }) => ({ id, status, uid: ext_uuid }))
-		}
-
-		return {
-			version: extension.runtime.getManifest().version,
-			isInitialized,
-			isLocked,
-			account,
-			network: this._getCurrentNetwork(selectedAccount),
-			messages: msg,
-		}
 	}
 }
 

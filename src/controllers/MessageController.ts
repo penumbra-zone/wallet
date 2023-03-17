@@ -1,208 +1,220 @@
 import EventEmitter from 'events'
-import { MessageInput, MessageStoreItem, MSG_STATUSES } from '../messages/types'
-import { ExtensionStorage } from '../storage'
-import { v4 as uuidv4 } from 'uuid'
-import ObservableStore from 'obs-store'
-import { RemoteConfigController } from './RemoteConfigController'
-import { extension } from '../lib'
-import { PreferencesAccount } from '../preferences'
-import { PermissionController, PERMISSIONS } from './PermissionController'
 import { nanoid } from 'nanoid'
+import ObservableStore from 'obs-store'
+import { extension } from '../lib'
+import {
+	Message,
+	MessageInput,
+	MessageInputOfType,
+	MessageStatus,
+} from '../messages/types'
+import { ExtensionStorage } from '../storage'
+import { PermissionController, PERMISSIONS } from './PermissionController'
+import { RemoteConfigController } from './RemoteConfigController'
 import { TransactionController } from './TransactionController'
 
 export class MessageController extends EventEmitter {
-	private messages
 	private store
 	private getMessagesConfig
-	setPermission
-	parseActions
+	public setPermission
+	private getTransactionMessageData
 	constructor({
 		extensionStorage,
 		getMessagesConfig,
 		setPermission,
-		parseActions,
+		getTransactionMessageData,
 	}: {
 		extensionStorage: ExtensionStorage
 		getMessagesConfig: RemoteConfigController['getMessagesConfig']
 		setPermission: PermissionController['setPermission']
-		parseActions: TransactionController['parseActions']
+		getTransactionMessageData: TransactionController['getTransactionMessageData']
 	}) {
 		super()
 
-		this.messages = extensionStorage.getInitState({
-			messages: [],
-		})
-
-		this.store = new ObservableStore(this.messages)
+		this.store = new ObservableStore(
+			extensionStorage.getInitState({
+				messages: [],
+			})
+		)
 		extensionStorage.subscribe(this.store)
 
 		this.getMessagesConfig = getMessagesConfig
 		this.setPermission = setPermission
-		this.parseActions = parseActions
+		this.getTransactionMessageData = getTransactionMessageData
+
+		this._rejectAllByTime()
 
 		extension.alarms.onAlarm.addListener(({ name }) => {
-		  if (name === 'rejectMessages') {
-		    this.rejectAllByTime();
-		  }
-		});
-
-		this.rejectAllByTime();
+			if (name === 'rejectMessages') {
+				this._rejectAllByTime()
+			}
+		})
 
 		this._updateBadge()
 	}
 
-	async newMessage(messageInput: MessageInput) {
-		let message: MessageStoreItem
-
+	async newMessage<T extends MessageInput['type']>(
+		messageInput: MessageInputOfType<T>
+	) {
 		try {
-			message = await this._generateMessage(messageInput)
-		} catch (error) {}
+			const message = await this._generateMessage(messageInput)
+			const { messages } = this.store.getState()
+			this._updateStore(messages.concat(message))
+			return message
+		} catch (e) {
+			console.error('newMessage:', e)
+		}
+	}
 
-		const messages = this.store.getState().messages
+	async getMessageResult(id: string) {
+		const message = this.getMessageById(id)
 
-		while (messages.length > this.getMessagesConfig().max_messages) {
-			const oldest = messages
-				.filter(msg => Object.values(MSG_STATUSES).includes(msg.status))
-				.sort((a, b) => a.timestamp - b.timestamp)[0]
-			if (oldest) {
-				this._deleteMessage(oldest.id)
-			} else {
-				break
-			}
+		switch (message.status) {
+			case MessageStatus.Signed:
+			case MessageStatus.Published:
+				return message.result
+			case MessageStatus.Rejected:
+				throw new Error('User denied message')
+			case MessageStatus.Failed:
+				throw new Error('Failed request')
 		}
 
-		const { options } = messageInput
-		const { getMeta } = options || {}
-		if (getMeta) {
-			return {
-				noSign: true,
-				id: message.id,
-				hash: message.messageHash,
-			}
-		}
-		messages.push(message)
+		const finishedMessage = await new Promise<Message>(resolve => {
+			this.once(`${id}:finished`, resolve)
+		})
 
-		this._updateStore(messages)
-		return { id: message.id }
+		switch (finishedMessage.status) {
+			case MessageStatus.Signed:
+			case MessageStatus.Published:
+				return finishedMessage.result
+			case MessageStatus.Rejected:
+			case MessageStatus.RejectedForever:
+				throw new Error('User denied message')
+			case MessageStatus.Failed:
+				throw new Error('Failed request')
+			default:
+				throw new Error('Unknown error')
+		}
+	}
+
+	getMessageById(id: string): Message {
+		const result = this.store
+			.getState()
+			.messages.find(message => message.id === id)
+		if (!result) throw new Error(`Failed to get message with id ${id}`)
+		return result
 	}
 
 	deleteMessage(id: string) {
-		return this._deleteMessage(id)
+		const { messages } = this.store.getState()
+		const index = messages.findIndex(message => message.id === id)
+		if (index > -1) {
+			messages.splice(index, 1)
+			this._updateStore(messages)
+		}
 	}
 
-	deleteAllMessages() {
-		this.store.updateState({ messages: [] })
+	async approve(id: string) {
+		const message = this.getMessageById(id)
+
+		try {
+			switch (message.type) {
+				case 'authOrigin':
+					this.setPermission(message.origin, PERMISSIONS.APPROVED)
+					message.result = { approved: 'OK' }
+					message.status = MessageStatus.Signed
+					break
+				case 'transaction': {
+					message.status = MessageStatus.Signed
+					break
+				}
+			}
+
+			this._updateMessage(message)
+			this.emit(`${message.id}:finished`, message)
+			return message
+		} catch (e) {
+			const errorMessage =
+				e && typeof e === 'object' && 'message' in e && e.message
+					? String(e.message)
+					: String(e)
+
+			Object.assign(message, {
+				status: MessageStatus.Failed,
+				err: errorMessage,
+			})
+			this._updateMessage(message)
+			this.emit(`${message.id}:finished`, message)
+
+			if (e instanceof Error) {
+				throw e
+			} else {
+				throw new Error(errorMessage)
+			}
+		}
 	}
 
-	rejectAllByTime() {
+	reject(id: string) {
+		const message = this.getMessageById(id)
+		message.status = MessageStatus.Rejected
+
+		this._updateMessage(message)
+		this.emit(`${message.id}:finished`, message)
+	}
+
+	rejectByOrigin(byOrigin: string) {
+		const { messages } = this.store.getState()
+
+		messages.forEach(({ id, origin }) => {
+			if (byOrigin === origin) {
+				this.reject(id)
+			}
+		})
+	}
+
+	removeMessagesFromConnection(connectionId: string) {
+		const { messages } = this.store.getState()
+
+		messages.forEach(message => {
+			if (message.connectionId === connectionId) {
+				this.reject(message.id)
+			}
+		})
+
+		this._updateStore(
+			messages.filter(message => message.connectionId !== connectionId)
+		)
+	}
+
+	clearMessages(ids?: string | string[]) {
+		if (typeof ids === 'string') {
+			this.deleteMessage(ids)
+		} else if (ids && ids.length > 0) {
+			ids.forEach(id => this.deleteMessage(id))
+		} else {
+			this._updateStore([])
+		}
+	}
+
+	getUnapproved() {
+		return this.store
+			.getState()
+			.messages.filter(({ status }) => status === MessageStatus.UnApproved)
+	}
+
+	_rejectAllByTime() {
 		const { message_expiration_ms } = this.getMessagesConfig()
-		const time = Date.now()
+
 		const { messages } = this.store.getState()
 		messages.forEach(({ id, timestamp, status }) => {
 			if (
-				time - timestamp > message_expiration_ms &&
-				status === MSG_STATUSES.UNAPPROVED
+				Date.now() - timestamp > message_expiration_ms &&
+				status === MessageStatus.UnApproved
 			) {
 				this.reject(id)
 			}
 		})
 		this._updateMessagesByTimeout()
-	}
-
-	reject(id: string, forever?: boolean) {
-		const message = this._getMessageById(id)
-		message.status = !forever
-			? MSG_STATUSES.REJECTED
-			: MSG_STATUSES.REJECTED_FOREVER
-		this._updateMessage(message)
-		this.emit(`${message.id}:finished`, message)
-	}
-
-	async approve(id: string, account?: PreferencesAccount) {
-		const message = this._getMessageById(id)
-		message.account = account || message.account
-
-		if (!message.account) {
-			throw new Error(
-				'Message has empty account filled and no address is provided'
-			)
-		}
-
-		try {
-			await this._signMessage(message)
-
-			if (message.successPath) {
-				const url = new URL(message.successPath)
-
-				switch (message.type) {
-					case 'auth':
-						if (message.result && typeof message.result !== 'string') {
-							url.searchParams.append('p', message.result.publicKey)
-							url.searchParams.append('s', message.result.signature)
-							url.searchParams.append('a', message.result.address)
-							this.emit('Open new tab', url.href)
-						}
-						break
-				}
-			}
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} catch (e: any) {
-			message.status = MSG_STATUSES.FAILED
-			message.err = {
-				message: e.toString(),
-				stack: e.stack,
-			}
-		}
-
-		this._updateMessage(message)
-		this.emit(`${message.id}:finished`, message)
-
-		if (message.status === MSG_STATUSES.FAILED) {
-			throw new Error(message.err.message)
-		}
-
-		return message
-	}
-
-	getMessageById(id: string) {
-		return this._getMessageById(id)
-	}
-
-	getUnapproved() {
-		return this.messages.messages.filter(
-			({ status }) => status === MSG_STATUSES.UNAPPROVED
-		)
-	}
-
-	async getMessageResult(id: string) {
-		const message = this._getMessageById(id)
-
-		switch (message.status) {
-			case MSG_STATUSES.SIGNED:
-			case MSG_STATUSES.PUBLISHED:
-				return message.result
-			case MSG_STATUSES.REJECTED:
-				throw new Error('User denied message')
-			case MSG_STATUSES.FAILED:
-				throw new Error('Failed request')
-		}
-
-		const finishedMessage = await new Promise<MessageStoreItem>(resolve => {
-			this.once(`${id}:finished`, resolve)
-		})
-
-		switch (finishedMessage.status) {
-			case MSG_STATUSES.SIGNED:
-			case MSG_STATUSES.PUBLISHED:
-				return finishedMessage.result
-			case MSG_STATUSES.REJECTED:
-			case MSG_STATUSES.REJECTED_FOREVER:
-				throw new Error('User denied message')
-			case MSG_STATUSES.FAILED:
-				throw new Error('Failed request')
-			default:
-				throw new Error('Unknown error')
-		}
 	}
 
 	_updateMessagesByTimeout() {
@@ -212,83 +224,50 @@ export class MessageController extends EventEmitter {
 		})
 	}
 
-	_updateMessage(message: MessageStoreItem) {
+	_updateMessage(message: Message) {
 		const messages = this.store.getState().messages
-		const id = message.id
-		const index = messages.findIndex(message => message.id === id)
+		const index = messages.findIndex(msg => msg.id === message.id)
 		messages[index] = message
 		this._updateStore(messages)
 	}
 
-	_getMessageById(id: string) {
-		const result = this.store
-			.getState()
-			.messages.find(message => message.id === id)
-		if (!result) throw new Error(`Failed to get message with id ${id}`)
-		return result
-	}
-
-	_deleteMessage(id: string) {
-		const { messages } = this.store.getState()
-		const index = messages.findIndex(message => message.id === id)
-		if (index > -1) {
-			messages.splice(index, 1)
-			this._updateStore(messages)
-		}
-	}
-
-	_updateStore(messages: MessageStoreItem[]) {
-		this.messages = { ...this.store.getState(), messages }
-		this.store.updateState(this.messages)
+	_updateStore(messages: Message[]) {
+		this.store.updateState({ ...this.store.getState(), messages })
 		this._updateBadge()
-	}
-
-	async _generateMessage(
-		messageInput: MessageInput
-	): Promise<MessageStoreItem> {
-		const message = {
-			...messageInput,
-			id: uuidv4(),
-			timestamp: Date.now(),
-			ext_uuid: messageInput.options && messageInput.options.uid,
-			status: MSG_STATUSES.UNAPPROVED,
-		}
-
-		if (!message.data && message.type !== 'authOrigin') {
-			throw new Error('should contain a data field')
-		}
-
-		switch (message.type) {
-			case 'authOrigin':
-				return {
-					...message,
-					successPath: message.data.successPath || undefined,
-				}
-			case 'transaction': {
-				const messageTx = await this.parseActions(message.data)
-				return {
-					...message,
-					successPath: message.data.successPath || undefined,
-					data: messageTx,
-				}
-			}
-		}
 	}
 
 	_updateBadge() {
 		this.emit('Update badge')
 	}
 
-	async _signMessage(message: MessageStoreItem) {
-		switch (message.type) {
-			case 'authOrigin':
-				message.result = { approved: 'OK' }
-				this.setPermission(message.origin, PERMISSIONS.APPROVED)
-				break
-			default:
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				throw new Error(`Unknown message type ${(message as any).type}`)
+	async _generateMessage(messageInput: MessageInput): Promise<Message> {
+		if (!messageInput.data && messageInput.type !== 'authOrigin') {
+			throw `should contain a data field ${messageInput}`
 		}
-		message.status = MSG_STATUSES.SIGNED
+		switch (messageInput.type) {
+			case 'authOrigin':
+				return {
+					...messageInput,
+					id: nanoid(),
+					extUuid: messageInput.options && messageInput.options.uid,
+					status: MessageStatus.UnApproved,
+					timestamp: Date.now(),
+				}
+			case 'transaction': {
+				const messageTx = await this.getTransactionMessageData(
+					messageInput.data
+				)
+				return {
+					...messageInput,
+					extUuid: messageInput.options ? messageInput.options.uid : undefined,
+					data: messageTx,
+					id: nanoid(),
+					input: messageInput,
+					status: MessageStatus.UnApproved,
+					successPath: messageInput.data.successPath,
+					timestamp: Date.now(),
+				}
+			}
+		}
 	}
 }

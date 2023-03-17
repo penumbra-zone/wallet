@@ -3,9 +3,8 @@ import { Contact, NetworkName, PermissionType } from '../../controllers'
 import { PreferencesAccount } from '../../preferences'
 import { StorageLocalState } from '../../storage'
 import {
-	ActionArrayType,
 	ParsedActions,
-	TransactionPlanType,
+	TransactionPlan,
 	TransactionResponseType,
 } from '../../types/transaction'
 import { TableName } from '../../utils'
@@ -424,7 +423,7 @@ class Background {
 		amount: number,
 		assetId?: string
 	): Promise<{
-		transactionPlan: TransactionPlanType
+		transactionPlan: TransactionPlan
 		actions: ParsedActions[]
 	}> {
 		try {
@@ -442,8 +441,8 @@ class Background {
 		}
 	}
 
-	async parseActions(transactionPlan: TransactionPlanType): Promise<{
-		transactionPlan: TransactionPlanType
+	async parseActions(transactionPlan: TransactionPlan): Promise<{
+		transactionPlan: TransactionPlan
 		actions: ParsedActions[]
 	}> {
 		try {
@@ -460,7 +459,7 @@ class Background {
 	//parseActions
 
 	async sendTransaction(
-		sendPlan: TransactionPlanType
+		sendPlan: TransactionPlan
 	): Promise<TransactionResponseType> {
 		try {
 			await this.initPromise
@@ -535,26 +534,25 @@ class Background {
 
 	async approve(
 		messageId: string,
-		address: PreferencesAccount
 	): Promise<unknown> {
 		try {
 			await this.initPromise
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			await this._connect!()
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			return await this.background!.approve(messageId, address)
+			return await this.background!.approve(messageId)
 		} catch (err) {
 			throw new Error(prepareErrorMessage(err))
 		}
 	}
 
-	async deleteAllMessages(): Promise<void> {
+	async clearMessages(): Promise<void> {
 		try {
 			await this.initPromise
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			await this._connect!()
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			return await this.background!.deleteAllMessages()
+			return await this.background!.clearMessages()
 		} catch (err) {
 			throw new Error(prepareErrorMessage(err))
 		}

@@ -129,20 +129,16 @@ export class PermissionController {
 	hasPermission(origin: string, permission: PermissionType) {
 		const permissions = this.getPermissions(origin)
 
-		if (!permissions.length) {
-			return null
-		}
+		if (!permissions.length) return null
 
-		if (permissions.includes(PERMISSIONS.REJECTED)) {
+		if (permissions.includes(PERMISSIONS.REJECTED))
 			return permission === PERMISSIONS.REJECTED
-		}
 
 		if (
 			permissions.includes(PERMISSIONS.ALL) ||
 			permissions.includes(permission)
-		) {
+		)
 			return true
-		}
 
 		return !!this.getPermission(origin, permission)
 	}
@@ -208,6 +204,13 @@ export class PermissionController {
 		this.remoteConfig.store.subscribe(({ whitelist }) => {
 			this.updateState({ whitelist })
 			this._updateBlackWhitelist()
+		})
+	}
+
+	clearStore() {
+		this.store.updateState({
+			...this.store.getState(),
+			...{ origins: {}, whitelist: [], inPending: {} },
 		})
 	}
 }

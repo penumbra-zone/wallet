@@ -14,7 +14,8 @@ import {
 	ActionArrayType,
 	ActionType,
 	ParsedActions,
-	TransactionPlanType,
+	TransactionMessageData,
+	TransactionPlan,
 	TransactionResponseType,
 } from '../types/transaction'
 import { IndexedDb } from '../utils'
@@ -120,10 +121,9 @@ export class TransactionController {
 		)
 	}
 
-	async parseActions(transactionPlan: TransactionPlanType): Promise<{
-		transactionPlan: TransactionPlanType
-		actions: ParsedActions[]
-	}> {
+	async getTransactionMessageData(
+		transactionPlan: TransactionPlan
+	): Promise<TransactionMessageData> {
 		let fvk
 		try {
 			fvk = this.configApi.getAccountFullViewingKey()
@@ -190,7 +190,7 @@ export class TransactionController {
 		amount: number,
 		assetId: string
 	): Promise<{
-		transactionPlan: TransactionPlanType
+		transactionPlan: TransactionPlan
 		actions: ParsedActions[]
 	}> {
 		let fvk
@@ -238,7 +238,7 @@ export class TransactionController {
 	}
 
 	async sendTransaction(
-		sendPlan: TransactionPlanType
+		sendPlan: TransactionPlan
 	): Promise<TransactionResponseType> {
 		let fvk
 		let spendingKey

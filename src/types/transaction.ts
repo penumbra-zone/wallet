@@ -35,7 +35,7 @@ type SpendActionType = {
 
 export type ActionArrayType = SpendActionType | OutputActionType
 
-export type TransactionPlanType = {
+export type TransactionPlan = {
 	chainId: string
 	cluePlans: {
 		address: {
@@ -58,6 +58,11 @@ export type ParsedActions = {
 	asset: string
 	isOwnAddress?: boolean
 	destAddress: string
+}
+
+export type TransactionMessageData = {
+	transactionPlan: TransactionPlan
+	actions: ParsedActions[]
 }
 
 export type TransactionResponseType = {

@@ -8,7 +8,6 @@ import Background from '../../services/Background'
 import { DetailTxBeforeSend } from '../Send/DetailTxBeforeSend'
 
 export const ActiveMessage = () => {
-	const navigate = useNavigate()
 	const messages = useAccountsSelector(selectMessages)
 	const account = useAccountsSelector(selectSelectedAccount)
 	const [isChecked, setIsChecked] = useState<boolean>(false)
@@ -17,25 +16,22 @@ export const ActiveMessage = () => {
 		setIsChecked(e.target.checked)
 
 	const handleCancel = async () => {
-		await Background.deleteAllMessages()
-		navigate(routesPath.HOME)
+		Background.reject(messages.unapprovedMessages[0].id)
 	}
 
 	const handleConfirm = async () => {
-		await Background.approve(
-			messages.unapprovedMessages[0].id,
-			account
-		)
-
-		await Background.deleteAllMessages()
-		navigate(routesPath.HOME)
+		await Background.approve(messages.unapprovedMessages[0].id)
 	}
 
-	if (messages.messages[0].type === 'transaction') {
+	if (
+		messages.unapprovedMessages[0] &&
+		messages.unapprovedMessages[0].type === 'transaction'
+	) {
 		return (
 			<DetailTxBeforeSend
-				sendPlan={messages.messages[0].data}
+				sendPlan={messages.unapprovedMessages[0].data}
 				handleCancel={handleCancel}
+				handleApprove={handleConfirm}
 			/>
 		)
 	}

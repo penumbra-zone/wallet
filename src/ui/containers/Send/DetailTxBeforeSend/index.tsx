@@ -1,35 +1,35 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
+import loader from '../../../../assets/gif/loader.gif'
+import { TRANSACTION_TABLE_NAME } from '../../../../lib'
 import {
 	ParsedActions,
-	TransactionPlanType,
+	TransactionMessageData,
+	TransactionPlan,
 	TransactionResponseType,
 } from '../../../../types/transaction'
 import { getShortKey, routesPath } from '../../../../utils'
 import { Button, ChevronLeftIcon, ModalWrapper } from '../../../components'
 import Background from '../../../services/Background'
-import toast from 'react-hot-toast'
-import loader from '../../../../assets/gif/loader.gif'
-import { TRANSACTION_TABLE_NAME } from '../../../../lib'
 
 type DetailTxBeforeSendProps = {
-	sendPlan: {
-		transactionPlan: TransactionPlanType
-		actions: ParsedActions[]
-	}
+	sendPlan: TransactionMessageData
 	setSendPlan?: Dispatch<
 		SetStateAction<{
-			transactionPlan: TransactionPlanType
+			transactionPlan: TransactionPlan
 			actions: ParsedActions[]
 		} | null>
 	>
 	handleCancel?: () => Promise<void>
+	handleApprove?: () => Promise<void>
 }
 
 export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 	sendPlan,
 	setSendPlan,
 	handleCancel,
+	handleApprove
 }) => {
 	const [txResponse, setTxResponse] = useState<null | TransactionResponseType>(
 		null
@@ -49,7 +49,6 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 				if (tx) {
 					setLoading(false)
 					navigate(routesPath.HOME)
-					await Background.deleteAllMessages()
 				}
 			}, 500)
 		} else {
@@ -57,8 +56,8 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 				position: 'top-right',
 			})
 			setLoading(false)
-			
 		}
+		handleApprove && handleApprove()
 
 		return () => clearInterval(interval)
 	}, [txResponse])

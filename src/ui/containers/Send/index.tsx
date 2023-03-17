@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ParsedActions, TransactionPlanType } from '../../../types/transaction'
+import { ParsedActions, TransactionPlan } from '../../../types/transaction'
 import Background from '../../services/Background'
 import { Address } from './Address'
 import { DetailTxBeforeSend } from './DetailTxBeforeSend'
@@ -9,7 +9,7 @@ export const Send = () => {
 	const [amount, setAmount] = useState<string>('')
 	const [select, setSelect] = useState<string>('PNB')
 	const [sendPlan, setSendPlan] = useState<{
-		transactionPlan: TransactionPlanType
+		transactionPlan: TransactionPlan
 		actions: ParsedActions[]
 	} | null>(null)
 

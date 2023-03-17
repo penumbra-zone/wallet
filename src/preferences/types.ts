@@ -1,7 +1,7 @@
 export type WalletAccount = {
 	name: string
 	addressByIndex: string
-} & ({ type: 'seed' } | { type: 'encodedSeed' })
+} & ({ type: 'seed' })
 
 export type PreferencesAccount = WalletAccount & {
 	lastUsed?: number

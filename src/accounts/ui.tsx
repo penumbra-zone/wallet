@@ -53,7 +53,7 @@ async function startUi() {
 				const popup = extension.extension
 					.getViews({ type: 'popup' })
 					.find(w => w.location.pathname === '/popup.html')
-
+				
 				if (popup) {
 					popup.close()
 				}
