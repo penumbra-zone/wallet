@@ -22,8 +22,7 @@
 		"alarms",
 		"storage",
 		"unlimitedStorage",
-		"activeTab",
-		"notifications"
+		"activeTab"
 	],
 	"web_accessible_resources": [
 		{
