@@ -20,9 +20,7 @@
 	],
 	"permissions": [
 		"alarms",
-		"storage",
-		"unlimitedStorage",
-		"activeTab"
+		"storage"
 	],
 	"web_accessible_resources": [
 		{
