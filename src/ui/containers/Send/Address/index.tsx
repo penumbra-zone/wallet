@@ -19,7 +19,7 @@ import {
 	Input,
 	PlusSvg,
 	SearchSvg,
-	Select,
+	SelectInput,
 } from '../../../components'
 import { selectBalance, selectContacts } from '../../../redux'
 
@@ -187,7 +187,7 @@ export const Address: React.FC<AddressProps> = ({
 							<></>
 						)}
 						<div className='flex flex-col max-h-[180px] overflow-y-scroll'>
-							<Select
+							<SelectInput
 								labelClassName={`${
 									isDesktop ? 'h3' : 'h2_ext'
 								} text-light_grey mb-[16px]`}

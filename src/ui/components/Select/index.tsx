@@ -1,9 +1,10 @@
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react'
 import SelectComponent, {
+	createFilter,
 	MultiValue,
 	SingleValue,
-	createFilter,
 } from 'react-select'
+import Select from 'react-select/dist/declarations/src/Select'
 
 export type OptionType = {
 	value: string | number
@@ -24,7 +25,7 @@ type SelectPropsType = {
 	onInputChange?: (value: string) => void
 }
 
-export const Select: React.FC<SelectPropsType> = ({
+export const SelectInput: React.FC<SelectPropsType> = ({
 	label,
 	options,
 	isLoading,
@@ -35,11 +36,14 @@ export const Select: React.FC<SelectPropsType> = ({
 	isError,
 	labelClassName,
 	handleChange,
+	onInputChange,
 	...props
 }) => {
 	const [values, setValues] = useState<string | number | null>(null)
-	const [isFocus, setFocus] = useState(false)
-	const inputRef = useRef<any>(null)
+	const [isFocus, setFocus] = useState<boolean>(false)
+	const [isOpen, setOpen] = useState<boolean>(false)
+	const inputRef = useRef<null | Select>(null)
+	const [inputValue, setInputValue] = useState<string>('')
 
 	//add initailValue
 	useEffect(() => {
@@ -56,6 +60,7 @@ export const Select: React.FC<SelectPropsType> = ({
 	const changeHandler = (
 		newValue: MultiValue<string | OptionType> | SingleValue<string | OptionType>
 	) => {
+		
 		setValues((newValue as OptionType).value)
 		handleChange((newValue as OptionType).value)
 	}
@@ -63,9 +68,20 @@ export const Select: React.FC<SelectPropsType> = ({
 	const containerHandler = () => {
 		inputRef.current?.focus()
 		setFocus(true)
-	}
+	}	
 
 	const inputBlurHandler = () => setFocus(false)
+
+	const inputChange = (value: string) => {
+		if(value.trim().split(' ').length >1){
+			setFocus(false)
+			setOpen(false)
+			setInputValue('')
+		}else{
+			setInputValue(value)
+		}
+		onInputChange(value)
+	}
 
 	return (
 		<div className={className}>
@@ -90,8 +106,13 @@ export const Select: React.FC<SelectPropsType> = ({
 						ref={inputRef}
 						classNamePrefix='custom_select'
 						onChange={changeHandler}
+						onInputChange={inputChange}
+						onMenuClose={() => setOpen(false)}
+						onMenuOpen={() => setOpen(true)}
+						menuIsOpen={isOpen}
 						hideSelectedOptions={false}
 						value={selectedValue}
+						inputValue={inputValue}
 						options={options}
 						id={`long-value-select ${fieldName}`}
 						instanceId={`long-value-select ${fieldName}`}

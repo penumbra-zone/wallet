@@ -7,7 +7,7 @@ import {
 	ChevronLeftIcon,
 	CreatePasswordForm,
 	InformationOutlineSvg,
-	Select,
+	SelectInput,
 	SuccessCreateModal,
 } from '../../components'
 import { accountsActions, createAccount, localStateActions } from '../../redux'
@@ -25,30 +25,30 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 	const navigate = useNavigate()
 
 	const [seed, setSeed] = useState({
-		1: 'under',
-		2: 'magnet',
-		3: 'father',
-		4: 'section',
-		5: 'sibling',
-		6: 'wide',
-		7: 'canoe',
-		8: 'baby',
-		9: 'cruel',
-		10: 'will',
-		11: 'mammal',
-		12: 'dignity',
-		13: 'apart',
-		14: 'pilot',
-		15: 'special',
-		16: 'car',
-		17: 'describe',
-		18: 'table',
-		19: 'ship',
-		20: 'mail',
-		21: 'amateur',
-		22: 'wash',
-		23: 'act',
-		24: 'end',
+		// 1: 'under',
+		// 2: 'magnet',
+		// 3: 'father',
+		// 4: 'section',
+		// 5: 'sibling',
+		// 6: 'wide',
+		// 7: 'canoe',
+		// 8: 'baby',
+		// 9: 'cruel',
+		// 10: 'will',
+		// 11: 'mammal',
+		// 12: 'dignity',
+		// 13: 'apart',
+		// 14: 'pilot',
+		// 15: 'special',
+		// 16: 'car',
+		// 17: 'describe',
+		// 18: 'table',
+		// 19: 'ship',
+		// 20: 'mail',
+		// 21: 'amateur',
+		// 22: 'wash',
+		// 23: 'act',
+		// 24: 'end',
 	})
 
 	const [isValidMnemonic, setIsValidMnemonic] = useState<boolean>(true)
@@ -69,9 +69,21 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 	}
 
 	const onInputChange = (index: number) => (value: string) => {
+		if (value.trim().split(' ').length > 1) {
+			value
+				.trim()
+				.split(' ')
+				.forEach((i, index) => {
+					setSeed(state => ({
+						...state,
+						[index + 1]: i,
+					}))
+				})
+			return
+		}
 		const typedValue = options.find(i => i.value === value)
-
 		if (!typedValue) return
+
 		setSeed(state => ({
 			...state,
 			[index + 1]: typedValue.value,
@@ -131,7 +143,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 					<div className='flex flex-wrap gap-y-[8px] gap-x-[16px]'>
 						{selects.map(i => (
 							<div className='flex-[0_0_calc(25%-16px)]' key={i}>
-								<Select
+								<SelectInput
 									options={options}
 									fieldName={String(i)}
 									label={`#${i + 1 < 10 ? `0${i + 1}` : i + 1}`}

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
-import { useAccountsSelector, useAppDispatch } from '../../../accounts'
-import { createAccount, selectNewAccount } from '../../redux'
 import { useNavigate } from 'react-router-dom'
+import { useAccountsSelector, useAppDispatch } from '../../../accounts'
+import { routesPath } from '../../../utils'
 import {
 	Button,
 	ChevronLeftIcon,
-	Select,
+	SelectInput,
 	SuccessCreateModal,
 } from '../../components'
-import { routesPath } from '../../../utils'
+import { createAccount, selectNewAccount } from '../../redux'
 import { options } from '../ImportSeed'
 
 type SeedPhraseConfirmProps = {}
@@ -128,7 +128,7 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
 						position
 					</p>
 					<div className='w-[100%] mb-[12px]'>
-						<Select
+						<SelectInput
 							options={options}
 							fieldName='first'
 							isError={words.first ? !isError.first : false}
@@ -141,7 +141,7 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
 						/>
 					</div>
 					<div className='w-[100%] mb-[12px]'>
-						<Select
+						<SelectInput
 							options={options}
 							fieldName='second'
 							isError={words.second ? !isError.second : false}
@@ -154,7 +154,7 @@ export const SeedPhraseConfirm: React.FC<SeedPhraseConfirmProps> = ({}) => {
 						/>
 					</div>
 					<div className='w-[100%]'>
-						<Select
+						<SelectInput
 							options={options}
 							fieldName='third'
 							isError={words.third ? !isError.third : false}

@@ -1,3 +1,4 @@
+import { ValidatorInfo } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/stake/v1alpha1/stake_pb'
 import { BigNumber } from 'big-integer'
 import { useEffect, useState } from 'react'
 import { useAccountsSelector } from '../../../accounts'
@@ -6,11 +7,10 @@ import {
 	EmptyTableHelper,
 	Input,
 	SearchSvg,
-	Select,
+	SelectInput,
 	ValidatorTable,
 } from '../../components'
 import { selectNetworks } from '../../redux'
-import { ValidatorInfo } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/stake/v1alpha1/stake_pb'
 
 type AllValidatorsProps = {
 	validators: ValidatorInfo[]
@@ -193,7 +193,7 @@ export const AllValidators: React.FC<AllValidatorsProps> = ({ validators }) => {
 					}
 					className='w-[400px]'
 				/>
-				<Select
+				<SelectInput
 					options={
 						totalValidators ===
 						filterValidator(
