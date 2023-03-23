@@ -1,10 +1,8 @@
 import { Balance, Button, Tabs } from '../../components'
 import { AllValidators } from '../AllValidators'
 import { useEffect, useState } from 'react'
-import {
-	createGrpcWebTransport,
-	createPromiseClient,
-} from '@bufbuild/connect-web'
+import { createGrpcWebTransport } from '@bufbuild/connect-web'
+import { createPromiseClient } from '@bufbuild/connect'
 import { useAccountsSelector } from '../../../accounts'
 import { selectNetworks } from '../../redux'
 import { MyValidators } from '../MyValidators'

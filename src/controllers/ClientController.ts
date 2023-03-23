@@ -1,7 +1,5 @@
-import {
-	createGrpcWebTransport,
-	createPromiseClient,
-} from '@bufbuild/connect-web'
+import { createGrpcWebTransport } from '@bufbuild/connect-web'
+import { createPromiseClient } from '@bufbuild/connect'
 import { ExtensionStorage } from '../storage'
 import ObservableStore from 'obs-store'
 import { WalletController } from './WalletController'
@@ -21,7 +19,6 @@ import {
 } from '../lib'
 import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
-
 import { IndexedDb } from '../utils'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
 import { ObliviousQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb'
