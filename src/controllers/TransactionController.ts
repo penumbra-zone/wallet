@@ -1,5 +1,3 @@
-import { createGrpcWebTransport } from '@bufbuild/connect-web'
-import { encode } from 'bech32-buffer'
 import {
 	base64_to_bech32,
 	build_tx,
@@ -8,14 +6,20 @@ import {
 	send_plan,
 } from 'penumbra-web-assembly'
 import {
+	CHAIN_PARAMETERS_TABLE_NAME,
+	FMD_PARAMETERS_TABLE_NAME,
+	SPENDABLE_NOTES_TABLE_NAME,
+} from '../lib'
+import {
 	ActionArrayType,
 	ActionType,
 	ParsedActions,
-	TransactionPlanType,
+	TransactionMessageData,
+	TransactionPlan,
 	TransactionResponseType,
 } from '../types/transaction'
 import { IndexedDb } from '../utils'
-import { base64ToBytes, bytesToBase64 } from '../utils/base64'
+import { bytesToBase64 } from '../utils/base64'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
 import { NetworkController } from './NetworkController'
 import { RemoteConfigController } from './RemoteConfigController'
@@ -57,10 +61,13 @@ export class TransactionController {
 		this.wasmViewConnector = wasmViewConnector
 	}
 
-	async parseActions(
-		actions: ActionArrayType[],
-		fvk: string
-	): Promise<ParsedActions[]> {
+	async parseActions2(actions: ActionArrayType[]): Promise<ParsedActions[]> {
+		let fvk
+		try {
+			fvk = this.configApi.getAccountFullViewingKey()
+		} catch {}
+		if (!fvk) return
+
 		return Promise.all(
 			actions.map(async (i: ActionArrayType) => {
 				const key = Object.keys(i)[0]
@@ -114,12 +121,76 @@ export class TransactionController {
 		)
 	}
 
+	async getTransactionMessageData(
+		transactionPlan: TransactionPlan
+	): Promise<TransactionMessageData> {
+		let fvk
+		try {
+			fvk = this.configApi.getAccountFullViewingKey()
+		} catch {}
+		if (!fvk) return
+		let actions
+		await Promise.all(
+			transactionPlan.actions.map(async (i: ActionArrayType) => {
+				const key = Object.keys(i)[0]
+				const value = Object.values(i)[0]
+
+				const amount =
+					Number(
+						key === 'spend' ? value.note.value.amount.lo : value.value.amount.lo
+					) /
+					10 ** 6
+
+				const assetId =
+					key === 'spend'
+						? value.note.value.assetId.inner
+						: value.value.assetId.inner
+
+				const destAddress = key === 'spend' ? '' : value.destAddress.inner
+
+				const detailAsset = await this.indexedDb.getValue('assets', assetId)
+
+				const asset = detailAsset.denom.denom
+
+				//encode recipinet address
+				const encodeRecipientAddress = destAddress
+					? base64_to_bech32('penumbrav2t', destAddress)
+					: ''
+				//check is recipient address is exist for current user
+				let isOwnAddress: undefined | { inner: string }
+				try {
+					if (key !== 'spend')
+						isOwnAddress = is_controlled_address(fvk, encodeRecipientAddress)
+				} catch (error) {
+					console.error('is_controlled_address', error)
+				}
+
+				const type =
+					key === 'output'
+						? isOwnAddress
+							? 'receive'
+							: 'send'
+						: (key as ActionType)
+
+				return {
+					type,
+					amount,
+					asset,
+					isOwnAddress: key === 'spend' ? undefined : Boolean(isOwnAddress),
+					destAddress: encodeRecipientAddress,
+				}
+			})
+		).then(act => (actions = act))
+
+		return { transactionPlan, actions }
+	}
+
 	async getTransactionPlan(
 		destAddress: string,
 		amount: number,
 		assetId: string
 	): Promise<{
-		transactionPlan: TransactionPlanType
+		transactionPlan: TransactionPlan
 		actions: ParsedActions[]
 	}> {
 		let fvk
@@ -128,20 +199,23 @@ export class TransactionController {
 		} catch {}
 		if (!fvk) return
 
-		let notes = await this.indexedDb.getAllValue('spendable_notes')
+		let notes = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
 		notes = notes
 			.filter(note => note.heightSpent === undefined)
 			.filter(note => note.note.value.assetId.inner === assetId)
 		if (!notes.length) console.error('No notes found to spend')
 
-		const fmdParameters = await this.indexedDb.getValue('fmd_parameters', `fmd`)
+		const fmdParameters = await this.indexedDb.getValue(
+			FMD_PARAMETERS_TABLE_NAME,
+			`fmd`
+		)
 		if (!fmdParameters) console.error('No found FmdParameters')
 
 		const chainParamsRecords = await this.indexedDb.getAllValue(
-			'chainParameters'
+			CHAIN_PARAMETERS_TABLE_NAME
 		)
 		const chainParameters = await chainParamsRecords[0]
-		if (!fmdParameters) console.error('No found chain parameters')
+		if (!chainParameters) console.error('No found chain parameters')
 
 		const data = {
 			notes,
@@ -158,13 +232,13 @@ export class TransactionController {
 		}
 
 		const transactionPlan = send_plan(fvk, valueJs, destAddress, data)
-		const actions = await this.parseActions(transactionPlan.actions, fvk)
+		const actions = await this.parseActions2(transactionPlan.actions)
 
 		return { transactionPlan, actions }
 	}
 
 	async sendTransaction(
-		sendPlan: TransactionPlanType
+		sendPlan: TransactionPlan
 	): Promise<TransactionResponseType> {
 		let fvk
 		let spendingKey
@@ -174,22 +248,8 @@ export class TransactionController {
 		} catch {}
 		if (!fvk || !spendingKey) return
 
-		const customGrpc =
-			this.configApi.getCustomGRPC()[this.configApi.getNetwork()]
-		const { grpc: defaultGrpc, chainId } =
-			this.configApi.getNetworkConfig()[this.configApi.getNetwork()]
-		const grpc = customGrpc || defaultGrpc
-		const transport = createGrpcWebTransport({
-			baseUrl: grpc,
-		})
-
-		const buildTx = build_tx(
-			spendingKey,
-			fvk,
-			sendPlan,
-			await this.wasmViewConnector.loadStoredTree()
-		)
-
+		const storedTree = await this.wasmViewConnector.loadStoredTree()
+		const buildTx = build_tx(spendingKey, fvk, sendPlan, storedTree)
 		const encodeTx = await encode_tx(buildTx)
 
 		const resp = await this.broadcastTx(bytesToBase64(encodeTx))

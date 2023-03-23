@@ -1,5 +1,6 @@
+import { deepEqual } from 'fast-equals'
 import { equals } from 'ramda'
-import { MessageStoreItem } from '../messages/types'
+import { Message, MessageStatus } from '../messages/types'
 import {
 	accountsActions,
 	messageNotificationActions,
@@ -90,30 +91,29 @@ export function createUpdateState(store: AccountsStore) {
 			dispatch(accountsActions.setSelectedAccount(selectedAccount))
 		}
 
-		function isMyMessages(msg: MessageStoreItem) {
-			try {
+		function isMyMessages(msg: Message) {
+			
 				const account =
 					state.selectedAccount || currentState.accounts.selectedAccount
 				return (
-					msg.status === 'unapproved' &&
+					account!= null &&
+					msg.status === MessageStatus.UnApproved &&
 					msg.account.addressByIndex === account?.addressByIndex
 				)
-			} catch (e) {
-				return false
-			}
+			
 		}
 
 		const messages = getParam(state.messages, [])
 		const unapprovedMessages = messages?.filter(isMyMessages)
-		// const toUpdateActiveNotify = {
-		//   allMessages: messages,
-		//   messages: currentState.messageNotification.messages,
-		//   //  notifications: currentState.notifications,
-		// };
+		
+		const setActiveAutoPayload = {
+      allMessages: messages,
+      messages: currentState.messageNotification.messages
+    };
 
 		if (
 			unapprovedMessages &&
-			!equals(unapprovedMessages, currentState.messageNotification.messages)
+			!deepEqual(unapprovedMessages, currentState.messageNotification.messages)
 		) {
 			dispatch(
 				messageNotificationActions.setMessages({

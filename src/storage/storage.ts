@@ -10,12 +10,12 @@ import {
 	NetworkName,
 	PermissionType,
 } from '../controllers'
-import { WalletAccount } from '../preferences'
-import { MessageStoreItem } from '../messages/types'
+import { PreferencesAccount} from '../preferences'
+import { Message } from '../messages/types'
 
 export type StorageLocalState = {
 	contacts: Contact[]
-	selectedAccount: WalletAccount | undefined
+	selectedAccount: PreferencesAccount | undefined
 	isInitialized: boolean | null
 	isLocked: boolean | null
 	config: {
@@ -43,7 +43,7 @@ export type StorageLocalState = {
 	origins: Record<string, PermissionType[]>
 	whitelist: string[]
 	inPending: Record<string, string | null>
-	messages: MessageStoreItem[]
+	messages: Message[]
 	notificationWindowId: number | undefined
 	inShowMode: boolean | undefined
 	idleInterval: number

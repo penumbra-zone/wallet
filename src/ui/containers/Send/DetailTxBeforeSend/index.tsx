@@ -1,32 +1,35 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
+import loader from '../../../../assets/gif/loader.gif'
+import { TRANSACTION_TABLE_NAME } from '../../../../lib'
 import {
 	ParsedActions,
-	TransactionPlanType,
+	TransactionMessageData,
+	TransactionPlan,
 	TransactionResponseType,
 } from '../../../../types/transaction'
 import { getShortKey, routesPath } from '../../../../utils'
 import { Button, ChevronLeftIcon, ModalWrapper } from '../../../components'
 import Background from '../../../services/Background'
-import toast from 'react-hot-toast'
-import loader from '../../../../assets/gif/loader.gif'
 
 type DetailTxBeforeSendProps = {
-	sendPlan: {
-		transactionPlan: TransactionPlanType
-		actions: ParsedActions[]
-	}
-	setSendPlan: Dispatch<
+	sendPlan: TransactionMessageData
+	setSendPlan?: Dispatch<
 		SetStateAction<{
-			transactionPlan: TransactionPlanType
+			transactionPlan: TransactionPlan
 			actions: ParsedActions[]
 		} | null>
 	>
+	handleCancel?: () => Promise<void>
+	handleApprove?: () => Promise<void>
 }
 
 export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 	sendPlan,
 	setSendPlan,
+	handleCancel,
+	handleApprove
 }) => {
 	const [txResponse, setTxResponse] = useState<null | TransactionResponseType>(
 		null
@@ -42,7 +45,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 			interval = setInterval(async () => {
 				const hash = txResponse.result.hash.toLowerCase()
 
-				const tx = await Background.getValueById('tx', hash)
+				const tx = await Background.getValueById(TRANSACTION_TABLE_NAME, hash)
 				if (tx) {
 					setLoading(false)
 					navigate(routesPath.HOME)
@@ -54,11 +57,15 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 			})
 			setLoading(false)
 		}
+		handleApprove && handleApprove()
 
 		return () => clearInterval(interval)
 	}, [txResponse])
 
-	const handleEdit = () => setSendPlan(null)
+	const handleEdit = () => {
+		if (handleCancel) handleCancel()
+		else setSendPlan(null)
+	}
 
 	const handleConfirm = async () => {
 		setLoading(true)
@@ -71,13 +78,15 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 	return (
 		<>
 			<div className='w-[100%] flex flex-col items-start ext:py-[20px] tablet:py-[30px] bg-brown rounded-[15px] px-[16px]'>
-				<Button
-					mode='icon_transparent'
-					onClick={handleEdit}
-					title='Edit'
-					iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
-					className='mb-[24px]'
-				/>
+				{setSendPlan && (
+					<Button
+						mode='icon_transparent'
+						onClick={handleEdit}
+						title='Edit'
+						iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
+						className='mb-[24px]'
+					/>
+				)}
 				<div className='w-[100%] max-h-[280px] overflow-y-scroll'>
 					{sendPlan.actions.map((i, index) => {
 						let text

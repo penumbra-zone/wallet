@@ -3,23 +3,41 @@ import type { __BackgroundPageApiDirect } from './background'
 import pipe from 'callbag-pipe'
 import filter from 'callbag-filter'
 import subscribe from 'callbag-subscribe'
-import { BalanceByAddressReq } from './types/viewService'
+import {
+	AssetsResponse,
+	BalanceByAddressRequest,
+	BalanceByAddressResponse,
+	ChainParametersResponse,
+	FMDParametersResponse,
+	NotesResponse,
+	StatusResponse,
+	StatusStreamResponse,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
-type Events = 'state' | 'status' | 'balance' | 'assets' | 'transactions'
+type Events =
+	| 'state'
+	| 'status'
+	| 'balance'
+	| 'assets'
+	| 'transactions'
+	| 'notes'
 
 declare global {
 	interface PenumbraApi extends __BackgroundPageApiDirect {
 		on(
 			event: Events,
 			cd: (
-				state: Awaited<
-					ReturnType<
-						| __BackgroundPageApiDirect['publicState']
-						| __BackgroundPageApiDirect['getStatusStream']
-						| __BackgroundPageApiDirect['getBalanceByAddress']
-						| __BackgroundPageApiDirect['getTransactions']
-					>
-				>
+				state:
+					| Awaited<
+							ReturnType<
+								| __BackgroundPageApiDirect['publicState']
+								| __BackgroundPageApiDirect['getStatusStream']
+								| __BackgroundPageApiDirect['getTransactions']
+							>
+					  >
+					| AssetsResponse
+					| BalanceByAddressResponse
+					| NotesResponse
 			) => void,
 			args: any
 		): void
@@ -36,37 +54,48 @@ const proxy = createIpcCallProxy<
 
 //@ts-ignore
 globalThis.penumbra = {
+	signTransaction: proxy.signTransaction,
 	publicState: proxy.publicState,
-	getBalanceByAddress: (arg: BalanceByAddressReq) =>
+	getBalanceByAddress: (arg: BalanceByAddressRequest) =>
 		proxy.getBalanceByAddress(arg),
-	getStatusStream: proxy.getStatusStream,
-	resourceIsApproved: proxy.resourceIsApproved,
-	getAssets: proxy.getAssets,
-	getChainParameters: proxy.getChainParameters,
-	getNotes: proxy.getNotes,
+	getChainParameters: async () =>
+		new ChainParametersResponse().fromJson(
+			(await proxy.getChainParameters()) as any
+		),
 	getNoteByCommitment: proxy.getNoteByCommitment,
-	getStatus: proxy.getStatus,
+	getStatus: async () =>
+		new StatusResponse().fromJson((await proxy.getStatus()) as any),
 	getTransactionHashes: proxy.getTransactionHashes,
 	getTransactionByHash: proxy.getTransactionByHash,
 	getTransactions: proxy.getTransactions,
-	getFmdParameters: proxy.getFmdParameters,
+	getFmdParameters: async () =>
+		new FMDParametersResponse().fromJson(
+			(await proxy.getFmdParameters()) as any
+		),
 	get initialPromise() {
 		return Promise.resolve(globalThis.penumbra)
 	},
 	on: async (event, cb, args) => {
-		const isApproved = await penumbra.resourceIsApproved()
+		const isApproved = await proxy.resourceIsApproved()
 		if (!isApproved) return
 
 		if (event === 'assets') {
-			const data = await penumbra.getAssets()
+			const data = await proxy.getAssets()
 			for (let i = 0; i < data.length; i++) {
-				cb(data[i] as any)
+				cb(new AssetsResponse().fromJson(data[i] as any))
 			}
-		} else if (event === 'transactions') {
-			const txs = await penumbra.getTransactions()
-
-			for (let i = 0; i < txs.length; i++) {
-				cb(txs[i] as any)
+		} else if (event === 'balance') {
+			const data = await penumbra.getBalanceByAddress(args)
+			for (let i = 0; i < data.length; i++) {
+				cb(new BalanceByAddressResponse().fromJson(data[i] as any))
+			}
+		} else if (event === 'status') {
+			const updatedValue = await proxy.getStatusStream()
+			cb(new StatusStreamResponse().fromJson(updatedValue as any))
+		} else if (event === 'notes') {
+			const data = await proxy.getNotes()
+			for (let i = 0; i < data.length; i++) {
+				cb(new NotesResponse().fromJson(data[i] as any))
 			}
 		}
 
@@ -75,23 +104,23 @@ globalThis.penumbra = {
 			filter((data: { penumbraMethod: string }) => {
 				return data.penumbraMethod === event.toUpperCase()
 			}),
-			subscribe(async () => {
+			subscribe(async data => {
 				if (event === 'status') {
-					const updatedValue = await penumbra.getStatusStream()
-					cb(updatedValue)
+					const updatedValue = await proxy.getStatusStream()
+					cb(new StatusStreamResponse().fromJson(updatedValue as any))
 				} else if (event === 'state') {
 					const updatedValue = await penumbra.publicState()
 					cb(updatedValue)
 				} else if (event === 'balance') {
 					const updatedValue = await penumbra.getBalanceByAddress(args)
+
 					for (let i = 0; i < updatedValue.length; i++) {
-						cb(updatedValue[i] as any)
+						cb(new BalanceByAddressResponse().fromJson(updatedValue[i] as any))
 					}
 				} else if (event === 'assets') {
-					const data = await penumbra.getAssets()
-					for (let i = 0; i < data.length; i++) {
-						cb(data[i] as any)
-					}
+					cb(new AssetsResponse().fromJson({ asset: (data as any).data }))
+				} else if (event === 'notes') {
+					cb(new NotesResponse().fromJson({ noteRecord: (data as any).data }))
 				}
 			})
 		)

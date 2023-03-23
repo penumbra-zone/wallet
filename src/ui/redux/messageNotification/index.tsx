@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { AccountsState } from '../../../accounts/rootReducer'
 import { PermissionType } from '../../../controllers'
-import { MessageStoreItem } from '../../../messages/types'
+import { Message } from '../../../messages/types'
 
 type Init = {
-	messages: MessageStoreItem[]
-	unapprovedMessages: MessageStoreItem[]
+	messages: Message[]
+	unapprovedMessages: Message[]
 	origins: Record<string, PermissionType[]>
 }
 

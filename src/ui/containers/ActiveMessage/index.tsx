@@ -1,8 +1,11 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAccountsSelector } from '../../../accounts'
+import { routesPath } from '../../../utils'
 import { Balance, Button, CheckBox, PlusSvg } from '../../components'
 import { selectMessages, selectSelectedAccount } from '../../redux'
 import Background from '../../services/Background'
+import { DetailTxBeforeSend } from '../Send/DetailTxBeforeSend'
 
 export const ActiveMessage = () => {
 	const messages = useAccountsSelector(selectMessages)
@@ -12,11 +15,25 @@ export const ActiveMessage = () => {
 	const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>) =>
 		setIsChecked(e.target.checked)
 
-	const handleCancel = async () =>
-		await Background.deleteMessage(messages.unapprovedMessages[0].id)
+	const handleCancel = async () => {
+		Background.reject(messages.unapprovedMessages[0].id)
+	}
 
 	const handleConfirm = async () => {
-		await Background.approve(messages.unapprovedMessages[0].id, account)
+		await Background.approve(messages.unapprovedMessages[0].id)
+	}
+
+	if (
+		messages.unapprovedMessages[0] &&
+		messages.unapprovedMessages[0].type === 'transaction'
+	) {
+		return (
+			<DetailTxBeforeSend
+				sendPlan={messages.unapprovedMessages[0].data}
+				handleCancel={handleCancel}
+				handleApprove={handleConfirm}
+			/>
+		)
 	}
 
 	return (

@@ -11,6 +11,16 @@ import { base64ToBytes } from './base64'
 import { CurrentAccountController, Transaction } from '../controllers'
 import { Nullifier } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { IndexedDb } from './IndexedDb'
+import {
+	FMD_PARAMETERS_TABLE_NAME,
+	NCT_COMMITMENTS_TABLE_NAME,
+	NCT_FORGOTTEN_TABLE_NAME,
+	NCT_HASHES_TABLE_NAME,
+	NCT_POSITION_TABLE_NAME,
+	SPENDABLE_NOTES_TABLE_NAME,
+	SWAP_TABLE_NAME,
+	TRANSACTION_TABLE_NAME,
+} from '../lib'
 
 export type StoredTree = {
 	last_position: number
@@ -64,13 +74,13 @@ export class WasmViewConnector {
 	}
 
 	async updateNotes(nullifier: Nullifier, height: bigint) {
-		const result = await this.indexedDb.getAllValue('spendable_notes')
+		const result = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
 
 		for (const note of result) {
 			if (JSON.stringify(note.nullifier) == JSON.stringify(nullifier)) {
-				note.heightSpent = height
+				note.heightSpent = String(height)
 				await this.indexedDb.putValueWithId(
-					'spendable_notes',
+					SPENDABLE_NOTES_TABLE_NAME,
 					note,
 					note.noteCommitment.inner
 				)
@@ -99,7 +109,9 @@ export class WasmViewConnector {
 			}
 		}
 		if (block.fmdParameters !== undefined)
-			await this.saveFmdParameters(block.fmdParameters)
+			await this.saveFmdParameters(
+				JSON.parse(block.fmdParameters.toJsonString())
+			)
 
 		// let ntcRoot = this.viewClient.get_nct_root();
 		//
@@ -120,21 +132,21 @@ export class WasmViewConnector {
 
 	public async loadStoredTree(): Promise<StoredTree> {
 		const nctPosition = await this.indexedDb.getValue(
-			'nct_position',
+			NCT_POSITION_TABLE_NAME,
 			'position'
 		)
 
 		const nctForgotten = await this.indexedDb.getValue(
-			'nct_forgotten',
+			NCT_FORGOTTEN_TABLE_NAME,
 			'forgotten'
 		)
 
 		const nctHashes: StoredHash[] = await this.indexedDb.getAllValue(
-			'nct_hashes'
+			NCT_HASHES_TABLE_NAME
 		)
 
 		const nctCommitments: StoredCommitment[] = await this.indexedDb.getAllValue(
-			'nct_commitments'
+			NCT_COMMITMENTS_TABLE_NAME
 		)
 
 		return {
@@ -188,43 +200,33 @@ export class WasmViewConnector {
 
 	async updateForgotten(setForgotten) {
 		await this.indexedDb.putValueWithId(
-			'nct_forgotten',
+			NCT_FORGOTTEN_TABLE_NAME,
 			setForgotten,
 			'forgotten'
 		)
 	}
 
 	async updatePosition(setPosition) {
-		await this.indexedDb.putValueWithId('nct_position', setPosition, 'position')
+		await this.indexedDb.putValueWithId(NCT_POSITION_TABLE_NAME, setPosition, 'position')
 	}
 
 	async storeCommitment(commitment) {
-		await this.indexedDb.putValue('nct_commitments', commitment)
+		await this.indexedDb.putValue(NCT_COMMITMENTS_TABLE_NAME, commitment)
 	}
 
 	async storeHash(hash) {
-		await this.indexedDb.putValue('nct_hashes', hash)
+		await this.indexedDb.putValue(NCT_HASHES_TABLE_NAME, hash)
 	}
 
 	async storeNote(note) {
 		let storedNote = await this.indexedDb.getValue(
-			'spendable_notes',
+			SPENDABLE_NOTES_TABLE_NAME,
 			note.noteCommitment.inner
 		)
 
-		// 		value
-		// :
-		// amount
-		// :
-		// {lo: '1000000000'}
-		// assetId
-		// :
-		// inner
-		// :
-		// "KeqcLzNx9qSH5+lcJHBB9KNW+YPrBk5dKzvPMiypahA="
 		if (storedNote == undefined) {
 			await this.indexedDb.putValueWithId(
-				'spendable_notes',
+				SPENDABLE_NOTES_TABLE_NAME,
 				note,
 				note.noteCommitment.inner
 			)
@@ -241,18 +243,18 @@ export class WasmViewConnector {
 				txBytes: note.source,
 				blockHeight: note.heightCreated,
 			}
-			await this.indexedDb.putValue('tx', tx)
+			await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, tx)
 		} else console.debug('note already stored', note.noteCommitment.inner)
 	}
 
 	async storeSwap(swap) {
 		let storedSwap = await this.indexedDb.getValue(
-			'swaps',
+			SWAP_TABLE_NAME,
 			swap.swapCommitment.inner
 		)
 		if (storedSwap == undefined)
 			await this.indexedDb.putValueWithId(
-				'swaps',
+				SWAP_TABLE_NAME,
 				swap,
 				swap.swapCommitment.inner
 			)
@@ -260,7 +262,11 @@ export class WasmViewConnector {
 	}
 
 	async saveFmdParameters(fmdParameters: FmdParameters) {
-		await this.indexedDb.putValueWithId('fmd_parameters', fmdParameters, 'fmd')
+		await this.indexedDb.putValueWithId(
+			FMD_PARAMETERS_TABLE_NAME,
+			fmdParameters,
+			'fmd'
+		)
 	}
 
 	convertCompactBlock(block: CompactBlock): CompactBlock {

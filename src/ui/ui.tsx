@@ -46,12 +46,13 @@ async function startUi() {
 	})
 
 	const connect = () => {
+	
+		
 		const uiApi = {
 			closePopupWindow: async () => {
 				const popup = extension.extension
 					.getViews({ type: 'popup' })
 					.find(w => w.location.pathname === '/popup.html')
-
 				if (popup) {
 					popup.close()
 				}
@@ -107,6 +108,7 @@ async function startUi() {
 		contacts: state.contacts,
 		messages: state.messages,
 		origins: state.origins,
+		...state
 	})
 
 	backgroundService.init(background)

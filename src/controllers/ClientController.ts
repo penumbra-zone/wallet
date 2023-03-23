@@ -5,26 +5,32 @@ import {
 import { ExtensionStorage } from '../storage'
 import ObservableStore from 'obs-store'
 import { WalletController } from './WalletController'
-import { extension } from '../lib'
+import {
+	ASSET_TABLE_NAME,
+	CHAIN_PARAMETERS_TABLE_NAME,
+	extension,
+	FMD_PARAMETERS_TABLE_NAME,
+	NCT_COMMITMENTS_TABLE_NAME,
+	NCT_FORGOTTEN_TABLE_NAME,
+	NCT_HASHES_TABLE_NAME,
+	NCT_POSITION_TABLE_NAME,
+	SPENDABLE_NOTES_TABLE_NAME,
+	SWAP_TABLE_NAME,
+	TRANSACTION_BY_NULLIFIER_TABLE_NAME,
+	TRANSACTION_TABLE_NAME,
+} from '../lib'
 import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
-import { encode } from 'bech32-buffer'
-import { EncodeAsset } from '../types'
+
 import { IndexedDb } from '../utils'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
 import { ObliviousQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb'
 import {
 	AssetListRequest,
-	AssetListResponse,
 	ChainParametersRequest,
-	ChainParametersResponse,
 	CompactBlockRangeRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
-import {
-	ChainParameters,
-	CompactBlock,
-	FmdParameters,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
+import { CompactBlock } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 
 export type Transaction = {
 	txHashHex: string
@@ -88,9 +94,7 @@ export class ClientController {
 	}
 
 	async saveAssets() {
-		const savedAssets: EncodeAsset[] = await this.indexedDb.getAllValue(
-			'assets'
-		)
+		const savedAssets = await this.indexedDb.getAllValue(ASSET_TABLE_NAME)
 
 		if (savedAssets.length) return
 
@@ -104,25 +108,19 @@ export class ClientController {
 
 		const assetRequest = new AssetListRequest()
 		assetRequest.chainId = chainId
+		const assetList = await client.assetList(assetRequest)
 
-		const asset = (await client.assetList(assetRequest)).assetList.assets.map(
-			i => i.toJsonString()
+		const assets = assetList.assetList.assets.map(i => i.toJsonString())
+		assets.forEach(
+			async i =>
+				await this.indexedDb.putValue(ASSET_TABLE_NAME, { ...JSON.parse(i) })
 		)
-
-		const encodeAsset = asset.map(asset => {
-			const parseAsset = JSON.parse(asset)
-
-			return {
-				...parseAsset,
-				decodeId: parseAsset.id.inner,
-			}
-		})
-		await this.indexedDb.putBulkValue('assets', encodeAsset)
 	}
 
 	async saveChainParameters() {
-		const savedChainParameters: ChainParameters[] =
-			await this.indexedDb.getAllValue('chainParameters')
+		const savedChainParameters = await this.indexedDb.getAllValue(
+			CHAIN_PARAMETERS_TABLE_NAME
+		)
 
 		if (savedChainParameters.length) return
 
@@ -135,12 +133,11 @@ export class ClientController {
 
 		const chainParametersRequest = new ChainParametersRequest()
 
-		const chainParameters: ChainParametersResponse =
-			await client.chainParameters(chainParametersRequest)
+		const chainParameters = await client.chainParameters(chainParametersRequest)
 
 		await this.indexedDb.putValue(
-			'chainParameters',
-			chainParameters.chainParameters
+			CHAIN_PARAMETERS_TABLE_NAME,
+			JSON.parse(chainParameters.chainParameters.toJsonString())
 		)
 
 		await this.configApi.setNetworks(
@@ -270,11 +267,6 @@ export class ClientController {
 		return lastBlock
 	}
 
-	async saveFmdParameters(fmdParameters: FmdParameters) {
-		await this.indexedDb.resetTables('fmd_parameters')
-		await this.indexedDb.putValue('fmd_parameters', fmdParameters)
-	}
-
 	async saveTransaction(height: bigint, sourceHex: Uint8Array) {
 		const tendermint = this.getTendermint()
 
@@ -295,7 +287,7 @@ export class ClientController {
 			blockHeight: height,
 		}
 
-		await this.indexedDb.putValue('tx', tx)
+		await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, tx)
 	}
 
 	byteArrayToLong = function (/*byte[]*/ byteArray) {
@@ -308,18 +300,17 @@ export class ClientController {
 	}
 
 	async resetWallet() {
-		await this.indexedDb.resetTables('notes')
-		await this.indexedDb.resetTables('chainParameters')
-		await this.indexedDb.resetTables('assets')
-		await this.indexedDb.resetTables('tx')
-		await this.indexedDb.resetTables('fmd_parameters')
-		await this.indexedDb.resetTables('nct_commitments')
-		await this.indexedDb.resetTables('nct_forgotten')
-		await this.indexedDb.resetTables('nct_hashes')
-		await this.indexedDb.resetTables('nct_position')
-		await this.indexedDb.resetTables('spendable_notes')
-		await this.indexedDb.resetTables('tx_by_nullifier')
-		await this.indexedDb.resetTables('swaps')
+		await this.indexedDb.resetTables(CHAIN_PARAMETERS_TABLE_NAME)
+		await this.indexedDb.resetTables(ASSET_TABLE_NAME)
+		await this.indexedDb.resetTables(TRANSACTION_TABLE_NAME)
+		await this.indexedDb.resetTables(FMD_PARAMETERS_TABLE_NAME)
+		await this.indexedDb.resetTables(NCT_COMMITMENTS_TABLE_NAME)
+		await this.indexedDb.resetTables(NCT_FORGOTTEN_TABLE_NAME)
+		await this.indexedDb.resetTables(NCT_HASHES_TABLE_NAME)
+		await this.indexedDb.resetTables(NCT_POSITION_TABLE_NAME)
+		await this.indexedDb.resetTables(SPENDABLE_NOTES_TABLE_NAME)
+		await this.indexedDb.resetTables(TRANSACTION_BY_NULLIFIER_TABLE_NAME)
+		await this.indexedDb.resetTables(SWAP_TABLE_NAME)
 
 		this.store.updateState({
 			lastSavedBlock: {

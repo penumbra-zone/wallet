@@ -1,107 +1,67 @@
 import { PreferencesAccount } from '../preferences'
-
-export const MSG_STATUSES = {
-	UNAPPROVED: 'unapproved',
-	SIGNED: 'signed',
-	PUBLISHED: 'published',
-	FAILED: 'failed',
-	REJECTED: 'rejected',
-	REJECTED_FOREVER: 'rejected_forever',
-	SHOWED_NOTIFICATION: 'showed_notify',
-	NEW_NOTIFICATION: 'new_notify',
-} as const
-
-export type MsgStatus = typeof MSG_STATUSES[keyof typeof MSG_STATUSES]
+import { TransactionMessageData, TransactionPlan } from '../types/transaction'
 
 export type MessageInput = {
-	connectionId?: string
 	account: PreferencesAccount
-	broadcast?: boolean
-	options?: {
-		getMeta?: unknown
-		uid?: unknown
-	}
-	successPath?: string | null
-	title?: string | null
+	connectionId: string
+	origin: string
+	options?: { uid?: unknown }
 } & (
+	| { type: 'authOrigin'; data: { origin: string } }
 	| {
-			type: 'auth'
-			origin?: string
-			data: {
-				data: string
-				host?: string
-				icon?: string
-				isRequest?: boolean
-				name?: string
-				origin?: string
-				referrer?: string
-				successPath?: string
-				type?: number
-			}
-	  }
-	| {
-			type: 'authOrigin'
-			origin: string
-			data: {
-				data?: unknown
-				isRequest?: boolean
-				origin: string
-				successPath?: string
-				type?: never
-			}
+			type: 'transaction'
+			broadcast: boolean
+			data: TransactionPlan & { successPath?: string }
 	  }
 )
 
-export type MessageStoreItem = {
-	connectionId?: string
+export type MessageInputOfType<T extends MessageInput['type']> = Extract<
+	MessageInput,
+	{ type: T }
+>
+
+export enum MessageStatus {
+	Failed = 'failed',
+	Published = 'published',
+	Rejected = 'rejected',
+	RejectedForever = 'rejected_forever',
+	Signed = 'signed',
+	UnApproved = 'unapproved',
+}
+
+export type Message = {
 	account: PreferencesAccount
-	broadcast?: boolean
-	err?: any
-	ext_uuid: unknown
+	connectionId: string
+	extUuid: unknown
 	id: string
-	json?: string
-	lease?: unknown
-	status: MsgStatus
-	successPath?: string | null
 	timestamp: number
 	title?: string | null
+	origin: string
 } & (
 	| {
-			type: 'auth'
-			origin?: string
-			result?:
-				| string
-				| {
-						host: string
-						name: unknown
-						prefix: string
-						address: string
-						publicKey: string
-						signature: string
-						version: number | undefined
-				  }
-			messageHash: string
-			data: {
-				type: 1000
-				referrer: string | undefined
-				isRequest: boolean | undefined
-				data: {
-					data: string
-					prefix: string
-					host: string
-					name: string | undefined
-					icon: string | undefined
-				}
-			}
+			status:
+				| typeof MessageStatus.Published
+				| typeof MessageStatus.Rejected
+				| typeof MessageStatus.RejectedForever
+				| typeof MessageStatus.Signed
+				| typeof MessageStatus.UnApproved
 	  }
 	| {
-			type: 'authOrigin'
-			origin: string
-			result?: { approved: 'OK' }
-			messageHash?: never
-			data: {
-				type?: never
-				data?: unknown
-			}
+			err: string
+			status: typeof MessageStatus.Failed
 	  }
-)
+) &
+	(
+		| {
+				type: 'authOrigin'
+				result?: { approved: 'OK' }
+		  }
+		| {
+				type: 'transaction'
+				broadcast: boolean
+				data: TransactionMessageData
+				input: MessageInputOfType<'transaction'>
+				result?: string
+				successPath?: string | null
+		  }
+	)
