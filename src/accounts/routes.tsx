@@ -18,6 +18,7 @@ import {
 	Send,
 	SettingsContacts,
 	SettingsPermissions,
+	SettingsAdvanced,
 } from '../ui/containers'
 import { RootAccounts } from './RootAccounts'
 import { routesPath } from '../utils'
@@ -88,11 +89,11 @@ export const routes: RouteObject[] = [
 					//   element: <h2>SUPPORT</h2>,
 					// },
 					{
-						path: routesPath.SETTINGS_ADDITIONALLY,
-						element: <h2>SETTINGS_ADDITIONALLY</h2>,
+						path: routesPath.SETTINGS,
+						element: <SettingsAdvanced />,
 					},
 					{
-						path: routesPath.SETTINGS,
+						path: routesPath.SETTINGS_CONTACTS,
 						// path: routesPath.SETTINGS_CONTACTS,
 						element: <SettingsContacts />,
 					},

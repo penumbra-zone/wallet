@@ -17,13 +17,13 @@ export const links = [
 	//   svg: <SettingsSvg />,
 	//   text: 'Support',
 	// },
-	// {
-	//   to: routesPath.SETTINGS_ADDITIONALLY,
-	//   svg: <AdditionallySvg />,
-	//   text: 'Additionally',
-	// },
 	{
-		to: routesPath.SETTINGS,
+	  to: routesPath.SETTINGS,
+	  svg: <AdditionallySvg />,
+	  text: 'Advanced',
+	},
+	{
+		to: routesPath.SETTINGS_CONTACTS,
 		// to: routesPath.SETTINGS_CONTACTS,
 		svg: <ContactsSvg />,
 		text: 'Contacts',

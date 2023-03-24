@@ -7,6 +7,7 @@ import {
 	Login,
 	Main,
 	Send,
+	SettingsAdvanced,
 	SettingsContacts,
 	SettingsExtenion,
 	SettingsNetworks,
@@ -54,8 +55,8 @@ export const routesUi: RouteObject[] = [
 						element: <h2>SUPPORT</h2>,
 					},
 					{
-						path: routesPath.SETTINGS_ADDITIONALLY,
-						element: <h2>SETTINGS_ADDITIONALLY</h2>,
+						path: routesPath.SETTINGS_ADVANCED,
+						element: <SettingsAdvanced />,
 					},
 					{
 						path: routesPath.SETTINGS_CONTACTS,

@@ -11,7 +11,7 @@ export const routesPath = {
 	CONFIRM_SEED_PHRASE: '/confirm-seed-phrase',
 	SETTINGS: '/settings',
 	SETTINGS_SUPPORT: '/settings/support',
-	SETTINGS_ADDITIONALLY: '/settings/additionally',
+	SETTINGS_ADVANCED: '/settings/advanced',
 	SETTINGS_CONTACTS: '/settings/contacts',
 	SETTINGS_SECURITY_PRIVACY: '/settings/security-privacy',
 	SETTINGS_WARNINGS: '/settings/warnings',

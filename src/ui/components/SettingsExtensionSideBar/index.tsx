@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { routesPath } from '../../../utils'
 import {
+	AdditionallySvg,
 	ChevronLeftIcon,
 	ContactsSvg,
 	LockSvg,
@@ -14,11 +15,11 @@ const links = [
 	//   svg: <SettingsSvg />,
 	//   text: 'Support',
 	// },
-	// {
-	//   to: routesPath.SETTINGS_ADDITIONALLY,
-	//   svg: <AdditionallySvg />,
-	//   text: 'Additionally',
-	// },
+	{
+	  to: routesPath.SETTINGS_ADVANCED,
+	  svg: <AdditionallySvg />,
+	  text: 'Advanced',
+	},
 	{
 		to: routesPath.SETTINGS_CONTACTS,
 		svg: <ContactsSvg />,
