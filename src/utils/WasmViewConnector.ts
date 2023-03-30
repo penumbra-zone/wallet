@@ -93,8 +93,6 @@ export class WasmViewConnector {
 	}
 
 	async handleNewCompactBlock(block: CompactBlock, fvk, transport) {
-
-		console.log(block)
 		if (this.viewClient == undefined) {
 			let storedTree = await this.loadStoredTree()
 			this.viewClient = new ViewClient(fvk, 719n, storedTree)
