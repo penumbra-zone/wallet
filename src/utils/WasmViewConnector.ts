@@ -1,4 +1,4 @@
-import { ViewClient } from 'penumbra-web-assembly'
+import { ViewClient } from 'penumbra-wasm'
 import {
 	SpendableNoteRecord,
 	SwapRecord,
@@ -93,6 +93,8 @@ export class WasmViewConnector {
 	}
 
 	async handleNewCompactBlock(block: CompactBlock, fvk, transport) {
+
+		console.log(block)
 		if (this.viewClient == undefined) {
 			let storedTree = await this.loadStoredTree()
 			this.viewClient = new ViewClient(fvk, 719n, storedTree)

@@ -3,7 +3,7 @@ import {
 	get_address_by_index,
 	get_full_viewing_key,
 	get_short_address_by_index,
-} from 'penumbra-web-assembly'
+} from 'penumbra-wasm'
 import { WalletPrivateDataOfType } from './types'
 import { Wallet } from './wallet'
 
