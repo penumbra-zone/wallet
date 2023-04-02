@@ -1,0 +1,36 @@
+{
+  "manifest_version": 2,
+  "name": "Penumbra Wallet",
+  "version": "0.2.0",
+  "description": "A wallet extension for Penumbra",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "browser_action": {
+    "default_icon": "icons/icon48.png",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": false
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "https://*.penumbra.zone/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.penumbra.zone/*"
+      ],
+      "js": [
+        "contentScript.js"
+      ]
+    }
+  ]
+}
