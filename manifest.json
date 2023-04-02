@@ -13,9 +13,7 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "scripts": [
-      "background.js"
-    ],
+    "scripts": [],
     "persistent": false
   },
   "permissions": [
