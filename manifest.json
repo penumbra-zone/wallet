@@ -12,6 +12,12 @@
     "default_icon": "icons/icon48.png",
     "default_popup": "popup.html"
   },
+  "background": {
+    "scripts": [
+      "/src/background.ts"
+    ],
+    "persistent": false
+  },
   "permissions": [
     "storage",
     "activeTab",
@@ -23,7 +29,7 @@
         "https://*.penumbra.zone/*"
       ],
       "js": [
-        "contentScript.js"
+        "/src/contentscript.ts"
       ]
     }
   ]
