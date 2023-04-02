@@ -12,10 +12,6 @@
     "default_icon": "icons/icon48.png",
     "default_popup": "popup.html"
   },
-  "background": {
-    "scripts": [],
-    "persistent": false
-  },
   "permissions": [
     "storage",
     "activeTab",
