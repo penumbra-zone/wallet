@@ -9,8 +9,9 @@ fi
 curl https://raw.githubusercontent.com/penumbra-zone/penumbra/main/docs/images/penumbra-dark.svg --output penumbra-logo.svg
 SVG_FILE="penumbra-logo.svg"
 
-# Add black background to the SVG using sed
-sed '/<g transform=/i <rect x="0" y="0" width="100%" height="100%" fill="black" \/>' $SVG_FILE >temp.svg
+# remove comments
+sed 's/<!--//g' $SVG_FILE >temp.svg
+sed -i 's/-->//g' temp.svg
 
 # Generate icons with black background using cairosvg
 cairosvg temp.svg -o icon16.png -W 16 -H 16
