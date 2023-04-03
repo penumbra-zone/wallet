@@ -4,7 +4,7 @@ import {
 	encode_tx,
 	is_controlled_address,
 	send_plan,
-} from 'penumbra-web-assembly'
+} from 'penumbra-wasm'
 import {
 	CHAIN_PARAMETERS_TABLE_NAME,
 	FMD_PARAMETERS_TABLE_NAME,

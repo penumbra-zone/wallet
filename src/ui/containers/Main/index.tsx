@@ -43,7 +43,7 @@ export const Main: React.FC<MainProps> = () => {
 						</span>
 					</div>
 				</div>
-				<div className='pt-[16px] flex flex-col items-center justify-center'>
+				{/* <div className='pt-[16px] flex flex-col items-center justify-center'>
 					<div className='w-[100%] ext:mb-[24px] tablet:mb-[40px]'>
 						<BalanceAction />
 					</div>
@@ -53,11 +53,11 @@ export const Main: React.FC<MainProps> = () => {
 							type === 'Assets' ? <AssetsList /> : <ActivityList />
 						}
 					/>
-				</div>
+				</div> */}
 
-				<p className='mt-[60px] text-center text_body text-light_grey'>
+				{/* <p className='mt-[60px] text-center text_body text-light_grey'>
 					Need help? Contact Penumbra Support
-				</p>
+				</p> */}
 			</div>
 		</div>
 	)

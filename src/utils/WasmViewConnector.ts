@@ -1,4 +1,4 @@
-import { ViewClient } from 'penumbra-web-assembly'
+import { ViewClient } from 'penumbra-wasm'
 import {
 	SpendableNoteRecord,
 	SwapRecord,

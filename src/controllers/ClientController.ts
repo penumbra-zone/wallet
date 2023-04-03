@@ -101,6 +101,8 @@ export class ClientController {
 		const transport = createGrpcWebTransport({
 			baseUrl,
 		})
+		console.log({ transport })
+
 		const client = createPromiseClient(ObliviousQueryService, transport)
 
 		const assetRequest = new AssetListRequest()
@@ -115,32 +117,42 @@ export class ClientController {
 	}
 
 	async saveChainParameters() {
-		const savedChainParameters = await this.indexedDb.getAllValue(
-			CHAIN_PARAMETERS_TABLE_NAME
-		)
+		try {
+			const savedChainParameters = await this.indexedDb.getAllValue(
+				CHAIN_PARAMETERS_TABLE_NAME
+			)
 
-		if (savedChainParameters.length) return
+			if (savedChainParameters.length) return
 
-		const baseUrl = this.getGRPC()
+			const baseUrl = this.getGRPC()
 
-		const transport = createGrpcWebTransport({
-			baseUrl,
-		})
-		const client = createPromiseClient(ObliviousQueryService, transport)
+			const transport = createGrpcWebTransport({
+				baseUrl,
+			})
 
-		const chainParametersRequest = new ChainParametersRequest()
+			console.log({ transport })
+			const client = createPromiseClient(ObliviousQueryService, transport)
 
-		const chainParameters = await client.chainParameters(chainParametersRequest)
+			console.log({ client })
 
-		await this.indexedDb.putValue(
-			CHAIN_PARAMETERS_TABLE_NAME,
-			JSON.parse(chainParameters.chainParameters.toJsonString())
-		)
+			const chainParametersRequest = new ChainParametersRequest()
 
-		await this.configApi.setNetworks(
-			chainParameters.chainParameters.chainId,
-			this.configApi.getNetwork()
-		)
+			const chainParameters = await client.chainParameters(
+				chainParametersRequest
+			)
+
+			await this.indexedDb.putValue(
+				CHAIN_PARAMETERS_TABLE_NAME,
+				JSON.parse(chainParameters.chainParameters.toJsonString())
+			)
+
+			await this.configApi.setNetworks(
+				chainParameters.chainParameters.chainId,
+				this.configApi.getNetwork()
+			)
+		} catch (error) {
+			console.log(error.message)
+		}
 	}
 
 	async getCompactBlockRange() {

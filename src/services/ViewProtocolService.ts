@@ -2,7 +2,7 @@ import { ClientController, Transaction } from '../controllers'
 import { ExtensionStorage } from '../storage'
 import { IAsset } from '../types/asset'
 import { IndexedDb } from '../utils'
-import { decode_transaction } from 'penumbra-web-assembly'
+import { decode_transaction } from 'penumbra-wasm'
 import {
 	AssetsRequest,
 	AssetsResponse,
