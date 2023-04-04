@@ -26,7 +26,7 @@ declare global {
 	interface PenumbraApi extends __BackgroundPageApiDirect {
 		on(
 			event: Events,
-			cd: (
+			cb: (
 				state:
 					| Awaited<
 							ReturnType<

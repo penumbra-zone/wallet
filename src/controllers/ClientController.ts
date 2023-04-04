@@ -101,7 +101,6 @@ export class ClientController {
 		const transport = createGrpcWebTransport({
 			baseUrl,
 		})
-		console.log({ transport })
 
 		const client = createPromiseClient(ObliviousQueryService, transport)
 
@@ -130,10 +129,7 @@ export class ClientController {
 				baseUrl,
 			})
 
-			console.log({ transport })
 			const client = createPromiseClient(ObliviousQueryService, transport)
-
-			console.log({ client })
 
 			const chainParametersRequest = new ChainParametersRequest()
 
@@ -151,7 +147,7 @@ export class ClientController {
 				this.configApi.getNetwork()
 			)
 		} catch (error) {
-			console.log(error.message)
+			console.error(error.message)
 		}
 	}
 

@@ -22,7 +22,7 @@ export const ActiveMessage = () => {
 	const handleConfirm = async () => {
 		await Background.approve(messages.unapprovedMessages[0].id)
 	}
-
+	
 	if (
 		messages.unapprovedMessages[0] &&
 		messages.unapprovedMessages[0].type === 'transaction'

@@ -29,7 +29,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 	sendPlan,
 	setSendPlan,
 	handleCancel,
-	handleApprove
+	handleApprove,
 }) => {
 	const [txResponse, setTxResponse] = useState<null | TransactionResponseType>(
 		null
@@ -66,7 +66,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 		if (handleCancel) handleCancel()
 		else setSendPlan(null)
 	}
-
+	
 	const handleConfirm = async () => {
 		setLoading(true)
 		const txResponse = await Background.sendTransaction(
