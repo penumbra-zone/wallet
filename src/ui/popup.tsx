@@ -1,38 +1,33 @@
-import ReactDOM from 'react-dom/client'
 import {
-	cbToPromise,
 	createIpcCallProxy,
 	extension,
 	fromPort,
 	handleMethodCallRequests,
-	PortStream,
-	setupDnode,
-	transformMethods,
 } from '../lib'
-import { createAccountsStore } from './store'
+import ReactDOM from 'react-dom/client'
 import backgroundService, {
 	BackgroundGetStateResult,
 	BackgroundUiApi,
-} from '../ui/services/Background'
+} from './services/Background'
+import './main.css'
+import { createAccountsStore, createUpdateState } from '../accounts'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
-import { routes } from './routes'
-import { createUpdateState } from './updateState'
 import { Provider } from 'react-redux'
-import '../ui/main.css'
+import { routesUi } from './routesUi'
 import pipe from 'callbag-pipe'
 import subscribe from 'callbag-subscribe'
 
+const isNotificationWindow = window.location.pathname === '/notification.html'
+
 startUi()
 
+console.log('popup')
 async function startUi() {
 	const store = createAccountsStore()
-
 	const updateState = createUpdateState(store)
 
 	extension.storage.onChanged.addListener(async (changes, area) => {
-		if (area !== 'local') {
-			return
-		}
+		if (area !== 'local') return
 
 		const stateChanges: Partial<Record<string, unknown>> &
 			Partial<BackgroundGetStateResult> = await backgroundService.getState([
@@ -43,7 +38,6 @@ async function startUi() {
 		for (const key in changes) {
 			stateChanges[key] = changes[key].newValue
 		}
-
 		updateState(stateChanges)
 	})
 
@@ -53,7 +47,6 @@ async function startUi() {
 				const popup = extension.extension
 					.getViews({ type: 'popup' })
 					.find(w => w.location.pathname === '/popup.html')
-				
 				if (popup) {
 					popup.close()
 				}
@@ -73,19 +66,44 @@ async function startUi() {
 			})
 		)
 		return createIpcCallProxy<keyof BackgroundUiApi, BackgroundUiApi>(
-      request => port?.postMessage(request),
-      fromPort(port)
-    );
+			request => port?.postMessage(request),
+			fromPort(port)
+		)
 	}
-
 	const background = connect()
 
-	const [state, networks] = await Promise.all([
-		background.getState(),
+	// If popup is opened close notification window
+	if (extension.extension.getViews({ type: 'popup' }).length > 0) {
+		await background.closeNotificationWindow()
+	}
+
+	if (
+		isNotificationWindow &&
+		!window.matchMedia('(display-mode: fullscreen)').matches
+	) {
+		background.resizeNotificationWindow(
+			400 + window.outerWidth - window.innerWidth,
+			600 + window.outerHeight - window.innerHeight
+		)
+	}
+
+	const [selectedAccount, networks, state] = await Promise.all([
+		background.getSelectedAccount(),
 		background.getNetworks(),
+		background.getState(),
 	])
 
-	updateState({ ...state, networks })
+	if (!selectedAccount) {
+		background.showTab(window.location.origin + '/accounts.html', 'accounts')
+	}
+	updateState({
+		selectedAccount,
+		networks,
+		contacts: state.contacts,
+		messages: state.messages,
+		origins: state.origins,
+		...state,
+	})
 
 	backgroundService.init(background)
 
@@ -94,14 +112,10 @@ async function startUi() {
 	document.addEventListener('mousedown', () => backgroundService.updateIdle())
 	document.addEventListener('focus', () => backgroundService.updateIdle())
 
-	const pageFromHash = window.location.hash.split('#')[1]
-
-	const router = createMemoryRouter(routes, {
-		initialEntries: [pageFromHash || '/'],
-	})
+	const router = createMemoryRouter(routesUi)
 
 	const root = ReactDOM.createRoot(
-		document.getElementById('accounts') as HTMLElement
+		document.getElementById('root') as HTMLElement
 	)
 
 	root.render(
