@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { useAccountsSelector } from '../../../accounts'
+import { useAccountsSelector } from '../../../account'
 import { useMediaQuery } from '../../../hooks'
 import { Button, PermissionsModal } from '../../components'
 import { selectOrigins } from '../../redux'

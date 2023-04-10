@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { useAccountsSelector } from '../../../accounts'
+import { useAccountsSelector } from '../../../account'
 import { useMediaQuery } from '../../../hooks'
 import { kitcut } from '../../../utils'
 import {

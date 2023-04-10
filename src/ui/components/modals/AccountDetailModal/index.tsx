@@ -1,4 +1,4 @@
-import { useAccountsSelector } from '../../../../accounts'
+import { useAccountsSelector } from '../../../../account'
 import { selectSelectedAccount } from '../../../redux'
 import { Button } from '../../Button'
 import { ModalWrapper } from '../../ModalWrapper'

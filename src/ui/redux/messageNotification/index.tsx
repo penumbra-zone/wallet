@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { AccountsState } from '../../../accounts/rootReducer'
+import { AccountsState } from '../../../account/rootReducer'
 import { PermissionType } from '../../../controllers'
 import { Message } from '../../../messages/types'
 

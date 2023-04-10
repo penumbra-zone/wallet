@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAccountsSelector } from '../../../accounts'
-import { routesPath } from '../../../utils'
+import { useAccountsSelector } from '../../../account'
 import { Balance, Button, CheckBox, PlusSvg } from '../../components'
 import { selectMessages, selectSelectedAccount } from '../../redux'
 import Background from '../../services/Background'
@@ -22,7 +20,7 @@ export const ActiveMessage = () => {
 	const handleConfirm = async () => {
 		await Background.approve(messages.unapprovedMessages[0].id)
 	}
-	
+
 	if (
 		messages.unapprovedMessages[0] &&
 		messages.unapprovedMessages[0].type === 'transaction'

@@ -1,13 +1,7 @@
-import { useAccountsSelector } from '../../../accounts'
-import {
-	ActivityList,
-	AssetsList,
-	BalanceAction,
-	CopySvg,
-	Tabs,
-} from '../../components'
-import { selectSelectedAccount, selectState } from '../../redux'
 import toast from 'react-hot-toast'
+import { useAccountsSelector } from '../../../account'
+import { CopySvg } from '../../components'
+import { selectSelectedAccount, selectState } from '../../redux'
 
 type MainProps = {}
 

@@ -1,11 +1,22 @@
 {
 	"name": "Penumbra wallet",
 	"description": "Penumbra wallet",
-	"version": "0.1.4",
 	"manifest_version": 3,
 	"background": {
 		"service_worker": "background.js"
 	},
+	"icons": {
+    "16": "icons/icon_16.png",
+    "24": "icons/icon_24.png",
+    "32": "icons/icon_32.png",
+    "48": "icons/icon_48.png",
+    "64": "icons/icon_64.png",
+    "96": "icons/icon_96.png",
+    "128": "icons/icon_128.png",
+    "192": "icons/icon_192.png",
+    "256": "icons/icon_256.png",
+    "512": "icons/icon_512.png"
+  },
 	"action": {
 		"default_title": "Penumbra wallet",
 		"default_popup": "popup.html"
@@ -14,7 +25,7 @@
 		{
 			"matches": ["http://*/*", "https://*/*"],
 			"js": ["contentscript.js"],
-			"run_at": "document_start",
+			"run_at": "document_end",
 			"all_frames": true
 		}
 	],
@@ -22,14 +33,5 @@
 		"alarms",
 		"storage",
 		"unlimitedStorage"
-	],
-	"web_accessible_resources": [
-		{
-			"resources": ["inpage.js"],
-			"matches": ["<all_urls>"]
-		}
-	],
-	"content_security_policy": {
-		"extension_pages": "object-src 'self'; script-src 'self' 'wasm-unsafe-eval'"
-	}
+	]
 }

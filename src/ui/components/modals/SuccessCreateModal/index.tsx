@@ -1,4 +1,4 @@
-import { useAppDispatch } from '../../../../accounts'
+import { useAppDispatch } from '../../../../account'
 import { accountsActions } from '../../../redux'
 import { Button } from '../../Button'
 import { Logo } from '../../Logo'

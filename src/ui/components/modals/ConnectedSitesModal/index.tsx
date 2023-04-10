@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAccountsSelector } from '../../../../accounts'
+import { useAccountsSelector } from '../../../../account'
 import { routesPath } from '../../../../utils'
 import { selectNewAccount, selectOrigins } from '../../../redux'
 import Background from '../../../services/Background'

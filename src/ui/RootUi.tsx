@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
-import { routesPath } from '../utils'
-import { selectSelectedAccount, selectState } from './redux'
-import { RootWrapperUi } from './containers'
 import { Toaster } from 'react-hot-toast'
-import { useAccountsSelector } from '../accounts'
+import { Outlet, useNavigate } from 'react-router-dom'
+import { useAccountsSelector } from '../account'
+import { routesPath } from '../utils'
+import { RootWrapperUi } from './containers'
+import { selectSelectedAccount, selectState } from './redux'
 
 export const RootUi = () => {
 	const navigate = useNavigate()

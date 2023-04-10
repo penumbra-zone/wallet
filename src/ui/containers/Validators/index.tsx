@@ -1,14 +1,14 @@
-import { Balance, Button, Tabs } from '../../components'
-import { AllValidators } from '../AllValidators'
-import { useEffect, useState } from 'react'
-import { createGrpcWebTransport } from '@bufbuild/connect-web'
-import { createPromiseClient } from '@bufbuild/connect'
-import { useAccountsSelector } from '../../../accounts'
-import { selectNetworks } from '../../redux'
-import { MyValidators } from '../MyValidators'
-import { ValidatorInfo } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/stake/v1alpha1/stake_pb'
 import { ObliviousQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb'
 import { ValidatorInfoRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
+import { ValidatorInfo } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/stake/v1alpha1/stake_pb'
+import { createPromiseClient } from '@bufbuild/connect'
+import { createGrpcWebTransport } from '@bufbuild/connect-web'
+import { useEffect, useState } from 'react'
+import { useAccountsSelector } from '../../../account'
+import { Balance, Button, Tabs } from '../../components'
+import { selectNetworks } from '../../redux'
+import { AllValidators } from '../AllValidators'
+import { MyValidators } from '../MyValidators'
 ;('@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb')
 
 export const Validators = () => {

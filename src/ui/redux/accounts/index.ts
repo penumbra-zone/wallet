@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { AccountsState } from '../../../accounts/rootReducer'
+import { AccountsState } from '../../../account/rootReducer'
 import { Contact } from '../../../controllers'
 import Background from '../../services/Background'
 

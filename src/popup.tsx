@@ -1,29 +1,40 @@
+import pipe from 'callbag-pipe'
+import subscribe from 'callbag-subscribe'
+import { createRoot } from 'react-dom/client'
+import { Provider } from 'react-redux'
+import { RouterProvider, createMemoryRouter } from 'react-router-dom'
+import invariant from 'tiny-invariant'
+import { createAccountsStore, createUpdateState } from './account'
 import {
 	createIpcCallProxy,
 	extension,
 	fromPort,
 	handleMethodCallRequests,
-} from '../lib'
-import ReactDOM from 'react-dom/client'
+} from './lib'
+import './ui/main.css'
+import { routesUi } from './ui/routesUi'
 import backgroundService, {
 	BackgroundGetStateResult,
 	BackgroundUiApi,
-} from './services/Background'
-import './main.css'
-import { createAccountsStore, createUpdateState } from '../accounts'
-import { createMemoryRouter, RouterProvider } from 'react-router-dom'
-import { Provider } from 'react-redux'
-import { routesUi } from './routesUi'
-import pipe from 'callbag-pipe'
-import subscribe from 'callbag-subscribe'
+} from './ui/services/Background'
 
 const isNotificationWindow = window.location.pathname === '/notification.html'
 
 startUi()
 
-console.log('popup')
 async function startUi() {
+	console.log('popup')
 	const store = createAccountsStore()
+
+	const router = createMemoryRouter(routesUi)
+
+	const root = document.getElementById('app-content')
+	invariant(root)
+
+	createRoot(root).render(
+		<Provider store={store} children={<RouterProvider router={router} />} />
+	)
+
 	const updateState = createUpdateState(store)
 
 	extension.storage.onChanged.addListener(async (changes, area) => {
@@ -111,16 +122,4 @@ async function startUi() {
 	document.addEventListener('keyup', () => backgroundService.updateIdle())
 	document.addEventListener('mousedown', () => backgroundService.updateIdle())
 	document.addEventListener('focus', () => backgroundService.updateIdle())
-
-	const router = createMemoryRouter(routesUi)
-
-	const root = ReactDOM.createRoot(
-		document.getElementById('root') as HTMLElement
-	)
-
-	root.render(
-		<Provider store={store}>
-			<RouterProvider router={router} />
-		</Provider>
-	)
 }

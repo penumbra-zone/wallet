@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { useAccountsSelector } from '../../../accounts'
+import { useAccountsSelector } from '../../../account'
 import {
 	AccountModal,
 	Logo,

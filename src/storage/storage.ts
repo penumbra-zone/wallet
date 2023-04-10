@@ -1,17 +1,16 @@
 import ObservableStore from 'obs-store'
-import pump from 'pump'
-import asStream from 'obs-store/lib/asStream'
-import debounceStream from 'debounce-stream'
-import log from 'loglevel'
-import { createStreamSink, DEFAULT_LEGACY_CONFIG, extension } from '../lib'
+import { DEFAULT_LEGACY_CONFIG, extension } from '../lib'
 import {
 	Contact,
 	NetworkConfigItem,
 	NetworkName,
 	PermissionType,
 } from '../controllers'
-import { PreferencesAccount} from '../preferences'
+import { PreferencesAccount } from '../preferences'
 import { Message } from '../messages/types'
+import pipe from 'callbag-pipe'
+import create from 'callbag-create'
+import subscribe from 'callbag-subscribe'
 
 export type StorageLocalState = {
 	contacts: Contact[]
@@ -56,13 +55,13 @@ export type StorageSessionState = {
 }
 
 export class ExtensionStorage {
-	private _state: Partial<StorageLocalState> | undefined
-	private _initState: StorageLocalState | undefined
-	private _initSession: StorageSessionState | undefined
+	private _state: Partial<StorageLocalState>
+	private _localState: StorageLocalState
+	private _sessionState: StorageSessionState
 
 	async create() {
-		this._initState = await this.get()
-		this._initSession = await this.getSession()
+		this._localState = await this.get()
+		this._sessionState = await this.getSession()
 	}
 
 	getInitState<
@@ -79,9 +78,9 @@ export class ExtensionStorage {
 	) {
 		const defaultsInitState = Object.keys(defaults).reduce(
 			(acc, key) =>
-				Object.prototype.hasOwnProperty.call(this._initState, key)
+				Object.prototype.hasOwnProperty.call(this._localState, key)
 					? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-					  { ...acc, [key]: (this._initState as any)[key] }
+					  { ...acc, [key]: (this._localState as any)[key] }
 					: acc,
 			{}
 		)
@@ -92,7 +91,7 @@ export class ExtensionStorage {
 	}
 
 	getInitSession() {
-		return this._initSession
+		return this._sessionState
 	}
 
 	async clear() {
@@ -100,7 +99,7 @@ export class ExtensionStorage {
 
 		const keysToRemove =
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			(Object.keys(this._initState!) as Array<keyof StorageLocalState>).reduce<
+			(Object.keys(this._localState!) as Array<keyof StorageLocalState>).reduce<
 				string[]
 			>(
 				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -110,34 +109,52 @@ export class ExtensionStorage {
 		await this._remove(storageState, keysToRemove)
 	}
 
-	subscribe(store: ObservableStore<unknown>) {
-		pump(
-			asStream(store),
-			debounceStream(200),
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			createStreamSink(async (state: any) => {
-				if (!state) {
-					throw new Error('Updated state is missing')
-				}
+	// subscribe(store: ObservableStore<unknown>) {
+	// 	pump(
+	// 		asStream(store),
+	// 		debounceStream(200),
+	// 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// 		createStreamSink(async (state: any) => {
+	// 			if (!state) {
+	// 				throw new Error('Updated state is missing')
+	// 			}
 
-				try {
-					await this.set(
-						Object.entries(state).reduce(
-							(acc, [key, value]) => ({
-								...acc,
-								[key]: value === undefined ? null : value,
-							}),
-							{}
-						) as StorageLocalState
-					)
-				} catch (err) {
-					// log error so we dont break the pipeline
-					log.error('error setting state in local store:', err)
-				}
-			}),
-			error => {
-				log.error('Persistence pipeline failed', error)
-			}
+	// 			try {
+	// 				await this.set(
+	// 					Object.entries(state).reduce(
+	// 						(acc, [key, value]) => ({
+	// 							...acc,
+	// 							[key]: value === undefined ? null : value,
+	// 						}),
+	// 						{}
+	// 					) as StorageLocalState
+	// 				)
+	// 			} catch (err) {
+	// 				// log error so we dont break the pipeline
+	// 				console.error('error setting state in local store:', err)
+	// 			}
+	// 		}),
+	// 		error => {
+	// 			console.error('Persistence pipeline failed', error)
+	// 		}
+	// 	)
+	// }
+
+	subscribe<T extends Record<string, unknown>>(store: ObservableStore<T>) {
+		pipe(
+			create<T>(next => store.subscribe(next)),
+			subscribe(state => {
+				const newState = Object.entries(state).reduce(
+					(acc, [key, value]) => ({
+						...acc,
+						[key]: value === undefined ? null : value,
+					}),
+					{}
+				)
+
+				this._state = { ...this._state, ...newState }
+				extension.storage.local.set(newState)
+			})
 		)
 	}
 

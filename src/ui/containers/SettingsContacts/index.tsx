@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAccountsSelector } from '../../../accounts'
+import { useAccountsSelector } from '../../../account'
 import { Contact } from '../../../controllers'
 import { useMediaQuery } from '../../../hooks'
 import { getShortName } from '../../../utils'

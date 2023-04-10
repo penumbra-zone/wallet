@@ -1,151 +1,241 @@
-const path = require('path')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+require('dotenv-flow/config')
+const path = require('node:path')
 const webpack = require('webpack')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const svgToMiniDataURI = require('mini-svg-data-uri')
-const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+const PlatformPlugin = require('./scripts/PlatformPlugin');
 
-module.exports = () => {
-	const mode = process.env.NODE_ENV || 'development'
-	const SOURCE_FOLDER = path.resolve(__dirname, 'src')
-	const DIST_FOLDER = path.resolve(__dirname, 'dist')
+async function makeConfig({
+	entry,
+	hmr,
+	mode,
+	name,
+	optimization,
+	plugins,
+	reactRefresh,
+	target,
+}) {
+	const dev = mode === 'development'
+
+	const { TinyBrowserHmrWebpackPlugin } = await import(
+		'@faergeek/tiny-browser-hmr-webpack-plugin'
+	)
 
 	return {
-		mode,
-		entry: {
-			popup: path.resolve(SOURCE_FOLDER, 'ui/popup'),
-			'accounts/account': path.resolve(SOURCE_FOLDER, 'accounts/account'),
-			background: path.resolve(SOURCE_FOLDER, 'background.ts'),
-			contentscript: path.resolve(SOURCE_FOLDER, 'contentscript.ts'),
-			inpage: path.resolve(SOURCE_FOLDER, 'inpage.ts'),
-		},
-		output: {
-			filename: '[name].js',
-			path: DIST_FOLDER,
-			publicPath: './',
-		},
-		devtool: 'inline-source-map',
-		optimization: {
-			splitChunks: {
-				cacheGroups: {
-					commons: {
-						name: 'commons',
-						test: /.js$/,
-						maxSize: 4000000,
-						chunks: chunk => ['ui', 'accounts/account'].includes(chunk.name),
-					},
-				},
+		name,
+		target,
+		devtool: dev ? 'cheap-module-source-map' : 'source-map',
+		stats: 'errors-warnings',
+		entry: Object.fromEntries(
+			Object.entries(entry).map(([key, value]) => [
+				key,
+				[
+					dev && hmr && '@faergeek/tiny-browser-hmr-webpack-plugin/client',
+					...(Array.isArray(value) ? value : [value]),
+				].filter(Boolean),
+			])
+		),
+		cache: {
+			type: 'filesystem',
+			buildDependencies: {
+				config: [__filename],
 			},
 		},
 		resolve: {
-			extensions: [
-				'.ts',
-				'.tsx',
-				'.js',
-				'.jsx',
-				'.json',
-				'.styl',
-				'.css',
-				'.png',
-				'.jpg',
-				'.gif',
-				'.svg',
-				'.woff',
-				'.woff2',
-				'.ttf',
-				'.otf',
-			],
+			modules: [path.resolve(__dirname, 'src'), 'node_modules'],
+			extensions: ['.ts', '.tsx', '.js'],
 			fallback: {
-				stream: require.resolve('stream-browserify'),
-				util: require.resolve('util'),
-				// buffer: require.resolve('buffer'),
-				'process/browser': require.resolve('process/browser'),
+				stream: 'stream-browserify',
 			},
 		},
-
-		plugins: [
-			new CleanWebpackPlugin({
-				cleanStaleWebpackAssets: false,
-			}),
-			new CopyWebpackPlugin({
-				patterns: [
-					{
-						from: path.join(SOURCE_FOLDER, 'copied'),
-						to: DIST_FOLDER,
-					},
-				],
-			}),
-			new HtmlWebpackPlugin({
-				title: 'Penumbra Wallet',
-				filename: 'accounts.html',
-				template: path.resolve(SOURCE_FOLDER, 'accounts.html'),
-				hash: true,
-				chunks: ['commons', 'accounts/account'],
-			}),
-			new HtmlWebpackPlugin({
-				title: 'Penumbra Wallet',
-				filename: 'notification.html',
-				template: path.resolve(SOURCE_FOLDER, 'notification.html'),
-				hash: true,
-				chunks: ['commons', 'popup'],
-			}),
-			new HtmlWebpackPlugin({
-				title: 'Penumbra Wallet',
-				filename: 'popup.html',
-				template: path.resolve(SOURCE_FOLDER, 'popup.html'),
-				hash: true,
-				chunks: ['commons', 'popup'],
-			}),
-			new webpack.ProvidePlugin({
-				process: 'process/browser',
-			}),
-			new webpack.ProvidePlugin({
-				Buffer: ['buffer', 'Buffer'],
-			}),
-		],
+		ignoreWarnings: [/Failed to parse source map/],
+		output: {
+			assetModuleFilename: 'assets/[hash][ext]',
+			filename: '[name].js',
+			path: path.resolve(__dirname, 'dist/build'),
+			publicPath: './',
+		},
 		experiments: {
 			asyncWebAssembly: true,
 		},
 		module: {
+			strictExportPresence: true,
 			rules: [
 				{
-					use: 'ts-loader',
-					test: /\.tsx?$/,
-					exclude: /node_modules/,
+					test: /\.(css|js)$/,
+					enforce: 'pre',
+					use: ['source-map-loader'],
 				},
 				{
-					test: /\.(jsx?)$/,
-					exclude: /node_modules/,
-					loader: 'babel-loader',
-				},
-				{
-					test: /\.css$/i,
-					include: path.resolve(SOURCE_FOLDER),
-					use: ['style-loader', 'css-loader', 'postcss-loader'],
-				},
-				{
-					test: /\.svg$/,
-					type: 'asset',
-					generator: {
-						filename: 'assets/img/[name].[ext]',
-						dataUrl: content => svgToMiniDataURI(content.toString()),
+					test: /\.(js|tsx?)$/,
+					include: path.resolve(__dirname, 'src'),
+					use: {
+						loader: 'babel-loader',
+						options: {
+							plugins:
+								dev && hmr && reactRefresh ? ['react-refresh/babel'] : [],
+						},
 					},
 				},
 				{
-					test: /\.(png|jpe?g|gif)$/,
+					test: /obs-store/,
+					use: 'babel-loader',
+				},
+				{
+					test: /\.(css)$/,
+					use: {
+						loader: MiniCssExtractPlugin.loader,
+						options: {
+							publicPath: (resourcePath, context) =>
+								`${path.relative(path.dirname(resourcePath), context)}/`,
+						},
+					},
+				},
+				{
+					test: /\.css$/,
+					use: [
+						{
+							loader: 'css-loader',
+							options: {
+								modules: {
+									auto: true,
+									exportLocalsConvention: 'dashesOnly',
+									localIdentName: '[local]@[name]#[contenthash:base64:5]',
+									namedExport: true,
+								},
+							},
+						},
+					],
+				},
+				{ test: /\.(css)$/, use: 'postcss-loader' },
+				{
+					test: /\.(gif|png|jpe?g|svg|webp|woff2)$/,
 					type: 'asset/resource',
-					generator: {
-						filename: 'assets/img/[name][ext]',
-					},
 				},
-				{
-					test: /\.(woff2?|ttf)$/,
-					type: 'asset/resource',
-					generator: {
-						filename: 'assets/fonts/[name][ext]',
-					},
-				},
+			],
+		},
+
+		plugins: [
+			process.stdout.isTTY && new webpack.ProgressPlugin(),
+			dev && hmr && new webpack.HotModuleReplacementPlugin(),
+			dev && hmr && new TinyBrowserHmrWebpackPlugin({ hostname: 'localhost' }),
+			dev &&
+				hmr &&
+				reactRefresh &&
+				new ReactRefreshWebpackPlugin({ overlay: false }),
+			!dev &&
+				new BundleAnalyzerPlugin({
+					analyzerMode: 'static',
+					defaultSizes: 'gzip',
+					generateStatsFile: true,
+					openAnalyzer: false,
+					reportFilename: path.resolve(
+						__dirname,
+						`dist/webpack-bundle-analyzer/${name}.html`
+					),
+					statsFilename: path.resolve(__dirname, `dist/stats/${name}.json`),
+				}),
+			new webpack.ProvidePlugin({
+				Buffer: ['buffer', 'Buffer'],
+			}),
+			new webpack.DefinePlugin({
+				'process.env.NODE_DEBUG': 'undefined',
+				'process.env.NODE_ENV': JSON.stringify(mode),
+			}),
+			new MiniCssExtractPlugin({ ignoreOrder: true }),
+			new PlatformPlugin({ clear: !dev }),
+		]
+			.concat(plugins)
+			.filter(Boolean),
+		optimization: {
+			...optimization,
+			minimizer: [
+				'...',
+				new CssMinimizerPlugin({
+					minify: CssMinimizerPlugin.lightningCssMinify,
+				}),
 			],
 		},
 	}
 }
+
+module.exports = async (_, { mode }) => [
+	await makeConfig({
+		mode,
+		name: 'background',
+		target: 'webworker',
+		entry: {
+			background: './src/background',
+		},
+		plugins: [
+			new CopyWebpackPlugin({
+				patterns: [
+					{
+						from: path.resolve(__dirname, 'src/copied'),
+						to: path.resolve(__dirname, 'dist/build'),
+					},
+				],
+			}),
+		],
+	}),
+	await makeConfig({
+		mode,
+		name: 'contentscript',
+		entry: {
+			contentscript: './src/contentscript',
+			inpage: './src/inpage',
+		},
+	}),
+	await makeConfig({
+		mode,
+		name: 'ui',
+		hmr: true,
+		reactRefresh: true,
+		entry: {
+			accounts: './src/accounts',
+			popup: './src/popup',
+		},
+		plugins: [
+			new HtmlWebpackPlugin({
+				filename: 'popup.html',
+				chunks: ['vendors', 'popup'],
+				hash: true,
+			}),
+			new HtmlWebpackPlugin({
+				filename: 'notification.html',
+				chunks: ['vendors', 'popup'],
+				hash: true,
+			}),
+			new HtmlWebpackPlugin({
+				filename: 'accounts.html',
+				chunks: ['vendors', 'accounts'],
+				hash: true,
+			}),
+		],
+		optimization: {
+			splitChunks: {
+				cacheGroups: {
+					defaultVendors: false,
+					default: false,
+					vendors: {
+						priority: 10,
+						test: /[\\/]node_modules[\\/]/,
+						chunks: 'initial',
+						name: (_module, chunks, cacheGroupKey) =>
+							`${cacheGroupKey}-${chunks.map(chunk => chunk.name).join('&')}`,
+					},
+					common: {
+						chunks: 'initial',
+						minChunks: 2,
+						name: (_module, chunks, cacheGroupKey) =>
+							`${cacheGroupKey}-${chunks.map(chunk => chunk.name).join('&')}`,
+					},
+				},
+			},
+		},
+	}),
+]

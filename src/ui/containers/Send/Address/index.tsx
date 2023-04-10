@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAccountsSelector } from '../../../../accounts'
+import { useAccountsSelector } from '../../../../account'
 import { Contact } from '../../../../controllers'
 import { useMediaQuery } from '../../../../hooks'
 import {

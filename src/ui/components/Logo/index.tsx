@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAccountsSelector } from '../../../accounts'
+import { useAccountsSelector } from '../../../account'
 import img from '../../../assets/img/logo.png'
 import { routesPath } from '../../../utils'
 import { selectState } from '../../redux'

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useAccountsSelector } from '../../../accounts'
+import { useAccountsSelector } from '../../../account'
 import { useMediaQuery } from '../../../hooks'
 import { Button, Input, ResetWalletModal } from '../../components'
 import { selectIdleInterval } from '../../redux'

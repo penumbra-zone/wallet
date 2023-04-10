@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { useAccountsSelector } from '../../../accounts'
+import { useAccountsSelector } from '../../../account'
 import { routesPath } from '../../../utils'
 import {
 	ActivityList,

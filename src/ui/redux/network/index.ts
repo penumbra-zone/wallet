@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { AccountsState } from '../../../accounts/rootReducer'
+import { AccountsState } from '../../../account/rootReducer'
 import { NetworkConfigItem, NetworkName } from '../../../controllers'
 
 export type LastBlocks = {

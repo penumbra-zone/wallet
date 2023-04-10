@@ -1,7 +1,23 @@
 {
-	"presets": ["@babel/preset-react"],
-	"plugins": [
-		["@babel/plugin-proposal-decorators", { "legacy": true }],
-		"@babel/plugin-proposal-class-properties"
-	]
+  "presets": [
+    "@babel/env",
+    [
+      "@babel/react",
+      {
+        "runtime": "automatic"
+      }
+    ],
+    "@babel/typescript"
+  ],
+  "plugins": [
+    [
+      "prismjs",
+      {
+        "languages": ["json"],
+        "theme": "solarizedlight",
+        "css": true
+      }
+    ]
+  ]
 }
+

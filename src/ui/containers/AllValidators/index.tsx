@@ -1,7 +1,6 @@
 import { ValidatorInfo } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/stake/v1alpha1/stake_pb'
-import { BigNumber } from 'big-integer'
 import { useEffect, useState } from 'react'
-import { useAccountsSelector } from '../../../accounts'
+import { useAccountsSelector } from '../../../account'
 import { columnsAllValidator } from '../../../lib'
 import {
 	EmptyTableHelper,
@@ -30,7 +29,7 @@ const filterValidator = (validator: ValidatorInfo[], filter: number) =>
 
 export type AllValidatorsTableDataType = {
 	name: string
-	votingPower: BigNumber
+	votingPower: any
 	commission: number
 	arp: number
 	state: number

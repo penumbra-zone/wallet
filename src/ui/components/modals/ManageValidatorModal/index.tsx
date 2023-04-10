@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAccountsSelector } from '../../../../accounts'
+import { useAccountsSelector } from '../../../../account'
 import { AllValidatorsTableDataType } from '../../../containers'
 import { selectBalance } from '../../../redux'
 import { Balance } from '../../Balance'

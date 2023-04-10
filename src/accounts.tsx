@@ -1,33 +1,43 @@
-import ReactDOM from 'react-dom/client'
+import pipe from 'callbag-pipe'
+import subscribe from 'callbag-subscribe'
+import { createRoot } from 'react-dom/client'
+import { Provider } from 'react-redux'
+import { RouterProvider, createMemoryRouter } from 'react-router-dom'
+import invariant from 'tiny-invariant'
+import { routes } from './account/routes'
+import { createAccountsStore } from './account/store'
+import { createUpdateState } from './account/updateState'
 import {
-	cbToPromise,
 	createIpcCallProxy,
 	extension,
 	fromPort,
 	handleMethodCallRequests,
-	PortStream,
-	setupDnode,
-	transformMethods,
-} from '../lib'
-import { createAccountsStore } from './store'
+} from './lib'
+import './ui/main.css'
 import backgroundService, {
 	BackgroundGetStateResult,
 	BackgroundUiApi,
-} from '../ui/services/Background'
-import { createMemoryRouter, RouterProvider } from 'react-router-dom'
-import { routes } from './routes'
-import { createUpdateState } from './updateState'
-import { Provider } from 'react-redux'
-import '../ui/main.css'
-import pipe from 'callbag-pipe'
-import subscribe from 'callbag-subscribe'
+} from './ui/services/Background'
 
 startUi()
 
 async function startUi() {
-	console.log('account');
-	
+	console.log('account')
+
 	const store = createAccountsStore()
+
+	const pageFromHash = window.location.hash.split('#')[1]
+
+	const router = createMemoryRouter(routes, {
+		initialEntries: [pageFromHash || '/'],
+	})
+
+	const root = document.getElementById('app-content')
+	invariant(root)
+
+	createRoot(root).render(
+		<Provider store={store} children={<RouterProvider router={router} />} />
+	)
 
 	const updateState = createUpdateState(store)
 
@@ -55,7 +65,7 @@ async function startUi() {
 				const popup = extension.extension
 					.getViews({ type: 'popup' })
 					.find(w => w.location.pathname === '/popup.html')
-				
+
 				if (popup) {
 					popup.close()
 				}
@@ -75,9 +85,9 @@ async function startUi() {
 			})
 		)
 		return createIpcCallProxy<keyof BackgroundUiApi, BackgroundUiApi>(
-      request => port?.postMessage(request),
-      fromPort(port)
-    );
+			request => port?.postMessage(request),
+			fromPort(port)
+		)
 	}
 
 	const background = connect()
@@ -95,20 +105,4 @@ async function startUi() {
 	document.addEventListener('keyup', () => backgroundService.updateIdle())
 	document.addEventListener('mousedown', () => backgroundService.updateIdle())
 	document.addEventListener('focus', () => backgroundService.updateIdle())
-
-	const pageFromHash = window.location.hash.split('#')[1]
-
-	const router = createMemoryRouter(routes, {
-		initialEntries: [pageFromHash || '/'],
-	})
-
-	const root = ReactDOM.createRoot(
-		document.getElementById('accounts') as HTMLElement
-	)
-
-	root.render(
-		<Provider store={store}>
-			<RouterProvider router={router} />
-		</Provider>
-	)
 }

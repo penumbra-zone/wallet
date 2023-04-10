@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAccountsSelector, useAppDispatch } from '../../../accounts'
+import { useAccountsSelector, useAppDispatch } from '../../../account'
 import { routesPath } from '../../../utils'
 import {
 	Button,

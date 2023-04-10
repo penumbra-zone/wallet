@@ -1,11 +1,11 @@
-import { useNavigate } from 'react-router-dom'
-import { routesPath } from '../../../utils'
 import { useEffect } from 'react'
-import { getSeedPhrase } from '../../../utils/getSeedPhrase'
-import { useAccountsSelector, useAppDispatch } from '../../../accounts'
-import { localStateActions, selectNewAccount } from '../../redux'
-import { Button, ChevronLeftIcon } from '../../components'
 import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
+import { useAccountsSelector, useAppDispatch } from '../../../account'
+import { routesPath } from '../../../utils'
+import { getSeedPhrase } from '../../../utils/getSeedPhrase'
+import { Button, ChevronLeftIcon } from '../../components'
+import { localStateActions, selectNewAccount } from '../../redux'
 
 type SeedPhraseProps = {}
 

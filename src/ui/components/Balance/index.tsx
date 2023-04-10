@@ -1,4 +1,4 @@
-import { useAccountsSelector } from '../../../accounts'
+import { useAccountsSelector } from '../../../account'
 import { selectBalance } from '../../redux'
 
 type BalanceProps = {

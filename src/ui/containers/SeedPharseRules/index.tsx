@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAppDispatch } from '../../../accounts'
+import { useAppDispatch } from '../../../account'
 import { routesPath } from '../../../utils'
 import { Button } from '../../components'
 import { accountsActions } from '../../redux'

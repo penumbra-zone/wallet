@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAppDispatch } from '../../../accounts'
+import { useAppDispatch } from '../../../account'
 import { getWordListOprions, routesPath } from '../../../utils'
 import {
 	Button,
