@@ -20,9 +20,9 @@ import backgroundService, {
 
 const isNotificationWindow = window.location.pathname === '/notification.html'
 
-startUi()
+startPopup()
 
-async function startUi() {
+async function startPopup() {
 	console.log('popup')
 	const store = createAccountsStore()
 

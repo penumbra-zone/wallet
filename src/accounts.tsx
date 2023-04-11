@@ -13,15 +13,15 @@ import {
 	fromPort,
 	handleMethodCallRequests,
 } from './lib'
-import './ui/main.css'
+import './ui/account.css'
 import backgroundService, {
 	BackgroundGetStateResult,
 	BackgroundUiApi,
 } from './ui/services/Background'
 
-startUi()
+startAccounts()
 
-async function startUi() {
+async function startAccounts() {
 	console.log('account')
 
 	const store = createAccountsStore()

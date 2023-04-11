@@ -1,5 +1,4 @@
 export * from './store'
 export * from './routes'
-export * from '../accounts'
 export * from './updateState'
 export * from './RootAccounts'

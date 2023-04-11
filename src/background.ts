@@ -107,14 +107,14 @@ async function setupBackgroundService() {
 	})
 
 	backgroundService.walletController.on('wallet create', async () => {
-		await backgroundService.clientController.saveAssets()
 		await backgroundService.clientController.saveChainParameters()
+		await backgroundService.clientController.saveAssets()
 		await backgroundService.clientController.getCompactBlockRange()
 	})
 
 	backgroundService.walletController.on('wallet unlock', async () => {
-		await backgroundService.clientController.saveAssets()
 		await backgroundService.clientController.saveChainParameters()
+		await backgroundService.clientController.saveAssets()
 		await backgroundService.clientController.getCompactBlockRange()
 	})
 

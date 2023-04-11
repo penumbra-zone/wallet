@@ -62,10 +62,6 @@ body {
 	line-height: 1.5;
 	color: #ffffff;
 	background-color: #000000;
-	margin: auto;
-  width: 400px;
-  height: 600px;
-  overflow: auto;
 }
 
 ul[class],
