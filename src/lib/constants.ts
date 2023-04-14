@@ -11,7 +11,7 @@ export const DEFAULT_LEGACY_CONFIG = {
 	NETWORKS: ['testnet'],
 	NETWORK_CONFIG: {
 		testnet: {
-			grpc: 'http://testnet.penumbra.zone:8080',
+			grpc: 'https://testnet1.penumbra.zone',
 			tendermint: 'http://testnet.penumbra.zone:26657',
 		},
 	},
