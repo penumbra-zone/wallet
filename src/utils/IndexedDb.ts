@@ -52,7 +52,7 @@ export class IndexedDb {
 					})
 
 					db.createObjectStore(TRANSACTION_TABLE_NAME, {
-						keyPath: 'txHashHex',
+						keyPath: 'txHash',
 					})
 
 					db.createObjectStore(FMD_PARAMETERS_TABLE_NAME)

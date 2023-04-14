@@ -30,10 +30,9 @@ import {
 import { CompactBlock } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 
 export type Transaction = {
-	txHashHex: string
 	blockHeight: bigint
 	txBytes: string
-	txHash: Uint8Array
+	txHash: string
 }
 
 export class ClientController {
@@ -270,29 +269,6 @@ export class ClientController {
 		this.store.updateState({ lastBlockHeight })
 
 		return lastBlock
-	}
-
-	async saveTransaction(height: bigint, sourceHex: Uint8Array) {
-		const tendermint = this.getTendermint()
-
-		const response = await fetch(
-			`${tendermint}/tx?hash=0x${this.toHexString(sourceHex)}`,
-			{
-				headers: {
-					'Cache-Control': 'no-cache',
-				},
-			}
-		)
-		const data = await response.json()
-
-		const tx: Transaction = {
-			txHashHex: this.toHexString(sourceHex),
-			txHash: sourceHex,
-			txBytes: data.result.tx,
-			blockHeight: height,
-		}
-
-		await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, tx)
 	}
 
 	byteArrayToLong = function (/*byte[]*/ byteArray) {

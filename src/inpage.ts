@@ -12,6 +12,7 @@ import {
 	NotesResponse,
 	StatusResponse,
 	StatusStreamResponse,
+	TransactionsResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 type Events =
@@ -38,6 +39,7 @@ declare global {
 					| AssetsResponse
 					| BalanceByAddressResponse
 					| NotesResponse
+					| TransactionsResponse
 			) => void,
 			args: any
 		): void
@@ -97,6 +99,11 @@ globalThis.penumbra = {
 			for (let i = 0; i < data.length; i++) {
 				cb(new NotesResponse().fromJson(data[i] as any))
 			}
+		} else if (event === 'transactions') {
+			const data = await proxy.getTransactions()
+			for (let i = 0; i < data.length; i++) {
+				cb(new TransactionsResponse().fromJson(data[i] as any))
+			}
 		}
 
 		pipe(
@@ -121,6 +128,8 @@ globalThis.penumbra = {
 					cb(new AssetsResponse().fromJson({ asset: (data as any).data }))
 				} else if (event === 'notes') {
 					cb(new NotesResponse().fromJson({ noteRecord: (data as any).data }))
+				}else if (event === 'transactions') {
+					cb(new TransactionsResponse().fromJson((data as any).data))
 				}
 			})
 		)

@@ -3,6 +3,7 @@ import {
 	AssetsRequest,
 	BalanceByAddressRequest,
 	NotesRequest,
+	TransactionsRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import pipe from 'callbag-pipe'
 import subscribe from 'callbag-subscribe'
@@ -27,10 +28,13 @@ import {
 } from './controllers'
 import { TransactionController } from './controllers/TransactionController'
 import {
+	ASSET_TABLE_NAME,
 	extension,
 	fromPort,
 	handleMethodCallRequests,
+	SPENDABLE_NOTES_TABLE_NAME,
 	TabsManager,
+	TRANSACTION_TABLE_NAME,
 	WindowManager,
 } from './lib'
 import { Message, MessageInputOfType, MessageStatus } from './messages/types'
@@ -272,8 +276,9 @@ class BackgroundService extends EventEmitter {
 		const inpageApi = this.getInpageApi(origin, connectionId)
 
 		const actionObj = {
-			assets: 'ASSETS',
-			spendable_notes: 'NOTES',
+			[ASSET_TABLE_NAME]: 'ASSETS',
+			[SPENDABLE_NOTES_TABLE_NAME]: 'NOTES',
+			[TRANSACTION_TABLE_NAME]: 'TRANSACTIONS'
 		}
 
 		this.indexedDb.addObserver((action, data) => {
@@ -602,7 +607,7 @@ class BackgroundService extends EventEmitter {
 				// }
 				return this.viewProtocolService.getTransactionByHash(request)
 			},
-			getTransactions: async (request?: object) => {
+			getTransactions: async (request?: TransactionsRequest) => {
 				// const canIUse = this.permissionsController.hasPermission(
 				// 	origin,
 				// 	PERMISSIONS.GET_TRANSACTIONS

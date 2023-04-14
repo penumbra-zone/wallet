@@ -267,14 +267,13 @@ export class WasmViewConnector {
             }
         )
         const data = await response.json()
-        console.log(data);
+      
 
         if (data.result !== undefined) {
 
 
             const tx: Transaction = {
-                txHashHex: this.toHexString(sourceHex),
-                txHash: sourceHex,
+                txHash: this.toHexString(sourceHex),
                 txBytes: data.result.tx,
                 blockHeight: data.result.height,
             }

@@ -25,6 +25,7 @@ import {
 	TransactionHashesRequest,
 	TransactionHashesResponse,
 	TransactionsRequest,
+	TransactionsResponse,
 	WitnessRequest,
 	WitnessResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
@@ -157,32 +158,30 @@ export class ViewProtocolService {
 	}
 
 	async getTransactionHashes(request?: object) {
-		const tx: Transaction[] = await this.indexedDb.getAllValue(
-			TRANSACTION_TABLE_NAME
-		)
-		const decodeRequest = new TransactionHashesRequest().fromBinary(
-			new Uint8Array(Object.values(request))
-		)
-
-		let data: Transaction[] = []
-		if (decodeRequest.startHeight && decodeRequest.endHeight) {
-			data = tx.filter(
-				i =>
-					i.blockHeight >= decodeRequest.startHeight &&
-					i.blockHeight <= decodeRequest.endHeight
-			)
-		} else if (decodeRequest.startHeight && !decodeRequest.endHeight) {
-			data = tx.filter(i => i.blockHeight >= decodeRequest.startHeight)
-		} else {
-			data = tx
-		}
-
-		return data.map(i => {
-			return new TransactionHashesResponse({
-				blockHeight: i.blockHeight,
-				txHash: i.txHash,
-			}).toBinary()
-		})
+		// const tx: Transaction[] = await this.indexedDb.getAllValue(
+		// 	TRANSACTION_TABLE_NAME
+		// )
+		// const decodeRequest = new TransactionHashesRequest().fromBinary(
+		// 	new Uint8Array(Object.values(request))
+		// )
+		// let data: Transaction[] = []
+		// if (decodeRequest.startHeight && decodeRequest.endHeight) {
+		// 	data = tx.filter(
+		// 		i =>
+		// 			i.blockHeight >= decodeRequest.startHeight &&
+		// 			i.blockHeight <= decodeRequest.endHeight
+		// 	)
+		// } else if (decodeRequest.startHeight && !decodeRequest.endHeight) {
+		// 	data = tx.filter(i => i.blockHeight >= decodeRequest.startHeight)
+		// } else {
+		// 	data = tx
+		// }
+		// return data.map(i => {
+		// 	return new TransactionHashesResponse({
+		// 		blockHeight: i.blockHeight,
+		// 		txHash: i.txHash,
+		// 	}).toBinary()
+		// })
 	}
 
 	async getTransactionByHash(request: object) {
@@ -207,36 +206,52 @@ export class ViewProtocolService {
 		}).toBinary()
 	}
 
-	async getTransactions(request?: object) {
-		const tx: Transaction[] = await this.indexedDb.getAllValue(
+	async getTransactions(
+		request?: TransactionsRequest
+	): Promise<TransactionsResponse[]> {
+		const transactions = await this.indexedDb.getAllValue(
 			TRANSACTION_TABLE_NAME
 		)
-		const decodeRequest = request
-			? new TransactionsRequest().fromBinary(
-					new Uint8Array(Object.values(request))
-			  )
-			: ({} as TransactionsRequest)
 
-		let data: Transaction[] = []
-		if (decodeRequest.startHeight && decodeRequest.endHeight) {
-			data = tx.filter(
-				i =>
-					i.blockHeight >= decodeRequest.startHeight &&
-					i.blockHeight <= decodeRequest.endHeight
-			)
-		} else if (decodeRequest.startHeight && !decodeRequest.endHeight) {
-			data = tx.filter(i => i.blockHeight >= decodeRequest.startHeight)
-		} else {
-			data = tx
-		}
-
-		return data.map(i => {
-			return {
+		const response = transactions.map(i =>
+			new TransactionsResponse().fromJson({
 				blockHeight: i.blockHeight,
 				txHash: i.txHash,
 				tx: decode_transaction(i.txBytes),
-			}
-		})
+			})
+		)
+		console.log({ response })
+
+		return response
+		// const tx: Transaction[] = await this.indexedDb.getAllValue(
+		// 	TRANSACTION_TABLE_NAME
+		// )
+		// const decodeRequest = request
+		// 	? new TransactionsRequest().fromBinary(
+		// 			new Uint8Array(Object.values(request))
+		// 	  )
+		// 	: ({} as TransactionsRequest)
+
+		// let data: Transaction[] = []
+		// if (decodeRequest.startHeight && decodeRequest.endHeight) {
+		// 	data = tx.filter(
+		// 		i =>
+		// 			i.blockHeight >= decodeRequest.startHeight &&
+		// 			i.blockHeight <= decodeRequest.endHeight
+		// 	)
+		// } else if (decodeRequest.startHeight && !decodeRequest.endHeight) {
+		// 	data = tx.filter(i => i.blockHeight >= decodeRequest.startHeight)
+		// } else {
+		// 	data = tx
+		// }
+
+		// return data.map(i => {
+		// 	return {
+		// 		blockHeight: i.blockHeight,
+		// 		txHash: i.txHash,
+		// 		tx: decode_transaction(i.txBytes),
+		// 	}
+		// })
 	}
 
 	async getFMDParameters(
