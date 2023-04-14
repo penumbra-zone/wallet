@@ -203,7 +203,7 @@ export class ViewProtocolService {
 		const decodeTransaction = decode_transaction(selectedTx.txBytes)
 
 		return new TransactionByHashResponse({
-			tx: this.mapTransaction(decodeTransaction),
+			tx: decodeTransaction,
 		}).toBinary()
 	}
 
@@ -234,7 +234,7 @@ export class ViewProtocolService {
 			return {
 				blockHeight: i.blockHeight,
 				txHash: i.txHash,
-				tx: this.mapTransaction(decode_transaction(i.txBytes)),
+				tx: decode_transaction(i.txBytes),
 			}
 		})
 	}

@@ -42,6 +42,7 @@ import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
 import { IndexedDb, TableName } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
 import { CreateWalletInput, ISeedWalletInput } from './wallets'
+import {decode_transaction} from "penumbra-wasm";
 
 const bgPromise = setupBackgroundService()
 
@@ -206,6 +207,8 @@ class BackgroundService extends EventEmitter {
 			indexedDb: this.indexedDb,
 			updateAssetBalance: (assetId: string, amount: number) =>
 				this.currentAccountController.updateAssetBalance(assetId, amount),
+			getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
+			getNetwork: () => this.networkController.getNetwork(),
 		})
 
 		this.transactionController = new TransactionController({
@@ -388,6 +391,10 @@ class BackgroundService extends EventEmitter {
 				this.messageController.clearMessages(),
 					this.permissionsController.clearStore()
 			},
+			decryptTx: async (bytes) => {
+				return decode_transaction(bytes);
+
+			}
 		}
 	}
 
