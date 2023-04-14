@@ -50,7 +50,8 @@ export const ActiveMessage = () => {
 							<div className='w-[35px] h-[35px] bg-brown rounded-[50%] flex items-center justify-center'></div>
 						</div>
 						<div className='flex flex-col justify-between ml-[8px]'>
-							<p className='h2_ext'>{`${account.name} (${account.shortAddressByIndex})`}</p>
+							<p className='h2_ext'>{account.name}</p>
+							<p className='h2_ext break-words w-[200px]'>{`(${account.shortAddressByIndex})`}</p>
 							<Balance className='text_numbers_ext' />
 						</div>
 					</div>

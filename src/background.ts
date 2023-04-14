@@ -46,7 +46,7 @@ import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
 import { IndexedDb, TableName } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
 import { CreateWalletInput, ISeedWalletInput } from './wallets'
-import {decode_transaction} from "penumbra-wasm";
+import { decode_transaction } from 'penumbra-wasm'
 
 const bgPromise = setupBackgroundService()
 
@@ -278,7 +278,7 @@ class BackgroundService extends EventEmitter {
 		const actionObj = {
 			[ASSET_TABLE_NAME]: 'ASSETS',
 			[SPENDABLE_NOTES_TABLE_NAME]: 'NOTES',
-			[TRANSACTION_TABLE_NAME]: 'TRANSACTIONS'
+			[TRANSACTION_TABLE_NAME]: 'TRANSACTIONS',
 		}
 
 		this.indexedDb.addObserver((action, data) => {
@@ -396,10 +396,9 @@ class BackgroundService extends EventEmitter {
 				this.messageController.clearMessages(),
 					this.permissionsController.clearStore()
 			},
-			decryptTx: async (bytes) => {
-				return decode_transaction(bytes);
-
-			}
+			decryptTx: async bytes => {
+				return decode_transaction(bytes)
+			},
 		}
 	}
 
@@ -409,12 +408,10 @@ class BackgroundService extends EventEmitter {
 			'isInitialized',
 		])
 
-		if (!selectedAccount)
-			throw new Error(
-				!isInitialized
-					? 'Init Penumbra Wallet and add account'
-					: 'Add Penumbra Wallet account'
-			)
+		if (!selectedAccount) {
+			this.emit('Show tab', '/accounts.html', 'accounts')
+			return
+		}
 
 		const hasPermission = this.permissionsController.hasPermission(
 			origin,
@@ -437,7 +434,7 @@ class BackgroundService extends EventEmitter {
 				) {
 					messageId = null
 				}
-				if(message.status === MessageStatus.Rejected){
+				if (message.status === MessageStatus.Rejected) {
 					messageId = null
 				}
 			} catch (e) {

@@ -65,7 +65,8 @@ body {
 	margin: auto;
   width: 400px;
   height: 600px;
-  overflow: auto;
+	overflow-y: hidden;
+	overflow-x: hidden;
 }
 
 ul[class],
