@@ -11,7 +11,7 @@ import {
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import {base64ToBytes} from './base64'
 import {CurrentAccountController, NetworkController, RemoteConfigController, Transaction} from '../controllers'
-import {Nullifier} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
+import {AssetId, Nullifier} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import {IndexedDb} from './IndexedDb'
 import {
     ASSET_TABLE_NAME,
@@ -263,7 +263,6 @@ export class WasmViewConnector {
 
     async storeAsset(assetId) {
 
-        console.log("storeAsset", assetId);
 
         const chainId = this.getChainId()
         const baseUrl = this.getGRPC()
@@ -278,7 +277,12 @@ export class WasmViewConnector {
 
         const assetInfoRequest = new AssetInfoRequest()
         assetInfoRequest.chainId = chainId
-        assetInfoRequest.assetId = assetId
+        const asset = new AssetId();
+        asset.inner = base64ToBytes(assetId.inner);
+        assetInfoRequest.assetId = asset;
+
+        console.log("assetInfoRequest", assetInfoRequest);
+
         const assetResponse = await client.assetInfo(assetInfoRequest);
 
         console.log("asset", assetResponse);
