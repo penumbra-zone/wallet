@@ -1,4 +1,6 @@
 import {ViewClient} from 'penumbra-wasm'
+import { createGrpcWebTransport } from '@bufbuild/connect-web'
+import { createPromiseClient } from '@bufbuild/connect'
 import {
     SpendableNoteRecord,
     SwapRecord,
@@ -12,6 +14,7 @@ import {CurrentAccountController, NetworkController, RemoteConfigController, Tra
 import {Nullifier} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import {IndexedDb} from './IndexedDb'
 import {
+    ASSET_TABLE_NAME,
     FMD_PARAMETERS_TABLE_NAME,
     NCT_COMMITMENTS_TABLE_NAME,
     NCT_FORGOTTEN_TABLE_NAME,
@@ -21,6 +24,10 @@ import {
     SWAP_TABLE_NAME,
     TRANSACTION_TABLE_NAME,
 } from '../lib'
+import {
+    ObliviousQueryService, SpecificQueryService
+} from "@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb";
+import {AssetInfoRequest} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb";
 
 export type StoredTree = {
     last_position: number
@@ -64,19 +71,23 @@ export class WasmViewConnector {
                     indexedDb,
                     updateAssetBalance,
                     getNetworkConfig,
-                    getNetwork
+                    getNetwork,
+                    getCustomGRPC
                 }: {
         indexedDb: IndexedDb
         updateAssetBalance: CurrentAccountController['updateAssetBalance']
         getNetworkConfig: RemoteConfigController['getNetworkConfig'],
-        getNetwork: NetworkController['getNetwork']
+        getNetwork: NetworkController['getNetwork'],
+        getCustomGRPC: NetworkController['getCustomGRPC']
 
     }) {
         this.indexedDb = indexedDb
         this.configApi = {
             updateAssetBalance,
             getNetworkConfig,
-            getNetwork
+            getNetwork,
+            getCustomGRPC
+
         }
     }
 
@@ -242,12 +253,58 @@ export class WasmViewConnector {
                 Number(note.note.value.amount.lo)
             )
 
-            let sourceHex = this.toHexString(base64ToBytes(note.source.inner))
+
+            await this.storeAsset(note.note.value.assetId);
 
             await this.saveTransaction(base64ToBytes(note.source.inner))
 
         } else console.debug('note already stored', note.noteCommitment.inner)
     }
+
+    async storeAsset(assetId) {
+
+        console.log("storeAsset", assetId);
+
+        const chainId = this.getChainId()
+        const baseUrl = this.getGRPC()
+
+        console.log(baseUrl);
+
+        const transport = createGrpcWebTransport({
+            baseUrl,
+        })
+
+        const client = createPromiseClient(SpecificQueryService, transport)
+
+        const assetInfoRequest = new AssetInfoRequest()
+        assetInfoRequest.chainId = chainId
+        assetInfoRequest.assetId = assetId
+        const assetResponse = await client.assetInfo(assetInfoRequest);
+
+        console.log("asset", assetResponse);
+
+
+        let assetJson = assetResponse.asset.toJsonString();
+        await this.indexedDb.putValue(ASSET_TABLE_NAME, { ...JSON.parse(assetJson) })
+
+    }
+
+    getChainId() {
+        const { chainId } =
+            this.configApi.getNetworkConfig()[this.configApi.getNetwork()]
+        return chainId
+    }
+    getGRPC() {
+        const customGrpc =
+            this.configApi.getCustomGRPC()[this.configApi.getNetwork()]
+        const { grpc: defaultGrpc } =
+            this.configApi.getNetworkConfig()[this.configApi.getNetwork()]
+
+        return customGrpc || defaultGrpc
+    }
+
+
+
 
     getTendermint() {
         const {tendermint} =

@@ -113,13 +113,11 @@ async function setupBackgroundService() {
 
 	backgroundService.walletController.on('wallet create', async () => {
 		await backgroundService.clientController.saveChainParameters()
-		await backgroundService.clientController.saveAssets()
 		await backgroundService.clientController.getCompactBlockRange()
 	})
 
 	backgroundService.walletController.on('wallet unlock', async () => {
 		await backgroundService.clientController.saveChainParameters()
-		await backgroundService.clientController.saveAssets()
 		await backgroundService.clientController.getCompactBlockRange()
 	})
 
@@ -136,7 +134,6 @@ async function setupBackgroundService() {
 	backgroundService.networkController.on('change grpc', async () => {
 		await backgroundService.clientController.abortGrpcRequest()
 		await backgroundService.clientController.resetWallet()
-		await backgroundService.clientController.saveAssets()
 		await backgroundService.clientController.saveChainParameters()
 		await backgroundService.clientController.getCompactBlockRange()
 	})
@@ -213,6 +210,7 @@ class BackgroundService extends EventEmitter {
 				this.currentAccountController.updateAssetBalance(assetId, amount),
 			getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
 			getNetwork: () => this.networkController.getNetwork(),
+			getCustomGRPC: () => this.networkController.getCustomGRPC(),
 		})
 
 		this.transactionController = new TransactionController({
@@ -338,7 +336,6 @@ class BackgroundService extends EventEmitter {
 				this.walletController.getAccountSeed(password),
 			getCompactBlockRange: async () =>
 				this.clientController.getCompactBlockRange(),
-			saveAssets: async () => this.clientController.saveAssets(),
 			saveChainParameters: async () =>
 				this.clientController.saveChainParameters(),
 			resetWallet: async () => this.walletController.resetWallet(),

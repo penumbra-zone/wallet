@@ -21,9 +21,12 @@ import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
 import { IndexedDb } from '../utils'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
-import { ObliviousQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb'
 import {
-	AssetListRequest,
+	ObliviousQueryService,
+	SpecificQueryService
+} from '@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb'
+import {
+	AssetInfoRequest,
 	ChainParametersRequest,
 	CompactBlockRangeRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
@@ -89,30 +92,7 @@ export class ClientController {
 		this.wasmViewConnector = wasmViewConnector
 	}
 
-	async saveAssets() {
-		const savedAssets = await this.indexedDb.getAllValue(ASSET_TABLE_NAME)
 
-		if (savedAssets.length) return
-
-		const chainId = this.getChainId()
-		const baseUrl = this.getGRPC()
-
-		const transport = createGrpcWebTransport({
-			baseUrl,
-		})
-
-		const client = createPromiseClient(ObliviousQueryService, transport)
-
-		const assetRequest = new AssetListRequest()
-		assetRequest.chainId = chainId
-		const assetList = await client.assetList(assetRequest)
-
-		const assets = assetList.assetList.assets.map(i => i.toJsonString())
-		assets.forEach(
-			async i =>
-				await this.indexedDb.putValue(ASSET_TABLE_NAME, { ...JSON.parse(i) })
-		)
-	}
 
 	async saveChainParameters() {
 		try {
