@@ -23,7 +23,6 @@ const isNotificationWindow = window.location.pathname === '/notification.html'
 startPopup()
 
 async function startPopup() {
-	console.log('popup')
 	const store = createAccountsStore()
 
 	const router = createMemoryRouter(routesUi)

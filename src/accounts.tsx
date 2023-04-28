@@ -19,85 +19,82 @@ import backgroundService, {
 	BackgroundUiApi,
 } from './ui/services/Background'
 
-startAccounts()
+// startAccounts()
 
-async function startAccounts() {
-	console.log('account')
+// async function startAccounts() {
 
-	const store = createAccountsStore()
+const store = createAccountsStore()
 
-	const pageFromHash = window.location.hash.split('#')[1]
+const pageFromHash = window.location.hash.split('#')[1]
 
-	const router = createMemoryRouter(routes, {
-		initialEntries: [pageFromHash || '/'],
-	})
+const router = createMemoryRouter(routes, {
+	initialEntries: [pageFromHash || '/'],
+})
 
-	const root = document.getElementById('app-content')
-	invariant(root)
+const root = document.getElementById('app-content')
+invariant(root)
 
-	createRoot(root).render(
-		<Provider store={store} children={<RouterProvider router={router} />} />
-	)
+createRoot(root).render(
+	<Provider store={store} children={<RouterProvider router={router} />} />
+)
 
-	const updateState = createUpdateState(store)
+const updateState = createUpdateState(store)
 
-	extension.storage.onChanged.addListener(async (changes, area) => {
-		if (area !== 'local') {
-			return
-		}
-
-		const stateChanges: Partial<Record<string, unknown>> &
-			Partial<BackgroundGetStateResult> = await backgroundService.getState([
-			'isInitialized',
-			'isLocked',
-		])
-
-		for (const key in changes) {
-			stateChanges[key] = changes[key].newValue
-		}
-
-		updateState(stateChanges)
-	})
-
-	const connect = () => {
-		const uiApi = {
-			closePopupWindow: async () => {
-				const popup = extension.extension
-					.getViews({ type: 'popup' })
-					.find(w => w.location.pathname === '/popup.html')
-
-				if (popup) {
-					popup.close()
-				}
-			},
-		}
-		let port: chrome.runtime.Port | null = extension.runtime.connect()
-		pipe(
-			fromPort(port),
-			handleMethodCallRequests(uiApi, res => port.postMessage(res)),
-			subscribe({
-				complete: () => {
-					backgroundService.setConnect(() => {
-						port = null
-						backgroundService.init(connect())
-					})
-				},
-			})
-		)
-		return createIpcCallProxy<keyof BackgroundUiApi, BackgroundUiApi>(
-			request => port?.postMessage(request),
-			fromPort(port)
-		)
+extension.storage.onChanged.addListener(async (changes, area) => {
+	if (area !== 'local') {
+		return
 	}
 
-	const background = connect()
-
-	const [state, networks] = await Promise.all([
-		background.getState(),
-		background.getNetworks(),
+	const stateChanges: Partial<Record<string, unknown>> &
+		Partial<BackgroundGetStateResult> = await backgroundService.getState([
+		'isInitialized',
+		'isLocked',
 	])
 
-	updateState({ ...state, networks })
+	for (const key in changes) {
+		stateChanges[key] = changes[key].newValue
+	}
+
+	updateState(stateChanges)
+})
+
+const connect = () => {
+	const uiApi = {
+		closePopupWindow: async () => {
+			const popup = extension.extension
+				.getViews({ type: 'popup' })
+				.find(w => w.location.pathname === '/popup.html')
+
+			if (popup) {
+				popup.close()
+			}
+		},
+	}
+	let port: chrome.runtime.Port | null = extension.runtime.connect()
+	pipe(
+		fromPort(port),
+		handleMethodCallRequests(uiApi, res => port.postMessage(res)),
+		subscribe({
+			complete: () => {
+				backgroundService.setConnect(() => {
+					port = null
+					backgroundService.init(connect())
+				})
+			},
+		})
+	)
+	return createIpcCallProxy<keyof BackgroundUiApi, BackgroundUiApi>(
+		request => port?.postMessage(request),
+		fromPort(port)
+	)
+}
+
+const background = connect()
+
+Promise.all([background.getState(), background.getNetworks()]).then(data => {
+	const [state, networks] = data
+
+	updateState({ networks, ...state })
 
 	backgroundService.init(background)
 
@@ -105,4 +102,6 @@ async function startAccounts() {
 	document.addEventListener('keyup', () => backgroundService.updateIdle())
 	document.addEventListener('mousedown', () => backgroundService.updateIdle())
 	document.addEventListener('focus', () => backgroundService.updateIdle())
-}
+})
+
+// }

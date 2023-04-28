@@ -32,13 +32,19 @@ export const SettingsNetworks = () => {
 		chainId: '',
 		grpc: '',
 	})
-	const [selected, setSelected] = useState<NetworkType>(networks[0])
+	const [selected, setSelected] = useState<NetworkType | undefined>()
 	const [search, setSearch] = useState<string>('')
-	const [filteredNetworks, setFilteredNetworks] =
-		useState<NetworkType[]>(networks)
+	const [filteredNetworks, setFilteredNetworks] = useState<NetworkType[]>([])
 	const [isOpenSubmit, setIsOpenSubmit] = useState<boolean>(false)
 
 	useEffect(() => {
+		if (!networks.length) return
+		setSelected(networks[0])
+		setFilteredNetworks(networks)
+	}, [networks])
+
+	useEffect(() => {
+		if (!selected) return
 		setInputsValues({
 			chainId: selected.chainId,
 			grpc: customGRPC[selected.name] || selected.grpc,
@@ -88,6 +94,7 @@ export const SettingsNetworks = () => {
 	}
 
 	const isDisabled = useMemo(() => {
+		if (!selected) return true
 		const grpc = customGRPC[selected.name] || selected.grpc
 
 		return (
@@ -128,7 +135,7 @@ export const SettingsNetworks = () => {
 										</span>
 									}
 									className='w-[100%] px-[16px]'
-									isError={!Boolean(filteredNetworks.length)}
+									isError={search && !Boolean(filteredNetworks.length)}
 								/>
 								{filteredNetworks.map((i, index) => (
 									<div

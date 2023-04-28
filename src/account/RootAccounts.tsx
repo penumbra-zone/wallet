@@ -21,7 +21,7 @@ export const RootAccounts = () => {
 	useEffect(() => {
 		if (!isRedirect) return
 
-		if (selectedAccount.name && isRedirect && !state.isLocked) {
+		if (isRedirect && !state.isLocked) {
 			if (pathname === routesPath.SETTINGS_NETWORKS) {
 				return navigate(routesPath.SETTINGS_NETWORKS)
 			}

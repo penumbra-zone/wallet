@@ -220,7 +220,6 @@ export class ViewProtocolService {
 				tx: decode_transaction(i.txBytes),
 			})
 		)
-		console.log({ response })
 
 		return response
 		// const tx: Transaction[] = await this.indexedDb.getAllValue(
