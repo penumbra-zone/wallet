@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { ViewClient, base64_to_bech32 } from 'penumbra-wasm'
+=======
+import { ViewServer } from 'penumbra-wasm'
+>>>>>>> 3e84f39c70dd28ce8446fe1efba9200d89c057df
 import { createGrpcWebTransport } from '@bufbuild/connect-web'
 import { createPromiseClient } from '@bufbuild/connect'
 import {
@@ -120,7 +124,8 @@ export class WasmViewConnector {
 	async handleNewCompactBlock(block: CompactBlock, fvk, transport) {
 		if (this.viewClient == undefined) {
 			let storedTree = await this.loadStoredTree()
-			this.viewClient = new ViewClient(fvk, 719n, storedTree)
+			// todo зробоити ViewServer глобальним, щоб
+			this.viewClient = new ViewServer(fvk, 719n, storedTree)
 		}
 		let result: ScanResult = await this.viewClient.scan_block_without_updates(
 			block.toJson()
@@ -248,6 +253,8 @@ export class WasmViewConnector {
 	}
 
 	async storeNote(note) {
+
+		console.log(note);
 		let storedNote = await this.indexedDb.getValue(
 			SPENDABLE_NOTES_TABLE_NAME,
 			note.noteCommitment.inner
@@ -266,7 +273,11 @@ export class WasmViewConnector {
 
 			await this.storeAsset(note.note.value.assetId)
 
+			try {
 			await this.saveTransaction(base64ToBytes(note.source.inner))
+			} catch (e) {
+				console.error("tx save failed ", e)
+			}
 		} else console.debug('note already stored', note.noteCommitment.inner)
 	}
 
@@ -299,6 +310,7 @@ export class WasmViewConnector {
 				...JSON.parse(assetJson),
 			})
 		}
+
 	}
 
 	getChainId() {
@@ -341,6 +353,8 @@ export class WasmViewConnector {
 			},
 		})
 		const data = await response.json()
+
+		console.log(data);
 
 		if (data.result !== undefined) {
 			const tx: Transaction = {

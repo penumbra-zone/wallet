@@ -25,7 +25,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 	const navigate = useNavigate()
 
 	const [seed, setSeed] = useState({
-		// 1: 'under',
+	// 1: 'under',
 		// 2: 'magnet',
 		// 3: 'father',
 		// 4: 'section',
