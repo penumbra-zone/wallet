@@ -37,7 +37,7 @@ import {
 	TRANSACTION_TABLE_NAME,
 	WindowManager,
 } from './lib'
-import { Message, MessageInputOfType, MessageStatus } from './messages/types'
+import { MessageInputOfType, MessageStatus } from './messages/types'
 import { PreferencesAccount } from './preferences'
 import { ViewProtocolService } from './services'
 import { ExtensionStorage, StorageLocalState } from './storage'
@@ -46,7 +46,7 @@ import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
 import { IndexedDb, TableName } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
 import { CreateWalletInput, ISeedWalletInput } from './wallets'
-import { decode_transaction } from 'penumbra-wasm'
+import { decode_transaction, ViewServer } from 'penumbra-wasm'
 
 const bgPromise = setupBackgroundService()
 
@@ -223,7 +223,6 @@ class BackgroundService extends EventEmitter {
 				this.remoteConfigController.setNetworks(networkName, type),
 			getNetwork: () => this.networkController.getNetwork(),
 			getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
-			wasmViewConnector: this.wasmViewConnector,
 			getCustomGRPC: () => this.networkController.getCustomGRPC(),
 		})
 
@@ -259,6 +258,7 @@ class BackgroundService extends EventEmitter {
 			indexedDb: this.indexedDb,
 			extensionStorage: this.extensionStorage,
 			getLastExistBlock: () => this.clientController.getLastExistBlock(),
+			wasmViewConnector: this.wasmViewConnector
 		})
 	}
 

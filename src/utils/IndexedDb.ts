@@ -13,6 +13,24 @@ import {
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
 
+export type StoredTree = {
+	last_position: number
+	last_forgotten: number
+	hashes: StoredHash[]
+	commitments: StoredCommitment[]
+}
+
+export type StoredHash = {
+	position: number
+	height: number
+	hash: Uint8Array
+}
+
+export type StoredCommitment = {
+	position: number
+	commitment: Uint8Array
+}
+
 export type TableName =
 	| typeof ASSET_TABLE_NAME
 	| typeof CHAIN_PARAMETERS_TABLE_NAME
@@ -153,5 +171,30 @@ export class IndexedDb {
 
 	removeObserver() {
 		this.observer = null
+	}
+
+	public async loadStoredTree(): Promise<StoredTree> {
+		// return result
+		const nctPosition = await this.getValue(NCT_POSITION_TABLE_NAME, 'position')
+
+		const nctForgotten = await this.getValue(
+			NCT_FORGOTTEN_TABLE_NAME,
+			'forgotten'
+		)
+
+		const nctHashes: StoredHash[] = await this.getAllValue(
+			NCT_HASHES_TABLE_NAME
+		)
+
+		const nctCommitments: StoredCommitment[] = await this.getAllValue(
+			NCT_COMMITMENTS_TABLE_NAME
+		)
+
+		return {
+			commitments: nctCommitments,
+			hashes: nctHashes,
+			last_forgotten: nctForgotten,
+			last_position: nctPosition,
+		}
 	}
 }

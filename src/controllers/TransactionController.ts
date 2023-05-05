@@ -38,7 +38,6 @@ export class TransactionController {
 		getNetworkConfig,
 		getAccountSpendingKey,
 		getCustomGRPC,
-		wasmViewConnector,
 	}: {
 		indexedDb: IndexedDb
 		getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword']
@@ -47,7 +46,6 @@ export class TransactionController {
 		getNetwork: NetworkController['getNetwork']
 		getNetworkConfig: RemoteConfigController['getNetworkConfig']
 		getCustomGRPC: NetworkController['getCustomGRPC']
-		wasmViewConnector: WasmViewConnector
 	}) {
 		this.configApi = {
 			getAccountFullViewingKey,
@@ -58,7 +56,6 @@ export class TransactionController {
 			getCustomGRPC,
 		}
 		this.indexedDb = indexedDb
-		this.wasmViewConnector = wasmViewConnector
 	}
 
 	async parseActions2(actions: ActionArrayType[]): Promise<ParsedActions[]> {
@@ -248,7 +245,7 @@ export class TransactionController {
 		} catch {}
 		if (!fvk || !spendingKey) return
 
-		const storedTree = await this.wasmViewConnector.loadStoredTree()
+		const storedTree = await this.indexedDb.loadStoredTree()
 		const buildTx = build_tx(spendingKey, fvk, sendPlan, storedTree)
 		const encodeTx = await encode_tx(buildTx)
 

@@ -32,6 +32,7 @@ import {
 	SPENDABLE_NOTES_TABLE_NAME,
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
+import { WasmViewConnector } from '../utils/WasmViewConnector'
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -41,19 +42,23 @@ export class ViewProtocolService {
 	private indexedDb
 	private extensionStorage
 	private getLastExistBlock
+	private wasmViewConnector
 
 	constructor({
 		indexedDb,
 		extensionStorage,
 		getLastExistBlock,
+		wasmViewConnector,
 	}: {
 		indexedDb: IndexedDb
 		extensionStorage: ExtensionStorage
 		getLastExistBlock: ClientController['getLastExistBlock']
+		wasmViewConnector: WasmViewConnector
 	}) {
 		this.indexedDb = indexedDb
 		this.extensionStorage = extensionStorage
 		this.getLastExistBlock = getLastExistBlock
+		this.wasmViewConnector = wasmViewConnector
 	}
 
 	async getBalanceByAddress(
@@ -151,8 +156,6 @@ export class ViewProtocolService {
 		}).toBinary()
 	}
 
-	// todo додати rpc TransactionInfo
-
 	async getTransactionInfo(
 		request?: TransactionInfoRequest
 	): Promise<TransactionInfoResponse[]> {
@@ -160,17 +163,23 @@ export class ViewProtocolService {
 			TRANSACTION_TABLE_NAME
 		)
 
-		const response = transactions.map(i =>
-			new TransactionInfoResponse().fromJson({
+		const response = transactions.map(i => {
+			const decodeTransaction = decode_transaction(i.txBytes)
+
+			const transactionInfo = this.wasmViewConnector
+				.getViewServerInstance()
+				.transaction_info(decodeTransaction)
+
+			return new TransactionInfoResponse().fromJson({
 				txInfo: {
 					height: i.blockHeight,
 					id: { hash: i.txHash },
-					transaction: decode_transaction(i.txBytes),
+					transaction: decodeTransaction,
+					perspective: transactionInfo.txp,
+					view: transactionInfo.txv,
 				},
 			})
-		)
-
-		console.log(response)
+		})
 
 		return response
 	}

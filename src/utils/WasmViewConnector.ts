@@ -35,24 +35,6 @@ import {
 import { SpecificQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb'
 import { AssetInfoRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 
-export type StoredTree = {
-	last_position: number
-	last_forgotten: number
-	hashes: StoredHash[]
-	commitments: StoredCommitment[]
-}
-
-export type StoredHash = {
-	position: number
-	height: number
-	hash: Uint8Array
-}
-
-export type StoredCommitment = {
-	position: number
-	commitment: Uint8Array
-}
-
 export type ScanResult = {
 	height
 	nct_updates: NctUpdates
@@ -70,7 +52,7 @@ export type NctUpdates = {
 
 export class WasmViewConnector {
 	private indexedDb
-	private viewClient
+	private viewServer
 	private configApi
 
 	constructor({
@@ -93,6 +75,7 @@ export class WasmViewConnector {
 			getNetwork,
 			getCustomGRPC,
 		}
+		
 	}
 
 	async updateNotes(nullifier: Nullifier, height: bigint) {
@@ -115,12 +98,12 @@ export class WasmViewConnector {
 	}
 
 	async handleNewCompactBlock(block: CompactBlock, fvk, transport) {
-		if (this.viewClient == undefined) {
-			let storedTree = await this.loadStoredTree()
+		if (!this.viewServer) {
+			let storedTree = await this.indexedDb.loadStoredTree()
 			// todo зробоити ViewServer глобальним, щоб
-			this.viewClient = new ViewServer(fvk, 719n, storedTree)
+			this.viewServer = new ViewServer(fvk, 719n, storedTree)
 		}
-		let result: ScanResult = await this.viewClient.scan_block_without_updates(
+		let result: ScanResult = await this.viewServer.scan_block_without_updates(
 			block.toJson()
 		)
 
@@ -153,39 +136,12 @@ export class WasmViewConnector {
 		// const delay = ms => new Promise(res => setTimeout(res, ms));
 	}
 
-	public async loadStoredTree(): Promise<StoredTree> {
-		const nctPosition = await this.indexedDb.getValue(
-			NCT_POSITION_TABLE_NAME,
-			'position'
-		)
-
-		const nctForgotten = await this.indexedDb.getValue(
-			NCT_FORGOTTEN_TABLE_NAME,
-			'forgotten'
-		)
-
-		const nctHashes: StoredHash[] = await this.indexedDb.getAllValue(
-			NCT_HASHES_TABLE_NAME
-		)
-
-		const nctCommitments: StoredCommitment[] = await this.indexedDb.getAllValue(
-			NCT_COMMITMENTS_TABLE_NAME
-		)
-
-		return {
-			commitments: nctCommitments,
-			hashes: nctHashes,
-			last_forgotten: nctForgotten,
-			last_position: nctPosition,
-		}
-	}
-
 	public async loadUpdates() {
-		if (this.viewClient == undefined) {
+		if (this.viewServer == undefined) {
 			console.error('View client is undefined')
 		} else {
-			let storedTree = await this.loadStoredTree()
-			let updates = await this.viewClient.get_updates(
+			let storedTree = await this.indexedDb.loadStoredTree()
+			let updates = await this.viewServer.get_updates(
 				storedTree.last_position,
 				storedTree.last_forgotten
 			)
@@ -434,9 +390,13 @@ export class WasmViewConnector {
 	}
 
 	resetWallet() {
-		if (this.viewClient) {
-			this.viewClient.free()
+		if (this.viewServer) {
+			this.viewServer.free()
 		}
-		this.viewClient = undefined
+		this.viewServer = undefined
+	}
+
+	getViewServerInstance(): ViewServer {
+		return this.viewServer
 	}
 }
