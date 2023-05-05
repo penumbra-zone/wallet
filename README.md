@@ -38,9 +38,5 @@ Link to web store - https://chrome.google.com/webstore/detail/penumbra-wallet/lk
      penumbra.getAssets()
 ## Query for the current chain parameters.
      penumbra.getChainParameters()
-## Query for the transaction hashes in the given range of blocks.
-     penumbra.getTransactionHashes({start_height,end_height})
 ## Query for the full transactions in the given range of blocks.
-     penumbra.getTransactions({start_height,end_height})
-## Query for a given transaction hash.
-     penumbra.getTransactionByHash({txHash})
+     penumbra.getTransactionInfo({start_height,end_height})

@@ -20,8 +20,6 @@ export const RootAccounts = () => {
 
 	useEffect(() => {
 		if (!isRedirect) return
-
-		console.log({isRedirect, state});
 		
 		if (state.isInitialized && !state.isLocked && !selectedAccount.addressByIndex)
 		return navigate(routesPath.SEED_PHRASE_RULES)

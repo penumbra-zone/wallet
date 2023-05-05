@@ -12,7 +12,7 @@ import {
 	NotesResponse,
 	StatusResponse,
 	StatusStreamResponse,
-	TransactionsResponse,
+	TransactionInfoResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 type Events =
@@ -33,13 +33,13 @@ declare global {
 							ReturnType<
 								| __BackgroundPageApiDirect['publicState']
 								| __BackgroundPageApiDirect['getStatusStream']
-								| __BackgroundPageApiDirect['getTransactions']
+								| __BackgroundPageApiDirect['getTransactionInfo']
 							>
 					  >
 					| AssetsResponse
 					| BalanceByAddressResponse
 					| NotesResponse
-					| TransactionsResponse
+					| TransactionInfoResponse
 			) => void,
 			args: any
 		): void
@@ -67,9 +67,7 @@ globalThis.penumbra = {
 	getNoteByCommitment: proxy.getNoteByCommitment,
 	getStatus: async () =>
 		new StatusResponse().fromJson((await proxy.getStatus()) as any),
-	getTransactionHashes: proxy.getTransactionHashes,
-	getTransactionByHash: proxy.getTransactionByHash,
-	getTransactions: proxy.getTransactions,
+	getTransactionInfo: proxy.getTransactionInfo,
 	getFmdParameters: async () =>
 		new FMDParametersResponse().fromJson(
 			(await proxy.getFmdParameters()) as any
@@ -100,9 +98,9 @@ globalThis.penumbra = {
 				cb(new NotesResponse().fromJson(data[i] as any))
 			}
 		} else if (event === 'transactions') {
-			const data = await proxy.getTransactions()
+			const data = await proxy.getTransactionInfo()
 			for (let i = 0; i < data.length; i++) {
-				cb(new TransactionsResponse().fromJson(data[i] as any))
+				cb(new TransactionInfoResponse().fromJson(data[i] as any))
 			}
 		}
 
@@ -128,8 +126,8 @@ globalThis.penumbra = {
 					cb(new AssetsResponse().fromJson({ asset: (data as any).data }))
 				} else if (event === 'notes') {
 					cb(new NotesResponse().fromJson({ noteRecord: (data as any).data }))
-				}else if (event === 'transactions') {
-					cb(new TransactionsResponse().fromJson((data as any).data))
+				} else if (event === 'transactions') {
+					cb(new TransactionInfoResponse().fromJson((data as any).data))
 				}
 			})
 		)

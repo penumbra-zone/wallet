@@ -16,9 +16,7 @@ const lowPermissions = {
 	getFmdParameters: 'Get FMD parameters',
 	getNoteByCommitment: 'Get note by note commitment',
 	getNullifierStatus: 'Get nullifier status',
-	getTransactionHashes: 'Get transaction hashes',
-	getTransactionByHash: 'Get transaction by hash',
-	getTransactions: 'Get transactions',
+	getTransactionInfo: 'Get transactions',
 	getTransactionPerspective: 'Get transactions perspective',
 }
 

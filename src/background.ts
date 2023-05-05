@@ -3,7 +3,7 @@ import {
 	AssetsRequest,
 	BalanceByAddressRequest,
 	NotesRequest,
-	TransactionsRequest,
+	TransactionInfoRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import pipe from 'callbag-pipe'
 import subscribe from 'callbag-subscribe'
@@ -581,27 +581,7 @@ class BackgroundService extends EventEmitter {
 				return this.viewProtocolService.getStatus()
 			},
 			getStatusStream: async () => this.viewProtocolService.getStatusStream(),
-			getTransactionHashes: async (request: object) => {
-				// const canIUse = this.permissionsController.hasPermission(
-				// 	origin,
-				// 	PERMISSIONS.GET_TRANSACTION_HASHES
-				// )
-				// if (!canIUse) {
-				// 	throw new Error('Access denied')
-				// }
-				return this.viewProtocolService.getTransactionHashes(request)
-			},
-			getTransactionByHash: async (request: object) => {
-				// const canIUse = this.permissionsController.hasPermission(
-				// 	origin,
-				// 	PERMISSIONS.GET_TRANSACTION_BY_HASH
-				// )
-				// if (!canIUse) {
-				// 	throw new Error('Access denied')
-				// }
-				return this.viewProtocolService.getTransactionByHash(request)
-			},
-			getTransactions: async (request?: TransactionsRequest) => {
+			getTransactionInfo: async (request?: TransactionInfoRequest) => {
 				// const canIUse = this.permissionsController.hasPermission(
 				// 	origin,
 				// 	PERMISSIONS.GET_TRANSACTIONS
@@ -609,7 +589,7 @@ class BackgroundService extends EventEmitter {
 				// if (!canIUse) {
 				// 	throw new Error('Access denied')
 				// }
-				return this.viewProtocolService.getTransactions(request)
+				return this.viewProtocolService.getTransactionInfo(request)
 			},
 
 			getFmdParameters: async () => {

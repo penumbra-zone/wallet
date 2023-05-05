@@ -1,4 +1,4 @@
-import { ClientController, Transaction } from '../controllers'
+import { ClientController } from '../controllers'
 import { ExtensionStorage } from '../storage'
 import { IAsset } from '../types/asset'
 import { IndexedDb } from '../utils'
@@ -20,17 +20,11 @@ import {
 	StatusResponse,
 	StatusStreamRequest,
 	StatusStreamResponse,
-	TransactionByHashRequest,
-	TransactionByHashResponse,
-	TransactionHashesRequest,
-	TransactionHashesResponse,
-	TransactionsRequest,
-	TransactionsResponse,
+	TransactionInfoRequest,
+	TransactionInfoResponse,
 	WitnessRequest,
 	WitnessResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
-
-import { FmdParameters } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import {
 	ASSET_TABLE_NAME,
 	CHAIN_PARAMETERS_TABLE_NAME,
@@ -157,102 +151,28 @@ export class ViewProtocolService {
 		}).toBinary()
 	}
 
-	async getTransactionHashes(request?: object) {
-		// const tx: Transaction[] = await this.indexedDb.getAllValue(
-		// 	TRANSACTION_TABLE_NAME
-		// )
-		// const decodeRequest = new TransactionHashesRequest().fromBinary(
-		// 	new Uint8Array(Object.values(request))
-		// )
-		// let data: Transaction[] = []
-		// if (decodeRequest.startHeight && decodeRequest.endHeight) {
-		// 	data = tx.filter(
-		// 		i =>
-		// 			i.blockHeight >= decodeRequest.startHeight &&
-		// 			i.blockHeight <= decodeRequest.endHeight
-		// 	)
-		// } else if (decodeRequest.startHeight && !decodeRequest.endHeight) {
-		// 	data = tx.filter(i => i.blockHeight >= decodeRequest.startHeight)
-		// } else {
-		// 	data = tx
-		// }
-		// return data.map(i => {
-		// 	return new TransactionHashesResponse({
-		// 		blockHeight: i.blockHeight,
-		// 		txHash: i.txHash,
-		// 	}).toBinary()
-		// })
-	}
-
 	// todo додати rpc TransactionInfo
-	async
-	async getTransactionByHash(request: object) {
-		const tx: Transaction[] = await this.indexedDb.getAllValue(
-			TRANSACTION_TABLE_NAME
-		)
 
-		const decodeRequest = new TransactionByHashRequest().fromBinary(
-			new Uint8Array(Object.values(request))
-		)
-
-		const selectedTx = tx.find(t => areEqual(t.txHash, decodeRequest.txHash))
-
-		if (!selectedTx) {
-			throw new Error('Tx doesn`t exist')
-		}
-
-		const decodeTransaction = decode_transaction(selectedTx.txBytes)
-
-		return new TransactionByHashResponse({
-			tx: decodeTransaction,
-		}).toBinary()
-	}
-
-	async getTransactions(
-		request?: TransactionsRequest
-	): Promise<TransactionsResponse[]> {
+	async getTransactionInfo(
+		request?: TransactionInfoRequest
+	): Promise<TransactionInfoResponse[]> {
 		const transactions = await this.indexedDb.getAllValue(
 			TRANSACTION_TABLE_NAME
 		)
 
 		const response = transactions.map(i =>
-			new TransactionsResponse().fromJson({
-				blockHeight: i.blockHeight,
-				txHash: i.txHash,
-				tx: decode_transaction(i.txBytes),
+			new TransactionInfoResponse().fromJson({
+				txInfo: {
+					height: i.blockHeight,
+					id: { hash: i.txHash },
+					transaction: decode_transaction(i.txBytes),
+				},
 			})
 		)
 
+		console.log(response)
+
 		return response
-		// const tx: Transaction[] = await this.indexedDb.getAllValue(
-		// 	TRANSACTION_TABLE_NAME
-		// )
-		// const decodeRequest = request
-		// 	? new TransactionsRequest().fromBinary(
-		// 			new Uint8Array(Object.values(request))
-		// 	  )
-		// 	: ({} as TransactionsRequest)
-
-		// let data: Transaction[] = []
-		// if (decodeRequest.startHeight && decodeRequest.endHeight) {
-		// 	data = tx.filter(
-		// 		i =>
-		// 			i.blockHeight >= decodeRequest.startHeight &&
-		// 			i.blockHeight <= decodeRequest.endHeight
-		// 	)
-		// } else if (decodeRequest.startHeight && !decodeRequest.endHeight) {
-		// 	data = tx.filter(i => i.blockHeight >= decodeRequest.startHeight)
-		// } else {
-		// 	data = tx
-		// }
-
-		// return data.map(i => {
-		// 	return {
-		// 		blockHeight: i.blockHeight,
-		// 		txHash: i.txHash,
-		// 		tx: decode_transaction(i.txBytes),
-		// 	}
-		// })
 	}
 
 	async getFMDParameters(

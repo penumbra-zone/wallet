@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { ViewClient, base64_to_bech32 } from 'penumbra-wasm'
-=======
-import { ViewServer } from 'penumbra-wasm'
->>>>>>> 3e84f39c70dd28ce8446fe1efba9200d89c057df
+import { base64_to_bech32, ViewServer } from 'penumbra-wasm'
 import { createGrpcWebTransport } from '@bufbuild/connect-web'
 import { createPromiseClient } from '@bufbuild/connect'
 import {
@@ -36,10 +32,7 @@ import {
 	SWAP_TABLE_NAME,
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
-import {
-	ObliviousQueryService,
-	SpecificQueryService,
-} from '@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb'
+import { SpecificQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb'
 import { AssetInfoRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 
 export type StoredTree = {
@@ -253,8 +246,6 @@ export class WasmViewConnector {
 	}
 
 	async storeNote(note) {
-
-		console.log(note);
 		let storedNote = await this.indexedDb.getValue(
 			SPENDABLE_NOTES_TABLE_NAME,
 			note.noteCommitment.inner
@@ -274,9 +265,9 @@ export class WasmViewConnector {
 			await this.storeAsset(note.note.value.assetId)
 
 			try {
-			await this.saveTransaction(base64ToBytes(note.source.inner))
+				await this.saveTransaction(base64ToBytes(note.source.inner))
 			} catch (e) {
-				console.error("tx save failed ", e)
+				console.error('tx save failed ', e)
 			}
 		} else console.debug('note already stored', note.noteCommitment.inner)
 	}
@@ -310,7 +301,6 @@ export class WasmViewConnector {
 				...JSON.parse(assetJson),
 			})
 		}
-
 	}
 
 	getChainId() {
@@ -353,8 +343,6 @@ export class WasmViewConnector {
 			},
 		})
 		const data = await response.json()
-
-		console.log(data);
 
 		if (data.result !== undefined) {
 			const tx: Transaction = {

@@ -25,9 +25,7 @@ export const PERMISSIONS = {
 	GET_FMD_PARAMETERS: 'getFmdParameters',
 	GET_NOTE_BY_COMMITMENT: 'getNoteByCommitment',
 	GET_NULLIFIER_STATUS: 'getNullifierStatus',
-	GET_TRANSACTION_HASHES: 'getTransactionHashes',
-	GET_TRANSACTION_BY_HASH: 'getTransactionByHash',
-	GET_TRANSACTIONS: 'getTransactions',
+	GET_TRANSACTIONS: 'getTransactionInfo',
 	GET_TRANSACTION_PERSPECTIVE: 'getTransactionPerspective',
 } as const
 
