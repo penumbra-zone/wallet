@@ -184,6 +184,8 @@ export class ViewProtocolService {
 		// })
 	}
 
+	// todo додати rpc TransactionInfo
+	async
 	async getTransactionByHash(request: object) {
 		const tx: Transaction[] = await this.indexedDb.getAllValue(
 			TRANSACTION_TABLE_NAME

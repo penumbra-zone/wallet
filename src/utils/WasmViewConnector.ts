@@ -1,4 +1,4 @@
-import { ViewClient } from 'penumbra-wasm'
+import { ViewServer } from 'penumbra-wasm'
 import { createGrpcWebTransport } from '@bufbuild/connect-web'
 import { createPromiseClient } from '@bufbuild/connect'
 import {
@@ -120,7 +120,8 @@ export class WasmViewConnector {
 	async handleNewCompactBlock(block: CompactBlock, fvk, transport) {
 		if (this.viewClient == undefined) {
 			let storedTree = await this.loadStoredTree()
-			this.viewClient = new ViewClient(fvk, 719n, storedTree)
+			// todo зробоити ViewServer глобальним, щоб
+			this.viewClient = new ViewServer(fvk, 719n, storedTree)
 		}
 		let result: ScanResult = await this.viewClient.scan_block_without_updates(
 			block.toJson()
