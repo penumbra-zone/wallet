@@ -1,4 +1,4 @@
-import { ViewClient } from 'penumbra-wasm'
+import { ViewClient, base64_to_bech32 } from 'penumbra-wasm'
 import { createGrpcWebTransport } from '@bufbuild/connect-web'
 import { createPromiseClient } from '@bufbuild/connect'
 import {
@@ -288,10 +288,17 @@ export class WasmViewConnector {
 
 		const assetResponse = await client.assetInfo(assetInfoRequest)
 
-		let assetJson = assetResponse.asset.toJsonString()
-		await this.indexedDb.putValue(ASSET_TABLE_NAME, {
-			...JSON.parse(assetJson),
-		})
+		if (!assetResponse.asset) {
+			await this.indexedDb.putValue(ASSET_TABLE_NAME, {
+				id: assetId,
+				denom: { denom: base64_to_bech32('passet', assetId.inner) },
+			})
+		} else {
+			let assetJson = assetResponse.asset.toJsonString()
+			await this.indexedDb.putValue(ASSET_TABLE_NAME, {
+				...JSON.parse(assetJson),
+			})
+		}
 	}
 
 	getChainId() {
@@ -317,19 +324,27 @@ export class WasmViewConnector {
 	async saveTransaction(sourceHex: Uint8Array) {
 		const tendermint = this.getTendermint()
 
-		const response = await fetch(
-			`${tendermint}/tx?hash=0x${this.toHexString(sourceHex)}`,
-			{
-				headers: {
-					'Cache-Control': 'no-cache',
-				},
-			}
+		const txHash = this.toHexString(sourceHex)
+
+		// check sourceHex is transaction
+		if (
+			!String(txHash)
+				.slice(0, 46)
+				.split('')
+				.filter(i => Boolean(Number(i))).length
 		)
+			return
+
+		const response = await fetch(`${tendermint}/tx?hash=0x${txHash}`, {
+			headers: {
+				'Cache-Control': 'no-cache',
+			},
+		})
 		const data = await response.json()
 
 		if (data.result !== undefined) {
 			const tx: Transaction = {
-				txHash: this.toHexString(sourceHex),
+				txHash,
 				txBytes: data.result.tx,
 				blockHeight: data.result.height,
 			}
