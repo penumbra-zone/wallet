@@ -248,6 +248,8 @@ export class WasmViewConnector {
 	}
 
 	async storeNote(note) {
+
+		console.log(note);
 		let storedNote = await this.indexedDb.getValue(
 			SPENDABLE_NOTES_TABLE_NAME,
 			note.noteCommitment.inner
@@ -266,7 +268,11 @@ export class WasmViewConnector {
 
 			await this.storeAsset(note.note.value.assetId)
 
+			try {
 			await this.saveTransaction(base64ToBytes(note.source.inner))
+			} catch (e) {
+				console.error("tx save failed ", e)
+			}
 		} else console.debug('note already stored', note.noteCommitment.inner)
 	}
 
@@ -287,6 +293,8 @@ export class WasmViewConnector {
 		assetInfoRequest.assetId = asset
 
 		const assetResponse = await client.assetInfo(assetInfoRequest)
+
+		console.log(assetResponse);
 
 		let assetJson = assetResponse.asset.toJsonString()
 		await this.indexedDb.putValue(ASSET_TABLE_NAME, {
@@ -326,6 +334,8 @@ export class WasmViewConnector {
 			}
 		)
 		const data = await response.json()
+
+		console.log(data);
 
 		if (data.result !== undefined) {
 			const tx: Transaction = {
