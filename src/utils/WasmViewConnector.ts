@@ -1,4 +1,4 @@
-import { base64_to_bech32, ViewServer } from 'penumbra-wasm'
+import { base64_to_bech32, decode_transaction, ViewServer } from 'penumbra-wasm'
 import { createGrpcWebTransport } from '@bufbuild/connect-web'
 import { createPromiseClient } from '@bufbuild/connect'
 import {
@@ -75,7 +75,6 @@ export class WasmViewConnector {
 			getNetwork,
 			getCustomGRPC,
 		}
-		
 	}
 
 	async updateNotes(nullifier: Nullifier, height: bigint) {
@@ -293,21 +292,37 @@ export class WasmViewConnector {
 		)
 			return
 
-		const response = await fetch(`${tendermint}/tx?hash=0x${txHash}`, {
-			headers: {
-				'Cache-Control': 'no-cache',
-			},
-		})
-		const data = await response.json()
+		try {
+			const response = await fetch(`${tendermint}/tx?hash=0x${txHash}`, {
+				headers: {
+					'Cache-Control': 'no-cache',
+				},
+			})
+			const data = await response.json()
 
-		if (data.result !== undefined) {
-			const tx: Transaction = {
+			if (!data.result) return
+
+			const transactionResponse: Transaction = {
 				txHash,
 				txBytes: data.result.tx,
 				blockHeight: data.result.height,
 			}
 
-			await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, tx)
+			const decodeTransaction = decode_transaction(transactionResponse.txBytes)
+
+			const transactionInfo =
+				this.viewServer.transaction_info(decodeTransaction)
+
+			await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, {
+				height: Number(transactionResponse.blockHeight),
+				id: { hash: transactionResponse.txHash },
+				transaction: decodeTransaction,
+				perspective: transactionInfo.txp,
+				view: transactionInfo.txv,
+			})
+
+		} catch (e) {
+			console.error('saveTransaction', e)
 		}
 	}
 
@@ -394,9 +409,5 @@ export class WasmViewConnector {
 			this.viewServer.free()
 		}
 		this.viewServer = undefined
-	}
-
-	getViewServerInstance(): ViewServer {
-		return this.viewServer
 	}
 }

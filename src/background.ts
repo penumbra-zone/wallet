@@ -258,7 +258,6 @@ class BackgroundService extends EventEmitter {
 			indexedDb: this.indexedDb,
 			extensionStorage: this.extensionStorage,
 			getLastExistBlock: () => this.clientController.getLastExistBlock(),
-			wasmViewConnector: this.wasmViewConnector
 		})
 	}
 
@@ -477,6 +476,11 @@ class BackgroundService extends EventEmitter {
 				)
 
 				const { isInitialized, isLocked, messages } = this.getState()
+				
+				if(isLocked){
+					 return showNotification()
+				}
+
 				const fvk =
 					this.walletController.getAccountFullViewingKeyWithoutPassword()
 

@@ -70,7 +70,7 @@ export class IndexedDb {
 					})
 
 					db.createObjectStore(TRANSACTION_TABLE_NAME, {
-						keyPath: 'txHash',
+						keyPath: 'height',
 					})
 
 					db.createObjectStore(FMD_PARAMETERS_TABLE_NAME)

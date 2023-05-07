@@ -32,7 +32,6 @@ import {
 	SPENDABLE_NOTES_TABLE_NAME,
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
-import { WasmViewConnector } from '../utils/WasmViewConnector'
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -42,23 +41,19 @@ export class ViewProtocolService {
 	private indexedDb
 	private extensionStorage
 	private getLastExistBlock
-	private wasmViewConnector
 
 	constructor({
 		indexedDb,
 		extensionStorage,
 		getLastExistBlock,
-		wasmViewConnector,
 	}: {
 		indexedDb: IndexedDb
 		extensionStorage: ExtensionStorage
 		getLastExistBlock: ClientController['getLastExistBlock']
-		wasmViewConnector: WasmViewConnector
 	}) {
 		this.indexedDb = indexedDb
 		this.extensionStorage = extensionStorage
 		this.getLastExistBlock = getLastExistBlock
-		this.wasmViewConnector = wasmViewConnector
 	}
 
 	async getBalanceByAddress(
@@ -163,25 +158,13 @@ export class ViewProtocolService {
 			TRANSACTION_TABLE_NAME
 		)
 
-		const response = transactions.map(i => {
-			const decodeTransaction = decode_transaction(i.txBytes)
-
-			const transactionInfo = this.wasmViewConnector
-				.getViewServerInstance()
-				.transaction_info(decodeTransaction)
-
+		const response = transactions.map(txInfo => {
 			return new TransactionInfoResponse().fromJson({
-				txInfo: {
-					height: i.blockHeight,
-					id: { hash: i.txHash },
-					transaction: decodeTransaction,
-					perspective: transactionInfo.txp,
-					view: transactionInfo.txv,
-				},
+				txInfo,
 			})
 		})
 
-		return response
+		return response.reverse()
 	}
 
 	async getFMDParameters(

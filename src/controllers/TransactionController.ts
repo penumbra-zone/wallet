@@ -149,6 +149,8 @@ export class TransactionController {
 
 				const asset = detailAsset.denom.denom
 
+				//TYrO7HYkLZJAf0IJJVa16YbV4sV+GEgBFLQ2O5xqUfcAuSn43RpyY7wnhjjD0dNFI6gbkuDVCC8e7YujcfAzCJegrj4+pwHBXmdw/6uDsD0=
+
 				//encode recipinet address
 				const encodeRecipientAddress = destAddress
 					? base64_to_bech32('penumbrav2t', destAddress)
