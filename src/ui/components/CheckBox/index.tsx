@@ -12,12 +12,7 @@ export const CheckBox: React.FC<InputProps> = props => {
 		>
 			<input type='checkbox' className='checkbox' {...props} />
 			<div
-				className={`flex items-center justify-center w-[30px] h-[30px] rounded-[5px] 
-     ${
-				props.checked
-					? 'bg-gradient-to-r from-[rgba(139,228,217,0.6)] via-[rgba(200,184,128,0.6)] to-[rgba(255,144,47,0.5)]'
-					: 'input_default_border'
-			}
+				className={`flex items-center justify-center w-[30px] h-[30px] rounded-[5px]	bg-gradient-to-r from-[rgba(139,228,217,0.6)] via-[rgba(200,184,128,0.6)] to-[rgba(255,144,47,0.5)]
       hover:bg-gradient-to-r hover:from-[rgba(139,228,217,0.6)] hover:via-[rgba(200,184,128,0.6)] hover:to-[rgba(255,144,47,0.5)]`}
 			>
 				<div className='flex items-center justify-center w-[29px] h-[29px]'>

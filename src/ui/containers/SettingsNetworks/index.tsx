@@ -122,7 +122,7 @@ export const SettingsNetworks = () => {
 				</p>
 				<div className='w-[100%] ext:h-[100%] tablet:h-[calc(100%-74px)] flex'>
 					<div className='ext:w-[100%] flex rounded-[15px]'>
-						<div className='ext:w-[100%] tablet:w-[55%]  flex flex-col justify-between pt-[24px]'>
+						<div className='ext:w-[100%] laptop:w-[55%]  flex flex-col justify-between pt-[24px]'>
 							<div>
 								<Input
 									placeholder='Search a previously added...'
@@ -140,7 +140,7 @@ export const SettingsNetworks = () => {
 								{filteredNetworks.map((i, index) => (
 									<div
 										key={index}
-										className={`w-[100] flex items-center px-[16px] text_ext cursor-pointer hover:bg-dark_grey py-[12px] ${
+										className={`w-[100%] flex items-center px-[16px] text_ext cursor-pointer hover:bg-dark_grey py-[12px] ${
 											selected.chainId === i.chainId ? 'bg-dark_grey' : ''
 										}`}
 										onClick={handleSelect(i)}

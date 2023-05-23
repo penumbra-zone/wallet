@@ -35,7 +35,7 @@ export const ActiveMessage = () => {
 	}
 
 	return (
-		<div className='w-[100%] h-[100vh] flex flex-col items-center justify-between py-[30px] bg-brown px-[16px]'>
+		<div className='w-[100%] h-[100vh] flex flex-col items-center justify-between py-[30px] px-[16px]'>
 			<div className='w-[100%] flex flex-col items-center'>
 				<p className='h1_ext mb-[16px]'>Connect with Penumbra</p>
 				<p className='text_body_ext mb-[16px]'>Select accounts to use</p>
@@ -46,9 +46,9 @@ export const ActiveMessage = () => {
 						// onKeyDown={handleKeyPressCheckBox}
 					/>
 					<div className='flex ml-[24px]'>
-						<div className='w-[36px] h-[36px] li_gradient rounded-[50%] flex  items-center justify-center'>
+						{/* <div className='w-[36px] h-[36px] li_gradient rounded-[50%] flex  items-center justify-center'>
 							<div className='w-[35px] h-[35px] bg-brown rounded-[50%] flex items-center justify-center'></div>
-						</div>
+						</div> */}
 						<div className='flex flex-col justify-between ml-[8px]'>
 							<p className='h2_ext'>{account.name}</p>
 							<p className='h2_ext break-words w-[200px]'>{`(${account.shortAddressByIndex})`}</p>
