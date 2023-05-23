@@ -21,14 +21,15 @@ import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
 import { IndexedDb } from '../utils'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
-import {
-	ObliviousQueryService,
-} from '@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb'
+
 import {
 	ChainParametersRequest,
 	CompactBlockRangeRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import { CompactBlock } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
+import {
+	ObliviousQueryService
+} from "@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect";
 
 export type Transaction = {
 	blockHeight: bigint

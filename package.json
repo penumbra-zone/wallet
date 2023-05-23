@@ -1,6 +1,6 @@
 {
 	"name": "extension-demo",
-	"version": "0.1.5",
+	"version": "0.1.9",
 	"description": "",
 	"main": "index.js",
 	"scripts": {
@@ -11,8 +11,10 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@buf/penumbra-zone_penumbra.bufbuild_connect-web": "^0.8.6-20230425231551-c22a172637d0.1",
-		"@buf/penumbra-zone_penumbra.bufbuild_es": "^1.2.0-20230425231551-c22a172637d0.1",
+		"@buf/penumbra-zone_penumbra.bufbuild_connect-es": "^0.8.6-20230516173436-aa66ff4efa04.1",
+		"@buf/penumbra-zone_penumbra.bufbuild_es": "^1.2.0-20230516173436-aa66ff4efa04.1",
+		"@buf/penumbra-zone_penumbra.grpc_web": "^1.4.2-20230516173436-aa66ff4efa04.2",
+		"@bufbuild/connect-web": "^0.8.6",
 		"@reduxjs/toolkit": "^1.8.6",
 		"bip39": "^3.0.4",
 		"bufbuild": "^0.2.0",
@@ -31,7 +33,7 @@
 		"moment": "^2.29.4",
 		"nanoid": "^4.0.1",
 		"obs-store": "^4.0.3",
-		"penumbra-wasm": "^0.51.0",
+		"penumbra-wasm": "^0.52.0",
 		"ramda": "^0.28.0",
 		"react": "^18.2.0",
 		"react-circular-progressbar": "^2.1.0",

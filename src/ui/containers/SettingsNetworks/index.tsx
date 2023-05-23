@@ -140,7 +140,7 @@ export const SettingsNetworks = () => {
 								{filteredNetworks.map((i, index) => (
 									<div
 										key={index}
-										className={`w-[100] flex items-center px-[16px] text_ext cursor-pointer hover:bg-dark_grey py-[12px] ${
+										className={`w-[100%] flex items-center px-[16px] text_ext cursor-pointer hover:bg-dark_grey py-[12px] ${
 											selected.chainId === i.chainId ? 'bg-dark_grey' : ''
 										}`}
 										onClick={handleSelect(i)}

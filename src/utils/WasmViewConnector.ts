@@ -32,8 +32,10 @@ import {
 	SWAP_TABLE_NAME,
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
-import { SpecificQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-web/penumbra/client/v1alpha1/client_connectweb'
 import { AssetInfoRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
+import {
+	SpecificQueryService
+} from "@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect";
 
 export type ScanResult = {
 	height
