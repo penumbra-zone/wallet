@@ -72,6 +72,8 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 		const txResponse = await Background.sendTransaction(
 			sendPlan.transactionPlan
 		)
+		console.log({txResponse});
+		
 		setTxResponse(txResponse)
 	}
 
@@ -87,7 +89,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 						className='mb-[24px]'
 					/>
 				)}
-				<div className='w-[100%] max-h-[280px] overflow-y-scroll'>
+				<div className='w-[100%]'>
 					{sendPlan.actions.map((i, index) => {
 						let text
 						if (i.type === 'send') {

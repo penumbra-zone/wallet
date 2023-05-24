@@ -447,3 +447,22 @@ select {
 .svg_hover:hover svg path {
 	fill: #ffffff;
 }
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background:rgba(0, 0, 0, 0.25);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
