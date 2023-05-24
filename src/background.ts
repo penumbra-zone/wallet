@@ -63,6 +63,36 @@ extension.runtime.onConnectExternal.addListener(async remotePort => {
 	const bgService = await bgPromise
 	bgService.setupPageConnection(remotePort)
 })
+type MessageSender = chrome.runtime.MessageSender;
+const onMessage = async (message: any, sender: MessageSender) => {
+  console.log("Background onMessage", message, sender);
+  if (message.type === "BUF_TRANSPORT_REQUEST") {
+    const { sequence, request, typeName } = message;
+    const { sentence } = request;
+    // TODO: select request by typeName, type response appropriately
+    // const response = await client.say({sentence})
+    // const modifiedResponse = new SayResponse({sentence:[...response.sentence].reverse().join("")})
+		const bgService = await bgPromise
+
+		const response = await bgService.viewProtocolService.getStatus()
+    const responseMessage = {
+      success: true,
+      type: "BUF_TRANSPORT_RESPONSE",
+      sequence,
+      response: response.toJson(),
+      typeName: response.getType().typeName,
+    };
+
+		console.log(responseMessage);
+		
+    console.log("Background response", responseMessage);
+    chrome.tabs.sendMessage(sender?.tab?.id as number, responseMessage);
+  } else {
+    console.warn("Background unknown message type", message);
+  }
+};
+
+extension.runtime.onMessage.addListener(onMessage)
 
 async function setupBackgroundService() {
 	const extensionStorage = new ExtensionStorage()
