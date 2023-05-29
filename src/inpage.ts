@@ -12,6 +12,7 @@ import {
 	NotesResponse,
 	StatusResponse,
 	StatusStreamResponse,
+	TransactionInfoRequest,
 	TransactionInfoResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
@@ -25,6 +26,7 @@ type Events =
 
 declare global {
 	interface PenumbraApi extends __BackgroundPageApiDirect {
+		removeListener(event: Events, cb)
 		on(
 			event: Events,
 			cb: (
@@ -53,6 +55,8 @@ const proxy = createIpcCallProxy<
 	keyof __BackgroundPageApiDirect,
 	__BackgroundPageApiDirect
 >(request => postMessage(request, location.origin), fromPostMessage())
+
+const timer = ms => new Promise(res => setTimeout(res, ms))
 
 //@ts-ignore
 globalThis.penumbra = {
@@ -83,11 +87,13 @@ globalThis.penumbra = {
 			const data = await proxy.getAssets()
 			for (let i = 0; i < data.length; i++) {
 				cb(new AssetsResponse().fromJson(data[i] as any))
+				await timer(100)
 			}
 		} else if (event === 'balance') {
 			const data = await penumbra.getBalanceByAddress(args)
 			for (let i = 0; i < data.length; i++) {
 				cb(new BalanceByAddressResponse().fromJson(data[i] as any))
+				await timer(100)
 			}
 		} else if (event === 'status') {
 			const updatedValue = await proxy.getStatusStream()
@@ -96,11 +102,15 @@ globalThis.penumbra = {
 			const data = await proxy.getNotes()
 			for (let i = 0; i < data.length; i++) {
 				cb(new NotesResponse().fromJson(data[i] as any))
+				await timer(100)
 			}
 		} else if (event === 'transactions') {
-			const data = await proxy.getTransactionInfo()
+			const data = await proxy.getTransactionInfo(
+				new TransactionInfoRequest(args)
+			)
 			for (let i = 0; i < data.length; i++) {
 				cb(new TransactionInfoResponse().fromJson(data[i] as any))
+				await timer(100)
 			}
 		}
 

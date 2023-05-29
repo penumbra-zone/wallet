@@ -593,7 +593,7 @@ class BackgroundService extends EventEmitter {
 				// if (!canIUse) {
 				// 	throw new Error('Access denied')
 				// }
-				return this.viewProtocolService.getTransactionInfo(request)
+				return this.viewProtocolService.getTransactionInfo(new TransactionInfoRequest(request))
 			},
 
 			getFmdParameters: async () => {

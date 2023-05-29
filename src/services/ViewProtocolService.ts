@@ -157,13 +157,35 @@ export class ViewProtocolService {
 			TRANSACTION_TABLE_NAME
 		)
 
-		const response = transactions.map(txInfo => {
-			return new TransactionInfoResponse().fromJson({
-				txInfo,
+		const response: TransactionInfoResponse[] = transactions
+			.map(txInfo => {
+				return new TransactionInfoResponse().fromJson({
+					txInfo,
+				})
 			})
-		})
+			.reverse()
 
-		return response.reverse()
+		if (request.startHeight && request.endHeight) {
+			return response.filter(
+				tx =>
+					Number(tx.txInfo.height) >= Number(request.startHeight) &&
+					Number(tx.txInfo.height) <= Number(request.endHeight)
+			)
+		}
+
+		if (request.startHeight && !request.endHeight) {
+			return response.filter(
+				tx => Number(tx.txInfo.height) >= Number(request.startHeight)
+			)
+		}
+
+		if (!request.startHeight && request.endHeight) {
+			return response.filter(
+				tx => Number(tx.txInfo.height) <= Number(request.endHeight)
+			)
+		}
+
+		return response
 	}
 
 	async getFMDParameters(
