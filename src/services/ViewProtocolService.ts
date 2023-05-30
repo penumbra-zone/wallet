@@ -165,25 +165,25 @@ export class ViewProtocolService {
 			})
 			.reverse()
 
-		if (request.startHeight && request.endHeight) {
-			return response.filter(
-				tx =>
-					Number(tx.txInfo.height) >= Number(request.startHeight) &&
-					Number(tx.txInfo.height) <= Number(request.endHeight)
-			)
-		}
+		// if (request.startHeight && request.endHeight) {
+		// 	return response.filter(
+		// 		tx =>
+		// 			Number(tx.txInfo.height) >= Number(request.startHeight) &&
+		// 			Number(tx.txInfo.height) <= Number(request.endHeight)
+		// 	)
+		// }
 
-		if (request.startHeight && !request.endHeight) {
-			return response.filter(
-				tx => Number(tx.txInfo.height) >= Number(request.startHeight)
-			)
-		}
+		// if (request.startHeight && !request.endHeight) {
+		// 	return response.filter(
+		// 		tx => Number(tx.txInfo.height) >= Number(request.startHeight)
+		// 	)
+		// }
 
-		if (!request.startHeight && request.endHeight) {
-			return response.filter(
-				tx => Number(tx.txInfo.height) <= Number(request.endHeight)
-			)
-		}
+		// if (!request.startHeight && request.endHeight) {
+		// 	return response.filter(
+		// 		tx => Number(tx.txInfo.height) <= Number(request.endHeight)
+		// 	)
+		// }
 
 		return response
 	}
