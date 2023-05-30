@@ -36,6 +36,8 @@ import { AssetInfoRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumb
 import {
 	SpecificQueryService
 } from "@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect";
+import {PositionState} from "@buf/penumbra-zone_penumbra.grpc_web/penumbra/core/dex/v1alpha1/dex_pb";
+import PositionStateEnum = PositionState.PositionStateEnum;
 
 export type ScanResult = {
 	height
@@ -315,6 +317,7 @@ export class WasmViewConnector {
 			const transactionInfo =
 				this.viewServer.transaction_info(decodeTransaction)
 
+			await this.storeLpnft(transactionInfo.txv);
 			await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, {
 				height: Number(transactionResponse.blockHeight),
 				id: { hash: transactionResponse.txHash },
@@ -325,6 +328,31 @@ export class WasmViewConnector {
 
 		} catch (e) {
 			console.error('saveTransaction', e)
+		}
+	}
+
+	async storeLpnft(txv) {
+		console.log(txv);
+		for (const actionView of txv.bodyView.actionViews) {
+			if (actionView.positionOpen !== undefined) {
+				let opened = this.viewServer.get_lpnft_asset(actionView.positionOpen.position, {state:
+					PositionStateEnum.POSITION_STATE_ENUM_OPENED});
+				await this.indexedDb.putValue(ASSET_TABLE_NAME, opened)
+
+				let closed = this.viewServer.get_lpnft_asset(actionView.positionOpen.position, {state:
+					PositionStateEnum.POSITION_STATE_ENUM_CLOSED});
+				await this.indexedDb.putValue(ASSET_TABLE_NAME, closed)
+
+				let withdrawn = this.viewServer.get_lpnft_asset(actionView.positionOpen.position, {state:
+					PositionStateEnum.POSITION_STATE_ENUM_WITHDRAWN});
+				await this.indexedDb.putValue(ASSET_TABLE_NAME, withdrawn)
+
+				let claimed = this.viewServer.get_lpnft_asset(actionView.positionOpen.position, {state:
+					PositionStateEnum.POSITION_STATE_ENUM_CLAIMED});
+				await this.indexedDb.putValue(ASSET_TABLE_NAME, claimed)
+
+
+			}
 		}
 	}
 
