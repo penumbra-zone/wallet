@@ -90,7 +90,7 @@ globalThis.penumbra = {
 				await timer(100)
 			}
 		} else if (event === 'balance') {
-			const data = await penumbra.getBalanceByAddress(args)
+			const data = await penumbra.getBalanceByAddress({} as any)
 			for (let i = 0; i < data.length; i++) {
 				cb(new BalanceByAddressResponse().fromJson(data[i] as any))
 				await timer(100)
