@@ -19,7 +19,7 @@ export const Welcome = () => {
 					We're glad to see you.
 				</p>
 				<div className='w-[192px]'>
-					<Button title='Get start' mode='gradient' onClick={handleStart} />
+					<Button title='Get started' mode='gradient' onClick={handleStart} />
 				</div>
 			</div>
 		</div>
