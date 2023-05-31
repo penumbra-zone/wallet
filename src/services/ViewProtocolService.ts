@@ -20,7 +20,8 @@ import {
 	StatusStreamRequest,
 	StatusStreamResponse,
 	TransactionInfoRequest,
-	TransactionInfoResponse, TransactionPlannerRequest,
+	TransactionInfoResponse,
+	TransactionPlannerRequest,
 	WitnessRequest,
 	WitnessResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
@@ -157,11 +158,15 @@ export class ViewProtocolService {
 			TRANSACTION_TABLE_NAME
 		)
 
-		const response: TransactionInfoResponse[] = transactions.map(txInfo => {
-			return new TransactionInfoResponse().fromJson({
-				txInfo,
+		const response: TransactionInfoResponse[] = transactions
+			.sort((a, b) => {
+				return Number(a.height) - Number(b.height)
 			})
-		})
+			.map(txInfo => {
+				return new TransactionInfoResponse().fromJson({
+					txInfo,
+				})
+			})
 
 		// if (request.startHeight && request.endHeight) {
 		// 	return response.filter(
@@ -201,7 +206,6 @@ export class ViewProtocolService {
 	}
 
 	async getTransactionPlanner(request?: TransactionPlannerRequest) {
-
 		// create wasm planner here
 		//
 
@@ -214,15 +218,14 @@ export class ViewProtocolService {
 
 		for (const delegate of request.delegations) {
 			// insert delegatins to planner
-
 		}
 		for (const swaps of request.swaps) {
-			console.warn("swaps planner rpc not implemented")
+			console.warn('swaps planner rpc not implemented')
 		}
 
 		// build plan
 
-		return new TransactionInfoResponse();
+		return new TransactionInfoResponse()
 	}
 
 	mapTransaction(decodeTransaction) {
