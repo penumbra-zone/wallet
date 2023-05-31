@@ -47,11 +47,12 @@ if (document.documentElement.tagName === 'HTML') {
 				)
 
 				extension.storage.onChanged.addListener(data => {
+					
+					
 					if (data.lastBlockHeight && data.lastSavedBlock) {
 						postMessage({ penumbraMethod: STATUS }, location.origin)
 					} else if (data.balance) {
 						//TODO find asset as changed
-						console.log(data.balance);
 						
 						postMessage({ penumbraMethod: BALANCE }, location.origin)
 					} else {

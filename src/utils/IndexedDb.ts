@@ -70,7 +70,7 @@ export class IndexedDb {
 					})
 
 					db.createObjectStore(TRANSACTION_TABLE_NAME, {
-						keyPath: 'height',
+						keyPath: 'id.hash',
 					})
 
 					db.createObjectStore(FMD_PARAMETERS_TABLE_NAME)
@@ -122,6 +122,7 @@ export class IndexedDb {
 		const tx = this.db.transaction(tableName, 'readwrite')
 		const store = tx.objectStore(tableName)
 		const result = await store.put(value)
+
 		if (this.observer) {
 			this.observer(tableName, value)
 		}

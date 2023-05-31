@@ -33,11 +33,9 @@ import {
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
 import { AssetInfoRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
-import {
-	SpecificQueryService
-} from "@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect";
-import {PositionState} from "@buf/penumbra-zone_penumbra.grpc_web/penumbra/core/dex/v1alpha1/dex_pb";
-import PositionStateEnum = PositionState.PositionStateEnum;
+import { SpecificQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
+import { PositionState } from '@buf/penumbra-zone_penumbra.grpc_web/penumbra/core/dex/v1alpha1/dex_pb'
+import PositionStateEnum = PositionState.PositionStateEnum
 
 export type ScanResult = {
 	height
@@ -170,10 +168,23 @@ export class WasmViewConnector {
 			}
 		}
 
-		if (scanResult.new_notes.length > 0 || scanResult.new_swaps.length > 0)
+		if (scanResult.new_notes.length > 0 || scanResult.new_swaps.length > 0) {
+			const uniqueSet = new Set()
+
 			for (const note of scanResult.new_notes) {
-				await this.storeNote(note)
+				const tx = await this.storeNote(note)
+
+				if (tx) {
+					uniqueSet.add(JSON.stringify(tx))
+				}
 			}
+
+			const uniqueTxs = Array.from(uniqueSet).map((i: string) => JSON.parse(i))
+
+			uniqueTxs.forEach(async i => {
+				await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, i)
+			})
+		}
 
 		for (const swap of scanResult.new_swaps) {
 			await this.storeSwap(swap)
@@ -224,7 +235,8 @@ export class WasmViewConnector {
 			await this.storeAsset(note.note.value.assetId)
 
 			try {
-				await this.saveTransaction(base64ToBytes(note.source.inner))
+				const tx = await this.saveTransaction(base64ToBytes(note.source.inner))
+				return tx
 			} catch (e) {
 				console.error('tx save failed ', e)
 			}
@@ -317,41 +329,52 @@ export class WasmViewConnector {
 			const transactionInfo =
 				this.viewServer.transaction_info(decodeTransaction)
 
-			await this.storeLpnft(transactionInfo.txv);
-			await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, {
+			await this.storeLpnft(transactionInfo.txv)
+			return {
 				height: Number(transactionResponse.blockHeight),
 				id: { hash: transactionResponse.txHash },
 				transaction: decodeTransaction,
 				perspective: transactionInfo.txp,
 				view: transactionInfo.txv,
-			})
-
+			}
+			// await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, {
+			// 	height: Number(transactionResponse.blockHeight),
+			// 	id: { hash: transactionResponse.txHash },
+			// 	transaction: decodeTransaction,
+			// 	perspective: transactionInfo.txp,
+			// 	view: transactionInfo.txv,
+			// })
 		} catch (e) {
 			console.error('saveTransaction', e)
 		}
 	}
 
 	async storeLpnft(txv) {
-		console.log(txv);
 		for (const actionView of txv.bodyView.actionViews) {
 			if (actionView.positionOpen !== undefined) {
-				let opened = this.viewServer.get_lpnft_asset(actionView.positionOpen.position, {state:
-					PositionStateEnum.POSITION_STATE_ENUM_OPENED});
+				let opened = this.viewServer.get_lpnft_asset(
+					actionView.positionOpen.position,
+					{ state: PositionStateEnum.POSITION_STATE_ENUM_OPENED }
+				)
 				await this.indexedDb.putValue(ASSET_TABLE_NAME, opened)
 
-				let closed = this.viewServer.get_lpnft_asset(actionView.positionOpen.position, {state:
-					PositionStateEnum.POSITION_STATE_ENUM_CLOSED});
+				let closed = this.viewServer.get_lpnft_asset(
+					actionView.positionOpen.position,
+					{ state: PositionStateEnum.POSITION_STATE_ENUM_CLOSED }
+				)
 				await this.indexedDb.putValue(ASSET_TABLE_NAME, closed)
 
-				let withdrawn = this.viewServer.get_lpnft_asset(actionView.positionOpen.position, {state:
-					PositionStateEnum.POSITION_STATE_ENUM_WITHDRAWN});
+				let withdrawn = this.viewServer.get_lpnft_asset(
+					actionView.positionOpen.position,
+					{ state: PositionStateEnum.POSITION_STATE_ENUM_WITHDRAWN }
+				)
 				await this.indexedDb.putValue(ASSET_TABLE_NAME, withdrawn)
 
-				let claimed = this.viewServer.get_lpnft_asset(actionView.positionOpen.position, {state:
-					PositionStateEnum.POSITION_STATE_ENUM_CLAIMED});
+				let claimed = this.viewServer.get_lpnft_asset(
+					actionView.positionOpen.position,
+					{ state: PositionStateEnum.POSITION_STATE_ENUM_CLAIMED }
+				)
 				await this.indexedDb.putValue(ASSET_TABLE_NAME, claimed)
-
-
 			}
 		}
 	}

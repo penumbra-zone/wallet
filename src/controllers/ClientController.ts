@@ -27,9 +27,7 @@ import {
 	CompactBlockRangeRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import { CompactBlock } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
-import {
-	ObliviousQueryService
-} from "@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect";
+import { ObliviousQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
 
 export type Transaction = {
 	blockHeight: bigint
@@ -90,8 +88,6 @@ export class ClientController {
 		this.indexedDb = indexedDb
 		this.wasmViewConnector = wasmViewConnector
 	}
-
-
 
 	async saveChainParameters() {
 		try {
