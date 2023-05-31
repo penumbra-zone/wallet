@@ -20,7 +20,7 @@ import {
 	StatusStreamRequest,
 	StatusStreamResponse,
 	TransactionInfoRequest,
-	TransactionInfoResponse,
+	TransactionInfoResponse, TransactionPlannerRequest,
 	WitnessRequest,
 	WitnessResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
@@ -198,6 +198,31 @@ export class ViewProtocolService {
 
 	async getWitness(request?: WitnessRequest) {
 		return new WitnessResponse({}).toBinary()
+	}
+
+	async getTransactionPlanner(request?: TransactionPlannerRequest) {
+
+		// create wasm planner here
+		//
+
+		if (request.fee !== undefined) {
+			// insert fee to planer
+		}
+		for (const output of request.outputs) {
+			// insert output to planer
+		}
+
+		for (const delegate of request.delegations) {
+			// insert delegatins to planner
+
+		}
+		for (const swaps of request.swaps) {
+			console.warn("swaps planner rpc not implemented")
+		}
+
+		// build plan
+
+		return new TransactionInfoResponse();
 	}
 
 	mapTransaction(decodeTransaction) {
