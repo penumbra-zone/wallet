@@ -157,13 +157,11 @@ export class ViewProtocolService {
 			TRANSACTION_TABLE_NAME
 		)
 
-		const response: TransactionInfoResponse[] = transactions
-			.map(txInfo => {
-				return new TransactionInfoResponse().fromJson({
-					txInfo,
-				})
+		const response: TransactionInfoResponse[] = transactions.map(txInfo => {
+			return new TransactionInfoResponse().fromJson({
+				txInfo,
 			})
-			.reverse()
+		})
 
 		// if (request.startHeight && request.endHeight) {
 		// 	return response.filter(

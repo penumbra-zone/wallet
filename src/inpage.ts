@@ -127,16 +127,26 @@ globalThis.penumbra = {
 					const updatedValue = await penumbra.publicState()
 					cb(updatedValue)
 				} else if (event === 'balance') {
-					const updatedValue = await penumbra.getBalanceByAddress(args)
-
-					for (let i = 0; i < updatedValue.length; i++) {
-						cb(new BalanceByAddressResponse().fromJson(updatedValue[i] as any))
+					const data = await penumbra.getBalanceByAddress({} as any)
+					for (let i = 0; i < data.length; i++) {
+						cb(new BalanceByAddressResponse().fromJson(data[i] as any))
+						await timer(100)
 					}
+					// console.log({data});
+
+					// const updatedValue = await penumbra.getBalanceByAddress(args)
+
+					// for (let i = 0; i < updatedValue.length; i++) {
+					// 	cb(new BalanceByAddressResponse().fromJson(updatedValue[i] as any))
+					// 	await timer(100)
+					// }
 				} else if (event === 'assets') {
 					cb(new AssetsResponse().fromJson({ asset: (data as any).data }))
 				} else if (event === 'notes') {
 					cb(new NotesResponse().fromJson({ noteRecord: (data as any).data }))
 				} else if (event === 'transactions') {
+					console.log((data as any).data)
+
 					cb(new TransactionInfoResponse().fromJson((data as any).data))
 				}
 			})
