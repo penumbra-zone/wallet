@@ -23,6 +23,7 @@ type Events =
 	| 'assets'
 	| 'transactions'
 	| 'notes'
+	| 'accountsChanged'
 
 declare global {
 	interface PenumbraApi extends __BackgroundPageApiDirect {
@@ -33,7 +34,7 @@ declare global {
 				state:
 					| Awaited<
 							ReturnType<
-								| __BackgroundPageApiDirect['publicState']
+								| __BackgroundPageApiDirect['requestAccounts']
 								| __BackgroundPageApiDirect['getStatusStream']
 								| __BackgroundPageApiDirect['getTransactionInfo']
 							>
@@ -42,6 +43,7 @@ declare global {
 					| BalanceByAddressResponse
 					| NotesResponse
 					| TransactionInfoResponse
+					| string[]
 			) => void,
 			args: any
 		): void
@@ -61,7 +63,8 @@ const timer = ms => new Promise(res => setTimeout(res, ms))
 //@ts-ignore
 globalThis.penumbra = {
 	signTransaction: proxy.signTransaction,
-	publicState: proxy.publicState,
+	requestAccounts: proxy.requestAccounts,
+	getFullViewingKey: proxy.getFullViewingKey,
 	getBalanceByAddress: (arg: BalanceByAddressRequest) =>
 		proxy.getBalanceByAddress(arg),
 	getChainParameters: async () =>
@@ -81,7 +84,7 @@ globalThis.penumbra = {
 	},
 	on: async (event, cb, args) => {
 		const isApproved = await proxy.resourceIsApproved()
-		if (!isApproved) return
+		if (!isApproved && event !== 'accountsChanged') return
 
 		if (event === 'assets') {
 			const data = await proxy.getAssets()
@@ -113,21 +116,27 @@ globalThis.penumbra = {
 				cb(new TransactionInfoResponse().fromJson(data[i] as any))
 				await timer(100)
 			}
+		} else if (event === 'accountsChanged') {
+			const account = await proxy.getAccount()
+
+			account.length && cb(account)
 		}
 
 		pipe(
 			fromPostMessage(),
 			filter((data: { penumbraMethod: string }) => {
-				return data.penumbraMethod === event.toUpperCase()
+				return data.penumbraMethod === event
 			}),
 			subscribe(async data => {
 				if (event === 'status') {
 					const updatedValue = await proxy.getStatusStream()
 					cb(new StatusStreamResponse().fromJson(updatedValue as any))
-				} else if (event === 'state') {
-					const updatedValue = await penumbra.publicState()
-					cb(updatedValue)
-				} else if (event === 'balance') {
+				}
+				//  else if (event === 'state') {
+				// 	const updatedValue = await penumbra.publicState()
+				// 	cb(updatedValue)
+				// } 
+				else if (event === 'balance') {
 					const data = await penumbra.getBalanceByAddress({} as any)
 					for (let i = 0; i < data.length; i++) {
 						cb(new BalanceByAddressResponse().fromJson(data[i] as any))
@@ -141,14 +150,18 @@ globalThis.penumbra = {
 					event === 'transactions' &&
 					data.penumbraMethod === 'TRANSACTIONS'
 				) {
-					
-
 					cb(
 						new TransactionInfoResponse().fromJson({
 							txInfo: (data as any).data,
 						})
 					)
 					await timer(100)
+				} else if (event === 'accountsChanged') {
+					const account = await proxy.getAccount()
+
+					console.log({ account })
+
+					cb(account)
 				}
 			})
 		)

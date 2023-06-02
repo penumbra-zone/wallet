@@ -83,6 +83,8 @@ export class MessageController extends EventEmitter {
 			this.once(`${id}:finished`, resolve)
 		})
 
+		console.log({ finishedMessage })
+
 		switch (finishedMessage.status) {
 			case MessageStatus.Signed:
 			case MessageStatus.Published:

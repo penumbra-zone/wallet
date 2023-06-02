@@ -102,9 +102,10 @@ export const columnsMyValidator: Array<
 ]
 
 
-export const STATUS = 'STATUS'
-export const STATE = 'STATE'
-export const BALANCE = 'BALANCE'
+export const STATUS = 'status'
+export const STATE = 'state'
+export const BALANCE = 'balance'
+export const ACCOUNTS_CHANGED = 'accountsChanged'
 
 export const ASSET_TABLE_NAME = 'assets'
 export const CHAIN_PARAMETERS_TABLE_NAME = 'chain_parameters'

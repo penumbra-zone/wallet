@@ -298,7 +298,8 @@ class BackgroundService extends EventEmitter {
 
 		if (!sender || !sender.url) return
 
-		const origin = new URL(sender.url).hostname
+		const origin = new URL(sender.url).origin
+
 		const connectionId = nanoid()
 		const inpageApi = this.getInpageApi(origin, connectionId)
 
@@ -500,42 +501,32 @@ class BackgroundService extends EventEmitter {
 
 		const commonMessageInput = { connectionId, origin }
 		return {
-			publicState: async () => {
+			requestAccounts: async () => {
 				const { selectedAccount } = await this.validatePermission(
 					origin,
 					connectionId
 				)
 
-				const { isInitialized, isLocked, messages } = this.getState()
+				const { isLocked } = this.getState()
 
 				if (isLocked) {
-					return showNotification()
+				return showNotification()
 				}
 
-				const fvk =
-					this.walletController.getAccountFullViewingKeyWithoutPassword()
-
-				return {
-					account: {
-						...selectedAccount,
-						fvk,
-					},
-					isInitialized,
-					isLocked,
-					messages: messages
-						.filter(
-							message =>
-								message.account.addressByIndex ===
-									selectedAccount.addressByIndex && message.origin === origin
-						)
-						.map(message => ({
-							id: message.id,
-							status: message.status,
-							uid: message.extUuid,
-						})),
-					network: this._getCurrentNetwork(selectedAccount),
-					version: extension.runtime.getManifest().version,
-				}
+				return [selectedAccount.addressByIndex]
+			},
+			getFullViewingKey: async () => {
+				return this.walletController.getAccountFullViewingKeyWithoutPassword()
+			},
+			getAccount: async (): Promise<string[]> => {
+				const { isLocked, selectedAccount } = this.getState()
+				return isLocked ||
+					!this.permissionsController.hasPermission(
+						origin,
+						PERMISSIONS.APPROVED
+					)
+					? []
+					: [selectedAccount.addressByIndex]
 			},
 			resourceIsApproved: async () => {
 				return this.permissionsController.hasPermission(
@@ -560,6 +551,8 @@ class BackgroundService extends EventEmitter {
 				})
 
 				showNotification()
+				console.log({ message })
+
 				return this.messageController.getMessageResult(message.id)
 			},
 

@@ -1,6 +1,7 @@
 import pipe from 'callbag-pipe'
 import subscribe from 'callbag-subscribe'
 import {
+	ACCOUNTS_CHANGED,
 	BALANCE,
 	extension,
 	filterIpcRequests,
@@ -47,14 +48,23 @@ if (document.documentElement.tagName === 'HTML') {
 				)
 
 				extension.storage.onChanged.addListener(data => {
-					
-					
 					if (data.lastBlockHeight && data.lastSavedBlock) {
 						postMessage({ penumbraMethod: STATUS }, location.origin)
 					} else if (data.balance) {
 						//TODO find asset as changed
-						
+
 						postMessage({ penumbraMethod: BALANCE }, location.origin)
+					} else if (data.isLocked) {
+						postMessage({ penumbraMethod: ACCOUNTS_CHANGED }, location.origin)
+					} else if (data.origins) {
+						if (
+							(!data.origins.newValue[location.origin] &&
+								data.origins.oldValue[location.origin]) ||
+							(data.origins.newValue[location.origin] &&
+								!data.origins.oldValue[location.origin])
+						) {
+							postMessage({ penumbraMethod: ACCOUNTS_CHANGED }, location.origin)
+						}
 					} else {
 						postMessage({ penumbraMethod: STATE }, location.origin)
 					}
@@ -65,20 +75,20 @@ if (document.documentElement.tagName === 'HTML') {
 }
 
 const onPageRequest = async (event: MessageEvent) => {
-  // TODO: confirmation of sender
-  if (event.data?.type === "BUF_TRANSPORT_REQUEST") {
-    console.log("Content onPageRequest", event);
-    chrome.runtime.sendMessage(event.data);
-  }
-};
-window.addEventListener("message", onPageRequest);
+	// TODO: confirmation of sender
+	if (event.data?.type === 'BUF_TRANSPORT_REQUEST') {
+		console.log('Content onPageRequest', event)
+		chrome.runtime.sendMessage(event.data)
+	}
+}
+window.addEventListener('message', onPageRequest)
 
-type MessageSender = chrome.runtime.MessageSender;
+type MessageSender = chrome.runtime.MessageSender
 const onExtensionResponse = async (message: any, sender: MessageSender) => {
-  // TODO: confirmation of sender
-  if (message.type === "BUF_TRANSPORT_RESPONSE") {
-    console.log("Content onExtensionResponse", message, sender);
-    window.postMessage(message);
-  }
-};
-chrome.runtime.onMessage.addListener(onExtensionResponse);
+	// TODO: confirmation of sender
+	if (message.type === 'BUF_TRANSPORT_RESPONSE') {
+		console.log('Content onExtensionResponse', message, sender)
+		window.postMessage(message)
+	}
+}
+chrome.runtime.onMessage.addListener(onExtensionResponse)
