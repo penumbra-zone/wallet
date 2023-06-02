@@ -44,18 +44,6 @@ export class WindowManager {
 		})
 	}
 
-	openWindow(options) {
-		return new Promise((resolve, reject) => {
-			extension.windows.create(options, newWindow => {
-				const error = checkForError()
-				if (error) {
-					return reject(error)
-				}
-				return resolve(newWindow)
-			})
-		})
-	}
-
 	async showWindow() {
 		const { inShowMode } = this.store.getState()
 
@@ -69,7 +57,6 @@ export class WindowManager {
 		const notificationWindow = await this._getNotificationWindow()
 
 		if (notificationWindow) {
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			extension.windows.update(notificationWindow.id!, {
 				focused: true,
 			})
@@ -89,7 +76,7 @@ export class WindowManager {
 				left = Math.max(screenX + (outerWidth - NOTIFICATION_WIDTH), 0)
 			}
 
-			const popupWindow = await this.openWindow({
+			const popupWindow = await extension.windows.create({
 				url: 'notification.html',
 				type: 'popup',
 				width: NOTIFICATION_WIDTH,
@@ -98,7 +85,7 @@ export class WindowManager {
 				top,
 			})
 
-			this.store.updateState({ notificationWindowId: (popupWindow as any).id })
+			this.store.updateState({ notificationWindowId: popupWindow.id })
 		}
 
 		this.store.updateState({ inShowMode: false })
