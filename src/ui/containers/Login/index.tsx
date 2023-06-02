@@ -1,12 +1,17 @@
 import { useState } from 'react'
 import { Button, Input } from '../../components'
 import Background from '../../services/Background'
+import { useAccountsSelector } from '../../../account'
+import { selectMessages } from '../../redux'
 
 type LoginProps = {}
 
 export const Login: React.FC<LoginProps> = ({}) => {
 	const [password, setPassword] = useState<string>('')
 	const [isError, setIsError] = useState<boolean>(false)
+	const messages = useAccountsSelector(selectMessages)
+
+	console.log(messages)
 
 	const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setPassword(event.target.value)
@@ -16,6 +21,14 @@ export const Login: React.FC<LoginProps> = ({}) => {
 	const handleSubmitPassword = async () => {
 		try {
 			await Background.unlock(password)
+			console.log(window.location.pathname)
+
+			if (
+				!messages.unapprovedMessages.length &&
+				window.location.pathname === '/notification.html'
+			) {
+				await Background.closeNotificationWindow()
+			}
 		} catch {
 			setIsError(true)
 		}
@@ -25,6 +38,13 @@ export const Login: React.FC<LoginProps> = ({}) => {
 		if (event.key === 'Enter') {
 			try {
 				await Background.unlock(password)
+
+				if (
+					!messages.unapprovedMessages.length &&
+					window.location.pathname === '/notification.html'
+				) {
+					await Background.closeNotificationWindow()
+				}
 			} catch {
 				setIsError(true)
 			}
