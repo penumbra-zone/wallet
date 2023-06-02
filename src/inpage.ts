@@ -135,7 +135,7 @@ globalThis.penumbra = {
 				//  else if (event === 'state') {
 				// 	const updatedValue = await penumbra.publicState()
 				// 	cb(updatedValue)
-				// } 
+				// }
 				else if (event === 'balance') {
 					const data = await penumbra.getBalanceByAddress({} as any)
 					for (let i = 0; i < data.length; i++) {
@@ -158,8 +158,6 @@ globalThis.penumbra = {
 					await timer(100)
 				} else if (event === 'accountsChanged') {
 					const account = await proxy.getAccount()
-
-					console.log({ account })
 
 					cb(account)
 				}

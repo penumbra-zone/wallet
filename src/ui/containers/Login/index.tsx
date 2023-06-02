@@ -11,8 +11,6 @@ export const Login: React.FC<LoginProps> = ({}) => {
 	const [isError, setIsError] = useState<boolean>(false)
 	const messages = useAccountsSelector(selectMessages)
 
-	console.log(messages)
-
 	const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setPassword(event.target.value)
 		setIsError(false)
@@ -21,7 +19,6 @@ export const Login: React.FC<LoginProps> = ({}) => {
 	const handleSubmitPassword = async () => {
 		try {
 			await Background.unlock(password)
-			console.log(window.location.pathname)
 
 			if (
 				!messages.unapprovedMessages.length &&

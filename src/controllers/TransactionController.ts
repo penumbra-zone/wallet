@@ -85,7 +85,7 @@ export class TransactionController {
 
 				const detailAsset = await this.indexedDb.getValue('assets', assetId)
 
-				const asset = detailAsset.denom.denom
+				const asset = detailAsset.asset.denom.denom
 
 				//encode recipinet address
 				const encodeRecipientAddress = destAddress
@@ -147,9 +147,7 @@ export class TransactionController {
 
 				const detailAsset = await this.indexedDb.getValue('assets', assetId)
 
-				const asset = detailAsset.denom.denom
-
-				//TYrO7HYkLZJAf0IJJVa16YbV4sV+GEgBFLQ2O5xqUfcAuSn43RpyY7wnhjjD0dNFI6gbkuDVCC8e7YujcfAzCJegrj4+pwHBXmdw/6uDsD0=
+				const asset = detailAsset.asset.denom.denom
 
 				//encode recipinet address
 				const encodeRecipientAddress = destAddress

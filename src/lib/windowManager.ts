@@ -97,6 +97,8 @@ export class WindowManager {
 				left,
 				top,
 			})
+
+			this.store.updateState({ notificationWindowId: (popupWindow as any).id })
 		}
 
 		this.store.updateState({ inShowMode: false })
