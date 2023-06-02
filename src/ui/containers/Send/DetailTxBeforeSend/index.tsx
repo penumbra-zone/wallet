@@ -66,14 +66,15 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 		if (handleCancel) handleCancel()
 		else setSendPlan(null)
 	}
-	
+
 	const handleConfirm = async () => {
 		setLoading(true)
 		const txResponse = await Background.sendTransaction(
 			sendPlan.transactionPlan
 		)
-		console.log({txResponse});
-		
+		if (window.location.pathname === '/notification.html') {
+			await Background.closeNotificationWindow()
+		}
 		setTxResponse(txResponse)
 	}
 

@@ -15,10 +15,16 @@ export const ActiveMessage = () => {
 
 	const handleCancel = async () => {
 		Background.reject(messages.unapprovedMessages[0].id)
+		if (window.location.pathname === '/notification.html') {
+			await Background.closeNotificationWindow()
+		}
 	}
 
 	const handleConfirm = async () => {
 		await Background.approve(messages.unapprovedMessages[0].id)
+		if (window.location.pathname === '/notification.html') {
+			await Background.closeNotificationWindow()
+		}
 	}
 
 	if (
