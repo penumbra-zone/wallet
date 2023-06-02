@@ -32,7 +32,9 @@ import {
 	SWAP_TABLE_NAME,
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
-import { AssetInfoRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
+import {
+	DenomMetadataByIdRequest
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import { SpecificQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
 import { PositionState } from '@buf/penumbra-zone_penumbra.grpc_web/penumbra/core/dex/v1alpha1/dex_pb'
 import PositionStateEnum = PositionState.PositionStateEnum
@@ -253,23 +255,32 @@ export class WasmViewConnector {
 
 		const client = createPromiseClient(SpecificQueryService, transport)
 
-		const assetInfoRequest = new AssetInfoRequest()
-		assetInfoRequest.chainId = chainId
+		const denomMetadataByIdRequest = new DenomMetadataByIdRequest()
+		denomMetadataByIdRequest.chainId = chainId
 		const asset = new AssetId()
 		asset.inner = base64ToBytes(assetId.inner)
-		assetInfoRequest.assetId = asset
+		denomMetadataByIdRequest.assetId = asset
 
-		const assetResponse = await client.assetInfo(assetInfoRequest)
+		const demomResponse = await client.denomMetadataById(denomMetadataByIdRequest)
 
-		if (!assetResponse.asset) {
+		if (!demomResponse.denomMetadata) {
 			await this.indexedDb.putValue(ASSET_TABLE_NAME, {
 				id: assetId,
-				denom: { denom: base64_to_bech32('passet', assetId.inner) },
+				asset: {
+					id: assetId,
+					denom:  { denom: demomResponse.denomMetadata.display}
+				},
+				metadata: {}
 			})
 		} else {
-			let assetJson = assetResponse.asset.toJsonString()
+			let denomMetadata = demomResponse.denomMetadata.toJsonString()
 			await this.indexedDb.putValue(ASSET_TABLE_NAME, {
-				...JSON.parse(assetJson),
+				id: assetId,
+				asset: {
+					id: assetId,
+					denom:  { denom: demomResponse.denomMetadata.display}
+				},
+				metadata: JSON.parse(denomMetadata),
 			})
 		}
 	}
