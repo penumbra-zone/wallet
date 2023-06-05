@@ -106,7 +106,7 @@ export class ViewProtocolService {
 		const assets = await this.indexedDb.getAllValue(ASSET_TABLE_NAME)
 
 		const response = assets.map(i => {
-			return new AssetsResponse().fromJson({ asset: i.asset })
+			return new AssetsResponse().fromJson({ denomMetadata: i })
 		})
 
 		return response

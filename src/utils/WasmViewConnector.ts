@@ -17,7 +17,7 @@ import {
 	Transaction,
 } from '../controllers'
 import {
-	AssetId,
+	AssetId, DenomMetadata, DenomUnit,
 	Nullifier,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { IndexedDb } from './IndexedDb'
@@ -264,23 +264,20 @@ export class WasmViewConnector {
 		const demomResponse = await client.denomMetadataById(denomMetadataByIdRequest)
 
 		if (!demomResponse.denomMetadata) {
-			await this.indexedDb.putValue(ASSET_TABLE_NAME, {
-				id: assetId,
-				asset: {
-					id: assetId,
-					denom:  { denom: demomResponse.denomMetadata.display}
-				},
-				metadata: {}
-			})
+			await this.indexedDb.putValue(ASSET_TABLE_NAME,
+				new DenomMetadata({
+					penumbraAssetId: asset,
+					base: base64_to_bech32('passet', assetId.inner),
+					display: base64_to_bech32('passet', assetId.inner),
+					denomUnits: [new DenomUnit({
+						denom: base64_to_bech32('passet', assetId.inner),
+						exponent: 0
+					})]
+				}))
 		} else {
 			let denomMetadata = demomResponse.denomMetadata.toJsonString()
 			await this.indexedDb.putValue(ASSET_TABLE_NAME, {
-				id: assetId,
-				asset: {
-					id: assetId,
-					denom:  { denom: demomResponse.denomMetadata.display}
-				},
-				metadata: JSON.parse(denomMetadata),
+				...JSON.parse(denomMetadata),
 			})
 		}
 	}

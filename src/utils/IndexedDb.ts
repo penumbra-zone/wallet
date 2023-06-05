@@ -1,4 +1,4 @@
-import { IDBPDatabase, openDB } from 'idb'
+import {deleteDB, IDBPDatabase, openDB} from 'idb'
 import {
 	ASSET_TABLE_NAME,
 	CHAIN_PARAMETERS_TABLE_NAME,
@@ -57,11 +57,16 @@ export class IndexedDb {
 
 	public async createObjectStore() {
 		try {
-			this.db = await openDB(this.database, 2, {
-				upgrade(db: IDBPDatabase) {
+			this.db = await openDB(this.database, 10, {
+				async upgrade(db: IDBPDatabase) {
+
+					for (const objectStoreName of db.objectStoreNames) {
+						db.deleteObjectStore(objectStoreName);
+					}
+
 					db.createObjectStore(ASSET_TABLE_NAME, {
 						autoIncrement: true,
-						keyPath: 'id.inner',
+						keyPath: 'penumbraAssetId.inner',
 					})
 
 					db.createObjectStore(CHAIN_PARAMETERS_TABLE_NAME, {
@@ -86,6 +91,7 @@ export class IndexedDb {
 						autoIncrement: true,
 						keyPath: 'id',
 					})
+
 					db.createObjectStore(NCT_POSITION_TABLE_NAME)
 
 					db.createObjectStore(SPENDABLE_NOTES_TABLE_NAME)
