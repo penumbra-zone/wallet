@@ -60,7 +60,7 @@ export class ViewProtocolService {
 		request?: BalanceByAddressRequest
 	): Promise<BalanceByAddressResponse[]> {
 		const { balance } = await this.extensionStorage.getState('balance')
-		const assets: IAsset[] = await this.indexedDb.getAllValue(ASSET_TABLE_NAME)
+		const assets = await this.indexedDb.getAllValue(ASSET_TABLE_NAME)
 
 		const res = Object.entries(balance).map((i: [string, number]) => {
 			return new BalanceByAddressResponse().fromJson({
@@ -70,7 +70,7 @@ export class ViewProtocolService {
 					// hi:
 				},
 				asset: {
-					inner: assets.find(asset => asset.id.inner === i[0]).id.inner,
+					inner: assets.find(asset => asset.penumbraAssetId.inner === i[0]).penumbraAssetId.inner,
 				},
 			})
 		})

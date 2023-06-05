@@ -88,6 +88,7 @@ globalThis.penumbra = {
 
 		if (event === 'assets') {
 			const data = await proxy.getAssets()
+
 			for (let i = 0; i < data.length; i++) {
 				cb(new AssetsResponse().fromJson(data[i] as any))
 				await timer(100)
@@ -143,7 +144,9 @@ globalThis.penumbra = {
 						await timer(100)
 					}
 				} else if (event === 'assets') {
-					cb(new AssetsResponse().fromJson({ asset: (data as any).data }))
+					cb(
+						new AssetsResponse().fromJson({ denomMetadata: (data as any).data })
+					)
 				} else if (event === 'notes') {
 					cb(new NotesResponse().fromJson({ noteRecord: (data as any).data }))
 				} else if (

@@ -67,8 +67,7 @@ export const Address: React.FC<AddressProps> = ({
 		),
 	}))
 
-	const handleMax = () =>
-		setAmount(String(Number(Object.values(balance)[0]) / 10 ** 6))
+	const handleMax = () => setAmount(String(Number(Object.values(balance)[0])))
 
 	const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearch(event.target.value)

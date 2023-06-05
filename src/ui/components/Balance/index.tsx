@@ -10,7 +10,7 @@ export const Balance: React.FC<BalanceProps> = ({ className }) => {
 
 	return (
 		<p className={className}>
-			{Number(Number(Object.values(balance)[0] || 0) / 10 ** 6).toLocaleString(
+			{Number(Number(Object.values(balance)[0] || 0)).toLocaleString(
 				'en-US'
 			)}{' '}
 			PNB

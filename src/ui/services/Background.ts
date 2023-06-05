@@ -3,10 +3,7 @@ import { Contact, NetworkName, PermissionType } from '../../controllers'
 import { TransactionResponse } from '../../messages/types'
 import { PreferencesAccount } from '../../preferences'
 import { StorageLocalState } from '../../storage'
-import {
-	ParsedActions,
-	TransactionPlan,
-} from '../../types/transaction'
+import { ParsedActions, TransactionPlan } from '../../types/transaction'
 import { TableName } from '../../utils'
 import { CreateWalletInput, ISeedWalletInput } from '../../wallets'
 import { PENUMBRAWALLET_DEBUG } from '../appConfig'
@@ -418,29 +415,6 @@ class Background {
 		}
 	}
 
-	async getTransactionPlan(
-		destAddress: string,
-		amount: number,
-		assetId?: string
-	): Promise<{
-		transactionPlan: TransactionPlan
-		actions: ParsedActions[]
-	}> {
-		try {
-			await this.initPromise
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			await this._connect!()
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			return await this.background!.getTransactionPlan(
-				destAddress,
-				amount,
-				assetId
-			)
-		} catch (err) {
-			throw new Error(prepareErrorMessage(err))
-		}
-	}
-
 	async parseActions(transactionPlan: TransactionPlan): Promise<{
 		transactionPlan: TransactionPlan
 		actions: ParsedActions[]
@@ -532,10 +506,7 @@ class Background {
 		}
 	}
 
-	async approve(
-		messageId: string,
-		result?: any
-	): Promise<unknown> {
+	async approve(messageId: string, result?: any): Promise<unknown> {
 		try {
 			await this.initPromise
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
