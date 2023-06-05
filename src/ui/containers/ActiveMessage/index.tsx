@@ -36,6 +36,7 @@ export const ActiveMessage = () => {
 				sendPlan={messages.unapprovedMessages[0].data}
 				handleCancel={handleCancel}
 				handleApprove={handleConfirm}
+				messageId={messages.unapprovedMessages[0].id}
 			/>
 		)
 	}

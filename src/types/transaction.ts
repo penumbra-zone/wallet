@@ -65,14 +65,4 @@ export type TransactionMessageData = {
 	actions: ParsedActions[]
 }
 
-export type TransactionResponseType = {
-	id: number
-	jsonrpc: string
-	result: {
-		code: 0 | 1
-		codespace: string
-		data: string
-		hash: string
-		log: string
-	}
-}
+

@@ -7,14 +7,15 @@ import {
 	ParsedActions,
 	TransactionMessageData,
 	TransactionPlan,
-	TransactionResponseType,
 } from '../../../../types/transaction'
 import { getShortKey, routesPath } from '../../../../utils'
 import { Button, ChevronLeftIcon, ModalWrapper } from '../../../components'
 import Background from '../../../services/Background'
+import { TransactionResponse } from '../../../../messages/types'
 
 type DetailTxBeforeSendProps = {
 	sendPlan: TransactionMessageData
+	messageId: string
 	setSendPlan?: Dispatch<
 		SetStateAction<{
 			transactionPlan: TransactionPlan
@@ -30,10 +31,9 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 	setSendPlan,
 	handleCancel,
 	handleApprove,
+	messageId,
 }) => {
-	const [txResponse, setTxResponse] = useState<null | TransactionResponseType>(
-		null
-	)
+	const [txResponse, setTxResponse] = useState<null | TransactionResponse>(null)
 	const [loading, setLoading] = useState<boolean>(false)
 	const navigate = useNavigate()
 
@@ -72,9 +72,12 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 		const txResponse = await Background.sendTransaction(
 			sendPlan.transactionPlan
 		)
+
+		await Background.approve(messageId, txResponse)
 		if (window.location.pathname === '/notification.html') {
 			await Background.closeNotificationWindow()
 		}
+
 		setTxResponse(txResponse)
 	}
 

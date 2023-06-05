@@ -59,10 +59,10 @@ extension.runtime.onConnect.addListener(async remotePort => {
 	}
 })
 
-extension.runtime.onConnectExternal.addListener(async remotePort => {
-	const bgService = await bgPromise
-	bgService.setupPageConnection(remotePort)
-})
+// extension.runtime.onConnectExternal.addListener(async remotePort => {
+// 	const bgService = await bgPromise
+// 	bgService.setupPageConnection(remotePort)
+// })
 
 async function setupBackgroundService() {
 	const extensionStorage = new ExtensionStorage()
@@ -366,8 +366,8 @@ class BackgroundService extends EventEmitter {
 				this.messageController.reject(messageId),
 			deleteMessage: async (id: string) =>
 				this.messageController.deleteMessage(id),
-			approve: async (messageId: string) => {
-				const message = await this.messageController.approve(messageId)
+			approve: async (messageId: string, result?: any) => {
+				const message = await this.messageController.approve(messageId, result)
 				return message.result
 			},
 			deleteOrigin: async (origin: string) =>
@@ -401,14 +401,19 @@ class BackgroundService extends EventEmitter {
 	}
 
 	async validatePermission(origin: string, connectionId: string) {
-		const { selectedAccount, isInitialized } = this.getState([
+		const { selectedAccount, isLocked } = this.getState([
 			'selectedAccount',
 			'isInitialized',
+			'isLocked',
 		])
 
 		if (!selectedAccount) {
 			this.emit('Show tab', '/accounts.html', 'accounts')
 			return
+		}
+
+		if (isLocked) {
+			this.emit('Show notification')
 		}
 
 		const hasPermission = this.permissionsController.hasPermission(
@@ -453,17 +458,17 @@ class BackgroundService extends EventEmitter {
 			this.permissionsController.setMessageIdAccess(origin, message.id)
 		}
 		this.emit('Show notification')
+		let messageResult
 
 		try {
-			await this.messageController.getMessageResult(messageId)
+			messageResult = await this.messageController.getMessageResult(messageId)
 			this.messageController.setPermission(origin, PERMISSIONS.APPROVED)
 		} catch (e) {
 			if (e.data === MessageStatus.Rejected) {
 				this.permissionsController.setMessageIdAccess(origin, null)
 			}
-			throw e
 		}
-		return { selectedAccount }
+		return { selectedAccount, messageResult }
 	}
 
 	getInpageApi(origin: string, connectionId: string) {
@@ -472,18 +477,10 @@ class BackgroundService extends EventEmitter {
 		const commonMessageInput = { connectionId, origin }
 		return {
 			requestAccounts: async () => {
-				const { selectedAccount } = await this.validatePermission(
-					origin,
-					connectionId
-				)
+				const { selectedAccount, messageResult } =
+					await this.validatePermission(origin, connectionId)
 
-				const { isLocked } = this.getState()
-
-				if (isLocked) {
-					return showNotification()
-				}
-
-				return [selectedAccount.addressByIndex]
+				return messageResult ? [selectedAccount.addressByIndex] : []
 			},
 			getFullViewingKey: async () => {
 				return this.walletController.getAccountFullViewingKeyWithoutPassword()

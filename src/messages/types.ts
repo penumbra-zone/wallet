@@ -20,6 +20,12 @@ export type MessageInputOfType<T extends MessageInput['type']> = Extract<
 	{ type: T }
 >
 
+
+export type MessageOfType<T extends Message['type']> = Extract<
+Message,
+	{ type: T }
+>
+
 export enum MessageStatus {
 	Failed = 'failed',
 	Published = 'published',
@@ -61,7 +67,19 @@ export type Message = {
 				broadcast: boolean
 				data: TransactionMessageData
 				input: MessageInputOfType<'transaction'>
-				result?: string
+				result?: TransactionResponse
 				successPath?: string | null
 		  }
 	)
+
+export type TransactionResponse = {
+	id: number
+	jsonrpc: string
+	result: {
+		code: 1 | 0
+		codespace: string
+		data: string
+		hash: string
+		log: string
+	}
+}

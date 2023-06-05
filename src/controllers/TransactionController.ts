@@ -16,7 +16,6 @@ import {
 	ParsedActions,
 	TransactionMessageData,
 	TransactionPlan,
-	TransactionResponseType,
 } from '../types/transaction'
 import { IndexedDb } from '../utils'
 import { bytesToBase64 } from '../utils/base64'
@@ -24,6 +23,7 @@ import { WasmViewConnector } from '../utils/WasmViewConnector'
 import { NetworkController } from './NetworkController'
 import { RemoteConfigController } from './RemoteConfigController'
 import { WalletController } from './WalletController'
+import { TransactionResponse } from '../messages/types'
 
 export class TransactionController {
 	private indexedDb: IndexedDb
@@ -236,7 +236,7 @@ export class TransactionController {
 
 	async sendTransaction(
 		sendPlan: TransactionPlan
-	): Promise<TransactionResponseType> {
+	): Promise<TransactionResponse> {
 		let fvk
 		let spendingKey
 		try {
@@ -246,7 +246,9 @@ export class TransactionController {
 		if (!fvk || !spendingKey) return
 
 		const storedTree = await this.indexedDb.loadStoredTree()
+
 		const buildTx = build_tx(spendingKey, fvk, sendPlan, storedTree)
+
 		const encodeTx = await encode_tx(buildTx)
 
 		const resp = await this.broadcastTx(bytesToBase64(encodeTx))
@@ -296,7 +298,7 @@ export class TransactionController {
 		)
 	}
 
-	async broadcastTx(tx_bytes_hex: string) {
+	async broadcastTx(tx_bytes_hex: string): Promise<TransactionResponse> {
 		const { tendermint } =
 			this.configApi.getNetworkConfig()[this.configApi.getNetwork()]
 

@@ -80,7 +80,7 @@ export class MessageController extends EventEmitter {
 		}
 
 		const finishedMessage = await new Promise<Message>(resolve => {
-			this.once(`${id}:finished`, resolve)
+			this.on(`${id}:finished`, resolve)
 		})
 
 		switch (finishedMessage.status) {
@@ -114,7 +114,7 @@ export class MessageController extends EventEmitter {
 		}
 	}
 
-	async approve(id: string) {
+	async approve(id: string, result?: any) {
 		const message = this.getMessageById(id)
 
 		try {
@@ -126,6 +126,7 @@ export class MessageController extends EventEmitter {
 					break
 				case 'transaction': {
 					message.status = MessageStatus.Signed
+					message.result = result
 					break
 				}
 			}
@@ -159,6 +160,7 @@ export class MessageController extends EventEmitter {
 		message.status = MessageStatus.Rejected
 
 		this._updateMessage(message)
+
 		this.emit(`${message.id}:finished`, message)
 	}
 

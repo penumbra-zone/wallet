@@ -1,11 +1,11 @@
 import { __BackgroundUiApiDirect } from '../../background'
 import { Contact, NetworkName, PermissionType } from '../../controllers'
+import { TransactionResponse } from '../../messages/types'
 import { PreferencesAccount } from '../../preferences'
 import { StorageLocalState } from '../../storage'
 import {
 	ParsedActions,
 	TransactionPlan,
-	TransactionResponseType,
 } from '../../types/transaction'
 import { TableName } from '../../utils'
 import { CreateWalletInput, ISeedWalletInput } from '../../wallets'
@@ -460,7 +460,7 @@ class Background {
 
 	async sendTransaction(
 		sendPlan: TransactionPlan
-	): Promise<TransactionResponseType> {
+	): Promise<TransactionResponse> {
 		try {
 			await this.initPromise
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -534,13 +534,14 @@ class Background {
 
 	async approve(
 		messageId: string,
+		result?: any
 	): Promise<unknown> {
 		try {
 			await this.initPromise
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			await this._connect!()
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			return await this.background!.approve(messageId)
+			return await this.background!.approve(messageId, result)
 		} catch (err) {
 			throw new Error(prepareErrorMessage(err))
 		}
