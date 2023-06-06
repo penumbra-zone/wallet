@@ -274,9 +274,9 @@ class BackgroundService extends EventEmitter {
 		const inpageApi = this.getInpageApi(origin, connectionId)
 
 		const actionObj = {
-			[ASSET_TABLE_NAME]: 'ASSETS',
-			[SPENDABLE_NOTES_TABLE_NAME]: 'NOTES',
-			[TRANSACTION_TABLE_NAME]: 'TRANSACTIONS',
+			[ASSET_TABLE_NAME]: 'assets',
+			[SPENDABLE_NOTES_TABLE_NAME]: 'notes',
+			[TRANSACTION_TABLE_NAME]: 'transactions',
 		}
 
 		this.indexedDb.addObserver((action, data) => {

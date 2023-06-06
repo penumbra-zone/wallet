@@ -139,6 +139,7 @@ globalThis.penumbra = {
 				// }
 				else if (event === 'balance') {
 					const data = await penumbra.getBalanceByAddress({} as any)
+
 					for (let i = 0; i < data.length; i++) {
 						cb(new BalanceByAddressResponse().fromJson(data[i] as any))
 						await timer(100)
@@ -149,10 +150,7 @@ globalThis.penumbra = {
 					)
 				} else if (event === 'notes') {
 					cb(new NotesResponse().fromJson({ noteRecord: (data as any).data }))
-				} else if (
-					event === 'transactions' &&
-					data.penumbraMethod === 'TRANSACTIONS'
-				) {
+				} else if (event === 'transactions') {
 					cb(
 						new TransactionInfoResponse().fromJson({
 							txInfo: (data as any).data,

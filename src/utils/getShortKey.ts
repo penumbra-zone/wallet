@@ -3,8 +3,8 @@ export const getShortKey = (text: string) => {
 	return text.slice(0, 36) + '...'
 }
 
-export const getShortName = (text: string) => {
+export const getShortName = (text: string, amount = 14) => {
 	if (!text) return
-	if (text.length <= 14) return text
-	return text.slice(0, 14) + '...'
+	if (text.length <= amount) return text
+	return text.slice(0, amount) + '...'
 }

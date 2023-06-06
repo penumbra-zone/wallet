@@ -267,16 +267,22 @@ export class WasmViewConnector {
 		)
 
 		if (!demomResponse.denomMetadata) {
-			await this.indexedDb.putValue(ASSET_TABLE_NAME,
-				JSON.parse(new DenomMetadata({
-					penumbraAssetId: asset,
-					base: base64_to_bech32('passet', assetId.inner),
-					display: base64_to_bech32('passet', assetId.inner),
-					denomUnits: [new DenomUnit({
-						denom: base64_to_bech32('passet', assetId.inner),
-						exponent: 0
-					})]
-				}).toJsonString()))
+			await this.indexedDb.putValue(
+				ASSET_TABLE_NAME,
+				JSON.parse(
+					new DenomMetadata({
+						penumbraAssetId: asset,
+						base: base64_to_bech32('passet', assetId.inner),
+						display: base64_to_bech32('passet', assetId.inner),
+						denomUnits: [
+							new DenomUnit({
+								denom: base64_to_bech32('passet', assetId.inner),
+								exponent: 0,
+							}),
+						],
+					}).toJsonString()
+				)
+			)
 		} else {
 			let denomMetadata = demomResponse.denomMetadata.toJsonString()
 			await this.indexedDb.putValue(ASSET_TABLE_NAME, {
@@ -367,57 +373,94 @@ export class WasmViewConnector {
 					actionView.positionOpen.position,
 					{ state: PositionStateEnum.POSITION_STATE_ENUM_OPENED }
 				)
-				console.log(opened)
-				await this.indexedDb.putValue(ASSET_TABLE_NAME, JSON.parse(new DenomMetadata({
-					penumbraAssetId: new AssetId({inner: base64ToBytes(opened.id.inner)}),
-					base: opened.denom.denom,
-					display: opened.denom.denom,
-					denomUnits: [new DenomUnit({
-						denom: opened.denom.denom,
-						exponent: 0
-					})]
-				}).toJsonString()))
+
+				await this.indexedDb.putValue(
+					ASSET_TABLE_NAME,
+					JSON.parse(
+						new DenomMetadata({
+							penumbraAssetId: new AssetId({
+								inner: base64ToBytes(opened.id.inner),
+							}),
+							base: opened.denom.denom,
+							display: opened.denom.denom,
+							denomUnits: [
+								new DenomUnit({
+									denom: opened.denom.denom,
+									exponent: 0,
+								}),
+							],
+						}).toJsonString()
+					)
+				)
 
 				let closed = this.viewServer.get_lpnft_asset(
 					actionView.positionOpen.position,
 					{ state: PositionStateEnum.POSITION_STATE_ENUM_CLOSED }
 				)
 
-				await this.indexedDb.putValue(ASSET_TABLE_NAME, JSON.parse(new DenomMetadata({
-					penumbraAssetId: new AssetId({inner: base64ToBytes(closed.id.inner)}),
-					base: closed.denom.denom,
-					display: closed.denom.denom,
-					denomUnits: [new DenomUnit({
-						denom: closed.denom.denom,
-						exponent: 0
-					})]
-				}).toJsonString()))
+				await this.indexedDb.putValue(
+					ASSET_TABLE_NAME,
+					JSON.parse(
+						new DenomMetadata({
+							penumbraAssetId: new AssetId({
+								inner: base64ToBytes(closed.id.inner),
+							}),
+							base: closed.denom.denom,
+							display: closed.denom.denom,
+							denomUnits: [
+								new DenomUnit({
+									denom: closed.denom.denom,
+									exponent: 0,
+								}),
+							],
+						}).toJsonString()
+					)
+				)
 				let withdrawn = this.viewServer.get_lpnft_asset(
 					actionView.positionOpen.position,
 					{ state: PositionStateEnum.POSITION_STATE_ENUM_WITHDRAWN }
 				)
-				await this.indexedDb.putValue(ASSET_TABLE_NAME, JSON.parse(new DenomMetadata({
-					penumbraAssetId: new AssetId({inner: base64ToBytes(withdrawn.id.inner)}),
-					base: withdrawn.denom.denom,
-					display: withdrawn.denom.denom,
-					denomUnits: [new DenomUnit({
-						denom: withdrawn.denom.denom,
-						exponent: 0
-					})]
-				}).toJsonString()))
+				await this.indexedDb.putValue(
+					ASSET_TABLE_NAME,
+					JSON.parse(
+						new DenomMetadata({
+							penumbraAssetId: new AssetId({
+								inner: base64ToBytes(withdrawn.id.inner),
+							}),
+							base: withdrawn.denom.denom,
+							display: withdrawn.denom.denom,
+							denomUnits: [
+								new DenomUnit({
+									denom: withdrawn.denom.denom,
+									exponent: 0,
+								}),
+							],
+						}).toJsonString()
+					)
+				)
 				let claimed = this.viewServer.get_lpnft_asset(
 					actionView.positionOpen.position,
 					{ state: PositionStateEnum.POSITION_STATE_ENUM_CLAIMED }
 				)
-				await this.indexedDb.putValue(ASSET_TABLE_NAME, JSON.parse(new DenomMetadata({
-					penumbraAssetId: new AssetId({inner: base64ToBytes(claimed.id.inner)}),
-					base: claimed.denom.denom,
-					display: claimed.denom.denom,
-					denomUnits: [new DenomUnit({
-						denom: claimed.denom.denom,
-						exponent: 0
-					})]
-				}).toJsonString()))			}
+				await this.indexedDb.putValue(
+					ASSET_TABLE_NAME,
+					JSON.parse(
+						new DenomMetadata({
+							penumbraAssetId: new AssetId({
+								inner: base64ToBytes(claimed.id.inner),
+							}),
+							base: claimed.denom.denom,
+							display: claimed.denom.denom,
+							denomUnits: [
+								new DenomUnit({
+									denom: claimed.denom.denom,
+									exponent: 0,
+								}),
+							],
+						}).toJsonString()
+					)
+				)
+			}
 		}
 	}
 

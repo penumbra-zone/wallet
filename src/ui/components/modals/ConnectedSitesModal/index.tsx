@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAccountsSelector } from '../../../../account'
-import { routesPath } from '../../../../utils'
+import { getShortName, routesPath } from '../../../../utils'
 import { selectNewAccount, selectOrigins } from '../../../redux'
 import Background from '../../../services/Background'
 import { Button } from '../../Button'
@@ -90,8 +90,8 @@ export const ConnectedSitesModal: React.FC<SuccessCreateModalProps> = ({
 											<div className='w-[36px] h-[36px] li_gradient rounded-[50%] flex items-center justify-center'>
 												<div className='w-[35px] h-[35px] bg-brown rounded-[50%] flex items-center justify-center'></div>
 											</div>
-											<p className='text-light_grey text_body_ext ml-[8px]'>
-												{i}
+											<p className='text-light_grey text_body_ext ml-[8px] '>
+												{getShortName(i, 20)}
 											</p>
 										</div>
 										<div className='flex'>
