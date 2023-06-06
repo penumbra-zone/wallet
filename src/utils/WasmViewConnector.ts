@@ -261,6 +261,9 @@ export class WasmViewConnector {
 		asset.inner = base64ToBytes(assetId.inner)
 		denomMetadataByIdRequest.assetId = asset
 
+		if (await this.indexedDb.getValue(ASSET_TABLE_NAME, assetId.inner) !== undefined)
+			return;
+
 		const demomResponse = await client.denomMetadataById(denomMetadataByIdRequest)
 
 		if (!demomResponse.denomMetadata) {
