@@ -104,7 +104,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 						return (
 							<div key={index} className='w-[100%] flex flex-col mt-[16px]'>
 								<p className='h2 mb-[8px] capitalize'>{i.type}</p>
-								<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey'>
+								<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-all'>
 									{text}
 								</p>
 							</div>
