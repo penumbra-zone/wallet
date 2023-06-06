@@ -17,7 +17,9 @@ import {
 	Transaction,
 } from '../controllers'
 import {
-	AssetId, DenomMetadata, DenomUnit,
+	AssetId,
+	DenomMetadata,
+	DenomUnit,
 	Nullifier,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { IndexedDb } from './IndexedDb'
@@ -32,9 +34,7 @@ import {
 	SWAP_TABLE_NAME,
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
-import {
-	DenomMetadataByIdRequest
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
+import { DenomMetadataByIdRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import { SpecificQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
 import { PositionState } from '@buf/penumbra-zone_penumbra.grpc_web/penumbra/core/dex/v1alpha1/dex_pb'
 import PositionStateEnum = PositionState.PositionStateEnum
@@ -229,12 +229,13 @@ export class WasmViewConnector {
 				note,
 				note.noteCommitment.inner
 			)
+
+			await this.storeAsset(note.note.value.assetId)
+
 			await this.configApi.updateAssetBalance(
 				note.note.value.assetId.inner,
 				Number(note.note.value.amount.lo)
 			)
-
-			await this.storeAsset(note.note.value.assetId)
 
 			try {
 				const tx = await this.saveTransaction(base64ToBytes(note.source.inner))
@@ -261,19 +262,25 @@ export class WasmViewConnector {
 		asset.inner = base64ToBytes(assetId.inner)
 		denomMetadataByIdRequest.assetId = asset
 
-		const demomResponse = await client.denomMetadataById(denomMetadataByIdRequest)
+		const demomResponse = await client.denomMetadataById(
+			denomMetadataByIdRequest
+		)
 
 		if (!demomResponse.denomMetadata) {
-			await this.indexedDb.putValue(ASSET_TABLE_NAME,
+			await this.indexedDb.putValue(
+				ASSET_TABLE_NAME,
 				new DenomMetadata({
 					penumbraAssetId: asset,
 					base: base64_to_bech32('passet', assetId.inner),
 					display: base64_to_bech32('passet', assetId.inner),
-					denomUnits: [new DenomUnit({
-						denom: base64_to_bech32('passet', assetId.inner),
-						exponent: 0
-					})]
-				}))
+					denomUnits: [
+						new DenomUnit({
+							denom: base64_to_bech32('passet', assetId.inner),
+							exponent: 0,
+						}),
+					],
+				})
+			)
 		} else {
 			let denomMetadata = demomResponse.denomMetadata.toJsonString()
 			await this.indexedDb.putValue(ASSET_TABLE_NAME, {
