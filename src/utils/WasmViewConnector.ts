@@ -17,7 +17,9 @@ import {
 	Transaction,
 } from '../controllers'
 import {
-	AssetId, DenomMetadata, DenomUnit,
+	AssetId,
+	DenomMetadata,
+	DenomUnit,
 	Nullifier,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { IndexedDb } from './IndexedDb'
@@ -32,9 +34,7 @@ import {
 	SWAP_TABLE_NAME,
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
-import {
-	DenomMetadataByIdRequest
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
+import { DenomMetadataByIdRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import { SpecificQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
 import { PositionState } from '@buf/penumbra-zone_penumbra.grpc_web/penumbra/core/dex/v1alpha1/dex_pb'
 import PositionStateEnum = PositionState.PositionStateEnum
@@ -229,12 +229,13 @@ export class WasmViewConnector {
 				note,
 				note.noteCommitment.inner
 			)
+
+			await this.storeAsset(note.note.value.assetId)
+
 			await this.configApi.updateAssetBalance(
 				note.note.value.assetId.inner,
 				Number(note.note.value.amount.lo)
 			)
-
-			await this.storeAsset(note.note.value.assetId)
 
 			try {
 				const tx = await this.saveTransaction(base64ToBytes(note.source.inner))
