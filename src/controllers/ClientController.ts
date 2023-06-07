@@ -161,13 +161,78 @@ export class ClientController {
 			)) {
 				await this.wasmViewConnector.handleNewCompactBlock(
 					response.compactBlock,
-					fvk,
-					transport
+					fvk
 				)
 
 				if (Number(response.compactBlock.height) < lastBlock) {
 					if (Number(response.compactBlock.height) % 1000 === 0) {
-						await this.wasmViewConnector.loadUpdates()
+						const updates = await this.wasmViewConnector.loadUpdates()
+
+						Promise.all([
+							await this.indexedDb.putBulkValue(
+								NCT_COMMITMENTS_TABLE_NAME,
+								updates.storeCommitments
+							),
+							await this.indexedDb.putBulkValue(
+								NCT_HASHES_TABLE_NAME,
+								updates.storeHashes
+							),
+							await this.indexedDb.putValueWithId(
+								NCT_POSITION_TABLE_NAME,
+								updates.setPosition,
+								'position'
+							),
+							updates.setForgotten &&
+								(await this.indexedDb.putValueWithId(
+									NCT_FORGOTTEN_TABLE_NAME,
+									updates.setForgotten,
+									'forgotten'
+								)),
+						]).then(() => {
+							console.log('done')
+							const oldState = this.store.getState().lastSavedBlock
+							const lastSavedBlock = {
+								...oldState,
+								[this.configApi.getNetwork()]: Number(
+									response.compactBlock.height
+								),
+							}
+							extension.storage.local.set({
+								lastSavedBlock,
+							})
+						})
+					}
+				} else {
+					console.log('there')
+					console.log({
+						savedBlock: Number(response.compactBlock.height),
+						lastBlock,
+					})
+
+					const updates = await this.wasmViewConnector.loadUpdates()
+
+					Promise.all([
+						await this.indexedDb.putBulkValue(
+							NCT_COMMITMENTS_TABLE_NAME,
+							updates.storeCommitments
+						),
+						await this.indexedDb.putBulkValue(
+							NCT_HASHES_TABLE_NAME,
+							updates.storeHashes
+						),
+						await this.indexedDb.putValueWithId(
+							NCT_POSITION_TABLE_NAME,
+							updates.setPosition,
+							'position'
+						),
+						await this.indexedDb.putValueWithId(
+							NCT_FORGOTTEN_TABLE_NAME,
+							updates.setForgotten,
+							'forgotten'
+						),
+					]).then(() => {
+						console.log('done')
+
 						const oldState = this.store.getState().lastSavedBlock
 						const lastSavedBlock = {
 							...oldState,
@@ -175,26 +240,18 @@ export class ClientController {
 								response.compactBlock.height
 							),
 						}
-						extension.storage.local.set({
+						const oldLastBlockHeight = this.store.getState().lastBlockHeight
+						const lastBlockHeight = {
+							...oldLastBlockHeight,
+							[this.configApi.getNetwork()]: Number(
+								response.compactBlock.height
+							),
+						}
+
+						this.store.updateState({
+							lastBlockHeight,
 							lastSavedBlock,
 						})
-					}
-				} else {
-					await this.wasmViewConnector.loadUpdates()
-					const oldState = this.store.getState().lastSavedBlock
-					const lastSavedBlock = {
-						...oldState,
-						[this.configApi.getNetwork()]: Number(response.compactBlock.height),
-					}
-					const oldLastBlockHeight = this.store.getState().lastBlockHeight
-					const lastBlockHeight = {
-						...oldLastBlockHeight,
-						[this.configApi.getNetwork()]: Number(response.compactBlock.height),
-					}
-
-					this.store.updateState({
-						lastBlockHeight,
-						lastSavedBlock,
 					})
 				}
 			}

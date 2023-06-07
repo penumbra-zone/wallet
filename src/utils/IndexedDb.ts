@@ -1,4 +1,4 @@
-import {deleteDB, IDBPDatabase, openDB} from 'idb'
+import { deleteDB, IDBPDatabase, openDB } from 'idb'
 import {
 	ASSET_TABLE_NAME,
 	CHAIN_PARAMETERS_TABLE_NAME,
@@ -59,9 +59,8 @@ export class IndexedDb {
 		try {
 			this.db = await openDB(this.database, 10, {
 				async upgrade(db: IDBPDatabase) {
-
 					for (const objectStoreName of db.objectStoreNames) {
-						db.deleteObjectStore(objectStoreName);
+						db.deleteObjectStore(objectStoreName)
 					}
 
 					db.createObjectStore(ASSET_TABLE_NAME, {
@@ -148,10 +147,13 @@ export class IndexedDb {
 	public async putBulkValue(tableName: TableName, values: object[]) {
 		const tx = this.db.transaction(tableName, 'readwrite')
 		const store = tx.objectStore(tableName)
-		for (const value of values) {
-			await store.put(value)
+		// for (const value of values) {
+		// 	await store.put(value)
+		// }
+		for(let i = 0; i < values.length; i++){
+			await store.put(values[i])
 		}
-		return this.getAllValue(tableName)
+		return ''
 	}
 
 	public async deleteValue(tableName: TableName, id: number) {

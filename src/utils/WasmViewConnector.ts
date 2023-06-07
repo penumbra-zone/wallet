@@ -100,24 +100,24 @@ export class WasmViewConnector {
 		}
 	}
 
-	async handleNewCompactBlock(block: CompactBlock, fvk, transport) {
+	async handleNewCompactBlock(block: CompactBlock, fvk: string) {
 		if (!this.viewServer) {
-			let storedTree = await this.indexedDb.loadStoredTree()
-			// todo зробоити ViewServer глобальним, щоб
+			const storedTree = await this.indexedDb.loadStoredTree()
 			this.viewServer = new ViewServer(fvk, 719n, storedTree)
 		}
-		let result: ScanResult = await this.viewServer.scan_block_without_updates(
+
+		const result: ScanResult = await this.viewServer.scan_block_without_updates(
 			block.toJson()
 		)
 
 		await this.handleScanResult(result)
 
-		if (block.nullifiers.length > 0) {
+		if (block.nullifiers.length) {
 			for (const nullifier of block.nullifiers) {
 				await this.updateNotes(nullifier, block.height)
 			}
 		}
-		if (block.fmdParameters !== undefined)
+		if (block.fmdParameters)
 			await this.saveFmdParameters(
 				JSON.parse(block.fmdParameters.toJsonString())
 			)
@@ -140,51 +140,54 @@ export class WasmViewConnector {
 	}
 
 	public async loadUpdates() {
-		if (this.viewServer == undefined) {
+		if (!this.viewServer) {
 			console.error('View client is undefined')
-		} else {
-			let storedTree = await this.indexedDb.loadStoredTree()
-			let updates = await this.viewServer.get_updates(
-				storedTree.last_position,
-				storedTree.last_forgotten
-			)
-			await this.handleScanResult(updates)
+			return
+		}
+
+		const lastPosition = await this.indexedDb.getValue(
+			NCT_POSITION_TABLE_NAME,
+			'position'
+		)
+
+		const lastForgotten = await this.indexedDb.getValue(
+			NCT_FORGOTTEN_TABLE_NAME,
+			'forgotten'
+		)
+
+		const { nct_updates } = await this.viewServer.get_updates(
+			lastPosition,
+			lastForgotten
+		)
+
+		return {
+			setForgotten: nct_updates.set_forgotten,
+			setPosition: nct_updates.set_position,
+			storeCommitments: nct_updates.store_commitments,
+			storeHashes: nct_updates.store_hashes,
 		}
 	}
 
 	async handleScanResult(scanResult: ScanResult) {
-		if (scanResult.nct_updates !== undefined) {
-			if (scanResult.nct_updates.set_forgotten !== undefined) {
-				await this.updateForgotten(scanResult.nct_updates.set_forgotten)
-			}
-			if (scanResult.nct_updates.set_position !== undefined) {
-				await this.updatePosition(scanResult.nct_updates.set_position)
-			}
-			for (const commitment of scanResult.nct_updates.store_commitments) {
-				await this.storeCommitment(commitment)
-			}
-			for (const hash of scanResult.nct_updates.store_hashes) {
-				await this.storeHash(hash)
-			}
-			if (scanResult.nct_updates.delete_ranges.length > 0) {
-			}
-		}
-
-		if (scanResult.new_notes.length > 0 || scanResult.new_swaps.length > 0) {
-			const uniqueSet = new Set()
+		if (scanResult.new_notes.length) {
+			const uniqueTxs = new Set()
 
 			for (const note of scanResult.new_notes) {
-				const tx = await this.storeNote(note)
+				const txHash = await this.storeNote(note)
 
-				if (tx) {
-					uniqueSet.add(JSON.stringify(tx))
+				if (txHash) {
+					uniqueTxs.add(txHash)
 				}
 			}
 
-			const uniqueTxs = Array.from(uniqueSet).map((i: string) => JSON.parse(i))
-
 			uniqueTxs.forEach(async i => {
-				await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, i)
+				try {
+					const tx = await this.saveTransaction(base64ToBytes(i))
+
+					tx && (await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, tx))
+				} catch (e) {
+					console.error('tx save failed ', e)
+				}
 			})
 		}
 
@@ -223,7 +226,7 @@ export class WasmViewConnector {
 			note.noteCommitment.inner
 		)
 
-		if (storedNote == undefined) {
+		if (!storedNote) {
 			await this.indexedDb.putValueWithId(
 				SPENDABLE_NOTES_TABLE_NAME,
 				note,
@@ -237,16 +240,25 @@ export class WasmViewConnector {
 				Number(note.note.value.amount.lo)
 			)
 
-			try {
-				const tx = await this.saveTransaction(base64ToBytes(note.source.inner))
-				return tx
-			} catch (e) {
-				console.error('tx save failed ', e)
-			}
+			return note.source.inner
+
+			// try {
+			// 	const tx = await this.saveTransaction(base64ToBytes(note.source.inner))
+			// 	return tx
+			// } catch (e) {
+			// 	console.error('tx save failed ', e)
+			// }
 		} else console.debug('note already stored', note.noteCommitment.inner)
 	}
 
 	async storeAsset(assetId) {
+		const currentAsset = await this.indexedDb.getValue(
+			ASSET_TABLE_NAME,
+			assetId.inner
+		)
+
+		if (currentAsset) return
+
 		const chainId = this.getChainId()
 		const baseUrl = this.getGRPC()
 
@@ -262,33 +274,28 @@ export class WasmViewConnector {
 		asset.inner = base64ToBytes(assetId.inner)
 		denomMetadataByIdRequest.assetId = asset
 
-		if (await this.indexedDb.getValue(ASSET_TABLE_NAME, assetId.inner) !== undefined)
-			return;
-
-		const demomResponse = await client.denomMetadataById(denomMetadataByIdRequest)
+		const demomResponse = await client.denomMetadataById(
+			denomMetadataByIdRequest
+		)
 
 		if (!demomResponse.denomMetadata) {
+			const denom = base64_to_bech32('passet', assetId.inner)
+
+			await this.indexedDb.putValue(ASSET_TABLE_NAME, {
+				penumbraAssetId: asset.toJson(),
+				base: denom,
+				display: denom,
+				denomUnits: [
+					{
+						denom,
+					},
+				],
+			})
+		} else {
 			await this.indexedDb.putValue(
 				ASSET_TABLE_NAME,
-				JSON.parse(
-					new DenomMetadata({
-						penumbraAssetId: asset,
-						base: base64_to_bech32('passet', assetId.inner),
-						display: base64_to_bech32('passet', assetId.inner),
-						denomUnits: [
-							new DenomUnit({
-								denom: base64_to_bech32('passet', assetId.inner),
-								exponent: 0,
-							}),
-						],
-					}).toJsonString()
-				)
+				demomResponse.denomMetadata.toJson()
 			)
-		} else {
-			let denomMetadata = demomResponse.denomMetadata.toJsonString()
-			await this.indexedDb.putValue(ASSET_TABLE_NAME, {
-				...JSON.parse(denomMetadata),
-			})
 		}
 	}
 
@@ -348,6 +355,7 @@ export class WasmViewConnector {
 				this.viewServer.transaction_info(decodeTransaction)
 
 			await this.storeLpnft(transactionInfo.txv)
+
 			return {
 				height: Number(transactionResponse.blockHeight),
 				id: { hash: transactionResponse.txHash },
@@ -470,7 +478,7 @@ export class WasmViewConnector {
 			SWAP_TABLE_NAME,
 			swap.swapCommitment.inner
 		)
-		if (storedSwap == undefined)
+		if (!storedSwap)
 			await this.indexedDb.putValueWithId(
 				SWAP_TABLE_NAME,
 				swap,
