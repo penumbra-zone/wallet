@@ -189,7 +189,6 @@ export class ClientController {
 									'forgotten'
 								)),
 						]).then(() => {
-							console.log('done')
 							const oldState = this.store.getState().lastSavedBlock
 							const lastSavedBlock = {
 								...oldState,
@@ -203,12 +202,6 @@ export class ClientController {
 						})
 					}
 				} else {
-					console.log('there')
-					console.log({
-						savedBlock: Number(response.compactBlock.height),
-						lastBlock,
-					})
-
 					const updates = await this.wasmViewConnector.loadUpdates()
 
 					Promise.all([
@@ -225,14 +218,13 @@ export class ClientController {
 							updates.setPosition,
 							'position'
 						),
-						await this.indexedDb.putValueWithId(
-							NCT_FORGOTTEN_TABLE_NAME,
-							updates.setForgotten,
-							'forgotten'
-						),
+						updates.setForgotten &&
+							(await this.indexedDb.putValueWithId(
+								NCT_FORGOTTEN_TABLE_NAME,
+								updates.setForgotten,
+								'forgotten'
+							)),
 					]).then(() => {
-						console.log('done')
-
 						const oldState = this.store.getState().lastSavedBlock
 						const lastSavedBlock = {
 							...oldState,
