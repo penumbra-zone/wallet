@@ -23,7 +23,7 @@ export const SelectAction: React.FC<{}> = () => {
 					header="Yes, let's set it up!"
 					descriptions='This will create a new wallet and recovery passphrase'
 					buttonTitle='Create a new wallet'
-					onClick={handleNavigate(routesPath.CREATE_PASSWORD)}
+					onClick={handleNavigate(routesPath.SEED_PHRASE_RULES)}
 					className='ext:w-[100%] laptop:w-[50%]'
 				/>
 			</div>

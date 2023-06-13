@@ -5,13 +5,11 @@ import { getWordListOprions, routesPath } from '../../../utils'
 import {
 	Button,
 	ChevronLeftIcon,
-	CreatePasswordForm,
 	InformationOutlineSvg,
 	SelectInput,
 	SuccessCreateModal,
 } from '../../components'
 import { accountsActions, createAccount, localStateActions } from '../../redux'
-import Background from '../../services/Background'
 const bip39 = require('bip39')
 
 type ImportSeedProps = {}
@@ -25,7 +23,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 	const navigate = useNavigate()
 
 	const [seed, setSeed] = useState({
-	// 1: 'under',
+		// 1: 'under',
 		// 2: 'magnet',
 		// 3: 'father',
 		// 4: 'section',
@@ -90,7 +88,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 		}))
 	}
 
-	const handleSubmit = (password: string) => async () => {
+	const handleSubmit = async () => {
 		const seedStr = Object.values(seed).join(' ')
 		const isValidate = bip39.validateMnemonic(seedStr)
 
@@ -106,7 +104,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 				type: 'seed',
 			})
 		)
-		await Background.initVault(password)
+
 		await dispatch(
 			createAccount({
 				seed: seedStr,
@@ -163,7 +161,9 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 						</div>
 					)}
 					<div className='w-[calc(50%-16px)] mt-[40px]'>
-						<CreatePasswordForm buttonTitle='Import' onClick={handleSubmit} />
+						<div className='w-[100%] mb-[30px]'>
+							<Button title='Import' mode='gradient' onClick={handleSubmit} />
+						</div>
 					</div>
 				</div>
 			</div>

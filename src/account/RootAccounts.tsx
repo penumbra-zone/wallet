@@ -20,9 +20,13 @@ export const RootAccounts = () => {
 
 	useEffect(() => {
 		if (!isRedirect) return
-		
-		if (state.isInitialized && !state.isLocked && !selectedAccount.addressByIndex)
-		return navigate(routesPath.SEED_PHRASE_RULES)
+
+		if (
+			state.isInitialized &&
+			!state.isLocked &&
+			!selectedAccount.addressByIndex
+		)
+			return navigate(routesPath.SELECT_ACTION)
 
 		if (isRedirect && !state.isLocked) {
 			if (pathname === routesPath.SETTINGS_NETWORKS) {

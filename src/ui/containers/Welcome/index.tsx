@@ -5,7 +5,7 @@ import { Button, Logo } from '../../components'
 export const Welcome = () => {
 	const navigate = useNavigate()
 
-	const handleStart = () => navigate(routesPath.SELECT_ACTION)
+	const handleStart = () => navigate(routesPath.CREATE_PASSWORD)
 
 	return (
 		<div className='w-[100%] min-h-[100vh] flex flex-col items-center justify-center'>

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch } from '../../../account'
 import { routesPath } from '../../../utils'
-import { Button } from '../../components'
+import { Button, ChevronLeftIcon } from '../../components'
 import { accountsActions } from '../../redux'
 
 export const SeedPharseRules = () => {
@@ -60,8 +60,18 @@ export const SeedPharseRules = () => {
 
 	const handleStart = () => navigate(routesPath.SEED_PHRASE)
 
+	const handleBack = () => navigate(routesPath.SELECT_ACTION)
+
 	return (
 		<div className='w-[100%] flex flex-col items-center justify-center'>
+			<div className='self-start'>
+				<Button
+					mode='icon_transparent'
+					onClick={handleBack}
+					title='Back'
+					iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
+				/>
+			</div>
 			<p className='h1 mb-[16px]'>Protect your wallet</p>
 			<div className='flex items-stretch flex-wrap justify-center ext:gap-[8px] tablet:gap-[16px]'>
 				{tips.map((i, index) => {
