@@ -113,6 +113,7 @@ export const routes: RouteObject[] = [
 						path: routesPath.SETTINGS_PERMISSIONS,
 						element: <SettingsPermissions />,
 					},
+					
 				],
 			},
 		],

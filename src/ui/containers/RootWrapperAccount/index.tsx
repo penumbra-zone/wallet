@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAccountsSelector } from '../../../account'
 import {
 	AccountModal,
 	Logo,
 	NetworkModal,
 	NetworkSelect,
+	SettingsSvg,
 	UserLogo,
 } from '../../components'
 import {
@@ -13,6 +14,7 @@ import {
 	selectSelectedAccount,
 	selectState,
 } from '../../redux'
+import { routesPath } from '../../../utils'
 
 type RootWrapperAccountProps = {
 	children: React.ReactNode
@@ -25,6 +27,7 @@ export const RootWrapperAccount: React.FC<RootWrapperAccountProps> = ({
 	const [isOpenNetworkPopup, setIsOpenNetworkPopup] = useState<boolean>(false)
 
 	const { pathname } = useLocation()
+	const navigate = useNavigate()
 
 	const selectedAccount = useAccountsSelector(selectSelectedAccount)
 	const isRedirect = useAccountsSelector(selectRedirectToAccountPage)
@@ -37,6 +40,8 @@ export const RootWrapperAccount: React.FC<RootWrapperAccountProps> = ({
 
 	const handleToggleNetworkModal = (value: boolean) => () =>
 		setIsOpenNetworkPopup(value)
+
+	const gotoSettings = () => navigate(routesPath.SETTINGS)
 
 	return (
 		<>
@@ -53,7 +58,9 @@ export const RootWrapperAccount: React.FC<RootWrapperAccountProps> = ({
 							!state.isLocked && (
 								<div className='flex items-center gap-x-[54px]'>
 									<NetworkSelect onClick={handleToggleNetworkModal(true)} />
-									<UserLogo onClick={handleToggleAccountModal(true)} />
+									<div className='cursor-pointer' onClick={gotoSettings}>
+										<SettingsSvg width='24' height='24' />
+									</div>
 								</div>
 							)}
 					</div>

@@ -210,8 +210,8 @@ select {
 		font-family: 'Faktum SemiBold';
 		font-style: normal;
 		font-weight: 600;
-		font-size: 20px;
-		line-height: 30px;
+		font-size: 15px;
+		line-height: 22px;
 	}
 
 	.h2 {
@@ -444,20 +444,20 @@ select {
 }
 
 ::-webkit-scrollbar {
-  width: 4px;
+	width: 4px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background:rgba(0, 0, 0, 0.25);
+	background: rgba(0, 0, 0, 0.25);
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888;
+	background: #888;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+	background: #555;
 }

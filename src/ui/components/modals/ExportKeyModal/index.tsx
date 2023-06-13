@@ -6,19 +6,18 @@ import Background from '../../../services/Background'
 import { Button } from '../../Button'
 import { Input } from '../../Input'
 import { ModalWrapper } from '../../ModalWrapper'
-import { KeysModalType } from '../../MorePopupButton'
-import { ChevronLeftIcon, InformationOutlineSvg } from '../../Svg'
-import { UserLogo } from '../../UserLogo'
+import { InformationOutlineSvg } from '../../Svg'
+
 import { SuccessCreateModalProps } from '../SuccessCreateModal'
+import { KeysModalType } from '../../../containers'
 
 type ExportKeyModalProps = {
 	type: KeysModalType
-	handleBack: () => void
 }
 
 export const ExportKeyModal: React.FC<
 	SuccessCreateModalProps & ExportKeyModalProps
-> = ({ show, onClose, type, handleBack }) => {
+> = ({ show, onClose, type }) => {
 	const selectedAccount = useAccountsSelector(selectSelectedAccount)
 
 	const [password, setPassword] = useState<string>('')
@@ -51,11 +50,6 @@ export const ExportKeyModal: React.FC<
 		})
 	}
 
-	const handleBackAndCleanKey = () => {
-		handleBack()
-		setKey('')
-	}
-
 	const handleCloseAndCleanKey = () => {
 		onClose()
 		setKey('')
@@ -69,21 +63,13 @@ export const ExportKeyModal: React.FC<
 			className='pt-[12px] pb-[30px] px-[0px] w-[335px]'
 		>
 			<div>
-				<div className='flex flex-col items-center border-b-[1px] border-solid border-dark_grey pb-[16px] px-[16px]'>
-					<div className='self-start'>
-						<Button
-							mode='icon_transparent'
-							onClick={handleBackAndCleanKey}
-							title='Back'
-							iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
-						/>
-					</div>
+				{/* <div className='flex flex-col items-center border-b-[1px] border-solid border-dark_grey pb-[16px] px-[16px]'>
 					<UserLogo />
 					<p className='h2 my-[12px]'>{selectedAccount.name}</p>
 					<p className='w-[100%] text-center text_body text-light_grey border-[1px] border-solid border-dark_grey rounded-[15px] py-[10px]'>
 						{selectedAccount.addressByIndex.slice(0, 35)}...
 					</p>
-				</div>
+				</div> */}
 				<div className='flex flex-col items-center pt-[12px] px-[16px]'>
 					<p className='h3 mb-[12px]'>
 						{type === 'full_viewing_key'

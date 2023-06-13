@@ -18,9 +18,9 @@ import { useMediaQuery } from '../../../../hooks'
 import { useState } from 'react'
 import { ConnectedSitesModal } from '../ConnectedSitesModal'
 import { AccountDetailModal } from '../AccountDetailModal'
-import { KeysModalType } from '../../MorePopupButton'
 import { MoreModal } from '../MoreModal'
 import { ExportKeyModal } from '../ExportKeyModal'
+import { KeysModalType } from '../../../containers'
 
 export const AccountModal: React.FC<SuccessCreateModalProps> = ({
 	show,
@@ -131,10 +131,7 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
 					</div>
 				</>
 			</ModalWrapper>
-			<ConnectedSitesModal
-				show={isOpenConnectedSites}
-				onClose={toggleConnectedSitesPopup(false)}
-			/>
+
 			<AccountDetailModal
 				show={isOpenDetailPopup}
 				onClose={toggleDetailPopup(false)}
@@ -151,7 +148,6 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
 					type={keyModalType}
 					show={Boolean(keyModalType)}
 					onClose={changeKeyModalType('')}
-					handleBack={handleBackExportPopup}
 				/>
 			)}
 		</>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAccountsSelector } from '../../../account'
 import { routesPath } from '../../../utils'
 import {
@@ -7,6 +7,7 @@ import {
 	Logo,
 	NetworkModal,
 	NetworkSelect,
+	SettingsSvg,
 	UserLogo,
 } from '../../components'
 import {
@@ -21,20 +22,19 @@ type RootWrapperUiProps = {
 
 export const RootWrapperUi: React.FC<RootWrapperUiProps> = ({ children }) => {
 	const { pathname } = useLocation()
-	const [isOpenAccountPopup, setIsOpenAccountPopup] = useState<boolean>(false)
+	const navigate = useNavigate()
 	const [isOpenNetworkPopup, setIsOpenNetworkPopup] = useState<boolean>(false)
 
 	const selectedAccount = useAccountsSelector(selectSelectedAccount)
 	const isRedirect = useAccountsSelector(selectRedirectToAccountPage)
 	const state = useAccountsSelector(selectState)
 
-	const isHeader = pathname !== routesPath.ACTIVE_MESSAGE
-
-	const handleToggleAccountModal = (value: boolean) => () =>
-		setIsOpenAccountPopup(value)
+	const isHeader = pathname === routesPath.HOME
 
 	const handleToggleNetworkModal = (value: boolean) => () =>
 		setIsOpenNetworkPopup(value)
+
+	const gotoSettings = () => navigate(routesPath.SETTINGS)
 
 	return (
 		<>
@@ -55,7 +55,9 @@ export const RootWrapperUi: React.FC<RootWrapperUiProps> = ({ children }) => {
 							{selectedAccount.addressByIndex &&
 								isRedirect &&
 								!state.isLocked && (
-									<UserLogo onClick={handleToggleAccountModal(true)} />
+									<div className='cursor-pointer' onClick={gotoSettings}>
+										<SettingsSvg width='16' height='16' />
+									</div>
 								)}
 						</div>
 					)}
@@ -64,10 +66,6 @@ export const RootWrapperUi: React.FC<RootWrapperUiProps> = ({ children }) => {
 					</div>
 				</div>
 			</div>
-			<AccountModal
-				show={isOpenAccountPopup}
-				onClose={handleToggleAccountModal(false)}
-			/>
 			<NetworkModal
 				show={isOpenNetworkPopup}
 				onClose={handleToggleNetworkModal(false)}

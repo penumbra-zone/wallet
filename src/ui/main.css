@@ -213,10 +213,10 @@ select {
 @media (max-width: 480px) {
 	.h1 {
 		font-family: 'Faktum SemiBold';
-		font-style: normal;
-		font-weight: 600;
-		font-size: 20px;
-		line-height: 30px;
+	font-style: normal;
+	font-weight: 600;
+	font-size: 15px;
+	line-height: 22px;
 	}
 
 	.h2 {
@@ -436,8 +436,8 @@ select {
 }
 
 .svg_notActive_link svg path {
-	fill: #524b4b;
-	stroke: #524b4b;
+	fill: #E0E0E0;
+	stroke: #E0E0E0;
 }
 
 .svg_notActive_link_stroke svg path {

@@ -1,8 +1,8 @@
 import { useAccountsSelector } from '../../../../account'
+import { KeysModalType } from '../../../containers'
 import { selectSelectedAccount } from '../../../redux'
 import { Button } from '../../Button'
 import { ModalWrapper } from '../../ModalWrapper'
-import { KeysModalType } from '../../MorePopupButton'
 import { UserLogo } from '../../UserLogo'
 import { SuccessCreateModalProps } from '../SuccessCreateModal'
 
