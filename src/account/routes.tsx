@@ -7,7 +7,6 @@ import {
 	Rules,
 	SeedPharseRules,
 	SeedPhrase,
-	SeedPhraseConfirm,
 	SelectAction,
 	Welcome,
 	Settings,
@@ -56,10 +55,7 @@ export const routes: RouteObject[] = [
 				path: routesPath.SEED_PHRASE,
 				element: <SeedPhrase />,
 			},
-			{
-				path: routesPath.CONFIRM_SEED_PHRASE,
-				element: <SeedPhraseConfirm />,
-			},
+
 			{
 				path: routesPath.LOGIN,
 				element: <Login />,

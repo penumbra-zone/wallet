@@ -59,7 +59,14 @@ export function createAccount(account: CreateAccountInput) {
 			...account,
 		})
 
-		dispatch(setSelectedAccount(lastAccount))
+		dispatch(
+			setSelectedAccount({
+				type: lastAccount.type,
+				name: lastAccount.name,
+				addressByIndex: lastAccount.addressByIndex,
+				shortAddressByIndex: lastAccount.shortAddressByIndex,
+			})
+		)
 		await Background.selectAccount(lastAccount)
 	}
 }
