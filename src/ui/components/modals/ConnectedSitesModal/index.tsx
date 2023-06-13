@@ -15,7 +15,6 @@ export const ConnectedSitesModal: React.FC<SuccessCreateModalProps> = ({
 	const account = useAccountsSelector(selectNewAccount)
 	const origins = useAccountsSelector(selectOrigins)
 	const navigate = useNavigate()
-
 	const [selectedSite, setSelectedSite] = useState<string>('')
 
 	const handleRevoke = (site: string) => () => setSelectedSite(site)
@@ -43,20 +42,10 @@ export const ConnectedSitesModal: React.FC<SuccessCreateModalProps> = ({
 			className='py-[28px] px-[0px] w-[335px]'
 		>
 			<div className='w-[100%] flex flex-col'>
-				<p
-					className={`border-b-[1px] border-solid border-dark_grey h1_ext pb-[16px] px-[16px] ${
-						selectedSite ? '' : 'text-center'
-					}`}
-				>
-					{selectedSite ? `Revoke ${selectedSite}` : 'Connected sites'}
+				<p className='border-b-[1px] border-solid border-dark_grey h1_ext pb-[16px] px-[16px]'>
+					{`Revoke ${selectedSite}`}
 				</p>
-				<p
-					className={`${
-						selectedSite
-							? 'mb-[16px]'
-							: 'border-b-[1px] border-solid border-dark_grey mb-[16px]'
-					}  py-[24px] px-[16px] h2_ext text-center mb-[16px]`}
-				>
+				<p className='mb-[16px] py-[24px] px-[16px] h2_ext text-center '>
 					{selectedSite
 						? 'Are you sure you want to turn it off? You may lose access to site features.'
 						: `${account.name} is connected to these sites. They can see your account
