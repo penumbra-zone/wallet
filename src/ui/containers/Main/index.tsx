@@ -42,7 +42,7 @@ export const Main: React.FC<MainProps> = () => {
 		const sites = Object.keys(origins)
 		const filtered = sites.filter(v => {
 			return (
-				v.toString().toLowerCase().indexOf(event.target.value.toLowerCase()) >
+				v.replace(/^https?:\/\//i, '').toString().toLowerCase().indexOf(event.target.value.toLowerCase()) >
 				-1
 			)
 		})
@@ -100,7 +100,7 @@ export const Main: React.FC<MainProps> = () => {
 				</div>
 				<p className='h1 ext:mb-[8px]'>Connected sites</p>
 				<Input
-					placeholder='Search dApp...'
+					placeholder='Search...'
 					value={search}
 					onChange={handleChangeSearch}
 					// helperText='No matching results found.'

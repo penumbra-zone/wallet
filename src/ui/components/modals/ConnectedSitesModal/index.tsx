@@ -20,7 +20,7 @@ export const ConnectedSitesModal: React.FC<
 		>
 			<div className='w-[100%] flex flex-col'>
 				<p className='border-b-[1px] border-solid border-dark_grey h1_ext pb-[16px] px-[16px]'>
-					{`Delete ${selectedSite}`}
+					{`Delete ${selectedSite && selectedSite.replace(/^https?:\/\//i, '')}`}
 				</p>
 				<p className='mb-[16px] py-[24px] px-[16px] h2_ext text-center '>
 					Are you sure you want to turn it off? You may lose access to site
