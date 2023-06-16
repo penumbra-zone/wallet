@@ -196,7 +196,11 @@ export class ClientController {
 									response.compactBlock.height
 								),
 							}
-							extension.storage.local.set({
+							// extension.storage.local.set({
+							// 	lastSavedBlock,
+							// })
+
+							this.store.updateState({
 								lastSavedBlock,
 							})
 						})
@@ -327,16 +331,16 @@ export class ClientController {
 				testnet: 0,
 			},
 		})
-		extension.storage.local.set({
-			lastSavedBlock: {
-				mainnet: 0,
-				testnet: 0,
-			},
-			lastBlockHeight: {
-				mainnet: 0,
-				testnet: 0,
-			},
-		})
+		// extension.storage.local.set({
+		// 	lastSavedBlock: {
+		// 		mainnet: 0,
+		// 		testnet: 0,
+		// 	},
+		// 	lastBlockHeight: {
+		// 		mainnet: 0,
+		// 		testnet: 0,
+		// 	},
+		// })
 	}
 
 	requireScanning(compactBlock: CompactBlock) {
