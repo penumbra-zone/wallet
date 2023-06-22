@@ -1,8 +1,9 @@
-import { ClientController } from '../controllers'
+import { ClientController, WalletController } from '../controllers'
 import { ExtensionStorage } from '../storage'
 import { IAsset } from '../types/asset'
 import { IndexedDb } from '../utils'
 import {
+	AddressByIndexRequest,
 	AssetsRequest,
 	AssetsResponse,
 	BalanceByAddressRequest,
@@ -45,22 +46,26 @@ export class ViewProtocolService {
 	private extensionStorage
 	private getLastExistBlock
 	private getTransactionFromTendermint
+	private getAccountAddresByIndex
 
 	constructor({
 		indexedDb,
 		extensionStorage,
 		getLastExistBlock,
 		getTransactionFromTendermint,
+		getAccountAddresByIndex,
 	}: {
 		indexedDb: IndexedDb
 		extensionStorage: ExtensionStorage
 		getLastExistBlock: ClientController['getLastExistBlock']
 		getTransactionFromTendermint: WasmViewConnector['getTransactionFromTendermint']
+		getAccountAddresByIndex: WalletController['getAccountAddresByIndex']
 	}) {
 		this.indexedDb = indexedDb
 		this.extensionStorage = extensionStorage
 		this.getLastExistBlock = getLastExistBlock
 		this.getTransactionFromTendermint = getTransactionFromTendermint
+		this.getAccountAddresByIndex = getAccountAddresByIndex
 	}
 
 	async getBalanceByAddress(
@@ -199,21 +204,19 @@ export class ViewProtocolService {
 		return response
 	}
 
-	async getTransactionInfoByHash(
-		request: TransactionInfoByHashRequest
-	): Promise<TransactionInfoByHashResponse> {
-		let tx = await this.indexedDb.getValue(
-			TRANSACTION_TABLE_NAME,
-			request.id.hash
-		)
+	async getTransactionInfoByHash(request: string) {
+		const req = new TransactionInfoByHashRequest().fromJsonString(request)
+		const id = req.id.toJson() as { hash: string }
+
+		let tx = await this.indexedDb.getValue(TRANSACTION_TABLE_NAME, id.hash)
 
 		if (!tx) {
-			tx = await this.getTransactionFromTendermint(request.id.hash)
+			tx = await this.getTransactionFromTendermint(id.hash)
 		}
 
-		return new TransactionInfoByHashResponse().fromJson({
+		return {
 			txInfo: tx || {},
-		})
+		}
 	}
 
 	async getFMDParameters(
@@ -251,6 +254,17 @@ export class ViewProtocolService {
 		// build plan
 
 		return new TransactionInfoResponse()
+	}
+
+	async getAddressByIndex(request: string) {
+		const req = new AddressByIndexRequest().fromJsonString(request)
+		const address = await this.getAccountAddresByIndex(req.addressIndex.account)
+		return {
+			address: {
+				inner: address,
+				altBech32m: address,
+			},
+		}
 	}
 
 	mapTransaction(decodeTransaction) {

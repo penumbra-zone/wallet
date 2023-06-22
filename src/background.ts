@@ -1,5 +1,6 @@
 import { ChainParametersRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import {
+	AddressByIndexRequest,
 	AssetsRequest,
 	BalanceByAddressRequest,
 	NotesRequest,
@@ -261,6 +262,8 @@ class BackgroundService extends EventEmitter {
 			getLastExistBlock: () => this.clientController.getLastExistBlock(),
 			getTransactionFromTendermint: (txHash: string) =>
 				this.wasmViewConnector.getTransactionFromTendermint(txHash),
+			getAccountAddresByIndex: (index: number) =>
+				this.walletController.getAccountAddresByIndex(index),
 		})
 	}
 
@@ -581,8 +584,8 @@ class BackgroundService extends EventEmitter {
 					new TransactionInfoRequest(request)
 				)
 			},
-			getTransactionInfoByHash: async (
-				request: TransactionInfoByHashRequest
+			getTransactionInfoByHashProxy: async (
+				request: string
 			) => {
 				return this.viewProtocolService.getTransactionInfoByHash(request)
 			},
@@ -598,6 +601,8 @@ class BackgroundService extends EventEmitter {
 			},
 			getBalanceByAddress: async (arg: BalanceByAddressRequest) =>
 				this.viewProtocolService.getBalanceByAddress(arg),
+			getAddressByIndexProxy: async (request: string) =>
+				this.viewProtocolService.getAddressByIndex(request),
 		}
 	}
 

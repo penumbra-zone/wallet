@@ -4,6 +4,8 @@ import pipe from 'callbag-pipe'
 import filter from 'callbag-filter'
 import subscribe from 'callbag-subscribe'
 import {
+	AddressByIndexRequest,
+	AddressByIndexResponse,
 	AssetsResponse,
 	BalanceByAddressRequest,
 	BalanceByAddressResponse,
@@ -30,6 +32,12 @@ type Events =
 declare global {
 	interface PenumbraApi extends __BackgroundPageApiDirect {
 		removeListener(event: Events, cb)
+		getTransactionInfoByHash(
+			request: TransactionInfoByHashRequest
+		): Promise<TransactionInfoByHashResponse>
+		getAddressByIndex(
+			request: AddressByIndexRequest
+		): Promise<AddressByIndexResponse>
 		on(
 			event: Events,
 			cb: (
@@ -77,15 +85,21 @@ globalThis.penumbra = {
 	getStatus: async () =>
 		new StatusResponse().fromJson((await proxy.getStatus()) as any),
 	getTransactionInfo: proxy.getTransactionInfo,
-	getTransactionInfoByHash: async request => {
-		return new TransactionInfoByHashResponse().fromJson(
-			(await proxy.getTransactionInfoByHash(request.toJson() as any)) as any
-		)
-	},
+
 	getFmdParameters: async () =>
 		new FMDParametersResponse().fromJson(
 			(await proxy.getFmdParameters()) as any
 		),
+	getTransactionInfoByHash: async request => {
+		return new TransactionInfoByHashResponse().fromJson(
+			await proxy.getTransactionInfoByHashProxy(request.toJsonString())
+		)
+	},
+	getAddressByIndex: async request => {
+		return new AddressByIndexResponse().fromJson(
+			await proxy.getAddressByIndexProxy(request.toJsonString())
+		)
+	},
 	get initialPromise() {
 		return Promise.resolve(globalThis.penumbra)
 	},

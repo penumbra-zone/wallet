@@ -322,14 +322,21 @@ export class WasmViewConnector {
 	async getTransactionFromTendermint(txHash: string) {
 		const tendermint = this.getTendermint()
 		try {
-			const response = await fetch(`${tendermint}/tx?hash=0x${txHash}`, {
+			let response = await fetch(`${tendermint}/tx?hash=0x${txHash}`, {
 				headers: {
 					'Cache-Control': 'no-cache',
 				},
 			})
-			const data = await response.json()
+			let data = await response.json()
 
-			if (!data.result) return
+			if (!data.result) {
+				response = await fetch(`${tendermint}/tx?hash=0x${txHash}`, {
+					headers: {
+						'Cache-Control': 'no-cache',
+					},
+				})
+				data = await response.json()
+			}
 
 			const transactionResponse: Transaction = {
 				txHash,

@@ -25,17 +25,17 @@ export class SeedWallet extends Wallet<WalletPrivateDataOfType<'seed'>> {
 		return {
 			type: this.data.type,
 			name: this.data.name,
-			addressByIndex: this.getAddressByIndex(),
-			shortAddressByIndex: this.getShortAddressByIndex(),
+			addressByIndex: this.getAddressByIndex(0),
+			shortAddressByIndex: this.getShortAddressByIndex(0),
 		}
 	}
 
-	getAddressByIndex() {
-		return get_address_by_index(this.getFullViewingKey(),0)
+	getAddressByIndex(index: number) {
+		return get_address_by_index(this.getFullViewingKey(), index)
 	}
 
-	getShortAddressByIndex() {
-		return get_short_address_by_index(this.getFullViewingKey(),0)
+	getShortAddressByIndex(index: number) {
+		return get_short_address_by_index(this.getFullViewingKey(), index)
 	}
 
 	getSeed() {

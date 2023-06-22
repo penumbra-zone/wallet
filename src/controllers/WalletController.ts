@@ -128,6 +128,10 @@ export class WalletController extends EventEmitter {
 		return this.wallets[0].getSpendKey()
 	}
 
+	async getAccountAddresByIndex(index: number) {
+		return this.wallets[0].getAddressByIndex(index)
+	}
+
 	_restoreWallets(password: string | null | undefined) {
 		const vault = this.store.getState().WalletController.vault
 

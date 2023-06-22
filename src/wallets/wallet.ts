@@ -11,6 +11,7 @@ export abstract class Wallet<TData extends WalletPrivateData> {
 	abstract getSeed(): string
 	abstract getFullViewingKey(): string
 	abstract getSpendKey(): string
+	abstract getAddressByIndex(index: number): string
 
 	serialize() {
 		return this.data
