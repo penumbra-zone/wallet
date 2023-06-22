@@ -129,48 +129,13 @@ export class TransactionController {
 
 		const storedTree = await this.indexedDb.loadStoredTree()
 
-		console.log({ storedTree })
-
 		const buildTx = build_tx(spendingKey, fvk, sendPlan, storedTree)
-		console.log({ buildTx })
 
 		const encodeTx = await encode_tx(buildTx)
-		console.log({ encodeTx })
 
 		const resp = await this.broadcastTx(bytesToBase64(encodeTx))
 
 		return resp
-
-		// if (resp.result.code === 0) {
-		//     extension.notifications.create(resp.id, {
-		//       type: 'basic',
-		//       iconUrl: 'assets/img/logo.png',
-		//       title: 'Transaction Confirmed',
-		//       message:
-		//         'Transaction with hash 0x' +
-		//         resp.result.hash +
-		//         ' successfully confirmed',
-		//       priority: 1,
-		//     });
-		// } else  {
-		//     extension.notifications.create(resp.id, {
-		//       type: 'basic',
-		//       iconUrl: 'assets/img/logo.png',
-		//       title: 'Transaction Error',
-		//       message:
-		//         'Error submitting transaction: code ' +
-		//         resp.result.code +
-		//         ', log: ' +
-		//         resp.result.log,
-		//       priority: 1,
-		//     });
-		// }
-
-		// const tendermint = createPromiseClient(TendermintProxyService, transport);
-		// let broadcastTxSyncRequest = new BroadcastTxSyncRequest();
-		// broadcastTxSyncRequest.params = encodeTx;
-		// broadcastTxSyncRequest.reqId = BigInt(id)
-		// let broadcastTxSync = await tendermint.broadcastTxSync(broadcastTxSyncRequest);
 	}
 
 	getRandomInt() {

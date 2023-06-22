@@ -78,8 +78,6 @@ globalThis.penumbra = {
 		new StatusResponse().fromJson((await proxy.getStatus()) as any),
 	getTransactionInfo: proxy.getTransactionInfo,
 	getTransactionInfoByHash: async request => {
-		console.log({ requestInpage: request.toJson() })
-
 		return new TransactionInfoByHashResponse().fromJson(
 			(await proxy.getTransactionInfoByHash(request.toJson() as any)) as any
 		)

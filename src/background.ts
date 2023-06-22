@@ -584,16 +584,6 @@ class BackgroundService extends EventEmitter {
 			getTransactionInfoByHash: async (
 				request: TransactionInfoByHashRequest
 			) => {
-				console.log({ request })
-
-				// try {
-				// 	console.log(
-				// 		new TransactionInfoByHashRequest().toJsonString(request as any)
-				// 	)
-				// } catch (error) {
-				// 	console.log(error)
-				// }
-
 				return this.viewProtocolService.getTransactionInfoByHash(request)
 			},
 			getFmdParameters: async () => {

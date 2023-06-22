@@ -202,8 +202,6 @@ export class ViewProtocolService {
 	async getTransactionInfoByHash(
 		request: TransactionInfoByHashRequest
 	): Promise<TransactionInfoByHashResponse> {
-		console.log({ hash: request.id.hash, string: request.id.hash.toString() })
-
 		let tx = await this.indexedDb.getValue(
 			TRANSACTION_TABLE_NAME,
 			request.id.hash
@@ -212,8 +210,6 @@ export class ViewProtocolService {
 		if (!tx) {
 			tx = await this.getTransactionFromTendermint(request.id.hash)
 		}
-
-		console.log({ tx })
 
 		return new TransactionInfoByHashResponse().fromJson({
 			txInfo: tx || {},
