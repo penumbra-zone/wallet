@@ -4,7 +4,6 @@ import {
 	encode_tx,
 	is_controlled_address,
 } from 'penumbra-wasm'
-
 import {
 	ActionArrayType,
 	ActionType,
@@ -13,7 +12,6 @@ import {
 } from '../types/transaction'
 import { IndexedDb } from '../utils'
 import { bytesToBase64 } from '../utils/base64'
-import { WasmViewConnector } from '../utils/WasmViewConnector'
 import { NetworkController } from './NetworkController'
 import { RemoteConfigController } from './RemoteConfigController'
 import { WalletController } from './WalletController'
@@ -22,7 +20,6 @@ import { TransactionResponse } from '../messages/types'
 export class TransactionController {
 	private indexedDb: IndexedDb
 	private configApi
-	private wasmViewConnector: WasmViewConnector
 
 	constructor({
 		indexedDb,
@@ -132,9 +129,13 @@ export class TransactionController {
 
 		const storedTree = await this.indexedDb.loadStoredTree()
 
+		console.log({ storedTree })
+
 		const buildTx = build_tx(spendingKey, fvk, sendPlan, storedTree)
+		console.log({ buildTx })
 
 		const encodeTx = await encode_tx(buildTx)
+		console.log({ encodeTx })
 
 		const resp = await this.broadcastTx(bytesToBase64(encodeTx))
 

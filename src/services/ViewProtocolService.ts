@@ -19,6 +19,8 @@ import {
 	StatusResponse,
 	StatusStreamRequest,
 	StatusStreamResponse,
+	TransactionInfoByHashRequest,
+	TransactionInfoByHashResponse,
 	TransactionInfoRequest,
 	TransactionInfoResponse,
 	TransactionPlannerRequest,
@@ -32,6 +34,7 @@ import {
 	SPENDABLE_NOTES_TABLE_NAME,
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
+import { WasmViewConnector } from '../utils/WasmViewConnector'
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -41,19 +44,23 @@ export class ViewProtocolService {
 	private indexedDb
 	private extensionStorage
 	private getLastExistBlock
+	private getTransactionFromTendermint
 
 	constructor({
 		indexedDb,
 		extensionStorage,
 		getLastExistBlock,
+		getTransactionFromTendermint,
 	}: {
 		indexedDb: IndexedDb
 		extensionStorage: ExtensionStorage
 		getLastExistBlock: ClientController['getLastExistBlock']
+		getTransactionFromTendermint: WasmViewConnector['getTransactionFromTendermint']
 	}) {
 		this.indexedDb = indexedDb
 		this.extensionStorage = extensionStorage
 		this.getLastExistBlock = getLastExistBlock
+		this.getTransactionFromTendermint = getTransactionFromTendermint
 	}
 
 	async getBalanceByAddress(
@@ -70,7 +77,8 @@ export class ViewProtocolService {
 					// hi:
 				},
 				asset: {
-					inner: assets.find(asset => asset.penumbraAssetId.inner === i[0]).penumbraAssetId.inner,
+					inner: assets.find(asset => asset.penumbraAssetId.inner === i[0])
+						.penumbraAssetId.inner,
 				},
 			})
 		})
@@ -189,6 +197,27 @@ export class ViewProtocolService {
 		// }
 
 		return response
+	}
+
+	async getTransactionInfoByHash(
+		request: TransactionInfoByHashRequest
+	): Promise<TransactionInfoByHashResponse> {
+		console.log({ hash: request.id.hash, string: request.id.hash.toString() })
+
+		let tx = await this.indexedDb.getValue(
+			TRANSACTION_TABLE_NAME,
+			request.id.hash
+		)
+
+		if (!tx) {
+			tx = await this.getTransactionFromTendermint(request.id.hash)
+		}
+
+		console.log({ tx })
+
+		return new TransactionInfoByHashResponse().fromJson({
+			txInfo: tx || {},
+		})
 	}
 
 	async getFMDParameters(

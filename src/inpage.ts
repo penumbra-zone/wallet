@@ -12,6 +12,8 @@ import {
 	NotesResponse,
 	StatusResponse,
 	StatusStreamResponse,
+	TransactionInfoByHashRequest,
+	TransactionInfoByHashResponse,
 	TransactionInfoRequest,
 	TransactionInfoResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
@@ -75,6 +77,13 @@ globalThis.penumbra = {
 	getStatus: async () =>
 		new StatusResponse().fromJson((await proxy.getStatus()) as any),
 	getTransactionInfo: proxy.getTransactionInfo,
+	getTransactionInfoByHash: async request => {
+		console.log({ requestInpage: request.toJson() })
+
+		return new TransactionInfoByHashResponse().fromJson(
+			(await proxy.getTransactionInfoByHash(request.toJson() as any)) as any
+		)
+	},
 	getFmdParameters: async () =>
 		new FMDParametersResponse().fromJson(
 			(await proxy.getFmdParameters()) as any

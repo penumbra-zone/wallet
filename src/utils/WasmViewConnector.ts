@@ -182,7 +182,7 @@ export class WasmViewConnector {
 
 			uniqueTxs.forEach(async i => {
 				try {
-					const tx = await this.saveTransaction(base64ToBytes(i))
+					const tx = await this.getTransaction(base64ToBytes(i))
 
 					tx && (await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, tx))
 				} catch (e) {
@@ -243,7 +243,7 @@ export class WasmViewConnector {
 			return note.source.inner
 
 			// try {
-			// 	const tx = await this.saveTransaction(base64ToBytes(note.source.inner))
+			// 	const tx = await this.getTransaction(base64ToBytes(note.source.inner))
 			// 	return tx
 			// } catch (e) {
 			// 	console.error('tx save failed ', e)
@@ -319,20 +319,8 @@ export class WasmViewConnector {
 		return tendermint
 	}
 
-	async saveTransaction(sourceHex: Uint8Array) {
+	async getTransactionFromTendermint(txHash: string) {
 		const tendermint = this.getTendermint()
-
-		const txHash = this.toHexString(sourceHex)
-
-		// check sourceHex is transaction
-		if (
-			!String(txHash)
-				.slice(0, 46)
-				.split('')
-				.filter(i => Boolean(Number(i))).length
-		)
-			return
-
 		try {
 			const response = await fetch(`${tendermint}/tx?hash=0x${txHash}`, {
 				headers: {
@@ -354,8 +342,6 @@ export class WasmViewConnector {
 			const transactionInfo =
 				this.viewServer.transaction_info(decodeTransaction)
 
-			await this.storeLpnft(transactionInfo.txv)
-
 			return {
 				height: Number(transactionResponse.blockHeight),
 				id: { hash: transactionResponse.txHash },
@@ -363,16 +349,27 @@ export class WasmViewConnector {
 				perspective: transactionInfo.txp,
 				view: transactionInfo.txv,
 			}
-			// await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, {
-			// 	height: Number(transactionResponse.blockHeight),
-			// 	id: { hash: transactionResponse.txHash },
-			// 	transaction: decodeTransaction,
-			// 	perspective: transactionInfo.txp,
-			// 	view: transactionInfo.txv,
-			// })
 		} catch (e) {
-			console.error('saveTransaction', e)
+			console.error('getTransaction from tendermint', e)
 		}
+	}
+
+	async getTransaction(sourceHex: Uint8Array) {
+		const txHash = this.toHexString(sourceHex)
+
+		// check sourceHex is transaction
+		if (
+			!String(txHash)
+				.slice(0, 46)
+				.split('')
+				.filter(i => Boolean(Number(i))).length
+		)
+			return
+
+		const transaction = await this.getTransactionFromTendermint(txHash)
+		await this.storeLpnft(transaction.view)
+
+		return transaction
 	}
 
 	async storeLpnft(txv) {

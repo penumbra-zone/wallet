@@ -3,6 +3,7 @@ import {
 	AssetsRequest,
 	BalanceByAddressRequest,
 	NotesRequest,
+	TransactionInfoByHashRequest,
 	TransactionInfoRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import pipe from 'callbag-pipe'
@@ -258,6 +259,8 @@ class BackgroundService extends EventEmitter {
 			indexedDb: this.indexedDb,
 			extensionStorage: this.extensionStorage,
 			getLastExistBlock: () => this.clientController.getLastExistBlock(),
+			getTransactionFromTendermint: (txHash: string) =>
+				this.wasmViewConnector.getTransactionFromTendermint(txHash),
 		})
 	}
 
@@ -578,7 +581,21 @@ class BackgroundService extends EventEmitter {
 					new TransactionInfoRequest(request)
 				)
 			},
+			getTransactionInfoByHash: async (
+				request: TransactionInfoByHashRequest
+			) => {
+				console.log({ request })
 
+				// try {
+				// 	console.log(
+				// 		new TransactionInfoByHashRequest().toJsonString(request as any)
+				// 	)
+				// } catch (error) {
+				// 	console.log(error)
+				// }
+
+				return this.viewProtocolService.getTransactionInfoByHash(request)
+			},
 			getFmdParameters: async () => {
 				// const canIUse = this.permissionsController.hasPermission(
 				// 	origin,
