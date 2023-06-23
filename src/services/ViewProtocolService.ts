@@ -38,8 +38,7 @@ import {
 } from '../lib'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
 import * as wasm from 'penumbra-wasm'
-import {bytesToBase64} from "../utils/base64";
-
+import { bytesToBase64 } from '../utils/base64'
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -51,15 +50,15 @@ export class ViewProtocolService {
 	private getLastExistBlock
 	private getTransactionFromTendermint
 	private getAccountAddresByIndex
-    private getAccountFullViewingKey
+	private getAccountFullViewingKey
 
 	constructor({
 		indexedDb,
 		extensionStorage,
 		getLastExistBlock,
 		getTransactionFromTendermint,
-		getAccountAddresByIndex, getAccountFullViewingKey
-
+		getAccountAddresByIndex,
+		getAccountFullViewingKey,
 	}: {
 		indexedDb: IndexedDb
 		extensionStorage: ExtensionStorage
@@ -67,14 +66,13 @@ export class ViewProtocolService {
 		getTransactionFromTendermint: WasmViewConnector['getTransactionFromTendermint']
 		getAccountAddresByIndex: WalletController['getAccountAddresByIndex']
 		getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword']
-
 	}) {
 		this.indexedDb = indexedDb
 		this.extensionStorage = extensionStorage
 		this.getLastExistBlock = getLastExistBlock
 		this.getTransactionFromTendermint = getTransactionFromTendermint
 		this.getAccountAddresByIndex = getAccountAddresByIndex
-        this.getAccountFullViewingKey = getAccountFullViewingKey;
+		this.getAccountFullViewingKey = getAccountFullViewingKey
 	}
 
 	async getBalanceByAddress(
@@ -243,56 +241,53 @@ export class ViewProtocolService {
 	}
 
 	async getTransactionPlanner(req?: string) {
-
-
 		try {
-		const request = new TransactionPlannerRequest().fromJsonString(req)
+			const request = new TransactionPlannerRequest().fromJsonString(req)
 
-		console.log(request)
+			let transactionPlan
+			if (request.outputs.length) {
+				let notes = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
+				notes = notes
+					.filter(note => note.heightSpent === undefined)
+					.filter(
+						note =>
+							note.note.value.assetId.inner ===
+							bytesToBase64(request.outputs[0].value.assetId.inner)
+					)
+				if (!notes.length) console.error('No notes found to spend')
 
+				const fmdParameters = await this.indexedDb.getValue(
+					FMD_PARAMETERS_TABLE_NAME,
+					`fmd`
+				)
+				if (!fmdParameters) console.error('No found FmdParameters')
 
-		let transactionPlan;
-		if (request.outputs.length) {
+				const chainParamsRecords = await this.indexedDb.getAllValue(
+					CHAIN_PARAMETERS_TABLE_NAME
+				)
+				const chainParameters = await chainParamsRecords[0]
+				if (!fmdParameters) console.error('No found chain parameters')
 
-			let notes = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
-			notes = notes
-				.filter(note => note.heightSpent === undefined)
-				.filter(note => note.note.value.assetId.inner === bytesToBase64(request.outputs[0].value.assetId.inner))
-			if (!notes.length) console.error('No notes found to spend')
+				const viewServiceData = {
+					notes,
+					chain_parameters: chainParameters,
+					fmd_parameters: fmdParameters,
+				}
 
-			const fmdParameters = await this.indexedDb.getValue(FMD_PARAMETERS_TABLE_NAME, `fmd`)
-			if (!fmdParameters) console.error('No found FmdParameters')
-
-			const chainParamsRecords = await this.indexedDb.getAllValue(
-				CHAIN_PARAMETERS_TABLE_NAME
-			)
-			const chainParameters = await chainParamsRecords[0]
-			if (!fmdParameters) console.error('No found chain parameters')
-
-			const viewServiceData = {
-				notes,
-				chain_parameters: chainParameters,
-				fmd_parameters: fmdParameters,
+				transactionPlan = await wasm.send_plan(
+					this.getAccountFullViewingKey(),
+					request.outputs[0].value.toJson(),
+					request.outputs[0].address.altBech32m,
+					viewServiceData
+				)
 			}
 
-			transactionPlan = await wasm.send_plan(
-				this.getAccountFullViewingKey(),
-				request.outputs[0].value.toJson(),
-                request.outputs[0].address.altBech32m,
-				viewServiceData
-			)
-		}
-
-		console.log(transactionPlan);
-
-		return {
-			plan: transactionPlan
-		}
-
+			return {
+				plan: transactionPlan,
+			}
 		} catch (e) {
 			console.error(e)
 		}
-
 	}
 
 	async getAddressByIndex(request: string) {
