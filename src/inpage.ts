@@ -17,7 +17,7 @@ import {
 	TransactionInfoByHashRequest,
 	TransactionInfoByHashResponse,
 	TransactionInfoRequest,
-	TransactionInfoResponse,
+	TransactionInfoResponse, TransactionPlannerRequest, TransactionPlannerResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 type Events =
@@ -38,6 +38,9 @@ declare global {
 		getAddressByIndex(
 			request: AddressByIndexRequest
 		): Promise<AddressByIndexResponse>
+		getTransactionPlanner: (
+			request: TransactionPlannerRequest
+		) => Promise<TransactionPlannerResponse>
 		on(
 			event: Events,
 			cb: (
@@ -98,6 +101,11 @@ globalThis.penumbra = {
 	getAddressByIndex: async request => {
 		return new AddressByIndexResponse().fromJson(
 			await proxy.getAddressByIndexProxy(request.toJsonString())
+		)
+	},
+	getTransactionPlanner: async request => {
+		return new TransactionPlannerResponse().fromJson(
+			await proxy.getTransactionPlannerProxy(request.toJsonString())
 		)
 	},
 	get initialPromise() {

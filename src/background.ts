@@ -5,7 +5,7 @@ import {
 	BalanceByAddressRequest,
 	NotesRequest,
 	TransactionInfoByHashRequest,
-	TransactionInfoRequest,
+	TransactionInfoRequest, TransactionPlannerRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import pipe from 'callbag-pipe'
 import subscribe from 'callbag-subscribe'
@@ -264,6 +264,8 @@ class BackgroundService extends EventEmitter {
 				this.wasmViewConnector.getTransactionFromTendermint(txHash),
 			getAccountAddresByIndex: (index: number) =>
 				this.walletController.getAccountAddresByIndex(index),
+			getAccountFullViewingKey: () =>
+				this.walletController.getAccountFullViewingKeyWithoutPassword(),
 		})
 	}
 
@@ -603,6 +605,8 @@ class BackgroundService extends EventEmitter {
 				this.viewProtocolService.getBalanceByAddress(arg),
 			getAddressByIndexProxy: async (request: string) =>
 				this.viewProtocolService.getAddressByIndex(request),
+			getTransactionPlannerProxy: async (request: string) =>
+				 this.viewProtocolService.getTransactionPlanner(request),
 		}
 	}
 

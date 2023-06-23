@@ -25,6 +25,7 @@ import {
 	TransactionInfoRequest,
 	TransactionInfoResponse,
 	TransactionPlannerRequest,
+	TransactionPlannerResponse,
 	WitnessRequest,
 	WitnessResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
@@ -36,6 +37,9 @@ import {
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
+import * as wasm from 'penumbra-wasm'
+import {bytesToBase64} from "../utils/base64";
+
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -47,25 +51,30 @@ export class ViewProtocolService {
 	private getLastExistBlock
 	private getTransactionFromTendermint
 	private getAccountAddresByIndex
+    private getAccountFullViewingKey
 
 	constructor({
 		indexedDb,
 		extensionStorage,
 		getLastExistBlock,
 		getTransactionFromTendermint,
-		getAccountAddresByIndex,
+		getAccountAddresByIndex, getAccountFullViewingKey
+
 	}: {
 		indexedDb: IndexedDb
 		extensionStorage: ExtensionStorage
 		getLastExistBlock: ClientController['getLastExistBlock']
 		getTransactionFromTendermint: WasmViewConnector['getTransactionFromTendermint']
 		getAccountAddresByIndex: WalletController['getAccountAddresByIndex']
+		getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword']
+
 	}) {
 		this.indexedDb = indexedDb
 		this.extensionStorage = extensionStorage
 		this.getLastExistBlock = getLastExistBlock
 		this.getTransactionFromTendermint = getTransactionFromTendermint
 		this.getAccountAddresByIndex = getAccountAddresByIndex
+        this.getAccountFullViewingKey = getAccountFullViewingKey;
 	}
 
 	async getBalanceByAddress(
@@ -233,27 +242,57 @@ export class ViewProtocolService {
 		return new WitnessResponse({}).toBinary()
 	}
 
-	async getTransactionPlanner(request?: TransactionPlannerRequest) {
-		// create wasm planner here
-		//
+	async getTransactionPlanner(req?: string) {
 
-		if (request.fee !== undefined) {
-			// insert fee to planer
-		}
-		for (const output of request.outputs) {
-			// insert output to planer
+
+		try {
+		const request = new TransactionPlannerRequest().fromJsonString(req)
+
+		console.log(request)
+
+
+		let transactionPlan;
+		if (request.outputs.length) {
+
+			let notes = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
+			notes = notes
+				.filter(note => note.heightSpent === undefined)
+				.filter(note => note.note.value.assetId.inner === bytesToBase64(request.outputs[0].value.assetId.inner))
+			if (!notes.length) console.error('No notes found to spend')
+
+			const fmdParameters = await this.indexedDb.getValue(FMD_PARAMETERS_TABLE_NAME, `fmd`)
+			if (!fmdParameters) console.error('No found FmdParameters')
+
+			const chainParamsRecords = await this.indexedDb.getAllValue(
+				CHAIN_PARAMETERS_TABLE_NAME
+			)
+			const chainParameters = await chainParamsRecords[0]
+			if (!fmdParameters) console.error('No found chain parameters')
+
+			const viewServiceData = {
+				notes,
+				chain_parameters: chainParameters,
+				fmd_parameters: fmdParameters,
+			}
+
+			transactionPlan = await wasm.send_plan(
+				this.getAccountFullViewingKey(),
+				request.outputs[0].value.toJson(),
+                request.outputs[0].address.altBech32m,
+				viewServiceData
+			)
 		}
 
-		for (const delegate of request.delegations) {
-			// insert delegatins to planner
-		}
-		for (const swaps of request.swaps) {
-			console.warn('swaps planner rpc not implemented')
+		console.log(transactionPlan);
+
+		return {
+			plan: transactionPlan
 		}
 
-		// build plan
+		} catch (e) {
+			console.error(e)
+		}
 
-		return new TransactionInfoResponse()
 	}
 
 	async getAddressByIndex(request: string) {
