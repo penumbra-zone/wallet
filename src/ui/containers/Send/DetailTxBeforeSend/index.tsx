@@ -9,7 +9,7 @@ import {
 	TransactionPlan,
 } from '../../../../types/transaction'
 import { getShortKey, routesPath } from '../../../../utils'
-import { Button, ChevronLeftIcon, ModalWrapper } from '../../../components'
+import { Button, ModalWrapper } from '../../../components'
 import Background from '../../../services/Background'
 import { TransactionResponse } from '../../../../messages/types'
 
@@ -83,47 +83,40 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 
 	return (
 		<>
-			<div className='w-[100%] flex flex-col items-start ext:py-[20px] tablet:py-[30px] bg-brown rounded-[10px] px-[16px]'>
-				{setSendPlan && (
-					<Button
-						mode='icon_transparent'
-						onClick={handleEdit}
-						title='Edit'
-						iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
-						className='mb-[24px]'
-					/>
-				)}
-				<div className='w-[100%]'>
-					{sendPlan.actions.map((i, index) => {
-						let text
-						if (i.type === 'send') {
-							text = `${i.amount} ${i.asset} to ${getShortKey(i.destAddress)}`
-						} else {
-							text = `${i.amount} ${i.asset}`
-						}
-						return (
-							<div key={index} className='w-[100%] flex flex-col mt-[16px]'>
-								<p className='h2 mb-[8px] capitalize'>{i.type}</p>
-								<p className='py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-all'>
-									{text}
-								</p>
-							</div>
-						)
-					})}
-				</div>
-				<div className='w-[100%] flex pt-[24px]'>
-					<Button
-						mode='transparent'
-						onClick={handleEdit}
-						title='Cancel'
-						className='w-[50%] mr-[8px]'
-					/>
-					<Button
-						mode='gradient'
-						onClick={handleConfirm}
-						title='Confirm'
-						className='w-[50%] ml-[8px]'
-					/>
+			<div className='w-[100%] h-[100vh] flex justify-center items-center px-[40px] py-[24px]'>
+				<div className='w-[100%] h-[calc(100vh-48px)] flex flex-col justify-between bg-brown rounded-[10px] p-[16px]'>
+					<div className='flex flex-col gap-y-[16px]'>
+						{sendPlan.actions.map((i, index) => {
+							let text
+							if (i.type === 'send') {
+								text = `${i.amount} ${i.asset} to ${getShortKey(i.destAddress)}`
+							} else {
+								text = `${i.amount} ${i.asset}`
+							}
+							return (
+								<div key={index} className='w-[100%] flex flex-col'>
+									<p className='h2 mb-[8px] capitalize'>{i.type}</p>
+									<p className='py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-all'>
+										{text}
+									</p>
+								</div>
+							)
+						})}
+					</div>
+					<div className='w-[100%] flex gap-x-[16px]'>
+						<Button
+							mode='transparent'
+							onClick={handleEdit}
+							title='Cancel'
+							className='w-[50%]'
+						/>
+						<Button
+							mode='gradient'
+							onClick={handleConfirm}
+							title='Confirm'
+							className='w-[50%]'
+						/>
+					</div>
 				</div>
 			</div>
 			<ModalWrapper show={loading} className='bg-transparent'>

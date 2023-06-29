@@ -92,8 +92,14 @@ export const SeedPhrase: React.FC<SeedPhraseProps> = ({}) => {
 
 	const copyToClipboard = () => {
 		navigator.clipboard.writeText(seed)
-		toast.success('Success copied!', {
-			position: 'top-right',
+		toast.success('Successfully copied', {
+			position: 'top-center',
+			icon: '👏',
+			style: {
+				borderRadius: '15px',
+				background: '#141212',
+				color: '#fff',
+			},
 		})
 	}
 	const handleNext = () => setIsConfirmPage(true)

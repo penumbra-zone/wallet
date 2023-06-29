@@ -45,8 +45,14 @@ export const ExportKeyModal: React.FC<
 
 	const copyToClipboard = () => {
 		navigator.clipboard.writeText(key)
-		toast.success('Success copied!', {
-			position: 'top-right',
+		toast.success('Successfully copied', {
+			position: 'top-center',
+			icon: '👏',
+			style: {
+				borderRadius: '15px',
+				background: '#141212',
+				color: '#fff',
+			},
 		})
 	}
 

@@ -40,8 +40,14 @@ export const DetailContactCard: React.FC<DetailContactCardProps> = ({
 
 	const copyToClipboard = () => {
 		navigator.clipboard.writeText(contact.address)
-		toast.success('Success copied!', {
-			position: 'top-right',
+		toast.success('Successfully copied', {
+			position: 'top-center',
+			icon: '👏',
+			style: {
+				borderRadius: '15px',
+				background: '#141212',
+				color: '#fff',
+			},
 		})
 	}
 
