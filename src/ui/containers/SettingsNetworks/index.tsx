@@ -114,7 +114,7 @@ export const SettingsNetworks = () => {
 		<>
 			<div className='ext:h-[calc(100%-100px)] tablet:h-[100%]'>
 				<p
-					className={`flex items-center w-[100%] px-[16px] h-[74px] border-b-[1px] border-solid border-dark_grey ${
+					className={`w-[100%] p-[16px] pb-[16px] ext:pt-[16px] tablet:pt-[24px] tablet:border-b-[1px] tablet:border-dark_grey ${
 						isDesktop ? 'h2' : 'h1_ext'
 					}`}
 				>

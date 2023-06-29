@@ -3,7 +3,7 @@ import React, { ReactElement, useMemo } from 'react'
 type ButtonProps = {
 	title: string | ReactElement
 	disabled?: boolean
-	mode: 'gradient' | 'icon_transparent' | 'transparent'
+	mode: 'gradient' | 'icon_transparent' | 'transparent' 
 	className?: string
 	iconLeft?: JSX.Element
 	iconRight?: JSX.Element

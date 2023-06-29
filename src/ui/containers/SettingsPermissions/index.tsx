@@ -27,7 +27,7 @@ export const SettingsPermissions = () => {
 		<>
 			<div>
 				<p
-					className={`w-[100%] px-[16px] py-[24px] border-b-[1px] border-solid border-dark_grey ${
+					className={`w-[100%] p-[16px] pb-[16px] ext:pt-[16px] tablet:pt-[24px] tablet:border-b-[1px] tablet:border-dark_grey ${
 						isDesktop ? 'h2' : 'h1_ext'
 					}`}
 				>
