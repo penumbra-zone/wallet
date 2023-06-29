@@ -63,7 +63,7 @@ export const SettingsAdvanced = () => {
 								isError={+timer > 10080}
 								rightElement={
 									<div
-										className='flex items-center bg-dark_grey h-[50px] px-[25px] rounded-r-[15px] text_button_ext cursor-pointer'
+										className='flex items-center bg-dark_grey h-[50px] px-[25px] rounded-r-[10px] text_button_ext cursor-pointer'
 										onClick={handleSaveTimer}
 									>
 										Save

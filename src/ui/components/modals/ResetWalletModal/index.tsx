@@ -32,13 +32,13 @@ export const ResetWalletModal: React.FC<
 							mode='transparent'
 							onClick={onClose}
 							title='Cancel'
-							className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] mr-[8px]'
+							className='w-[50%] mr-[8px]'
 						/>
 						<Button
 							mode='gradient'
 							onClick={handleConfirm}
 							title='Confirm'
-							className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
+							className='w-[50%] ml-[8px]'
 						/>
 					</div>
 				</div>

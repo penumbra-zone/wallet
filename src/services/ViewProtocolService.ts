@@ -216,10 +216,13 @@ export class ViewProtocolService {
 		const id = req.id.toJson() as { hash: string }
 
 		let tx = await this.indexedDb.getValue(TRANSACTION_TABLE_NAME, id.hash)
+		console.log({ tx })
 
 		if (!tx) {
 			tx = await this.getTransactionFromTendermint(id.hash)
 		}
+
+		console.log({ tx })
 
 		return {
 			txInfo: tx || {},

@@ -156,7 +156,7 @@ export const SeedPhrase: React.FC<SeedPhraseProps> = ({}) => {
 							WARNING: Never share your recovery passphrase. Anyone who has it
 							can take your token forever.
 						</p>
-						<div className='bg-brown px-[30px] pt-[34px] pb-[26px] rounded-[15px] flex flex-wrap'>
+						<div className='bg-brown px-[30px] pt-[34px] pb-[26px] rounded-[10px] flex flex-wrap'>
 							{seed.split(' ').map((i, index) => {
 								return (
 									<div key={index} className='flex-[0_0_25%] flex mb-[8px]'>

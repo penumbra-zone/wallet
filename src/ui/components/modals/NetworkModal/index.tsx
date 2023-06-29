@@ -67,12 +67,7 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
 					))}
 
 					<div className='w-[100%] mt-[40px] px-[16px]'>
-						<Button
-							title='Change'
-							mode='gradient'
-							onClick={handleChange}
-							className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
-						/>
+						<Button title='Change' mode='gradient' onClick={handleChange} />
 					</div>
 				</div>
 			</div>

@@ -3,7 +3,6 @@ import { routesPath } from '../utils'
 import { SettingsExtensionSideBar } from './components'
 import {
 	ActiveMessage,
-	BalanceDetail,
 	Login,
 	Main,
 	Send,
@@ -30,10 +29,7 @@ export const routesUi: RouteObject[] = [
 				path: routesPath.LOGIN,
 				element: <Login />,
 			},
-			{
-				path: routesPath.BALANCE_DETAIL,
-				element: <BalanceDetail />,
-			},
+
 			{
 				path: routesPath.SEND,
 				element: <Send />,

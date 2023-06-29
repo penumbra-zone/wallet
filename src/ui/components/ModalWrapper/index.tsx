@@ -39,7 +39,7 @@ export const ModalWrapper: React.FC<ModalWrapperPropsType> = ({
 					}`}
 				>
 					<div
-						className={`bg-brown rounded-[15px] p-[30px] ${className}`}
+						className={`bg-brown rounded-[10px] p-[30px] ${className}`}
 						onClick={stopPropagation}
 					>
 						{children}

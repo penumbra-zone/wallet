@@ -42,8 +42,8 @@ export const CreateContactModal: React.FC<CreateContactModalProps> = ({
         <p className="h1_ext mb-[24px]">Add nickname</p>
         <div className="relative w-[36px] h-[36px] bg-brown rounded-[50%] li_gradient before:content-[''] before:absolute before:top-[0.5px] before:left-[0.5px] before:block before:w-[calc(100%-1px)] before:h-[calc(100%-1px)] before:bg-brown before:rounded-[50%]"></div>
         <p className="h2_ext mt-[12px] mb-[8px]">Address</p>
-        <div className="w-[100%] relative input_default_border p-[1px] rounded-[15px]">
-          <p className="break-all bg-brown text-light_grey rounded-[15px] text_body_ext py-[10px] px-[12px]">
+        <div className="w-[100%] relative input_default_border p-[1px] rounded-[10px]">
+          <p className="break-all bg-brown text-light_grey rounded-[10px] text_body_ext py-[10px] px-[12px]">
             {address}
           </p>
         </div>
@@ -61,13 +61,13 @@ export const CreateContactModal: React.FC<CreateContactModalProps> = ({
             mode="transparent"
             onClick={onClose}
             title="Cancel"
-            className="w-[50%] mr-[8px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]"
+            className="w-[50%] mr-[8px]"
           />
           <Button
             mode="gradient"
             onClick={handleSave}
             title="Save"
-            className="w-[50%] ml-[8px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]"
+            className="w-[50%] ml-[8px]"
             disabled={!nickname}
           />
         </div>

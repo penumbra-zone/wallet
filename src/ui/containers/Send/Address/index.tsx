@@ -132,7 +132,7 @@ export const Address: React.FC<AddressProps> = ({
 				</span>
 			</div>
 			{!Object.values(isValidate).includes(false) && search ? (
-				<div className='flex items-center p-[16px] bg-brown rounded-[15px] mb-[16px]'>
+				<div className='flex items-center p-[16px] bg-brown rounded-[10px] mb-[16px]'>
 					<div className='ext:mr-[8px] tablet:mr-[10px]'>
 						<DoneSvg width='24' height='24' />
 					</div>
@@ -166,12 +166,12 @@ export const Address: React.FC<AddressProps> = ({
 					className='w-[100%]'
 				/>
 			)}
-			<div className={`bg-brown rounded-[15px] w-[100%]`}>
+			<div className={`bg-brown rounded-[10px] w-[100%]`}>
 				{!Object.values(isValidate).includes(false) && search ? (
 					<div className='h-[100%] flex flex-col justify-between px-[16px] py-[24px]'>
 						{!contacts.find(i => i.address === search) ? (
 							<div
-								className='flex justify-between items-center bg-dark_grey py-[8px] px-[16px] rounded-[15px] mb-[24px] cursor-pointer'
+								className='flex justify-between items-center bg-dark_grey py-[8px] px-[16px] rounded-[10px] mb-[24px] cursor-pointer'
 								onClick={handleOpenModal}
 							>
 								<p className='text_body'>
@@ -207,7 +207,7 @@ export const Address: React.FC<AddressProps> = ({
 								helperText={'You do not have enough token'}
 								rightElement={
 									<div
-										className='flex items-center bg-dark_grey h-[50px] px-[25px] rounded-r-[15px] text_button_ext cursor-pointer'
+										className='flex items-center bg-dark_grey h-[50px] px-[25px] rounded-r-[10px] text_button_ext cursor-pointer'
 										onClick={handleMax}
 									>
 										Max
@@ -220,13 +220,13 @@ export const Address: React.FC<AddressProps> = ({
 								mode='transparent'
 								onClick={handleBack}
 								title='Cancel'
-								className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] mr-[8px]'
+								className='w-[50%] mr-[8px]'
 							/>
 							<Button
 								mode='gradient'
 								onClick={handleNext}
 								title='Next'
-								className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
+								className='w-[50%] ml-[8px]'
 								disabled={!Number(amount) || balance < Number(amount)}
 							/>
 						</div>

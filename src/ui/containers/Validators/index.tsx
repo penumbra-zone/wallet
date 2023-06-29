@@ -43,7 +43,7 @@ export const Validators = () => {
 	return (
 		<div className='w-[100%] mt-[20px] mb-[20px]'>
 			<div className='mx-[0px] flex flex-col items-center'>
-				<div className='w-[100%] flex items-center justify-between rounded-[15px] bg-brown py-[24px] px-[20px] mb-[24px]'>
+				<div className='w-[100%] flex items-center justify-between rounded-[10px] bg-brown py-[24px] px-[20px] mb-[24px]'>
 					<div className='flex flex-col'>
 						<p className='h3 mb-[16px]'>Total PNB Amount </p>
 						<Balance className='text_numbers pb-[4px]' />
@@ -57,16 +57,16 @@ export const Validators = () => {
 						<Button
 							mode='transparent'
 							title='Send'
-							className='w-[110px] tablet:py-[9px]'
+							className='w-[110px]'
 						/>
 						<Button
 							mode='gradient'
 							title='Deposit'
-							className='w-[110px] ml-[16px] tablet:py-[9px]'
+							className='w-[110px] ml-[16px]'
 						/>
 					</div>
 				</div>
-				<div className='w-[100%] flex items-center justify-between rounded-[15px] bg-brown py-[24px] px-[20px] mb-[40px]'>
+				<div className='w-[100%] flex items-center justify-between rounded-[10px] bg-brown py-[24px] px-[20px] mb-[40px]'>
 					<div className='flex flex-col'>
 						<p className='h3 mb-[8px]'>Staked Amount</p>
 						<p className='text_numbers mb-[4px]'>0 PNB</p>
@@ -84,7 +84,7 @@ export const Validators = () => {
 					<Button
 						mode='gradient'
 						title='Claim'
-						className='w-[110px] ml-[16px] tablet:py-[9px]'
+						className='w-[110px] ml-[16px]'
 					/>
 				</div>
 			</div>

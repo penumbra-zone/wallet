@@ -126,7 +126,7 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
 							title='Block account'
 							mode='gradient'
 							onClick={handleBlock}
-							className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] mt-[40px] '
+							className='mt-[40px] '
 						/>
 					</div>
 				</>

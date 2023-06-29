@@ -61,13 +61,13 @@ export const SettingsPermissions = () => {
 										mode='transparent'
 										onClick={handleRevoke(i)}
 										title='Revoke'
-										className='ext:[50%] tablet:w-[88px] mr-[8px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] text_button_ext'
+										className='ext:[50%] tablet:w-[88px] mr-[8px] text_button_ext'
 									/>
 									<Button
 										mode='gradient'
 										onClick={handleSelectSite(i)}
 										title='View'
-										className='ext:[50%] tablet:w-[88px] ml-[8px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] text_button_ext'
+										className='ext:[50%] tablet:w-[88px] ml-[8px] text_button_ext'
 									/>
 								</div>
 							</div>

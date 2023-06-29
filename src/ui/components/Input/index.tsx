@@ -42,9 +42,9 @@ export const Input: React.FC<InputProps> = ({
 
 	return (
 		<div className={className}>
-			<p className={labelClassName}>{label}</p>
+			{label && <p className={labelClassName}>{label}</p>}
 			<div
-				className={`w-[100%] h-[52px] rounded-[15px] flex items-center justify-center  
+				className={`w-[100%] h-[44px] rounded-[10px] flex items-center justify-center  
         ${
 					isError
 						? 'bg-red'
@@ -56,14 +56,14 @@ export const Input: React.FC<InputProps> = ({
 				onClick={containerHandler}
 			>
 				<div
-					className={`w-[calc(100%-2px)] rounded-[15px] ${
+					className={`w-[calc(100%-2px)] rounded-[10px] ${
 						props.value && !isError ? 'bg-brown' : 'bg-background'
 					}`}
 				>
 					<div
-						className={`w-[100%] h-[50px] ${
+						className={`w-[100%] h-[42px] ${
 							props.value && !isError ? 'input_typing_bg' : 'bg-brown'
-						} cursor-text rounded-[15px] flex justify-center items-center`}
+						} cursor-text rounded-[10px] flex justify-center items-center`}
 					>
 						{leftSvg}
 						<input
@@ -72,7 +72,7 @@ export const Input: React.FC<InputProps> = ({
 								customType === 'password'
 									? 'w-[calc(100%-80px)]'
 									: 'w-[calc(100%-40px)]'
-							} h-[50px] rounded-[15px] border-[none] px-[5px] bg-transparent text_body
+							} h-[42px] rounded-[10px] border-[none] px-[5px] bg-transparent text_body
               active:outline-none focus:outline-none placeholder:text-[#524B4B] placeholder:text_body`}
 							onBlur={inputBlurHandler}
 							placeholder={placeholder}

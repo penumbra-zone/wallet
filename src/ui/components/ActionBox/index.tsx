@@ -19,7 +19,7 @@ export const ActionBox: React.FC<ActionBoxProps> = ({
 }) => {
 	return (
 		<div
-			className={`flex flex-col items-center justify-between py-[33px] px-[21px] bg-brown rounded-[15px] shadow-action_box  ${className}`}
+			className={`flex flex-col items-center justify-between py-[33px] px-[21px] bg-brown rounded-[10px] shadow-action_box  ${className}`}
 		>
 			<div className='flex flex-col items-center'>
 				{icon}

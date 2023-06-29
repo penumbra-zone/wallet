@@ -83,7 +83,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 
 	return (
 		<>
-			<div className='w-[100%] flex flex-col items-start ext:py-[20px] tablet:py-[30px] bg-brown rounded-[15px] px-[16px]'>
+			<div className='w-[100%] flex flex-col items-start ext:py-[20px] tablet:py-[30px] bg-brown rounded-[10px] px-[16px]'>
 				{setSendPlan && (
 					<Button
 						mode='icon_transparent'
@@ -104,7 +104,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 						return (
 							<div key={index} className='w-[100%] flex flex-col mt-[16px]'>
 								<p className='h2 mb-[8px] capitalize'>{i.type}</p>
-								<p className='py-[8px] px-[16px] bg-dark_grey rounded-[15px] text_numbers_s text-light_grey break-all'>
+								<p className='py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-all'>
 									{text}
 								</p>
 							</div>
@@ -116,13 +116,13 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 						mode='transparent'
 						onClick={handleEdit}
 						title='Cancel'
-						className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] mr-[8px]'
+						className='w-[50%] mr-[8px]'
 					/>
 					<Button
 						mode='gradient'
 						onClick={handleConfirm}
 						title='Confirm'
-						className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
+						className='w-[50%] ml-[8px]'
 					/>
 				</div>
 			</div>

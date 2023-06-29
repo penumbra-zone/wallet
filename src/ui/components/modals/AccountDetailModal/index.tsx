@@ -27,7 +27,7 @@ export const AccountDetailModal: React.FC<
 					<UserLogo />
 					<p className='h2 mt-[12px] mb-[40px]'>{selectedAccount.name}</p>
 					<div className='w-[100%] px-[31px]'>
-						<div className='px-[16px] py-[8px] rounded-[15px] bg-dark_grey break-words'>
+						<div className='px-[16px] py-[8px] rounded-[10px]bg-dark_grey break-words'>
 							{selectedAccount.addressByIndex}
 						</div>
 					</div>
@@ -37,13 +37,13 @@ export const AccountDetailModal: React.FC<
 						title='Export full viewing key'
 						mode='gradient'
 						onClick={changeKeyModalType('full_viewing_key')}
-						className='w-[100%] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
+						className='w-[100%]'
 					/>
 					<Button
 						title='Export spending key'
 						mode='gradient'
 						onClick={changeKeyModalType('spending_key')}
-						className='w-[100%] mt-[24px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
+						className='w-[100%] mt-[24px]'
 					/>
 				</div>
 			</div>

@@ -12,7 +12,6 @@ import {
 	Settings,
 	SettingsSecurityPrivacy,
 	SettingsNetworks,
-	BalanceDetail,
 	Validators,
 	Send,
 	SettingsContacts,
@@ -65,10 +64,6 @@ export const routes: RouteObject[] = [
 				element: <ImportSeed />,
 			},
 			{
-				path: routesPath.BALANCE_DETAIL,
-				element: <BalanceDetail />,
-			},
-			{
 				path: routesPath.VALIDATORS,
 				element: <Validators />,
 			},
@@ -113,7 +108,6 @@ export const routes: RouteObject[] = [
 						path: routesPath.SETTINGS_PERMISSIONS,
 						element: <SettingsPermissions />,
 					},
-					
 				],
 			},
 		],

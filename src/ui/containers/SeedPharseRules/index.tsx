@@ -78,7 +78,7 @@ export const SeedPharseRules = () => {
 					return (
 						<div
 							key={index}
-							className='ext:w-[100%] tablet:w-[calc(50%-8px)] border-[1px] border-solid border-dark_grey rounded-[15px] px-[14px] pt-[24px] pb-[48px] bg-brown'
+							className='ext:w-[100%] tablet:w-[calc(50%-8px)] border-[1px] border-solid border-dark_grey rounded-[10px] px-[14px] pt-[24px] pb-[48px] bg-brown'
 						>
 							<p className='h2 text-center mb-[16px]'>{i.header}</p>
 							{i.children}

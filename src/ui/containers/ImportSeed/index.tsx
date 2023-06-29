@@ -121,7 +121,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 	return (
 		<>
 			<div className='w-[100%] flex items-center justify-center'>
-				<div className='flex flex-col  justify-center'>
+				<div className='flex flex-col   justify-center'>
 					<div>
 						<Button
 							mode='icon_transparent'
@@ -153,7 +153,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 						))}
 					</div>
 					{!isValidMnemonic && (
-						<div className='flex items-center bg-brown py-[23px] pl-[14px] w-[calc(50%-16px)] rounded-[15px] border-[1px] border-solid border-red mt-[20px]'>
+						<div className='flex items-center bg-brown py-[23px] pl-[14px] w-[calc(50%-16px)] rounded-[10px] border-[1px] border-solid border-red mt-[20px]'>
 							<InformationOutlineSvg fill='#870606' />
 							<p className='pl-[18px] text _body'>
 								Invalid recovery passphrase.

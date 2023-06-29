@@ -15,7 +15,7 @@ export const SettingsExtenion = () => {
 
 	return (
 		<div className='min-h-[100vh] w-[100%] py-[20px] '>
-			<div className='h-[100%] bg-brown rounded-[15px] pb-[28px] flex flex-col justify-between'>
+			<div className='h-[100%] bg-brown rounded-[10px] pb-[28px] flex flex-col justify-between'>
 				<div>
 					{pathname === routesPath.SETTINGS ? (
 						<></>
@@ -53,7 +53,6 @@ export const SettingsExtenion = () => {
 							title='Block account'
 							mode='gradient'
 							onClick={handleBlock}
-							className=''
 						/>
 					</div>
 				)}
