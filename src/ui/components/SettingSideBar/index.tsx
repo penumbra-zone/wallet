@@ -24,12 +24,12 @@ export const links = [
 		svg: <AdditionallySvg fill='#E0E0E0' />,
 		text: 'Advanced',
 	},
-	{
-		to: routesPath.SETTINGS_CONTACTS,
-		// to: routesPath.SETTINGS_CONTACTS,
-		svg: <ContactsSvg fill='#E0E0E0' />,
-		text: 'Contacts',
-	},
+	// {
+	// 	to: routesPath.SETTINGS_CONTACTS,
+	// 	// to: routesPath.SETTINGS_CONTACTS,
+	// 	svg: <ContactsSvg fill='#E0E0E0' />,
+	// 	text: 'Contacts',
+	// },
 	{
 		to: routesPath.SETTINGS_SECURITY_PRIVACY,
 		svg: <LockSvg fill='#E0E0E0' />,

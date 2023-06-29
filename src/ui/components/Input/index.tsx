@@ -72,7 +72,7 @@ export const Input: React.FC<InputProps> = ({
 								customType === 'password'
 									? 'w-[calc(100%-80px)]'
 									: 'w-[calc(100%-40px)]'
-							} h-[42px] rounded-[10px] border-[none] px-[5px] bg-transparent text_body
+							} ${leftSvg ? '': 'pl-[12px]'} h-[42px] rounded-[10px] border-[none] px-[5px] bg-transparent text_body
               active:outline-none focus:outline-none placeholder:text-[#524B4B] placeholder:text_body`}
 							onBlur={inputBlurHandler}
 							placeholder={placeholder}
@@ -98,7 +98,7 @@ export const Input: React.FC<InputProps> = ({
 				</div>
 			</div>
 			{helperText && (
-				<div className='pt-[8px] h-[30px] '>
+				<div className='h-[16px] '>
 					{isError && (
 						<p className='w-[100%]  text-red text_body'>{helperText}</p>
 					)}

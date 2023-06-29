@@ -63,7 +63,7 @@ export const SeedPharseRules = () => {
 	const handleBack = () => navigate(routesPath.SELECT_ACTION)
 
 	return (
-		<div className='w-[100%] flex flex-col items-center justify-center'>
+		<div className='w-[100%] flex flex-col items-center justify-center mb-[40px]'>
 			<div className='self-start'>
 				<Button
 					mode='icon_transparent'
@@ -72,13 +72,13 @@ export const SeedPharseRules = () => {
 					iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
 				/>
 			</div>
-			<p className='h1 mb-[16px]'>Protect your wallet</p>
+			<p className='h1 mb-[24px]'>Protect your wallet</p>
 			<div className='flex items-stretch flex-wrap justify-center ext:gap-[8px] tablet:gap-[16px]'>
 				{tips.map((i, index) => {
 					return (
 						<div
 							key={index}
-							className='ext:w-[100%] tablet:w-[calc(50%-8px)] border-[1px] border-solid border-dark_grey rounded-[10px] px-[14px] pt-[24px] pb-[48px] bg-brown'
+							className='ext:w-[100%] tablet:w-[calc(50%-8px)] border-[1px] border-solid border-dark_grey rounded-[10px] px-[22px] pt-[24px] pb-[48px] bg-brown'
 						>
 							<p className='h2 text-center mb-[16px]'>{i.header}</p>
 							{i.children}
@@ -86,7 +86,7 @@ export const SeedPharseRules = () => {
 					)
 				})}
 			</div>
-			<div className='w-[48%] mt-[40px] mb-[40px]  mx-[8px]'>
+			<div className='w-[48%] mt-[24px] mx-[8px]'>
 				<Button title='Start' mode='gradient' onClick={handleStart} />
 			</div>
 		</div>

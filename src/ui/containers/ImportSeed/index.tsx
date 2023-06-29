@@ -120,8 +120,8 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 
 	return (
 		<>
-			<div className='w-[100%] flex items-center justify-center'>
-				<div className='flex flex-col   justify-center'>
+			<div className='w-[100%] flex items-center justify-center mt-[24px] mb-[40px]'>
+				<div className='flex flex-col justify-center'>
 					<div>
 						<Button
 							mode='icon_transparent'
@@ -133,11 +133,17 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 					<p className='h1 mt-[40px] mb-[16px]'>
 						Import wallet with recovery passphrase
 					</p>
-					<p className='text _body text-light_grey mb-[40px] w-[calc(75%-16px)]'>
+					<p className='text _body text-light_grey mb-[24px] w-[calc(75%-16px)]'>
 						Only the first account in this wallet is automatically loaded. To
 						add additional accounts, after completing this process, click on the
 						drop-down menu and then select «Create Account».
 					</p>
+					<div className='flex items-center gap-x-[16px] px-[12px] py-[14px] bg-brown rounded-[10px] mb-[40px]'>
+						<InformationOutlineSvg height='16' width='16' />
+						<p className='text_body'>
+							You can paste your entire recovery passphrase into any field
+						</p>
+					</div>
 					<div className='flex flex-wrap gap-y-[8px] gap-x-[16px]'>
 						{selects.map(i => (
 							<div className='flex-[0_0_calc(25%-16px)]' key={i}>
@@ -160,10 +166,14 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 							</p>
 						</div>
 					)}
-					<div className='w-[calc(50%-16px)] mt-[40px]'>
-						<div className='w-[100%] mb-[30px]'>
-							<Button title='Import' mode='gradient' onClick={handleSubmit} />
-						</div>
+
+					<div className='w-[100%] mt-[70px] flex items-center justify-center'>
+						<Button
+							title='Import'
+							mode='gradient'
+							onClick={handleSubmit}
+							className='w-[400px]'
+						/>
 					</div>
 				</div>
 			</div>

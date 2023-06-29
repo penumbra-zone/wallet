@@ -17,11 +17,11 @@ const links = [
 		svg: <AdditionallySvg />,
 		text: 'Advanced',
 	},
-	{
-		to: routesPath.SETTINGS_CONTACTS,
-		svg: <ContactsSvg />,
-		text: 'Contacts',
-	},
+	// {
+	// 	to: routesPath.SETTINGS_CONTACTS,
+	// 	svg: <ContactsSvg />,
+	// 	text: 'Contacts',
+	// },
 	{
 		to: routesPath.SETTINGS_SECURITY_PRIVACY,
 		svg: <LockSvg />,

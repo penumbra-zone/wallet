@@ -18,8 +18,6 @@ export const CreatePasswordForm: React.FC<CreatePasswordFormProps> = ({
 		newPass: string
 		confirmPass: string
 	}>({
-		// newPass: '1qazXsw@',
-		// confirmPass: '1qazXsw@',
 		newPass: '',
 		confirmPass: '',
 	})
@@ -75,7 +73,7 @@ export const CreatePasswordForm: React.FC<CreatePasswordFormProps> = ({
 					customType='password'
 				/>
 			</div>
-			<div className='w-[100%] mb-[24px]'>
+			<div className='w-[100%] mb-[40px]'>
 				<Input
 					label='Confirm password'
 					placeholder='Confirm password'
@@ -90,26 +88,22 @@ export const CreatePasswordForm: React.FC<CreatePasswordFormProps> = ({
 				/>
 			</div>
 			<PasswordRules password={password.newPass} validates={isValidate} />
-			<div className='self-start mb-[10px] mt-[16px]'>
-				<CheckBox
-					label='I have read the terms of use and agree to them'
-					onChange={handleChangeCheck('terms')}
-					checked={isChecked.terms}
-					// onKeyDown={handleKeyPressCheckBox}
-				/>
-			</div>
-			<div className='self-start mb-[40px]'>
+			<div className='self-start mb-[40px]  mt-[16px]'>
 				<CheckBox
 					label={
 						<div className='flex items-center'>
-							<p>I have read and agree with the</p>
-							<a
-								className='text-green underline cursor-pointer hover:text-light_grey ml-[2px]'
-								target='_blank'
-								href='https://privacy.penumbra.zpoken.io/'
-							>
-								Privacy policy
-							</a>
+							<p>
+								I have read and agree with the{' '}
+								<span>
+									<a
+										className='text-green underline cursor-pointer hover:text-light_grey'
+										target='_blank'
+										href='https://privacy.penumbra.zpoken.io/'
+									>
+										Privacy policy
+									</a>
+								</span>
+							</p>
 						</div>
 					}
 					onChange={handleChangeCheck('privacy')}
@@ -122,13 +116,12 @@ export const CreatePasswordForm: React.FC<CreatePasswordFormProps> = ({
 					title={buttonTitle}
 					mode='gradient'
 					disabled={
-					  !(
-					    Boolean(Object.values(isValidate).length) &&
-					    !Object.values(isValidate).includes(false) &&
-					    password.confirmPass === password.newPass &&
-					    isChecked.privacy &&
-					    isChecked.terms
-					  )
+						!(
+							Boolean(Object.values(isValidate).length) &&
+							!Object.values(isValidate).includes(false) &&
+							password.confirmPass === password.newPass &&
+							isChecked.privacy
+						)
 					}
 					onClick={onClick(password.newPass)}
 				/>
