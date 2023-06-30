@@ -27,6 +27,7 @@ import {
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import { CompactBlock } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import { ObliviousQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
+import { CurrentAccountController } from './CurrentAccountController'
 
 export type Transaction = {
 	blockHeight: bigint
@@ -52,6 +53,7 @@ export class ClientController {
 		wasmViewConnector,
 		getAccountSpendingKey,
 		getCustomGRPC,
+		resetBalance,
 	}: {
 		extensionStorage: ExtensionStorage
 		indexedDb: IndexedDb
@@ -62,6 +64,7 @@ export class ClientController {
 		getNetwork: NetworkController['getNetwork']
 		getNetworkConfig: RemoteConfigController['getNetworkConfig']
 		getCustomGRPC: NetworkController['getCustomGRPC']
+		resetBalance: CurrentAccountController['resetWallet']
 	}) {
 		this.store = new ObservableStore(
 			extensionStorage.getInitState({
@@ -82,6 +85,7 @@ export class ClientController {
 			getNetworkConfig,
 			getAccountSpendingKey,
 			getCustomGRPC,
+			resetBalance,
 		}
 		extensionStorage.subscribe(this.store)
 		this.indexedDb = indexedDb
@@ -195,9 +199,6 @@ export class ClientController {
 									response.compactBlock.height
 								),
 							}
-							// extension.storage.local.set({
-							// 	lastSavedBlock,
-							// })
 
 							this.store.updateState({
 								lastSavedBlock,
@@ -251,7 +252,16 @@ export class ClientController {
 				}
 			}
 		} catch (error) {
-			console.error(error)
+			if (this.abortController.signal.aborted) {
+				if (
+					this.abortController.signal.reason === 'reset wallet' ||
+					this.abortController.signal.reason === 'change grpc'
+				) {
+					await this.indexedDb.clearAllTables()
+					await this.resetWallet()
+					await this.configApi.resetBalance()
+				}
+			}
 		}
 	}
 
@@ -308,18 +318,6 @@ export class ClientController {
 	}
 
 	async resetWallet() {
-		await this.indexedDb.resetTables(CHAIN_PARAMETERS_TABLE_NAME)
-		await this.indexedDb.resetTables(ASSET_TABLE_NAME)
-		await this.indexedDb.resetTables(TRANSACTION_TABLE_NAME)
-		await this.indexedDb.resetTables(FMD_PARAMETERS_TABLE_NAME)
-		await this.indexedDb.resetTables(NCT_COMMITMENTS_TABLE_NAME)
-		await this.indexedDb.resetTables(NCT_FORGOTTEN_TABLE_NAME)
-		await this.indexedDb.resetTables(NCT_HASHES_TABLE_NAME)
-		await this.indexedDb.resetTables(NCT_POSITION_TABLE_NAME)
-		await this.indexedDb.resetTables(SPENDABLE_NOTES_TABLE_NAME)
-		await this.indexedDb.resetTables(TRANSACTION_BY_NULLIFIER_TABLE_NAME)
-		await this.indexedDb.resetTables(SWAP_TABLE_NAME)
-
 		this.store.updateState({
 			lastSavedBlock: {
 				mainnet: 0,
@@ -330,16 +328,6 @@ export class ClientController {
 				testnet: 0,
 			},
 		})
-		// extension.storage.local.set({
-		// 	lastSavedBlock: {
-		// 		mainnet: 0,
-		// 		testnet: 0,
-		// 	},
-		// 	lastBlockHeight: {
-		// 		mainnet: 0,
-		// 		testnet: 0,
-		// 	},
-		// })
 	}
 
 	requireScanning(compactBlock: CompactBlock) {
@@ -356,8 +344,8 @@ export class ClientController {
 		)
 	}
 
-	abortGrpcRequest() {
-		this.abortController.abort()
+	abortGrpcRequest(reason?: string) {
+		this.abortController.abort(reason)
 	}
 
 	getGRPC() {

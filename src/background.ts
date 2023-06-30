@@ -118,18 +118,6 @@ async function setupBackgroundService() {
 		await backgroundService.clientController.abortGrpcRequest()
 	})
 
-	// backgroundService.walletController.on('delete wallet', async () => {
-	// 	console.log(await extensionStorage.getState())
-	// 	await backgroundService.remoteConfigController.resetWallet()
-	// 	await backgroundService.clientController.resetWallet()
-	// 	await backgroundService.networkController.resetWallet()
-	// 	await backgroundService.wasmViewConnector.resetWallet()
-	// 	await backgroundService.currentAccountController.resetWallet()
-	// 	await backgroundService.preferencesController.resetWallet()
-	// 	await backgroundService.permissionsController.clearStore()
-	// 	console.log(await extensionStorage.getState())
-	// })
-
 	backgroundService.walletController.on('wallet create', async () => {
 		await backgroundService.clientController.saveChainParameters()
 		await backgroundService.clientController.getCompactBlockRange()
@@ -141,18 +129,15 @@ async function setupBackgroundService() {
 	})
 
 	backgroundService.walletController.on('reset wallet', async () => {
-		await backgroundService.clientController.abortGrpcRequest()
+		await backgroundService.clientController.abortGrpcRequest('reset wallet')
 		await backgroundService.remoteConfigController.resetWallet()
-		await backgroundService.clientController.resetWallet()
 		await backgroundService.networkController.resetWallet()
 		await backgroundService.wasmViewConnector.resetWallet()
-		await backgroundService.currentAccountController.resetWallet()
 		await backgroundService.vaultController.lock()
 	})
 
 	backgroundService.networkController.on('change grpc', async () => {
-		await backgroundService.clientController.abortGrpcRequest()
-		await backgroundService.clientController.resetWallet()
+		await backgroundService.clientController.abortGrpcRequest('change grpc')
 		await backgroundService.clientController.saveChainParameters()
 		await backgroundService.clientController.getCompactBlockRange()
 	})
@@ -271,6 +256,7 @@ class BackgroundService extends EventEmitter {
 			getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
 			wasmViewConnector: this.wasmViewConnector,
 			getCustomGRPC: () => this.networkController.getCustomGRPC(),
+			resetBalance: () => this.currentAccountController.resetWallet(),
 		})
 
 		this.viewProtocolService = new ViewProtocolService({
@@ -423,6 +409,7 @@ class BackgroundService extends EventEmitter {
 				await this.currentAccountController.resetWallet()
 				await this.preferencesController.resetWallet()
 				await this.permissionsController.clearStore()
+				await this.indexedDb.clearAllTables()
 			},
 		}
 	}

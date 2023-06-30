@@ -131,6 +131,7 @@ export class IndexedDb {
 		if (this.observer) {
 			this.observer(tableName, value)
 		}
+
 		return result
 	}
 
@@ -141,6 +142,7 @@ export class IndexedDb {
 		if (this.observer) {
 			this.observer(tableName, value)
 		}
+
 		return result
 	}
 
@@ -150,9 +152,10 @@ export class IndexedDb {
 		// for (const value of values) {
 		// 	await store.put(value)
 		// }
-		for(let i = 0; i < values.length; i++){
+		for (let i = 0; i < values.length; i++) {
 			await store.put(values[i])
 		}
+
 		return ''
 	}
 
@@ -172,6 +175,23 @@ export class IndexedDb {
 		const tx = this.db.transaction([tableName], 'readwrite')
 		const store = tx.objectStore(tableName)
 		await store.clear()
+	}
+
+	private getObjectStore(storeName: TableName) {
+		return this.db.transaction(storeName, 'readwrite').objectStore(storeName)
+	}
+
+	async clearAllTables(): Promise<void> {
+		const db = await this.db
+		const objectStoreNames = db.objectStoreNames
+
+		// Iterate through each object store and clear it
+		for (let i = 0; i < objectStoreNames.length; i++) {
+			const objectStoreName = objectStoreNames[i]
+			const store = this.getObjectStore(objectStoreName)
+			await store.clear()
+			console.log(`Table ${objectStoreName} cleared.`)
+		}
 	}
 
 	addObserver(callback) {
