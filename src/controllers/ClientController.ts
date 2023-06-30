@@ -21,7 +21,6 @@ import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
 import { IndexedDb } from '../utils'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
-
 import {
 	ChainParametersRequest,
 	CompactBlockRangeRequest,

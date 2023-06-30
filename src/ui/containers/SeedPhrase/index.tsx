@@ -204,7 +204,7 @@ export const SeedPhrase: React.FC<SeedPhraseProps> = ({}) => {
 								/>
 							</div>
 							<p className='h1 mt-[40px]'>Confirm your recovery passphrase</p>
-							<p className='text _body text-light-grey mt-[16px] mb-[24px]'>
+							<p className='text_body text-light-grey mt-[16px] mb-[24px]'>
 								Please confirm the seed phrase by entering the correct word for
 								each position
 							</p>

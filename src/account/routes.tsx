@@ -17,6 +17,7 @@ import {
 	SettingsContacts,
 	SettingsPermissions,
 	SettingsAdvanced,
+	ForgotPassword,
 } from '../ui/containers'
 import { RootAccounts } from './RootAccounts'
 import { routesPath } from '../utils'
@@ -62,6 +63,10 @@ export const routes: RouteObject[] = [
 			{
 				path: routesPath.IMPORT_SEED_PHRASE,
 				element: <ImportSeed />,
+			},
+			{
+				path: routesPath.FORGOT_PASSWORD,
+				element: <ForgotPassword />,
 			},
 			{
 				path: routesPath.VALIDATORS,

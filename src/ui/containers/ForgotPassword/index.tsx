@@ -1,53 +1,29 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch } from '../../../account'
-import { getWordListOprions as getWordListOptions, routesPath } from '../../../utils'
+import { routesPath } from '../../../utils'
 import {
 	Button,
 	ChevronLeftIcon,
+	CreatePasswordForm,
 	InformationOutlineSvg,
 	SelectInput,
 	SuccessCreateModal,
 } from '../../components'
 import { accountsActions, createAccount, localStateActions } from '../../redux'
+import { options } from '../ImportSeed'
+import Background from '../../services/Background'
 const bip39 = require('bip39')
 
-type ImportSeedProps = {}
-
-export const options = getWordListOptions()
+type ForgotPasswordProps = {}
 
 const selects = [...Array(24).keys()]
 
-export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
+export const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
 	const dispatch = useAppDispatch()
 	const navigate = useNavigate()
 
-	const [seed, setSeed] = useState({
-		// 1: 'under',
-		// 2: 'magnet',
-		// 3: 'father',
-		// 4: 'section',
-		// 5: 'sibling',
-		// 6: 'wide',
-		// 7: 'canoe',
-		// 8: 'baby',
-		// 9: 'cruel',
-		// 10: 'will',
-		// 11: 'mammal',
-		// 12: 'dignity',
-		// 13: 'apart',
-		// 14: 'pilot',
-		// 15: 'special',
-		// 16: 'car',
-		// 17: 'describe',
-		// 18: 'table',
-		// 19: 'ship',
-		// 20: 'mail',
-		// 21: 'amateur',
-		// 22: 'wash',
-		// 23: 'act',
-		// 24: 'end',
-	})
+	const [seed, setSeed] = useState({})
 
 	const [isValidMnemonic, setIsValidMnemonic] = useState<boolean>(true)
 	const [isShowModal, setIsShowModal] = useState<boolean>(false)
@@ -57,7 +33,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 		dispatch(accountsActions.setRedirectAccountPage(false))
 	}, [])
 
-	const handleBack = () => navigate(routesPath.SELECT_ACTION)
+	const handleBack = () => navigate(routesPath.LOGIN)
 
 	const handleChange = (index: number) => (value: string) => {
 		setSeed(state => ({
@@ -88,7 +64,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 		}))
 	}
 
-	const handleSubmit = async () => {
+	const handleSubmit = (password: string) => async () => {
 		const seedStr = Object.values(seed).join(' ')
 		const isValidate = bip39.validateMnemonic(seedStr)
 
@@ -98,6 +74,9 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 			setIsValidMnemonic(false)
 		}
 		if (!isValidate || Object.values(seed).length !== 24) return
+		await Background.deleteVault()
+		await Background.initVault(password)
+
 		await dispatch(
 			localStateActions.setNewAccount({
 				seed: seedStr,
@@ -114,6 +93,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 				shortAddressByIndex: '',
 			})
 		)
+
 		setIsShowModal(true)
 	}
 	const handleCloseModal = () => setIsShowModal(false)
@@ -130,13 +110,25 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 							iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
 						/>
 					</div>
-					<p className='h1 mt-[40px] mb-[16px]'>
-						Import wallet with recovery passphrase
+					<p className='h1 mt-[24px] mb-[16px]'>Reset wallet</p>
+					<p className='text_body text-light_grey mb-[16px] w-[calc(75%-16px)]'>
+						Penumbra does not keep a copy of your password. If you’re having
+						trouble unlocking your account, you will need to reset your wallet.
+						You can do this by providing the Secret Recovery Phrase you used
+						when you set up your wallet.
 					</p>
-					<p className='text_body text-light_grey mb-[24px] w-[calc(75%-16px)]'>
-						Only the first account in this wallet is automatically loaded. To
-						add additional accounts, after completing this process, click on the
-						drop-down menu and then select «Create Account».
+					<p className='text_body text-light_grey mb-[16px] w-[calc(75%-16px)]'>
+						This action will delete your current wallet and Secret Recovery
+						Phrase from this device, along with the list of accounts you’ve
+						curated. After resetting with a Secret Recovery Phrase, you’ll see a
+						list of accounts based on the Secret Recovery Phrase you use to
+						reset. This new list will automatically include accounts that have a
+						balance. You’ll also be able to re-add any other accounts created
+						previously. Custom accounts that you’ve imported will need to be
+						re-added, and any custom tokens you’ve added to an account will need
+						to be re-added as well. Make sure you’re using the correct Secret
+						Recovery Phrase before proceeding. You will not be able to undo
+						this.
 					</p>
 					<div className='flex items-center gap-x-[16px] px-[12px] py-[14px] bg-brown rounded-[10px] mb-[40px]'>
 						<InformationOutlineSvg height='16' width='16' />
@@ -166,14 +158,8 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 							</p>
 						</div>
 					)}
-
-					<div className='w-[100%] mt-[70px] flex items-center justify-center'>
-						<Button
-							title='Import'
-							mode='gradient'
-							onClick={handleSubmit}
-							className='w-[400px]'
-						/>
+					<div className='mt-[24px] w-[400px]'>
+						<CreatePasswordForm buttonTitle='Reset' onClick={handleSubmit} />
 					</div>
 				</div>
 			</div>
