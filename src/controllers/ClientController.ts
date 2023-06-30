@@ -4,18 +4,11 @@ import { ExtensionStorage } from '../storage'
 import ObservableStore from 'obs-store'
 import { WalletController } from './WalletController'
 import {
-	ASSET_TABLE_NAME,
 	CHAIN_PARAMETERS_TABLE_NAME,
-	extension,
-	FMD_PARAMETERS_TABLE_NAME,
 	NCT_COMMITMENTS_TABLE_NAME,
 	NCT_FORGOTTEN_TABLE_NAME,
 	NCT_HASHES_TABLE_NAME,
 	NCT_POSITION_TABLE_NAME,
-	SPENDABLE_NOTES_TABLE_NAME,
-	SWAP_TABLE_NAME,
-	TRANSACTION_BY_NULLIFIER_TABLE_NAME,
-	TRANSACTION_TABLE_NAME,
 } from '../lib'
 import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
@@ -28,6 +21,7 @@ import {
 import { CompactBlock } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import { ObliviousQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
 import { CurrentAccountController } from './CurrentAccountController'
+import { VaultController } from './VaultController'
 
 export type Transaction = {
 	blockHeight: bigint
@@ -54,6 +48,7 @@ export class ClientController {
 		getAccountSpendingKey,
 		getCustomGRPC,
 		resetBalance,
+		lock,
 	}: {
 		extensionStorage: ExtensionStorage
 		indexedDb: IndexedDb
@@ -65,6 +60,7 @@ export class ClientController {
 		getNetworkConfig: RemoteConfigController['getNetworkConfig']
 		getCustomGRPC: NetworkController['getCustomGRPC']
 		resetBalance: CurrentAccountController['resetWallet']
+		lock: VaultController['lock']
 	}) {
 		this.store = new ObservableStore(
 			extensionStorage.getInitState({
@@ -86,6 +82,7 @@ export class ClientController {
 			getAccountSpendingKey,
 			getCustomGRPC,
 			resetBalance,
+			lock,
 		}
 		extensionStorage.subscribe(this.store)
 		this.indexedDb = indexedDb
@@ -147,14 +144,17 @@ export class ClientController {
 
 		const compactBlockRangeRequest = new CompactBlockRangeRequest()
 
+		const lastSavedBlockHeight =
+			this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
+
 		compactBlockRangeRequest.chainId = chainId
 		compactBlockRangeRequest.startHeight = BigInt(
-			this.store.getState().lastSavedBlock[this.configApi.getNetwork()] === 0
-				? 0
-				: this.store.getState().lastSavedBlock[this.configApi.getNetwork()] + 1
+			!lastSavedBlockHeight ? 0 : lastSavedBlockHeight + 1
 		)
 		compactBlockRangeRequest.keepAlive = true
 		this.abortController = new AbortController()
+		let height
+
 		try {
 			for await (const response of client.compactBlockRange(
 				compactBlockRangeRequest,
@@ -192,19 +192,15 @@ export class ClientController {
 									'forgotten'
 								)),
 						]).then(() => {
-							const oldState = this.store.getState().lastSavedBlock
-							const lastSavedBlock = {
-								...oldState,
-								[this.configApi.getNetwork()]: Number(
-									response.compactBlock.height
-								),
-							}
-
-							this.store.updateState({
-								lastSavedBlock,
-							})
+							this.saveLastBlock(Number(response.compactBlock.height))
 						})
 					}
+					if (Number(response.compactBlock.height) === 61325) {
+						//TODO delete
+						await this.abortGrpcRequest()
+						await this.configApi.lock()
+					}
+					height = Number(response.compactBlock.height)
 				} else {
 					const updates = await this.wasmViewConnector.loadUpdates()
 
@@ -249,6 +245,7 @@ export class ClientController {
 							lastSavedBlock,
 						})
 					})
+					height = Number(response.compactBlock.height)
 				}
 			}
 		} catch (error) {
@@ -260,9 +257,48 @@ export class ClientController {
 					await this.indexedDb.clearAllTables()
 					await this.resetWallet()
 					await this.configApi.resetBalance()
+				} else {
+					const updates = await this.wasmViewConnector.loadUpdates()
+
+					Promise.all([
+						await this.indexedDb.putBulkValue(
+							NCT_COMMITMENTS_TABLE_NAME,
+							updates.storeCommitments
+						),
+						await this.indexedDb.putBulkValue(
+							NCT_HASHES_TABLE_NAME,
+							updates.storeHashes
+						),
+						await this.indexedDb.putValueWithId(
+							NCT_POSITION_TABLE_NAME,
+							updates.setPosition,
+							'position'
+						),
+						updates.setForgotten &&
+							(await this.indexedDb.putValueWithId(
+								NCT_FORGOTTEN_TABLE_NAME,
+								updates.setForgotten,
+								'forgotten'
+							)),
+					]).then(() => {
+						this.saveLastBlock(Number(height))
+					})
 				}
 			}
 		}
+	}
+
+	saveLastBlock(height: number) {
+		const oldState = this.store.getState().lastSavedBlock
+
+		const lastSavedBlock = {
+			...oldState,
+			[this.configApi.getNetwork()]: Number(height),
+		}
+
+		this.store.updateState({
+			lastSavedBlock,
+		})
 	}
 
 	async broadcastTx(tx_bytes_hex: string) {

@@ -257,6 +257,7 @@ class BackgroundService extends EventEmitter {
 			wasmViewConnector: this.wasmViewConnector,
 			getCustomGRPC: () => this.networkController.getCustomGRPC(),
 			resetBalance: () => this.currentAccountController.resetWallet(),
+			lock: () => this.vaultController.lock()
 		})
 
 		this.viewProtocolService = new ViewProtocolService({

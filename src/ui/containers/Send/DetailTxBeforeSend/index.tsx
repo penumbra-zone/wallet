@@ -83,8 +83,8 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 
 	return (
 		<>
-			<div className='w-[100%] h-[100vh] flex justify-center items-center px-[40px] py-[24px]'>
-				<div className='w-[100%] h-[calc(100vh-48px)] flex flex-col justify-between bg-brown rounded-[10px] p-[16px]'>
+			<div className='w-[100%] min-h-[100vh] flex justify-center items-center px-[40px] py-[24px]'>
+				<div className='w-[100%] min-h-[calc(100vh-48px)] flex flex-col justify-between bg-brown rounded-[10px] p-[16px]'>
 					<div className='flex flex-col gap-y-[16px]'>
 						{sendPlan.actions.map((i, index) => {
 							let text
@@ -103,7 +103,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 							)
 						})}
 					</div>
-					<div className='w-[100%] flex gap-x-[16px]'>
+					<div className='w-[100%] flex gap-x-[16px] mt-[24px]'>
 						<Button
 							mode='transparent'
 							onClick={handleEdit}

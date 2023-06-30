@@ -190,7 +190,6 @@ export class IndexedDb {
 			const objectStoreName = objectStoreNames[i]
 			const store = this.getObjectStore(objectStoreName)
 			await store.clear()
-			console.log(`Table ${objectStoreName} cleared.`)
 		}
 	}
 

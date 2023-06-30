@@ -65,7 +65,7 @@ body {
 	margin: auto;
 	width: 400px;
 	height: 600px;
-	overflow-y: hidden;
+	overflow-y: auto;
 	overflow-x: hidden;
 }
 
