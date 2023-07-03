@@ -1,4 +1,9 @@
-import { base64_to_bech32, decode_transaction, ViewServer } from 'penumbra-wasm'
+import {
+	base64_to_bech32,
+	decode_nct_root,
+	decode_transaction,
+	ViewServer,
+} from 'penumbra-wasm'
 import { createGrpcWebTransport } from '@bufbuild/connect-web'
 import { createPromiseClient } from '@bufbuild/connect'
 import {
@@ -34,7 +39,10 @@ import {
 	SWAP_TABLE_NAME,
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
-import { DenomMetadataByIdRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
+import {
+	DenomMetadataByIdRequest,
+	KeyValueRequest,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import { SpecificQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
 import { PositionState } from '@buf/penumbra-zone_penumbra.grpc_web/penumbra/core/dex/v1alpha1/dex_pb'
 import PositionStateEnum = PositionState.PositionStateEnum
@@ -56,7 +64,7 @@ export type NctUpdates = {
 
 export class WasmViewConnector {
 	private indexedDb
-	private viewServer
+	private viewServer: ViewServer
 	private configApi
 
 	constructor({
@@ -82,26 +90,36 @@ export class WasmViewConnector {
 	}
 
 	async updateNotes(nullifier: Nullifier, height: bigint) {
-		const result = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
+		const result: SpendableNoteRecord[] = await this.indexedDb.getAllValue(
+			SPENDABLE_NOTES_TABLE_NAME
+		)
 
 		for (const note of result) {
 			if (JSON.stringify(note.nullifier) == JSON.stringify(nullifier)) {
-				note.heightSpent = String(height)
-				await this.indexedDb.putValueWithId(
-					SPENDABLE_NOTES_TABLE_NAME,
-					note,
-					note.noteCommitment.inner
-				)
-				await this.configApi.updateAssetBalance(
-					note.note.value.assetId.inner,
-					Number(note.note.value.amount.lo) * -1
-				)
+				if (!note.heightSpent) {
+					console.log('updateNotes')
+
+					console.log(note.heightCreated, note.noteCommitment.inner)
+
+					note.heightSpent = String(height) as any
+					await this.indexedDb.putValueWithId(
+						SPENDABLE_NOTES_TABLE_NAME,
+						note,
+						note.noteCommitment.inner
+					)
+					await this.configApi.updateAssetBalance(
+						note.note.value.assetId.inner,
+						Number(note.note.value.amount.lo) * -1
+					)
+				}
 			}
 		}
 	}
 
 	async handleNewCompactBlock(block: CompactBlock, fvk: string) {
 		if (!this.viewServer) {
+			console.log(this.viewServer)
+
 			const storedTree = await this.indexedDb.loadStoredTree()
 			this.viewServer = new ViewServer(fvk, 719n, storedTree)
 		}
@@ -122,21 +140,31 @@ export class WasmViewConnector {
 				JSON.parse(block.fmdParameters.toJsonString())
 			)
 
-		// let ntcRoot = this.viewClient.get_nct_root();
-		//
-		// const client = createPromiseClient(SpecificQueryService, transport);
-		//
-		// const keyValueRequest : KeyValueRequest = new KeyValueRequest();
-		// keyValueRequest.key = "shielded_pool/anchor/" + block.height
-		// let keyValue = await client.keyValue(keyValueRequest);
-		//
-		// let decodeNctRoot = decode_nct_root(this.toHexString(keyValue.value));
-		//
-		// // if (decodeNctRoot.inner != decodeNctRoot.inner ) {
+		if (Number(block.height) % 1000 === 0) {
+			try {
+				const transport = createGrpcWebTransport({
+					baseUrl: 'https://grpc.testnet.penumbra.zone',
+				})
 
-		// // }
-		//
-		// const delay = ms => new Promise(res => setTimeout(res, ms));
+				const client = createPromiseClient(SpecificQueryService, transport)
+
+				const keyValueRequest = new KeyValueRequest()
+				keyValueRequest.key = `sct/anchor/${String(block.height)}`
+				let keyValue = await client.keyValue(keyValueRequest)
+
+				let decodeNctRoot = decode_nct_root(
+					this.toHexString(keyValue.value.value)
+				)
+
+				const nctRoot = this.viewServer.get_nct_root()
+
+				if (decodeNctRoot.inner !== nctRoot.inner) {
+					console.log('bad', block.height)
+				}
+			} catch (error) {
+				console.log(error)
+			}
+		}
 	}
 
 	public async loadUpdates() {
@@ -154,6 +182,11 @@ export class WasmViewConnector {
 			NCT_FORGOTTEN_TABLE_NAME,
 			'forgotten'
 		)
+
+		console.log({
+			lastPosition,
+			lastForgotten,
+		})
 
 		const { nct_updates } = await this.viewServer.get_updates(
 			lastPosition,
@@ -186,7 +219,7 @@ export class WasmViewConnector {
 
 					tx && (await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, tx))
 				} catch (e) {
-					console.error('tx save failed ', e)
+					// console.error('tx save failed ', e)
 				}
 			})
 		}
@@ -220,8 +253,8 @@ export class WasmViewConnector {
 		await this.indexedDb.putValue(NCT_HASHES_TABLE_NAME, hash)
 	}
 
-	async storeNote(note) {
-		let storedNote = await this.indexedDb.getValue(
+	async storeNote(note: SpendableNoteRecord) {
+		const storedNote = await this.indexedDb.getValue(
 			SPENDABLE_NOTES_TABLE_NAME,
 			note.noteCommitment.inner
 		)
@@ -232,6 +265,9 @@ export class WasmViewConnector {
 				note,
 				note.noteCommitment.inner
 			)
+			console.log('storeNote')
+
+			console.log(note.heightCreated, note.noteCommitment.inner)
 
 			await this.storeAsset(note.note.value.assetId)
 
@@ -241,13 +277,6 @@ export class WasmViewConnector {
 			)
 
 			return note.source.inner
-
-			// try {
-			// 	const tx = await this.getTransaction(base64ToBytes(note.source.inner))
-			// 	return tx
-			// } catch (e) {
-			// 	console.error('tx save failed ', e)
-			// }
 		} else console.debug('note already stored', note.noteCommitment.inner)
 	}
 
@@ -357,7 +386,7 @@ export class WasmViewConnector {
 				view: transactionInfo.txv,
 			}
 		} catch (e) {
-			console.error('getTransaction from tendermint', e)
+			// console.error('getTransaction from tendermint', e)
 		}
 	}
 

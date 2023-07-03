@@ -62,10 +62,29 @@ extension.runtime.onConnect.addListener(async remotePort => {
 	}
 })
 
+// function logTabs(tabs) {
+//   for (const tab of tabs) {
+//     // tab.url requires the `tabs` permission or a matching host permission.
+//     console.log(tab);
+//   }
+// }
+
+// function onError(error) {
+//   console.error(`Error: ${error}`);
+// }
+
+// extension.tabs.query({ currentWindow: true }).then(logTabs, onError);
+
 // extension.runtime.onConnectExternal.addListener(async remotePort => {
 // 	const bgService = await bgPromise
 // 	bgService.setupPageConnection(remotePort)
 // })
+
+extension.runtime.onSuspend.addListener(() => {
+	console.log('asd')
+
+	// backgroundService.vaultController.lock()
+})
 
 async function setupBackgroundService() {
 	const extensionStorage = new ExtensionStorage()
@@ -132,7 +151,6 @@ async function setupBackgroundService() {
 		await backgroundService.clientController.abortGrpcRequest('reset wallet')
 		await backgroundService.remoteConfigController.resetWallet()
 		await backgroundService.networkController.resetWallet()
-		await backgroundService.wasmViewConnector.resetWallet()
 		await backgroundService.vaultController.lock()
 	})
 
@@ -257,7 +275,7 @@ class BackgroundService extends EventEmitter {
 			wasmViewConnector: this.wasmViewConnector,
 			getCustomGRPC: () => this.networkController.getCustomGRPC(),
 			resetBalance: () => this.currentAccountController.resetWallet(),
-			lock: () => this.vaultController.lock()
+			deleteViewServer: () => this.wasmViewConnector.resetWallet()
 		})
 
 		this.viewProtocolService = new ViewProtocolService({

@@ -48,7 +48,7 @@ export class ClientController {
 		getAccountSpendingKey,
 		getCustomGRPC,
 		resetBalance,
-		lock,
+		deleteViewServer,
 	}: {
 		extensionStorage: ExtensionStorage
 		indexedDb: IndexedDb
@@ -60,7 +60,7 @@ export class ClientController {
 		getNetworkConfig: RemoteConfigController['getNetworkConfig']
 		getCustomGRPC: NetworkController['getCustomGRPC']
 		resetBalance: CurrentAccountController['resetWallet']
-		lock: VaultController['lock']
+		deleteViewServer: WasmViewConnector['resetWallet']
 	}) {
 		this.store = new ObservableStore(
 			extensionStorage.getInitState({
@@ -82,7 +82,7 @@ export class ClientController {
 			getAccountSpendingKey,
 			getCustomGRPC,
 			resetBalance,
-			lock,
+			deleteViewServer,
 		}
 		extensionStorage.subscribe(this.store)
 		this.indexedDb = indexedDb
@@ -171,6 +171,10 @@ export class ClientController {
 					if (Number(response.compactBlock.height) % 1000 === 0) {
 						const updates = await this.wasmViewConnector.loadUpdates()
 
+						if (Number(response.compactBlock.height) === 62000) {
+							console.log(updates)
+						}
+
 						Promise.all([
 							await this.indexedDb.putBulkValue(
 								NCT_COMMITMENTS_TABLE_NAME,
@@ -194,11 +198,6 @@ export class ClientController {
 						]).then(() => {
 							this.saveLastBlock(Number(response.compactBlock.height))
 						})
-					}
-					if (Number(response.compactBlock.height) === 61325) {
-						//TODO delete
-						await this.abortGrpcRequest()
-						await this.configApi.lock()
 					}
 					height = Number(response.compactBlock.height)
 				} else {
@@ -249,6 +248,8 @@ export class ClientController {
 				}
 			}
 		} catch (error) {
+			console.log(height)
+
 			if (this.abortController.signal.aborted) {
 				if (
 					this.abortController.signal.reason === 'reset wallet' ||
@@ -258,32 +259,32 @@ export class ClientController {
 					await this.resetWallet()
 					await this.configApi.resetBalance()
 				} else {
-					const updates = await this.wasmViewConnector.loadUpdates()
-
-					Promise.all([
-						await this.indexedDb.putBulkValue(
-							NCT_COMMITMENTS_TABLE_NAME,
-							updates.storeCommitments
-						),
-						await this.indexedDb.putBulkValue(
-							NCT_HASHES_TABLE_NAME,
-							updates.storeHashes
-						),
-						await this.indexedDb.putValueWithId(
-							NCT_POSITION_TABLE_NAME,
-							updates.setPosition,
-							'position'
-						),
-						updates.setForgotten &&
-							(await this.indexedDb.putValueWithId(
-								NCT_FORGOTTEN_TABLE_NAME,
-								updates.setForgotten,
-								'forgotten'
-							)),
-					]).then(() => {
-						this.saveLastBlock(Number(height))
-					})
+					// 	const updates = await this.wasmViewConnector.loadUpdates()
+					// 	Promise.all([
+					// 		await this.indexedDb.putBulkValue(
+					// 			NCT_COMMITMENTS_TABLE_NAME,
+					// 			updates.storeCommitments
+					// 		),
+					// 		await this.indexedDb.putBulkValue(
+					// 			NCT_HASHES_TABLE_NAME,
+					// 			updates.storeHashes
+					// 		),
+					// 		await this.indexedDb.putValueWithId(
+					// 			NCT_POSITION_TABLE_NAME,
+					// 			updates.setPosition,
+					// 			'position'
+					// 		),
+					// 		updates.setForgotten &&
+					// 			(await this.indexedDb.putValueWithId(
+					// 				NCT_FORGOTTEN_TABLE_NAME,
+					// 				updates.setForgotten,
+					// 				'forgotten'
+					// 			)),
+					// 	]).then(() => {
+					// 		this.saveLastBlock(Number(height))
+					// 	})
 				}
+				await this.configApi.deleteViewServer()
 			}
 		}
 	}
