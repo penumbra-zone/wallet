@@ -249,7 +249,6 @@ export class ViewProtocolService {
 			let transactionPlan
 			if (request.outputs.length) {
 				let notes = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
-				console.log(JSON.stringify(notes));
 				
 				notes = notes
 					.filter(note => note.heightSpent === undefined)

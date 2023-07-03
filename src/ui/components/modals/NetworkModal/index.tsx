@@ -58,7 +58,7 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
 								}
 								rightChild={
 									<p className='text-light_grey text-[10px] pl-[8px]'>
-										{lastSavedBlock[i.name]}/{lastExistBlock[i.name]}
+										{lastSavedBlock[i.name] || 0}/{lastExistBlock[i.name]}
 									</p>
 								}
 								text={i.chainId}

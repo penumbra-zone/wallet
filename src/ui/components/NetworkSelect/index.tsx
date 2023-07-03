@@ -37,7 +37,7 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
 	}, [networks, currentNetworkName])
 
 	const percent = percentage(
-		lastSavedBlock[currentNetwork],
+		lastSavedBlock[currentNetwork] || 0,
 		lastExistBlock[currentNetwork]
 	)
 

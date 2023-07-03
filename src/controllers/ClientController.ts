@@ -65,8 +65,8 @@ export class ClientController {
 		this.store = new ObservableStore(
 			extensionStorage.getInitState({
 				lastSavedBlock: {
-					mainnet: 0,
-					testnet: 0,
+					mainnet: undefined,
+					testnet: undefined,
 				},
 				lastBlockHeight: {
 					mainnet: 0,
@@ -147,9 +147,12 @@ export class ClientController {
 		const lastSavedBlockHeight =
 			this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
 
+		console.log({lastSavedBlockHeight});
+		
+
 		compactBlockRangeRequest.chainId = chainId
 		compactBlockRangeRequest.startHeight = BigInt(
-			!lastSavedBlockHeight ? 0 : lastSavedBlockHeight + 1
+			lastSavedBlockHeight === undefined ? 0 : lastSavedBlockHeight + 1
 		)
 		compactBlockRangeRequest.keepAlive = true
 		this.abortController = new AbortController()
@@ -171,9 +174,7 @@ export class ClientController {
 					if (Number(response.compactBlock.height) % 1000 === 0) {
 						const updates = await this.wasmViewConnector.loadUpdates()
 
-						if (Number(response.compactBlock.height) === 62000) {
-							console.log(updates)
-						}
+						console.log({ updates })
 
 						Promise.all([
 							await this.indexedDb.putBulkValue(
@@ -259,30 +260,30 @@ export class ClientController {
 					await this.resetWallet()
 					await this.configApi.resetBalance()
 				} else {
-					// 	const updates = await this.wasmViewConnector.loadUpdates()
-					// 	Promise.all([
-					// 		await this.indexedDb.putBulkValue(
-					// 			NCT_COMMITMENTS_TABLE_NAME,
-					// 			updates.storeCommitments
-					// 		),
-					// 		await this.indexedDb.putBulkValue(
-					// 			NCT_HASHES_TABLE_NAME,
-					// 			updates.storeHashes
-					// 		),
-					// 		await this.indexedDb.putValueWithId(
-					// 			NCT_POSITION_TABLE_NAME,
-					// 			updates.setPosition,
-					// 			'position'
-					// 		),
-					// 		updates.setForgotten &&
-					// 			(await this.indexedDb.putValueWithId(
-					// 				NCT_FORGOTTEN_TABLE_NAME,
-					// 				updates.setForgotten,
-					// 				'forgotten'
-					// 			)),
-					// 	]).then(() => {
-					// 		this.saveLastBlock(Number(height))
-					// 	})
+						const updates = await this.wasmViewConnector.loadUpdates()
+						Promise.all([
+							await this.indexedDb.putBulkValue(
+								NCT_COMMITMENTS_TABLE_NAME,
+								updates.storeCommitments
+							),
+							await this.indexedDb.putBulkValue(
+								NCT_HASHES_TABLE_NAME,
+								updates.storeHashes
+							),
+							await this.indexedDb.putValueWithId(
+								NCT_POSITION_TABLE_NAME,
+								updates.setPosition,
+								'position'
+							),
+							updates.setForgotten &&
+								(await this.indexedDb.putValueWithId(
+									NCT_FORGOTTEN_TABLE_NAME,
+									updates.setForgotten,
+									'forgotten'
+								)),
+						]).then(() => {
+							this.saveLastBlock(Number(height))
+						})
 				}
 				await this.configApi.deleteViewServer()
 			}
@@ -300,6 +301,7 @@ export class ClientController {
 		this.store.updateState({
 			lastSavedBlock,
 		})
+		console.log({ lastSavedBlock })
 	}
 
 	async broadcastTx(tx_bytes_hex: string) {
@@ -357,8 +359,8 @@ export class ClientController {
 	async resetWallet() {
 		this.store.updateState({
 			lastSavedBlock: {
-				mainnet: 0,
-				testnet: 0,
+				mainnet: undefined,
+				testnet: undefined,
 			},
 			lastBlockHeight: {
 				mainnet: 0,

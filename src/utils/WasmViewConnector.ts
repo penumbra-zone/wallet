@@ -97,10 +97,6 @@ export class WasmViewConnector {
 		for (const note of result) {
 			if (JSON.stringify(note.nullifier) == JSON.stringify(nullifier)) {
 				if (!note.heightSpent) {
-					console.log('updateNotes')
-
-					console.log(note.heightCreated, note.noteCommitment.inner)
-
 					note.heightSpent = String(height) as any
 					await this.indexedDb.putValueWithId(
 						SPENDABLE_NOTES_TABLE_NAME,
@@ -265,9 +261,6 @@ export class WasmViewConnector {
 				note,
 				note.noteCommitment.inner
 			)
-			console.log('storeNote')
-
-			console.log(note.heightCreated, note.noteCommitment.inner)
 
 			await this.storeAsset(note.note.value.assetId)
 
