@@ -89,7 +89,6 @@ export class ClientController extends EventEmitter {
 		extensionStorage.subscribe(this.store)
 		this.indexedDb = indexedDb
 		this.wasmViewConnector = wasmViewConnector
-		this.abortController = new AbortController()
 	}
 
 	async saveChainParameters() {
@@ -155,14 +154,12 @@ export class ClientController extends EventEmitter {
 			lastSavedBlockHeight === undefined ? 0 : lastSavedBlockHeight + 1
 		)
 		compactBlockRangeRequest.keepAlive = true
-		if (this.abortController.signal.aborted) {
-			this.abortController = new AbortController()
-		}
 
 		let height
-		console.time('start')
+		this.abortController = new AbortController()
+
 		await this.wasmViewConnector.setViewServer(fvk)
-		console.timeEnd('start')
+
 		try {
 			for await (const response of client.compactBlockRange(
 				compactBlockRangeRequest,
@@ -202,9 +199,8 @@ export class ClientController extends EventEmitter {
 						]).then(() => {
 							this.saveLastBlock(Number(response.compactBlock.height))
 						})
-
-						height = Number(response.compactBlock.height)
 					}
+					height = Number(response.compactBlock.height)
 				} else {
 					const updates = await this.wasmViewConnector.loadUpdates()
 
@@ -249,7 +245,6 @@ export class ClientController extends EventEmitter {
 							lastSavedBlock,
 						})
 					})
-					height = Number(response.compactBlock.height)
 				}
 			}
 		} catch (error) {
@@ -273,31 +268,37 @@ export class ClientController extends EventEmitter {
 					if (height === undefined) {
 						this.emit('abort without clear')
 					} else {
-						const updates = await this.wasmViewConnector.loadUpdates()
-						Promise.all([
-							await this.indexedDb.putBulkValue(
-								NCT_COMMITMENTS_TABLE_NAME,
-								updates.storeCommitments
-							),
-							await this.indexedDb.putBulkValue(
-								NCT_HASHES_TABLE_NAME,
-								updates.storeHashes
-							),
-							await this.indexedDb.putValueWithId(
-								NCT_POSITION_TABLE_NAME,
-								updates.setPosition,
-								'position'
-							),
-							updates.setForgotten &&
-								(await this.indexedDb.putValueWithId(
-									NCT_FORGOTTEN_TABLE_NAME,
-									updates.setForgotten,
-									'forgotten'
-								)),
-						]).then(async () => {
-							this.saveLastBlock(Number(height))
+						if (Number(height) % 1000 === 0) {
 							this.emit('abort without clear')
-						})
+						} else {
+							const updates = await this.wasmViewConnector.loadUpdates()
+							console.log(height)
+
+							Promise.all([
+								await this.indexedDb.putBulkValue(
+									NCT_COMMITMENTS_TABLE_NAME,
+									updates.storeCommitments
+								),
+								await this.indexedDb.putBulkValue(
+									NCT_HASHES_TABLE_NAME,
+									updates.storeHashes
+								),
+								await this.indexedDb.putValueWithId(
+									NCT_POSITION_TABLE_NAME,
+									updates.setPosition,
+									'position'
+								),
+								updates.setForgotten &&
+									(await this.indexedDb.putValueWithId(
+										NCT_FORGOTTEN_TABLE_NAME,
+										updates.setForgotten,
+										'forgotten'
+									)),
+							]).then(async () => {
+								this.saveLastBlock(Number(height))
+								this.emit('abort without clear')
+							})
+						}
 					}
 				}
 			}
