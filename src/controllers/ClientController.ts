@@ -147,8 +147,7 @@ export class ClientController {
 		const lastSavedBlockHeight =
 			this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
 
-		console.log({lastSavedBlockHeight});
-		
+		console.log({ lastSavedBlockHeight })
 
 		compactBlockRangeRequest.chainId = chainId
 		compactBlockRangeRequest.startHeight = BigInt(
@@ -251,6 +250,11 @@ export class ClientController {
 		} catch (error) {
 			console.log(height)
 
+			// if (error.message === '[unknown] network error' && error.code === 2) {
+			// 	await this.abortGrpcRequest()
+			// 	await this.configApi.deleteViewServer()
+			// }
+
 			if (this.abortController.signal.aborted) {
 				if (
 					this.abortController.signal.reason === 'reset wallet' ||
@@ -260,30 +264,30 @@ export class ClientController {
 					await this.resetWallet()
 					await this.configApi.resetBalance()
 				} else {
-						const updates = await this.wasmViewConnector.loadUpdates()
-						Promise.all([
-							await this.indexedDb.putBulkValue(
-								NCT_COMMITMENTS_TABLE_NAME,
-								updates.storeCommitments
-							),
-							await this.indexedDb.putBulkValue(
-								NCT_HASHES_TABLE_NAME,
-								updates.storeHashes
-							),
-							await this.indexedDb.putValueWithId(
-								NCT_POSITION_TABLE_NAME,
-								updates.setPosition,
-								'position'
-							),
-							updates.setForgotten &&
-								(await this.indexedDb.putValueWithId(
-									NCT_FORGOTTEN_TABLE_NAME,
-									updates.setForgotten,
-									'forgotten'
-								)),
-						]).then(() => {
-							this.saveLastBlock(Number(height))
-						})
+					const updates = await this.wasmViewConnector.loadUpdates()
+					Promise.all([
+						await this.indexedDb.putBulkValue(
+							NCT_COMMITMENTS_TABLE_NAME,
+							updates.storeCommitments
+						),
+						await this.indexedDb.putBulkValue(
+							NCT_HASHES_TABLE_NAME,
+							updates.storeHashes
+						),
+						await this.indexedDb.putValueWithId(
+							NCT_POSITION_TABLE_NAME,
+							updates.setPosition,
+							'position'
+						),
+						updates.setForgotten &&
+							(await this.indexedDb.putValueWithId(
+								NCT_FORGOTTEN_TABLE_NAME,
+								updates.setForgotten,
+								'forgotten'
+							)),
+					]).then(() => {
+						this.saveLastBlock(Number(height))
+					})
 				}
 				await this.configApi.deleteViewServer()
 			}
