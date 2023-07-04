@@ -111,15 +111,14 @@ export class WasmViewConnector {
 			}
 		}
 	}
-
-	async handleNewCompactBlock(block: CompactBlock, fvk: string) {
+	async setViewServer(fvk: string) {
 		if (!this.viewServer) {
-			console.log(this.viewServer)
-
 			const storedTree = await this.indexedDb.loadStoredTree()
 			this.viewServer = new ViewServer(fvk, 719n, storedTree)
 		}
+	}
 
+	async handleNewCompactBlock(block: CompactBlock, fvk: string) {
 		const result: ScanResult = await this.viewServer.scan_block_without_updates(
 			block.toJson()
 		)
@@ -169,31 +168,36 @@ export class WasmViewConnector {
 			return
 		}
 
-		const lastPosition = await this.indexedDb.getValue(
-			NCT_POSITION_TABLE_NAME,
-			'position'
-		)
+		try {
+			const lastPosition = await this.indexedDb.getValue(
+				NCT_POSITION_TABLE_NAME,
+				'position'
+			)
 
-		const lastForgotten = await this.indexedDb.getValue(
-			NCT_FORGOTTEN_TABLE_NAME,
-			'forgotten'
-		)
+			const lastForgotten = await this.indexedDb.getValue(
+				NCT_FORGOTTEN_TABLE_NAME,
+				'forgotten'
+			)
 
-		console.log({
-			lastPosition,
-			lastForgotten,
-		})
+			console.log({
+				lastPosition,
+				lastForgotten,
+				viewServer: this.viewServer,
+			})
 
-		const { nct_updates } = await this.viewServer.get_updates(
-			lastPosition,
-			lastForgotten
-		)
+			const { nct_updates } = await this.viewServer.get_updates(
+				lastPosition,
+				lastForgotten
+			)
 
-		return {
-			setForgotten: nct_updates.set_forgotten,
-			setPosition: nct_updates.set_position,
-			storeCommitments: nct_updates.store_commitments,
-			storeHashes: nct_updates.store_hashes,
+			return {
+				setForgotten: nct_updates.set_forgotten,
+				setPosition: nct_updates.set_position,
+				storeCommitments: nct_updates.store_commitments,
+				storeHashes: nct_updates.store_hashes,
+			}
+		} catch (error) {
+			console.log(error)
 		}
 	}
 
