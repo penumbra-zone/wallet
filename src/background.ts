@@ -146,7 +146,6 @@ async function setupBackgroundService() {
 
 	backgroundService.clientController.on('abort without clear', async () => {
 		await backgroundService.wasmViewConnector.resetWallet()
-		await backgroundService.vaultController.lock()
 	})
 
 	backgroundService.networkController.on('change grpc', async () => {
@@ -346,6 +345,7 @@ class BackgroundService extends EventEmitter {
 			},
 			lock: async () => {
 				await this.clientController.abortGrpcRequest()
+				await this.vaultController.lock()
 			},
 			unlock: async (password: string) => this.vaultController.unlock(password),
 			addWallet: async (account: CreateWalletInput) =>
