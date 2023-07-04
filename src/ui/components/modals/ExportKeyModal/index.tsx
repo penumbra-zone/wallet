@@ -45,8 +45,14 @@ export const ExportKeyModal: React.FC<
 
 	const copyToClipboard = () => {
 		navigator.clipboard.writeText(key)
-		toast.success('Success copied!', {
-			position: 'top-right',
+		toast.success('Successfully copied', {
+			position: 'top-center',
+			icon: '👏',
+			style: {
+				borderRadius: '15px',
+				background: '#141212',
+				color: '#fff',
+			},
 		})
 	}
 
@@ -66,7 +72,7 @@ export const ExportKeyModal: React.FC<
 				{/* <div className='flex flex-col items-center border-b-[1px] border-solid border-dark_grey pb-[16px] px-[16px]'>
 					<UserLogo />
 					<p className='h2 my-[12px]'>{selectedAccount.name}</p>
-					<p className='w-[100%] text-center text_body text-light_grey border-[1px] border-solid border-dark_grey rounded-[15px] py-[10px]'>
+					<p className='w-[100%] text-center text_body text-light_grey border-[1px] border-solid border-dark_grey rounded-[10px] py-[10px]'>
 						{selectedAccount.addressByIndex.slice(0, 35)}...
 					</p>
 				</div> */}
@@ -98,7 +104,7 @@ export const ExportKeyModal: React.FC<
 								<p
 									role='button'
 									tabIndex={0}
-									className='break-words text_ext text-red py-[8px] px-[19px] border-[1px] border-solid border-dark_grey rounded-[15px] cursor-pointer'
+									className='break-words text_ext text-red py-[8px] px-[19px] border-[1px] border-solid border-dark_grey rounded-[10px] cursor-pointer'
 									onClick={copyToClipboard}
 								>
 									{key}
@@ -106,7 +112,7 @@ export const ExportKeyModal: React.FC<
 							</div>
 						)}
 					</div>
-					<div className='flex items-center border-[1px] border-solid border-red rounded-[15px] p-[11px] mb-[40px]'>
+					<div className='flex items-center border-[1px] border-solid border-red rounded-[10px] p-[11px] mb-[40px]'>
 						<InformationOutlineSvg fill='#870606' height='20' width='20' />
 						<p className='w-[95%] text_body pl-[18px]'>
 							Warning: never reveal this key. Anyone with your keys can steal

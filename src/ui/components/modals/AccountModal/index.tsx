@@ -16,7 +16,6 @@ import { useNavigate } from 'react-router-dom'
 import { routesPath } from '../../../../utils'
 import { useMediaQuery } from '../../../../hooks'
 import { useState } from 'react'
-import { ConnectedSitesModal } from '../ConnectedSitesModal'
 import { AccountDetailModal } from '../AccountDetailModal'
 import { MoreModal } from '../MoreModal'
 import { ExportKeyModal } from '../ExportKeyModal'
@@ -126,7 +125,7 @@ export const AccountModal: React.FC<SuccessCreateModalProps> = ({
 							title='Block account'
 							mode='gradient'
 							onClick={handleBlock}
-							className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] mt-[40px] '
+							className='mt-[40px] '
 						/>
 					</div>
 				</>

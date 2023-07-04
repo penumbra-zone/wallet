@@ -32,13 +32,13 @@ export const ConnectedSitesModal: React.FC<
 							mode='transparent'
 							onClick={onClose}
 							title='Cancel'
-							className='w-[50%] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] text_button_ext mr-[8px]'
+							className='w-[50%] text_button_ext mr-[8px]'
 						/>
 						<Button
 							mode='gradient'
 							onClick={handleConfirmRevoke}
 							title='Revoke'
-							className='w-[50%] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] text_button_ext ml-[8px]'
+							className='w-[50%] text_button_ext ml-[8px]'
 						/>
 					</div>
 				</>

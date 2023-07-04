@@ -41,29 +41,31 @@ export const SettingsAdvanced = () => {
 		<>
 			<div>
 				<p
-					className={`w-[100%] px-[16px] py-[24px] border-b-[1px] border-solid border-dark_grey ${
+					className={`w-[100%] p-[16px] pb-[16px] ext:pt-[16px] tablet:pt-[24px] tablet:border-b-[1px] tablet:border-dark_grey ${
 						isDesktop ? 'h2' : 'h1_ext'
 					}`}
 				>
 					Advanced
 				</p>
-				<div className='tablet:px-[16px] h-[100%] mt-[24px]'>
+				<div className='tablet:px-[16px] h-[100%] tablet:mt-[16px]'>
 					<div className='w-[100%] flex flex-col ext:px-[16px] tablet:px-[0px]'>
 						<div className='flex flex-col'>
-							<p className='h3'>Auto-lock timer (minutes)</p>
-							<p className='ext:w-[100%] tablet:w-[280px] text_body text-light_grey mt-[8px] mb-[16px]'>
+							<p className={`${isDesktop ? 'h3' : 'h2_ext'}`}>
+								Auto-lock timer (minutes)
+							</p>
+							<p className='text_body text-light_grey ext:mt-[8px] ext:mb-[8px] tablet:mt-[8px] tablet:mb-[16px]'>
 								Set the inactivity time in the coming days before Penumbra is
 								blocked.
 							</p>
 							<Input
 								value={timer}
 								onChange={handleChangeTimer}
-								className='ext:w-[100%] tablet:w-[280px]'
+								className='ext:w-[100%] tablet:w-[312px]'
 								helperText='Lock time is too great'
 								isError={+timer > 10080}
 								rightElement={
 									<div
-										className='flex items-center bg-dark_grey h-[50px] px-[25px] rounded-r-[15px] text_button_ext cursor-pointer'
+										className='flex items-center bg-dark_grey h-[42px] px-[25px] rounded-r-[10px] text_button_ext cursor-pointer'
 										onClick={handleSaveTimer}
 									>
 										Save
@@ -72,12 +74,12 @@ export const SettingsAdvanced = () => {
 							/>
 						</div>
 						<div className='flex flex-col'>
-							<p className='h3 mb-[16px]'>Clear cache</p>
+							<p className={`${isDesktop ? 'h3' : 'h2_ext'} ext:mb-[8px] tablet:mb-[16px]`}>Clear cache</p>
 							<Button
 								title='Clear cache'
 								mode='gradient'
 								onClick={toggleShowResetWalletModal(true)}
-								className='ext:w-[100%] tablet:w-[280px] '
+								className='ext:w-[100%] tablet:w-[312px]'
 							/>
 						</div>
 					</div>

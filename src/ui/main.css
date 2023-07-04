@@ -63,9 +63,9 @@ body {
 	color: #ffffff;
 	background-color: #000000;
 	margin: auto;
-  width: 400px;
-  height: 600px;
-	overflow-y: hidden;
+	width: 400px;
+	height: 600px;
+	overflow-y: auto;
 	overflow-x: hidden;
 }
 
@@ -97,106 +97,85 @@ select {
 /* font styles */
 
 .h1 {
-	font-family: 'Faktum SemiBold';
-	font-style: normal;
-	font-weight: 600;
+	font-family: 'Faktum Medium';
 	font-size: 24px;
+	font-weight: 500;
 	line-height: 36px;
 }
 
 .h2 {
 	font-family: 'Faktum SemiBold';
-	font-style: normal;
-	font-weight: 600;
 	font-size: 18px;
+	font-weight: 600;
 	line-height: 26px;
+}
+
+.h1_ext {
+	font-family: 'Faktum Medium';
+	font-size: 15px;
+	font-weight: 500;
+	line-height: 22px;
 }
 
 .h2_ext {
 	font-family: 'Faktum Medium';
-	font-style: normal;
-	font-weight: 500;
 	font-size: 14px;
+	font-weight: 500;
 	line-height: 20px;
-}
-
-.h1_ext {
-	font-family: 'Faktum SemiBold';
-	font-style: normal;
-	font-weight: 600;
-	font-size: 15px;
-	line-height: 22px;
 }
 
 .h3 {
 	font-family: 'Faktum Medium';
-	font-style: normal;
-	font-weight: 500;
 	font-size: 16px;
+	font-weight: 500;
 	line-height: 24px;
 }
 
 .text_ext {
 	font-family: 'Faktum Bold';
-	font-style: normal;
 	font-weight: 500;
 	font-size: 12px;
 	line-height: 18px;
 }
 
 .text_button {
-	font-family: 'Faktum Bold';
-	font-style: normal;
-	font-weight: 700;
+	font-family: 'Faktum Medium';
 	font-size: 15px;
+	font-weight: 500;
 	line-height: 22px;
 }
 
 .text_button_ext {
-	font-family: 'Faktum Bold';
-	font-style: normal;
-	font-weight: 700;
+	font-family: 'Faktum Medium';
 	font-size: 12px;
+	font-weight: 500;
 	line-height: 18px;
 }
 
 .text_numbers {
 	font-family: 'Faktum Medium';
-	font-style: normal;
-	font-weight: 500;
 	font-size: 20px;
+	font-weight: 500;
 	line-height: 30px;
 }
 
 .text_numbers_ext {
 	font-family: 'Faktum SemiBold';
-	font-style: normal;
-	font-weight: 600;
 	font-size: 12px;
+	font-weight: 600;
 	line-height: 18px;
 }
 
 .text_body {
 	font-family: 'Devanagari Sangam Regular';
-	font-style: normal;
-	font-weight: 400;
 	font-size: 15px;
 	line-height: 22px;
 }
 
-.text_body_ext {
-	font-family: 'Devanagari Sangam Regular';
-	font-style: normal;
-	font-weight: 400;
-	font-size: 12px;
-	line-height: 18px;
-}
-
 .text_numbers_s {
 	font-family: 'Faktum Medium';
-	font-style: normal;
-	font-weight: 500;
 	font-size: 16px;
+	font-weight: 500;
 	line-height: 24px;
 }
 
@@ -212,49 +191,42 @@ select {
 
 @media (max-width: 480px) {
 	.h1 {
-		font-family: 'Faktum SemiBold';
-	font-style: normal;
-	font-weight: 600;
-	font-size: 15px;
-	line-height: 22px;
+		font-family: 'Faktum Medium';
+		font-size: 15px;
+		font-weight: 500;
+		line-height: 22px;
 	}
 
 	.h2 {
 		font-family: 'Faktum Medium';
-		font-style: normal;
-		font-weight: 500;
 		font-size: 14px;
+		font-weight: 500;
 		line-height: 20px;
 	}
 
 	.text_button {
-		font-family: 'Faktum Bold';
-		font-style: normal;
-		font-weight: 500;
+		font-family: 'Faktum Medium';
 		font-size: 12px;
+		font-weight: 500;
 		line-height: 18px;
 	}
 
 	.text_numbers {
 		font-family: 'Faktum SemiBold';
-		font-style: normal;
-		font-weight: 600;
 		font-size: 12px;
+		font-weight: 600;
 		line-height: 18px;
 	}
 
 	.text_numbers_s {
 		font-family: 'Faktum Medium';
-		font-style: normal;
-		font-weight: 500;
 		font-size: 10px;
+		font-weight: 500;
 		line-height: 16px;
 	}
 
 	.text_body {
 		font-family: 'Devanagari Sangam Regular';
-		font-style: normal;
-		font-weight: 400;
 		font-size: 12px;
 		line-height: 18px;
 	}
@@ -336,7 +308,7 @@ select {
 	background-color: #141212 !important;
 	border: none !important;
 	border: 0 !important;
-	border-radius: 15px !important;
+	border-radius: 10px !important;
 	box-shadow: none !important;
 	height: 50px !important;
 }
@@ -436,8 +408,8 @@ select {
 }
 
 .svg_notActive_link svg path {
-	fill: #E0E0E0;
-	stroke: #E0E0E0;
+	fill: #e0e0e0;
+	stroke: #e0e0e0;
 }
 
 .svg_notActive_link_stroke svg path {
@@ -449,20 +421,20 @@ select {
 }
 
 ::-webkit-scrollbar {
-  width: 4px;
+	width: 4px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background:rgba(0, 0, 0, 0.25);
+	background: rgba(0, 0, 0, 0.25);
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888;
+	background: #888;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+	background: #555;
 }

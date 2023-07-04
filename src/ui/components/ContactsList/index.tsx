@@ -26,7 +26,7 @@ export const ContactsList: React.FC<ContactsListProps> = ({
 							return (
 								<div key={i} className='flex flex-col'>
 									<p
-										className={`mb-[8px] mx-[16px] px-[16px] ext:py-[10px] tablet:py-[8px] bg-dark_grey rounded-[15px] ${
+										className={`mb-[8px] mx-[16px] px-[16px] ext:py-[10px] tablet:py-[8px] bg-dark_grey rounded-[10px] ${
 											isDesktop ? 'h3' : 'h2_ext'
 										}`}
 									>

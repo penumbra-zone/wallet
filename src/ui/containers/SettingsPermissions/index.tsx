@@ -27,7 +27,7 @@ export const SettingsPermissions = () => {
 		<>
 			<div>
 				<p
-					className={`w-[100%] px-[16px] py-[24px] border-b-[1px] border-solid border-dark_grey ${
+					className={`w-[100%] p-[16px] pb-[16px] ext:pt-[16px] tablet:pt-[24px] tablet:border-b-[1px] tablet:border-dark_grey ${
 						isDesktop ? 'h2' : 'h1_ext'
 					}`}
 				>
@@ -61,13 +61,13 @@ export const SettingsPermissions = () => {
 										mode='transparent'
 										onClick={handleRevoke(i)}
 										title='Revoke'
-										className='ext:[50%] tablet:w-[88px] mr-[8px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] text_button_ext'
+										className='ext:[50%] tablet:w-[88px] mr-[8px] text_button_ext'
 									/>
 									<Button
 										mode='gradient'
 										onClick={handleSelectSite(i)}
 										title='View'
-										className='ext:[50%] tablet:w-[88px] ml-[8px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] text_button_ext'
+										className='ext:[50%] tablet:w-[88px] ml-[8px] text_button_ext'
 									/>
 								</div>
 							</div>

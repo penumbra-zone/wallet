@@ -22,4 +22,5 @@ export const routesPath = {
 	VALIDATORS: '/validators',
 	SEND: '/send',
 	ACTIVE_MESSAGE: '/active-message',
+	FORGOT_PASSWORD: '/forgot-password'
 }

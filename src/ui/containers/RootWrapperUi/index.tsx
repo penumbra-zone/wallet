@@ -29,7 +29,7 @@ export const RootWrapperUi: React.FC<RootWrapperUiProps> = ({ children }) => {
 	const isRedirect = useAccountsSelector(selectRedirectToAccountPage)
 	const state = useAccountsSelector(selectState)
 
-	const isHeader = pathname === routesPath.HOME
+	const isHeader = pathname === routesPath.HOME || pathname === routesPath.LOGIN
 
 	const handleToggleNetworkModal = (value: boolean) => () =>
 		setIsOpenNetworkPopup(value)

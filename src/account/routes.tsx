@@ -12,12 +12,12 @@ import {
 	Settings,
 	SettingsSecurityPrivacy,
 	SettingsNetworks,
-	BalanceDetail,
 	Validators,
 	Send,
 	SettingsContacts,
 	SettingsPermissions,
 	SettingsAdvanced,
+	ForgotPassword,
 } from '../ui/containers'
 import { RootAccounts } from './RootAccounts'
 import { routesPath } from '../utils'
@@ -65,8 +65,8 @@ export const routes: RouteObject[] = [
 				element: <ImportSeed />,
 			},
 			{
-				path: routesPath.BALANCE_DETAIL,
-				element: <BalanceDetail />,
+				path: routesPath.FORGOT_PASSWORD,
+				element: <ForgotPassword />,
 			},
 			{
 				path: routesPath.VALIDATORS,
@@ -113,7 +113,6 @@ export const routes: RouteObject[] = [
 						path: routesPath.SETTINGS_PERMISSIONS,
 						element: <SettingsPermissions />,
 					},
-					
 				],
 			},
 		],

@@ -4,30 +4,24 @@ import { ExtensionStorage } from '../storage'
 import ObservableStore from 'obs-store'
 import { WalletController } from './WalletController'
 import {
-	ASSET_TABLE_NAME,
 	CHAIN_PARAMETERS_TABLE_NAME,
-	extension,
-	FMD_PARAMETERS_TABLE_NAME,
 	NCT_COMMITMENTS_TABLE_NAME,
 	NCT_FORGOTTEN_TABLE_NAME,
 	NCT_HASHES_TABLE_NAME,
 	NCT_POSITION_TABLE_NAME,
-	SPENDABLE_NOTES_TABLE_NAME,
-	SWAP_TABLE_NAME,
-	TRANSACTION_BY_NULLIFIER_TABLE_NAME,
-	TRANSACTION_TABLE_NAME,
 } from '../lib'
 import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
 import { IndexedDb } from '../utils'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
-
 import {
 	ChainParametersRequest,
 	CompactBlockRangeRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import { CompactBlock } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import { ObliviousQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
+import { CurrentAccountController } from './CurrentAccountController'
+import { VaultController } from './VaultController'
 
 export type Transaction = {
 	blockHeight: bigint
@@ -53,6 +47,8 @@ export class ClientController {
 		wasmViewConnector,
 		getAccountSpendingKey,
 		getCustomGRPC,
+		resetBalance,
+		deleteViewServer,
 	}: {
 		extensionStorage: ExtensionStorage
 		indexedDb: IndexedDb
@@ -63,12 +59,14 @@ export class ClientController {
 		getNetwork: NetworkController['getNetwork']
 		getNetworkConfig: RemoteConfigController['getNetworkConfig']
 		getCustomGRPC: NetworkController['getCustomGRPC']
+		resetBalance: CurrentAccountController['resetWallet']
+		deleteViewServer: WasmViewConnector['resetWallet']
 	}) {
 		this.store = new ObservableStore(
 			extensionStorage.getInitState({
 				lastSavedBlock: {
-					mainnet: 0,
-					testnet: 0,
+					mainnet: undefined,
+					testnet: undefined,
 				},
 				lastBlockHeight: {
 					mainnet: 0,
@@ -83,6 +81,8 @@ export class ClientController {
 			getNetworkConfig,
 			getAccountSpendingKey,
 			getCustomGRPC,
+			resetBalance,
+			deleteViewServer,
 		}
 		extensionStorage.subscribe(this.store)
 		this.indexedDb = indexedDb
@@ -144,14 +144,20 @@ export class ClientController {
 
 		const compactBlockRangeRequest = new CompactBlockRangeRequest()
 
+		const lastSavedBlockHeight =
+			this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
+
+		console.log({lastSavedBlockHeight});
+		
+
 		compactBlockRangeRequest.chainId = chainId
 		compactBlockRangeRequest.startHeight = BigInt(
-			this.store.getState().lastSavedBlock[this.configApi.getNetwork()] === 0
-				? 0
-				: this.store.getState().lastSavedBlock[this.configApi.getNetwork()] + 1
+			lastSavedBlockHeight === undefined ? 0 : lastSavedBlockHeight + 1
 		)
 		compactBlockRangeRequest.keepAlive = true
 		this.abortController = new AbortController()
+		let height
+
 		try {
 			for await (const response of client.compactBlockRange(
 				compactBlockRangeRequest,
@@ -167,6 +173,8 @@ export class ClientController {
 				if (Number(response.compactBlock.height) < lastBlock) {
 					if (Number(response.compactBlock.height) % 1000 === 0) {
 						const updates = await this.wasmViewConnector.loadUpdates()
+
+						console.log({ updates })
 
 						Promise.all([
 							await this.indexedDb.putBulkValue(
@@ -189,22 +197,10 @@ export class ClientController {
 									'forgotten'
 								)),
 						]).then(() => {
-							const oldState = this.store.getState().lastSavedBlock
-							const lastSavedBlock = {
-								...oldState,
-								[this.configApi.getNetwork()]: Number(
-									response.compactBlock.height
-								),
-							}
-							// extension.storage.local.set({
-							// 	lastSavedBlock,
-							// })
-
-							this.store.updateState({
-								lastSavedBlock,
-							})
+							this.saveLastBlock(Number(response.compactBlock.height))
 						})
 					}
+					height = Number(response.compactBlock.height)
 				} else {
 					const updates = await this.wasmViewConnector.loadUpdates()
 
@@ -249,11 +245,63 @@ export class ClientController {
 							lastSavedBlock,
 						})
 					})
+					height = Number(response.compactBlock.height)
 				}
 			}
 		} catch (error) {
-			console.error(error)
+			console.log(height)
+
+			if (this.abortController.signal.aborted) {
+				if (
+					this.abortController.signal.reason === 'reset wallet' ||
+					this.abortController.signal.reason === 'change grpc'
+				) {
+					await this.indexedDb.clearAllTables()
+					await this.resetWallet()
+					await this.configApi.resetBalance()
+				} else {
+						const updates = await this.wasmViewConnector.loadUpdates()
+						Promise.all([
+							await this.indexedDb.putBulkValue(
+								NCT_COMMITMENTS_TABLE_NAME,
+								updates.storeCommitments
+							),
+							await this.indexedDb.putBulkValue(
+								NCT_HASHES_TABLE_NAME,
+								updates.storeHashes
+							),
+							await this.indexedDb.putValueWithId(
+								NCT_POSITION_TABLE_NAME,
+								updates.setPosition,
+								'position'
+							),
+							updates.setForgotten &&
+								(await this.indexedDb.putValueWithId(
+									NCT_FORGOTTEN_TABLE_NAME,
+									updates.setForgotten,
+									'forgotten'
+								)),
+						]).then(() => {
+							this.saveLastBlock(Number(height))
+						})
+				}
+				await this.configApi.deleteViewServer()
+			}
 		}
+	}
+
+	saveLastBlock(height: number) {
+		const oldState = this.store.getState().lastSavedBlock
+
+		const lastSavedBlock = {
+			...oldState,
+			[this.configApi.getNetwork()]: Number(height),
+		}
+
+		this.store.updateState({
+			lastSavedBlock,
+		})
+		console.log({ lastSavedBlock })
 	}
 
 	async broadcastTx(tx_bytes_hex: string) {
@@ -309,38 +357,16 @@ export class ClientController {
 	}
 
 	async resetWallet() {
-		await this.indexedDb.resetTables(CHAIN_PARAMETERS_TABLE_NAME)
-		await this.indexedDb.resetTables(ASSET_TABLE_NAME)
-		await this.indexedDb.resetTables(TRANSACTION_TABLE_NAME)
-		await this.indexedDb.resetTables(FMD_PARAMETERS_TABLE_NAME)
-		await this.indexedDb.resetTables(NCT_COMMITMENTS_TABLE_NAME)
-		await this.indexedDb.resetTables(NCT_FORGOTTEN_TABLE_NAME)
-		await this.indexedDb.resetTables(NCT_HASHES_TABLE_NAME)
-		await this.indexedDb.resetTables(NCT_POSITION_TABLE_NAME)
-		await this.indexedDb.resetTables(SPENDABLE_NOTES_TABLE_NAME)
-		await this.indexedDb.resetTables(TRANSACTION_BY_NULLIFIER_TABLE_NAME)
-		await this.indexedDb.resetTables(SWAP_TABLE_NAME)
-
 		this.store.updateState({
 			lastSavedBlock: {
-				mainnet: 0,
-				testnet: 0,
+				mainnet: undefined,
+				testnet: undefined,
 			},
 			lastBlockHeight: {
 				mainnet: 0,
 				testnet: 0,
 			},
 		})
-		// extension.storage.local.set({
-		// 	lastSavedBlock: {
-		// 		mainnet: 0,
-		// 		testnet: 0,
-		// 	},
-		// 	lastBlockHeight: {
-		// 		mainnet: 0,
-		// 		testnet: 0,
-		// 	},
-		// })
 	}
 
 	requireScanning(compactBlock: CompactBlock) {
@@ -357,8 +383,8 @@ export class ClientController {
 		)
 	}
 
-	abortGrpcRequest() {
-		this.abortController.abort()
+	abortGrpcRequest(reason?: string) {
+		this.abortController.abort(reason)
 	}
 
 	getGRPC() {

@@ -7,6 +7,7 @@ import {
 	DotsSvg,
 	EditSvg,
 	HttpSvg,
+	HttpsSvg,
 	Input,
 	SearchSvg,
 } from '../../components'
@@ -42,8 +43,11 @@ export const Main: React.FC<MainProps> = () => {
 		const sites = Object.keys(origins)
 		const filtered = sites.filter(v => {
 			return (
-				v.replace(/^https?:\/\//i, '').toString().toLowerCase().indexOf(event.target.value.toLowerCase()) >
-				-1
+				v
+					.replace(/^https?:\/\//i, '')
+					.toString()
+					.toLowerCase()
+					.indexOf(event.target.value.toLowerCase()) > -1
 			)
 		})
 
@@ -52,8 +56,14 @@ export const Main: React.FC<MainProps> = () => {
 
 	const copyToClipboard = () => {
 		navigator.clipboard.writeText(selectedAccount.addressByIndex)
-		toast.success('Success copied!', {
-			position: 'top-right',
+		toast.success('Successfully copied', {
+			position: 'top-center',
+			icon: '👏',
+			style: {
+				borderRadius: '15px',
+				background: '#141212',
+				color: '#fff',
+			},
 		})
 	}
 
@@ -81,41 +91,44 @@ export const Main: React.FC<MainProps> = () => {
 	return (
 		<>
 			<div
-				className='w-[100%] ext:pt-[50px] ext:pb-[24px]'
+				className='w-[100%] ext:pt-[40px] tablet:pt-[24px] pb-[24px]'
 				onClick={() => setSelectedSite(null)}
 			>
-				<div className='flex flex-col items-center justify-center bg-brown rounded-[15px] ext:px-[26px] ext:py-[12px] ext:mb-[24px]'>
-					<p className='h1 ext:pb-[8px]'>{selectedAccount.name}</p>
-					<div className='flex items-center text_body text-light_grey break-all text-center'>
+				<div className='flex flex-col items-center justify-center bg-brown rounded-[10px] ext:px-[22px] ext:py-[12px] tablet:px-[116px] tablet:py-[40px] ext:mb-[24px] tablet:mb-[40px] gap-y-[8px]'>
+					<p className='h1'>{selectedAccount.name}</p>
+					<div className='flex items-center text_body text-light_grey break-all text-center gap-x-[16px]'>
 						{selectedAccount.addressByIndex}
 						<span
-							className='ml-[10px] cursor-pointer svg_hover'
+							className='cursor-pointer svg_hover'
 							onClick={copyToClipboard}
 							role='button'
 							tabIndex={0}
 						>
-							<CopySvg fill='#524B4B' width='16' height='16' />
+							<CopySvg
+								fill='#524B4B'
+								className='ext:w-[16px] ext:h-[16px] tablet:w-[20px] tablet:h-[20px]'
+							/>
 						</span>
 					</div>
 				</div>
-				<p className='h1 ext:mb-[8px]'>Connected sites</p>
-				<Input
-					placeholder='Search...'
-					value={search}
-					onChange={handleChangeSearch}
-					// helperText='No matching results found.'
-					leftSvg={
-						<span className='ml-[24px] mr-[9px]'>
-							<SearchSvg />
-						</span>
-					}
-					className='w-[100%] mb-[24px]'
-					// isError={search && !Boolean(filteredSites.length)}
-				/>
+				<div className='flex ext:flex-col tablet:flex-row tablet:items-center tablet:justify-between mb-[24px] ext:gap-y-[8px] tablet:gap-y-[0px]'>
+					<p className='h2'>Connected sites</p>
+					<Input
+						placeholder='Search...'
+						value={search}
+						onChange={handleChangeSearch}
+						leftSvg={
+							<span className='ml-[24px] mr-[9px]'>
+								<SearchSvg />
+							</span>
+						}
+						className='ext:w-[100%] tablet:w-[400px]'
+					/>
+				</div>
 				<div
 					className={`flex flex-col ${
 						filteredSites.length ? '' : 'items-center justify-center'
-					} bg-brown rounded-[15px] min-h-[160px] w-[100%] pb-[12px]`}
+					} bg-brown rounded-[10px] min-h-[160px] w-[100%] pb-[12px]`}
 				>
 					{!filteredSites.length && !search ? (
 						<p className='text_body ext:px-[44px] text-center'>
@@ -146,7 +159,11 @@ export const Main: React.FC<MainProps> = () => {
 										key={i}
 									>
 										<div className='flex items-center'>
-											<HttpSvg />
+											{i.includes('https') ? (
+												<HttpsSvg className='ext:w-[16px] ext:h-[16px] tablet:w-[24px] tablet:h-[24px]' />
+											) : (
+												<HttpSvg className='ext:w-[16px] ext:h-[16px] tablet:w-[24px] tablet:h-[24px]' />
+											)}
 											<a
 												className='text_body text-light_grey break-all cursor-pointer ext:ml-[6px]'
 												href={i}
@@ -157,16 +174,16 @@ export const Main: React.FC<MainProps> = () => {
 										</div>
 										<div className='cursor-pointer inline-block relative'>
 											<span onClick={handleSelectSite(i)}>
-												<DotsSvg width='24' height='24' />
+												<DotsSvg width='24' height='24' className='rotate-90' />
 											</span>
 											<ul
 												className={`${
 													selectedSite === i ? 'block' : 'hidden'
-												} absolute right-[20px] bottom-[0px] w-[200px] bg-black rounded-[15px]`}
+												} absolute right-[20px] bottom-[0px] w-[200px] bg-black rounded-[10px]`}
 											>
 												<li className=''>
 													<div
-														className='px-[18px] py-[12px] rounded-t-[15px] flex items-center hover:bg-light_brown'
+														className='px-[18px] py-[12px] rounded-t-[10px] flex items-center hover:bg-light_brown border-b-[1px] border-dark_grey'
 														onClick={handleDelete(i)}
 													>
 														<DeleteSvg />
@@ -175,7 +192,7 @@ export const Main: React.FC<MainProps> = () => {
 												</li>
 												<li className=''>
 													<div
-														className='px-[18px] py-[12px] rounded-b-[15px] flex items-center hover:bg-light_brown'
+														className='px-[18px] py-[12px] rounded-b-[10px] flex items-center hover:bg-light_brown'
 														onClick={handleEdit(i)}
 													>
 														<EditSvg />

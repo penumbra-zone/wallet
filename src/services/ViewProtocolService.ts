@@ -239,6 +239,8 @@ export class ViewProtocolService {
 	async getWitness(request?: WitnessRequest) {
 		return new WitnessResponse({}).toBinary()
 	}
+	
+	
 
 	async getTransactionPlanner(req?: string) {
 		try {
@@ -247,6 +249,7 @@ export class ViewProtocolService {
 			let transactionPlan
 			if (request.outputs.length) {
 				let notes = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
+				
 				notes = notes
 					.filter(note => note.heightSpent === undefined)
 					.filter(

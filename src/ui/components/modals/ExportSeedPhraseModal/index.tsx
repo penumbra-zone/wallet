@@ -32,8 +32,14 @@ export const ExportSeedPhraseModal: React.FC<SuccessCreateModalProps> = ({
 
 	const copyToClipboard = () => {
 		navigator.clipboard.writeText(seed)
-		toast.success('Success copied!', {
-			position: 'top-right',
+		toast.success('Successfully copied', {
+			position: 'top-center',
+			icon: '👏',
+			style: {
+				borderRadius: '15px',
+				background: '#141212',
+				color: '#fff',
+			},
 		})
 	}
 
@@ -55,7 +61,7 @@ export const ExportSeedPhraseModal: React.FC<SuccessCreateModalProps> = ({
 					If you change browser or switch to another computer, you will need
 					this recovery passphrase to access your accounts.
 				</p>
-				<div className='flex items-center border-[1px] border-solid border-red rounded-[15px] py-[14px] px-[17px] mb-[16px]'>
+				<div className='flex items-center border-[1px] border-solid border-red rounded-[10px] py-[14px] px-[17px] mb-[16px]'>
 					<InformationOutlineSvg fill='#870606' height='20' width='20' />
 					<p className='w-[95%] pl-[10px]'>
 						Don’t share this phrase with anyone.
@@ -72,7 +78,7 @@ export const ExportSeedPhraseModal: React.FC<SuccessCreateModalProps> = ({
 				) : (
 					<div className='flex flex-col'>
 						<p className='text_body mb-[12px]'>Recovery secret phrase</p>
-						<div className='bg-brown rounded-[15px] flex flex-wrap border-[1px] border-solid border-dark_grey p-[15px] rounded-[15px]'>
+						<div className='bg-brown flex flex-wrap border-[1px] border-solid border-dark_grey p-[15px] rounded-[10px]'>
 							{seed.split(' ').map((i, index) => {
 								return (
 									<div key={index} className='flex-[0_0_33%] flex mb-[5px]'>
@@ -93,7 +99,7 @@ export const ExportSeedPhraseModal: React.FC<SuccessCreateModalProps> = ({
 											<CopySvg width='20' height='20' fill='#524B4B' />
 										</span>
 									}
-									className='text-white  ext:text-[15px] tablet:text-[15px] w-[50%] py-[11px]'
+									className='text-white w-[50%]'
 								/>
 								<Button
 									mode='icon_transparent'
@@ -104,7 +110,7 @@ export const ExportSeedPhraseModal: React.FC<SuccessCreateModalProps> = ({
 											<SaveSvg width='20' height='20' fill='#524B4B' />
 										</span>
 									}
-									className='text-white ext:text-[15px] tablet:text-[15px] w-[50%] py-[11px]'
+									className='text-white w-[50%]'
 								/>
 							</div>
 						</div>
@@ -112,19 +118,19 @@ export const ExportSeedPhraseModal: React.FC<SuccessCreateModalProps> = ({
 				)}
 				{!seed && (
 					<div className='flex mt-[40px]'>
-							<Button
-								mode='transparent'
-								onClick={handleCloseAndCleanKey}
-								title='Cancel'
-								className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] mr-[8px]'
-							/>
-							<Button
-								mode='gradient'
-								onClick={handleConfirm}
-								title='Confirm'
-								disabled={!password}
-								className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] w-[50%] ml-[8px]'
-							/>
+						<Button
+							mode='transparent'
+							onClick={handleCloseAndCleanKey}
+							title='Cancel'
+							className='w-[50%] mr-[8px]'
+						/>
+						<Button
+							mode='gradient'
+							onClick={handleConfirm}
+							title='Confirm'
+							disabled={!password}
+							className='w-[50%] ml-[8px]'
+						/>
 					</div>
 				)}
 			</div>

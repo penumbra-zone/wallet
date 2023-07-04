@@ -18,9 +18,12 @@ export const Welcome = () => {
 				<p className='text_body text-light_grey mt-[6px] mb-[40px]'>
 					We're glad to see you.
 				</p>
-				<div className='w-[192px]'>
-					<Button title='Get started' mode='gradient' onClick={handleStart} />
-				</div>
+				<Button
+					title='Get started'
+					mode='gradient'
+					onClick={handleStart}
+					className='w-[192px'
+				/>
 			</div>
 		</div>
 	)

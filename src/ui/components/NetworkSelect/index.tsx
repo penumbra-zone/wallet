@@ -37,14 +37,14 @@ export const NetworkSelect: React.FC<NetworkSelectProps> = ({
 	}, [networks, currentNetworkName])
 
 	const percent = percentage(
-		lastSavedBlock[currentNetwork],
+		lastSavedBlock[currentNetwork] || 0,
 		lastExistBlock[currentNetwork]
 	)
 
 	return (
 		<div
 			onClick={onClick}
-			className={`ext:h-[36px] ext:w-[152px] tablet:h-[52px] tablet:w-[296px] ext:px-[10px] tablet:px-[21px] bg-brown rounded-[15px] border-[1px] border-solid border-dark_grey flex items-center cursor-pointer
+			className={`ext:h-[36px] ext:w-[152px] tablet:h-[52px] tablet:w-[296px] ext:px-[10px] tablet:px-[21px] bg-brown rounded-[10px] border-[1px] border-solid border-dark_grey flex items-center cursor-pointer
       ${className}`}
 		>
 			{percent > 100 ? (

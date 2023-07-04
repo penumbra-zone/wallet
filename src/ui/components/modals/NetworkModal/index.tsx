@@ -58,7 +58,7 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
 								}
 								rightChild={
 									<p className='text-light_grey text-[10px] pl-[8px]'>
-										{lastSavedBlock[i.name]}/{lastExistBlock[i.name]}
+										{lastSavedBlock[i.name] || 0}/{lastExistBlock[i.name]}
 									</p>
 								}
 								text={i.chainId}
@@ -67,12 +67,7 @@ export const NetworkModal: React.FC<SuccessCreateModalProps> = ({
 					))}
 
 					<div className='w-[100%] mt-[40px] px-[16px]'>
-						<Button
-							title='Change'
-							mode='gradient'
-							onClick={handleChange}
-							className='ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
-						/>
+						<Button title='Change' mode='gradient' onClick={handleChange} />
 					</div>
 				</div>
 			</div>

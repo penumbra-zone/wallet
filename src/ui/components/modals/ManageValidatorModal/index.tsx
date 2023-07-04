@@ -87,7 +87,7 @@ export const ManageValidatorModal = ({
 						</p>
 					)}
 					<div className='flex gap-x-[16px]'>
-						<div className='w-[100%] flex flex-col bg-dark_grey rounded-[15px] pt-[24px] pb-[40px] px-[20px]'>
+						<div className='w-[100%] flex flex-col bg-dark_grey rounded-[10px] pt-[24px] pb-[40px] px-[20px]'>
 							<p className='h2_ext text-light_grey'>Your Delegation</p>
 							<p className='mt-[14px] mb-[16px] text_numbers_ext text-white'>
 								0 PNB
@@ -95,7 +95,7 @@ export const ManageValidatorModal = ({
 							<p className='text_numbers_ext text-light_grey'>$ -</p>
 						</div>
 						{showDelegeta && (
-							<div className='w-[100%] flex flex-col bg-dark_grey rounded-[15px] py-[24px] px-[20px]'>
+							<div className='w-[100%] flex flex-col bg-dark_grey rounded-[10px] py-[24px] px-[20px]'>
 								<p className='h2_ext text-light_grey'>Available to Delegate</p>
 								<Balance className='mt-[14px] mb-[16px] text_numbers_ext text-white' />
 								<p className='text_numbers_ext text-light_grey'>$ -</p>
@@ -103,7 +103,7 @@ export const ManageValidatorModal = ({
 						)}
 					</div>
 					{showDelegeta && (
-						<div className='flex flex-col bg-dark_grey rounded-[15px] pt-[24px] pb-[16px] px-[20px] mt-[24px]'>
+						<div className='flex flex-col bg-dark_grey rounded-[10px] pt-[24px] pb-[16px] px-[20px] mt-[24px]'>
 							<Input
 								label={
 									<p className='h2_ext text-light_grey'>Amount to Delegate</p>
@@ -112,7 +112,7 @@ export const ManageValidatorModal = ({
 								onChange={handleChangeDelegate}
 								rightElement={
 									<div
-										className='flex items-center bg-dark_grey h-[50px] px-[25px] rounded-r-[15px] text_button_ext cursor-pointer'
+										className='flex items-center bg-dark_grey h-[50px] px-[25px] rounded-r-[10px] text_button_ext cursor-pointer'
 										onClick={handleMax}
 									>
 										Max
@@ -127,14 +127,14 @@ export const ManageValidatorModal = ({
 							<Button
 								mode='transparent'
 								title='Redelegate'
-								className='w-[120px] tablet:py-[9px]'
+								className='w-[120px]'
 							/>
 						)}
 						<Button
 							mode='gradient'
 							onClick={handleDelegate}
 							title='Delegate'
-							className='w-[120px] ml-[16px] tablet:py-[9px]'
+							className='w-[120px] ml-[16px]'
 						/>
 					</div>
 				</div>

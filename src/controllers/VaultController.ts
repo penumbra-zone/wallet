@@ -4,7 +4,7 @@ import { WalletController } from './WalletController'
 
 export class VaultController {
 	store
-	private wallet
+	private wallet: WalletController
 	private identity
 
 	constructor({
@@ -68,5 +68,11 @@ export class VaultController {
 		this.wallet.unlock(password)
 
 		this.isLocked = false
+	}
+
+	async clear() {
+		await this.wallet.deleteVault()
+		// this.#identity.deleteVault()
+		this.store.updateState({ isInitialized: false, isLocked: true })
 	}
 }

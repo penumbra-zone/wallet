@@ -3,10 +3,14 @@ import { Button, Input } from '../../components'
 import Background from '../../services/Background'
 import { useAccountsSelector } from '../../../account'
 import { selectMessages } from '../../redux'
+import { useNavigate } from 'react-router-dom'
+import { routesPath } from '../../../utils'
 
 type LoginProps = {}
 
 export const Login: React.FC<LoginProps> = ({}) => {
+	const navigate = useNavigate()
+
 	const [password, setPassword] = useState<string>('')
 	const [isError, setIsError] = useState<boolean>(false)
 	const messages = useAccountsSelector(selectMessages)
@@ -48,11 +52,13 @@ export const Login: React.FC<LoginProps> = ({}) => {
 		}
 	}
 
+	const gotoForgotPassword = () => navigate(routesPath.FORGOT_PASSWORD)
+
 	return (
-		<div className='w-[100%] flex items-center justify-center'>
-			<div className='w-[400px] ext:py-[20px] tablet:py-[0px] ext:px-[16px] tablet:px-[0px] ext:bg-brown tablet:bg-transparent rounded-[15px] flex flex-col items-center justify-center'>
+		<div className='w-[100%] h-[calc(100vh-160px)] flex items-center justify-center'>
+			<div className='ext:w-[100%] tablet:w-[400px] ext:px-[16px] tablet:px-[0px] flex flex-col items-center justify-center'>
 				<p className='h1'>Welcome back!</p>
-				<p className='text_body text-light_grey mb-[40px] ext:mt-[12px] tablet:mt-[16px]'>
+				<p className='text_body text-light_grey ext:mb-[24px] tablet:mb-[40px] mt-[8px]'>
 					A decentralized network awaits
 				</p>
 				<Input
@@ -63,7 +69,7 @@ export const Login: React.FC<LoginProps> = ({}) => {
 					value={password}
 					onChange={handleChangePassword}
 					customType='password'
-					className='w-[100%] mb-[24px]'
+					className='w-[100%] mb-[16px]'
 					onKeyDown={handleKeyDown}
 				/>
 				<Button
@@ -71,11 +77,28 @@ export const Login: React.FC<LoginProps> = ({}) => {
 					mode='gradient'
 					onClick={handleSubmitPassword}
 					disabled={!password}
-					className='w-[100%] mb-[60px]'
+					className='w-[100%] ext:mb-[16px] tablet:mb-[24px]'
 				/>
-				<p className='text_body text-light_grey'>
-					Need help? Contact Penumbra support
+				<p
+					className='text_button text-light_grey cursor-pointer hover:text-white'
+					onClick={gotoForgotPassword}
+				>
+					Forgot Password?
 				</p>
+				<div className='flex items-center text_body mt-[16px] text-light_grey'>
+					<p>
+						Need help? Contact{' '}
+						<span>
+							<a
+								className='text-green underline cursor-pointer hover:text-light_grey'
+								target='_blank'
+								href='https://guide.penumbra.zone/main/extension.html'
+							>
+								Penumbra Support
+							</a>
+						</span>
+					</p>
+				</div>
 			</div>
 		</div>
 	)

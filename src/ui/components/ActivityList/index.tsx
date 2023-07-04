@@ -101,11 +101,6 @@ export const ActivityList = () => {
 					)
 				})}
 			</div>
-			{/* <Button
-        mode="gradient"
-        title="More"
-        className="ext:w-[96px] tablet:w-[192px]"
-      /> */}
 		</div>
 	)
 }

@@ -62,7 +62,7 @@ export const SettingsContacts = () => {
 						mode='gradient'
 						onClick={handleCreate}
 						title='Add contact'
-						className='w-[172px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
+						className='w-[172px]'
 					/>
 				) : (
 					<></>

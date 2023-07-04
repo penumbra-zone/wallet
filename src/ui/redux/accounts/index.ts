@@ -67,6 +67,7 @@ export function createAccount(account: CreateAccountInput) {
 				shortAddressByIndex: lastAccount.shortAddressByIndex,
 			})
 		)
+
 		await Background.selectAccount(lastAccount)
 	}
 }

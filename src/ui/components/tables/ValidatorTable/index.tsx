@@ -15,7 +15,7 @@ const renderCell = (
 	if (columnId === 'name')
 		return (
 			<div
-				className={`flex items-center  bg-dark_grey rounded-l-[15px] ${
+				className={`flex items-center  bg-dark_grey rounded-l-[10px] ${
 					type === 'all_validator' ? 'h-[48px]' : 'h-[60px]'
 				}`}
 			>
@@ -28,7 +28,7 @@ const renderCell = (
 	else if (columnId === 'manage')
 		return (
 			<div
-				className={`flex items-center justify-center bg-dark_grey -ml-[2px] rounded-r-[15px] ${
+				className={`flex items-center justify-center bg-dark_grey -ml-[2px] rounded-r-[10px] ${
 					type === 'all_validator' ? 'h-[48px]' : 'h-[60px]'
 				} `}
 			>
@@ -143,7 +143,7 @@ export const ValidatorTable = <T, K extends keyof T>({
 
 	return (
 		<>
-			<div className='bg-brown rounded-[15px] pt-[24px] pb-[20px] px-[20px]'>
+			<div className='bg-brown rounded-[10px] pt-[24px] pb-[20px] px-[20px]'>
 				<table {...getTableProps()} className='w-[100%] '>
 					<thead className='h3'>
 						{headerGroups.map((headerGroup, headerGroupIndex) => (

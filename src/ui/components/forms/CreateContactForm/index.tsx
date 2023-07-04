@@ -100,18 +100,18 @@ export const CreateContactForm: React.FC<CreateContactFormProps> = ({
 					onChange={handleChangeValues('address')}
 				/>
 			</div>
-			<div className='w-[100%] flex'>
+			<div className='w-[100%] flex gap-x-[8px]'>
 				<Button
 					mode='transparent'
 					onClick={handleCancel}
 					title='Cancel'
-					className='w-[50%] mr-[8px]'
+					className='w-[50%]'
 				/>
 				<Button
 					mode='gradient'
 					onClick={handleSave}
 					title='Save'
-					className='w-[50%] ml-[8px]'
+					className='w-[50%]'
 					disabled={
 						!(
 							values.address &&

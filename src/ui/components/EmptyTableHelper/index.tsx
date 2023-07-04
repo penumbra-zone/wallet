@@ -4,7 +4,7 @@ type EmptyTableHelperProps = {
 
 export const EmptyTableHelper: React.FC<EmptyTableHelperProps> = ({ text }) => {
 	return (
-		<div className=' flex items-center justify-center w-[100%] bg-brown rounded-[15px] h-[400px] text_body text-light_brown'>
+		<div className=' flex items-center justify-center w-[100%] bg-brown rounded-[10px] h-[400px] text_body text-light_brown'>
 			{text}
 		</div>
 	)

@@ -40,8 +40,14 @@ export const DetailContactCard: React.FC<DetailContactCardProps> = ({
 
 	const copyToClipboard = () => {
 		navigator.clipboard.writeText(contact.address)
-		toast.success('Success copied!', {
-			position: 'top-right',
+		toast.success('Successfully copied', {
+			position: 'top-center',
+			icon: '👏',
+			style: {
+				borderRadius: '15px',
+				background: '#141212',
+				color: '#fff',
+			},
 		})
 	}
 
@@ -113,7 +119,7 @@ export const DetailContactCard: React.FC<DetailContactCardProps> = ({
 						title='Delete'
 						mode='gradient'
 						onClick={handleDelete}
-						className='w-[152px] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px]'
+						className='w-[152px]'
 					/>
 				)}
 			</div>
@@ -144,7 +150,7 @@ export const DetailContactCard: React.FC<DetailContactCardProps> = ({
 			{!isEdit ? (
 				<div className='flex flex-col mb-[24px]'>
 					<p className='text_body mb-[16px]'>Penumbra's address</p>
-					<div className='flex items-center py-[8px] ext:px-[16px] tablet:px-[10px] bg-dark_grey rounded-[15px]'>
+					<div className='flex items-center py-[8px] ext:px-[16px] tablet:px-[10px] bg-dark_grey rounded-[10px]'>
 						<p className='break-all text_body mr-[10px]'>{contact.address}</p>
 						<span
 							className=' cursor-pointer svg_hover'

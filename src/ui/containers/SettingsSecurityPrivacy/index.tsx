@@ -20,39 +20,57 @@ export const SettingsSecurityPrivacy = () => {
 		<>
 			<div>
 				<p
-					className={`w-[100%] px-[16px] py-[24px] border-b-[1px] border-solid border-dark_grey ${
+					className={`w-[100%] p-[16px] pb-[16px] ext:pt-[16px] tablet:pt-[24px] tablet:border-b-[1px] tablet:border-dark_grey ${
 						isDesktop ? 'h2' : 'h1_ext'
 					}`}
 				>
 					Security and Privacy
 				</p>
-				<div className='tablet:px-[16px] h-[100%] mt-[24px]'>
-					<div className='w-[100%] flex flex-col ext:px-[16px] tablet:px-[0px]'>
-						<div className='flex flex-col mb-[24px]'>
-							<p className='h3 mb-[16px]'>Show recovery passphrase</p>
+				<div className='tablet:px-[16px] h-[100%] tablet:mt-[16px]'>
+					<div className='w-[100%] flex flex-col gap-y-[16px] ext:px-[16px] tablet:px-[0px]'>
+						<div className='flex flex-col'>
+							<p
+								className={`${
+									isDesktop ? 'h3' : 'h2_ext'
+								} ext:mb-[8px] tablet:mb-[16px]`}
+							>
+								Show recovery passphrase
+							</p>
 							<Button
 								title='Show passphrase'
 								mode='gradient'
 								onClick={toggleShowSeedModal(true)}
-								className='ext:w-[100%] tablet:w-[280px]'
+								className='ext:w-[100%] tablet:w-[312px]'
 							/>
 						</div>
-						<div className='flex flex-col mb-[24px]'>
-							<p className='h3 mb-[16px]'>Full viewing key</p>
+						<div className='flex flex-col'>
+							<p
+								className={`${
+									isDesktop ? 'h3' : 'h2_ext'
+								} ext:mb-[8px] tablet:mb-[16px]`}
+							>
+								Full viewing key
+							</p>
 							<Button
 								title='Export full viewing key'
 								mode='gradient'
 								onClick={changeKeyModalType('full_viewing_key')}
-								className='ext:w-[100%] tablet:w-[280px]'
+								className='ext:w-[100%] tablet:w-[312px]'
 							/>
 						</div>
-						<div className='flex flex-col mb-[24px]'>
-							<p className='h3 mb-[16px]'>Spending key</p>
+						<div className='flex flex-col'>
+							<p
+								className={`${
+									isDesktop ? 'h3' : 'h2_ext'
+								} ext:mb-[8px] tablet:mb-[16px]`}
+							>
+								Spending key
+							</p>
 							<Button
 								title='Export spending key'
 								mode='gradient'
 								onClick={changeKeyModalType('spending_key')}
-								className='ext:w-[100%] tablet:w-[280px]'
+								className='ext:w-[100%] tablet:w-[312px]'
 							/>
 						</div>
 					</div>

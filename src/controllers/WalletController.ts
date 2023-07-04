@@ -84,6 +84,7 @@ export class WalletController extends EventEmitter {
 	lock() {
 		this._setPassword(null)
 		this.wallets = []
+		this.emit('wallet lock')
 	}
 
 	getAccountFullViewingKey(password: string) {
@@ -130,6 +131,12 @@ export class WalletController extends EventEmitter {
 
 	async getAccountAddresByIndex(index: number) {
 		return this.wallets[0].getAddressByIndex(index)
+	}
+
+	async deleteVault() {
+		this._setPassword(null)
+		this.wallets = []
+		this.store.updateState({ WalletController: { vault: undefined } })
 	}
 
 	_restoreWallets(password: string | null | undefined) {

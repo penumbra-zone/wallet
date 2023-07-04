@@ -92,8 +92,14 @@ export const SeedPhrase: React.FC<SeedPhraseProps> = ({}) => {
 
 	const copyToClipboard = () => {
 		navigator.clipboard.writeText(seed)
-		toast.success('Success copied!', {
-			position: 'top-right',
+		toast.success('Successfully copied', {
+			position: 'top-center',
+			icon: '👏',
+			style: {
+				borderRadius: '15px',
+				background: '#141212',
+				color: '#fff',
+			},
 		})
 	}
 	const handleNext = () => setIsConfirmPage(true)
@@ -136,7 +142,7 @@ export const SeedPhrase: React.FC<SeedPhraseProps> = ({}) => {
 		<>
 			{!isConfirmPage ? (
 				<div className='w-[100%] flex items-center justify-center'>
-					<div className='flex flex-col items-center justify-center'>
+					<div className='w-[500px] flex flex-col items-center justify-center'>
 						<div className='self-start'>
 							<Button
 								mode='icon_transparent'
@@ -156,7 +162,7 @@ export const SeedPhrase: React.FC<SeedPhraseProps> = ({}) => {
 							WARNING: Never share your recovery passphrase. Anyone who has it
 							can take your token forever.
 						</p>
-						<div className='bg-brown px-[30px] pt-[34px] pb-[26px] rounded-[15px] flex flex-wrap'>
+						<div className='bg-brown px-[30px] pt-[34px] pb-[26px] rounded-[10px] flex flex-wrap'>
 							{seed.split(' ').map((i, index) => {
 								return (
 									<div key={index} className='flex-[0_0_25%] flex mb-[8px]'>
@@ -198,7 +204,7 @@ export const SeedPhrase: React.FC<SeedPhraseProps> = ({}) => {
 								/>
 							</div>
 							<p className='h1 mt-[40px]'>Confirm your recovery passphrase</p>
-							<p className='text _body text-light-grey mt-[16px] mb-[24px]'>
+							<p className='text_body text-light-grey mt-[16px] mb-[24px]'>
 								Please confirm the seed phrase by entering the correct word for
 								each position
 							</p>

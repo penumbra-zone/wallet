@@ -5,7 +5,8 @@ import {
 	BalanceByAddressRequest,
 	NotesRequest,
 	TransactionInfoByHashRequest,
-	TransactionInfoRequest, TransactionPlannerRequest,
+	TransactionInfoRequest,
+	TransactionPlannerRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import pipe from 'callbag-pipe'
 import subscribe from 'callbag-subscribe'
@@ -61,10 +62,6 @@ extension.runtime.onConnect.addListener(async remotePort => {
 	}
 })
 
-// extension.runtime.onConnectExternal.addListener(async remotePort => {
-// 	const bgService = await bgPromise
-// 	bgService.setupPageConnection(remotePort)
-// })
 
 async function setupBackgroundService() {
 	const extensionStorage = new ExtensionStorage()
@@ -113,6 +110,10 @@ async function setupBackgroundService() {
 		return tabsManager.getOrCreate(url, name)
 	})
 
+	backgroundService.walletController.on('wallet lock', async () => {
+		await backgroundService.clientController.abortGrpcRequest()
+	})
+
 	backgroundService.walletController.on('wallet create', async () => {
 		await backgroundService.clientController.saveChainParameters()
 		await backgroundService.clientController.getCompactBlockRange()
@@ -124,18 +125,14 @@ async function setupBackgroundService() {
 	})
 
 	backgroundService.walletController.on('reset wallet', async () => {
-		await backgroundService.clientController.abortGrpcRequest()
+		await backgroundService.clientController.abortGrpcRequest('reset wallet')
 		await backgroundService.remoteConfigController.resetWallet()
-		await backgroundService.clientController.resetWallet()
 		await backgroundService.networkController.resetWallet()
-		await backgroundService.wasmViewConnector.resetWallet()
-		await backgroundService.currentAccountController.resetWallet()
 		await backgroundService.vaultController.lock()
 	})
 
 	backgroundService.networkController.on('change grpc', async () => {
-		await backgroundService.clientController.abortGrpcRequest()
-		await backgroundService.clientController.resetWallet()
+		await backgroundService.clientController.abortGrpcRequest('change grpc')
 		await backgroundService.clientController.saveChainParameters()
 		await backgroundService.clientController.getCompactBlockRange()
 	})
@@ -254,6 +251,8 @@ class BackgroundService extends EventEmitter {
 			getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
 			wasmViewConnector: this.wasmViewConnector,
 			getCustomGRPC: () => this.networkController.getCustomGRPC(),
+			resetBalance: () => this.currentAccountController.resetWallet(),
+			deleteViewServer: () => this.wasmViewConnector.resetWallet()
 		})
 
 		this.viewProtocolService = new ViewProtocolService({
@@ -395,6 +394,18 @@ class BackgroundService extends EventEmitter {
 			},
 			decryptTx: async bytes => {
 				return decode_transaction(bytes)
+			},
+			deleteVault: async () => {
+				await this.messageController.clearMessages()
+				await this.vaultController.clear()
+				await this.remoteConfigController.resetWallet()
+				await this.clientController.resetWallet()
+				await this.networkController.resetWallet()
+				await this.wasmViewConnector.resetWallet()
+				await this.currentAccountController.resetWallet()
+				await this.preferencesController.resetWallet()
+				await this.permissionsController.clearStore()
+				await this.indexedDb.clearAllTables()
 			},
 		}
 	}
@@ -586,9 +597,7 @@ class BackgroundService extends EventEmitter {
 					new TransactionInfoRequest(request)
 				)
 			},
-			getTransactionInfoByHashProxy: async (
-				request: string
-			) => {
+			getTransactionInfoByHashProxy: async (request: string) => {
 				return this.viewProtocolService.getTransactionInfoByHash(request)
 			},
 			getFmdParameters: async () => {
@@ -606,7 +615,7 @@ class BackgroundService extends EventEmitter {
 			getAddressByIndexProxy: async (request: string) =>
 				this.viewProtocolService.getAddressByIndex(request),
 			getTransactionPlannerProxy: async (request: string) =>
-				 this.viewProtocolService.getTransactionPlanner(request),
+				this.viewProtocolService.getTransactionPlanner(request),
 		}
 	}
 

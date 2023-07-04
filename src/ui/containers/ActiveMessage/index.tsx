@@ -46,7 +46,7 @@ export const ActiveMessage = () => {
 			<div className='w-[100%] flex flex-col items-center'>
 				<p className='h1_ext mb-[16px]'>Connect with Penumbra</p>
 				<p className='text_body_ext mb-[16px]'>Select accounts to use</p>
-				<div className='w-[100%] flex items-center  px-[20px] py-[16px] border-[1px] border-solid border-dark_grey rounded-[15px]'>
+				<div className='w-[100%] flex items-center  px-[20px] py-[16px] border-[1px] border-solid border-dark_grey rounded-[10px]'>
 					<CheckBox
 						onChange={handleChangeCheck}
 						checked={isChecked}

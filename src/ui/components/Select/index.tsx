@@ -88,7 +88,7 @@ export const SelectInput: React.FC<SelectPropsType> = ({
 			<p className={labelClassName}>{label}</p>
 			<div
 				onClick={containerHandler}
-				className={`w-[100%] h-[52px] rounded-[15px] flex items-center justify-center
+				className={`w-[100%] h-[52px] rounded-[10px] flex items-center justify-center
         ${
 					isError
 						? 'bg-red'
@@ -98,7 +98,7 @@ export const SelectInput: React.FC<SelectPropsType> = ({
 				}`}
 			>
 				<div
-					className={`w-[calc(100%-2px)] h-[50px] rounded-[15px] bg-brown ${
+					className={`w-[calc(100%-2px)] h-[50px] rounded-[10px] bg-brown ${
 						values ? 'input_typing_bg' : 'bg-brown'
 					}`}
 				>

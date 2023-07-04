@@ -1,19 +1,25 @@
-import { Outlet } from 'react-router-dom'
-import { SettingSideBar } from '../../components'
+import { Outlet, useNavigate } from 'react-router-dom'
+import { Button, ChevronLeftIcon, SettingSideBar } from '../../components'
+import { routesPath } from '../../../utils'
 
 export const Settings = () => {
+	const navigate = useNavigate()
+	const handleBack = () => navigate(routesPath.HOME)
+
 	return (
-		<div className='w-[100%] h-[auto] flex justify-center mt-[18px]'>
-			<div className='w-[100%] flex flex-col bg-brown rounded-[15px]'>
-				<div className='flex pt-[16px] pb-[24px] border-b-[1px] border-solid border-dark_grey'>
-					<p className='h1 pl-[20px]'>Settings</p>
-				</div>
-				<div className='flex h-[100%]'>
-					<SettingSideBar />
-					{/* <div className="w-[610px]"> */}
-					<div className='w-[100%]'>
-						<Outlet />
-					</div>
+		<div className='w-[100%] h-[auto] flex flex-col justify-center mt-[26px]'>
+			<div className='self-start mb-[26px]'>
+				<Button
+					mode='icon_transparent'
+					onClick={handleBack}
+					title='Back'
+					iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
+				/>
+			</div>
+			<div className='flex h-[100%] w-[100%]  bg-brown rounded-[10px]'>
+				<SettingSideBar />
+				<div className='w-[100%]'>
+					<Outlet />
 				</div>
 			</div>
 		</div>

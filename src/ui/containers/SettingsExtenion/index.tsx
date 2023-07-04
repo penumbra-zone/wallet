@@ -14,28 +14,11 @@ export const SettingsExtenion = () => {
 	const handleBlock = async () => await Background.lock()
 
 	return (
-		<div className='min-h-[100vh] w-[100%] py-[20px] '>
-			<div className='h-[100%] bg-brown rounded-[15px] pb-[28px] flex flex-col justify-between'>
+		<div className='min-h-[100vh] w-[100%] py-[20px]'>
+			<div className='h-[100%] bg-brown rounded-[10px] pb-[28px] flex flex-col justify-between'>
 				<div>
 					{pathname === routesPath.SETTINGS ? (
-						<></>
-					) : (
-						<Button
-							mode='icon_transparent'
-							onClick={handleBack}
-							title='Back'
-							iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
-							className='text-[12px] pl-[8px] pt-[22px] pb-[2px]'
-						/>
-					)}
-					{pathname === routesPath.SETTINGS && (
-						<div
-							className={`flex justify-center items-center ${
-								pathname !== routesPath.SETTINGS
-									? 'border-b-[1px] border-solid border-dark_grey'
-									: 'border-b-[1px] border-solid border-dark_grey py-[16px] relative'
-							}`}
-						>
+						<div className='flex justify-center items-center border-b-[1px] border-dark_grey h-[54px] relative'>
 							<span
 								className='cursor-pointer absolute left-[20px]'
 								onClick={handleHome}
@@ -44,7 +27,18 @@ export const SettingsExtenion = () => {
 							</span>
 							<p className='h1'>Settings</p>
 						</div>
+					) : (
+						<div className='flex items-center border-b-[1px] border-dark_grey h-[54px]'>
+							<Button
+								mode='icon_transparent'
+								onClick={handleBack}
+								title='Back'
+								iconLeft={<ChevronLeftIcon stroke='#E0E0E0' />}
+								className='text-[12px] pl-[8px]'
+							/>
+						</div>
 					)}
+
 					<Outlet />
 				</div>
 				{pathname === routesPath.SETTINGS && (
@@ -53,7 +47,6 @@ export const SettingsExtenion = () => {
 							title='Block account'
 							mode='gradient'
 							onClick={handleBlock}
-							className=''
 						/>
 					</div>
 				)}

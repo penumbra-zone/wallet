@@ -23,13 +23,21 @@ export class PreferencesController extends EventEmitter {
 		return this.store.getState().selectedAccount
 	}
 
-	selectAccount(selectedAccount: ISeedWalletInput) {
-		this.store.updateState({
+	async selectAccount(selectedAccount: ISeedWalletInput) {
+		await this.store.updateState({
 			selectedAccount,
 		})
 	}
 
 	setIdleInterval(idleInterval: number) {
 		this.store.updateState({ idleInterval })
+	}
+
+	async resetWallet() {
+		await this.store.updateState({
+			idleInterval: 0,
+			accounts: [],
+			selectedAccount: undefined,
+		})
 	}
 }

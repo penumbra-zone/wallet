@@ -114,14 +114,14 @@ export const SettingsNetworks = () => {
 		<>
 			<div className='ext:h-[calc(100%-100px)] tablet:h-[100%]'>
 				<p
-					className={`flex items-center w-[100%] px-[16px] h-[74px] border-b-[1px] border-solid border-dark_grey ${
+					className={`w-[100%] p-[16px] pb-[16px] ext:pt-[16px] tablet:pt-[24px] tablet:border-b-[1px] tablet:border-dark_grey ${
 						isDesktop ? 'h2' : 'h1_ext'
 					}`}
 				>
 					Networks
 				</p>
 				<div className='w-[100%] ext:h-[100%] laptop:h-[calc(100%-74px)] flex'>
-					<div className='ext:w-[100%] flex rounded-[15px]'>
+					<div className='ext:w-[100%] flex rounded-[10px]'>
 						<div className='ext:w-[100%] laptop:w-[55%]  flex flex-col justify-between pt-[24px]'>
 							<div>
 								<Input
@@ -159,7 +159,7 @@ export const SettingsNetworks = () => {
 									title='Add network'
 									mode='gradient'
 									onClick={handleOpentTab}
-									className='w-[calc(100%-32px)] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] mx-[16px] mb-[24px]'
+									className='w-[calc(100%-32px)] mx-[16px] mb-[24px]'
 								/>
 							)}
 						</div>
@@ -181,14 +181,14 @@ export const SettingsNetworks = () => {
 										title='Cancel'
 										mode='transparent'
 										onClick={handleCancel}
-										className='w-[100%] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] mr-[4px]'
+										className='w-[100%] mr-[4px]'
 										disabled={isDisabled}
 									/>
 									<Button
 										title='Save'
 										mode='gradient'
 										onClick={toggleShowSubmitModal(true)}
-										className='w-[100%] ext:pt-[7px] tablet:pt-[7px] ext:pb-[7px] tablet:pb-[7px] ml-[4px]'
+										className='w-[100%] ml-[4px]'
 										disabled={isDisabled}
 									/>
 								</div>
