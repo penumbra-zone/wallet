@@ -155,6 +155,9 @@ export class ClientController extends EventEmitter {
 			lastSavedBlockHeight === undefined ? 0 : lastSavedBlockHeight + 1
 		)
 		compactBlockRangeRequest.keepAlive = true
+		if (this.abortController.signal.aborted) {
+			this.abortController = new AbortController()
+		}
 
 		let height
 		console.time('start')
@@ -250,9 +253,11 @@ export class ClientController extends EventEmitter {
 				}
 			}
 		} catch (error) {
+			console.log(error)
+			console.log(this.abortController.signal)
+
 			if (error.message === '[unknown] network error' && error.code === 2) {
-				await this.abortGrpcRequest()
-				// await this.configApi.deleteViewServer()
+				this.abortGrpcRequest()
 			}
 
 			if (this.abortController.signal.aborted) {
