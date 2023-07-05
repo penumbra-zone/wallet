@@ -48,7 +48,7 @@ export class ViewProtocolService {
 	private indexedDb
 	private extensionStorage
 	private getLastExistBlock
-	private getTransactionFromTendermint
+	private getTransaction
 	private getAccountAddresByIndex
 	private getAccountFullViewingKey
 
@@ -56,21 +56,21 @@ export class ViewProtocolService {
 		indexedDb,
 		extensionStorage,
 		getLastExistBlock,
-		getTransactionFromTendermint,
+		getTransaction,
 		getAccountAddresByIndex,
 		getAccountFullViewingKey,
 	}: {
 		indexedDb: IndexedDb
 		extensionStorage: ExtensionStorage
 		getLastExistBlock: ClientController['getLastExistBlock']
-		getTransactionFromTendermint: WasmViewConnector['getTransactionFromTendermint']
+		getTransaction: WasmViewConnector['getTransaction']
 		getAccountAddresByIndex: WalletController['getAccountAddresByIndex']
 		getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword']
 	}) {
 		this.indexedDb = indexedDb
 		this.extensionStorage = extensionStorage
 		this.getLastExistBlock = getLastExistBlock
-		this.getTransactionFromTendermint = getTransactionFromTendermint
+		this.getTransaction = getTransaction
 		this.getAccountAddresByIndex = getAccountAddresByIndex
 		this.getAccountFullViewingKey = getAccountFullViewingKey
 	}
@@ -218,7 +218,7 @@ export class ViewProtocolService {
 		let tx = await this.indexedDb.getValue(TRANSACTION_TABLE_NAME, id.hash)
 
 		if (!tx) {
-			tx = await this.getTransactionFromTendermint(id.hash)
+			tx = await this.getTransaction(id.hash)
 		}
 
 		return {
