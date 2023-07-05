@@ -133,6 +133,11 @@ export class ClientController extends EventEmitter {
 		} catch {}
 		if (!fvk) return
 
+		await this.wasmViewConnector.setViewServer(fvk)
+
+		const lastSavedBlockHeight =
+			this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
+
 		const chainId = this.getChainId()
 		const baseUrl = this.getGRPC()
 		const lastBlock = await this.getLastExistBlock()
@@ -145,8 +150,6 @@ export class ClientController extends EventEmitter {
 
 		const compactBlockRangeRequest = new CompactBlockRangeRequest()
 
-		const lastSavedBlockHeight =
-			this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
 
 		compactBlockRangeRequest.chainId = chainId
 		compactBlockRangeRequest.startHeight = BigInt(
@@ -155,9 +158,9 @@ export class ClientController extends EventEmitter {
 		compactBlockRangeRequest.keepAlive = true
 
 		let height
-		this.abortController = new AbortController()
 
-		await this.wasmViewConnector.setViewServer(fvk)
+		this.abortController = new AbortController()
+		console.log(this.abortController)
 
 		try {
 			for await (const response of client.compactBlockRange(
@@ -170,7 +173,6 @@ export class ClientController extends EventEmitter {
 					response.compactBlock,
 					fvk
 				)
-				
 
 				if (Number(response.compactBlock.height) < lastBlock) {
 					if (Number(response.compactBlock.height) % 1000 === 0) {
@@ -216,7 +218,6 @@ export class ClientController extends EventEmitter {
 					this.abortController.signal.reason === 'reset wallet' ||
 					this.abortController.signal.reason === 'change grpc'
 				) {
-					await this.resetWallet()
 					this.abortController.signal.reason === 'reset wallet'
 						? this.emit('abort with clear')
 						: this.emit('abort with balance and db clear')
@@ -236,7 +237,7 @@ export class ClientController extends EventEmitter {
 				}
 			}
 		}
-		this.abortController = new AbortController()
+		// this.abortController = new AbortController()
 	}
 
 	async saveUpdates() {

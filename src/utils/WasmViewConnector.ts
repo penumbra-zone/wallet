@@ -89,6 +89,10 @@ export class WasmViewConnector {
 		}
 	}
 
+	getViewServer() {
+		return this.viewServer
+	}
+
 	async updateNotes(nullifier: Nullifier, height: bigint) {
 		const result: SpendableNoteRecord[] = await this.indexedDb.getAllValue(
 			SPENDABLE_NOTES_TABLE_NAME
@@ -118,6 +122,30 @@ export class WasmViewConnector {
 		}
 	}
 
+	async checkLastNctRoot(block: number) {
+		try {
+			const transport = createGrpcWebTransport({
+				baseUrl: 'https://grpc.testnet.penumbra.zone',
+			})
+
+			const client = createPromiseClient(SpecificQueryService, transport)
+
+			const keyValueRequest = new KeyValueRequest()
+			keyValueRequest.key = `sct/anchor/${String(block)}`
+			let keyValue = await client.keyValue(keyValueRequest)
+
+			let decodeNctRoot = decode_nct_root(
+				this.toHexString(keyValue.value.value)
+			)
+
+			const nctRoot = this.viewServer.get_nct_root()
+
+			return decodeNctRoot.inner !== nctRoot.inner
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
 	async handleNewCompactBlock(block: CompactBlock, fvk: string) {
 		const result: ScanResult = await this.viewServer.scan_block_without_updates(
 			block.toJson()
@@ -135,7 +163,7 @@ export class WasmViewConnector {
 				JSON.parse(block.fmdParameters.toJsonString())
 			)
 
-		if (Number(block.height) % 1000 === 0) {
+		if (Number(block.height) % 1000 === 0 || Number(block.height) > 133917) {
 			try {
 				const transport = createGrpcWebTransport({
 					baseUrl: 'https://grpc.testnet.penumbra.zone',
