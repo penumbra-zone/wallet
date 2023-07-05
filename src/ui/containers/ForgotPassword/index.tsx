@@ -28,12 +28,12 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
 	const [isValidMnemonic, setIsValidMnemonic] = useState<boolean>(true)
 	const [isShowModal, setIsShowModal] = useState<boolean>(false)
 
-	//logic to show popup after create
+	// //logic to show popup after create
 	useEffect(() => {
-		dispatch(accountsActions.setRedirectAccountPage(false))
-		return () => {
-			dispatch(accountsActions.setRedirectAccountPage(true))
-		}
+		// dispatch(accountsActions.setRedirectAccountPage(true))
+		// return () => {
+		// 	dispatch(accountsActions.setRedirectAccountPage(true))
+		// }
 	}, [])
 
 	const handleBack = () => navigate(routesPath.LOGIN)
@@ -97,9 +97,13 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
 			})
 		)
 
-		setIsShowModal(true)
+		// setIsShowModal(true)
 	}
-	const handleCloseModal = () => setIsShowModal(false)
+	// const handleCloseModal = () => {
+	// 	setIsShowModal(false)
+	// 	// navigate(routesPath.HOME)
+	// 	dispatch(accountsActions.setRedirectAccountPage(true))
+	// }
 
 	return (
 		<>
@@ -166,7 +170,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
 					</div>
 				</div>
 			</div>
-			<SuccessCreateModal show={isShowModal} onClose={handleCloseModal} />
+			{/* <SuccessCreateModal show={isShowModal} onClose={handleCloseModal} /> */}
 		</>
 	)
 }
