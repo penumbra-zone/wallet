@@ -5,11 +5,13 @@ import { useAccountsSelector } from '../../../account'
 import { selectMessages } from '../../redux'
 import { useNavigate } from 'react-router-dom'
 import { routesPath } from '../../../utils'
+import { useMediaQuery } from '../../../hooks'
 
 type LoginProps = {}
 
 export const Login: React.FC<LoginProps> = ({}) => {
 	const navigate = useNavigate()
+	const isDesktop = useMediaQuery()
 
 	const [password, setPassword] = useState<string>('')
 	const [isError, setIsError] = useState<boolean>(false)
@@ -54,6 +56,14 @@ export const Login: React.FC<LoginProps> = ({}) => {
 
 	const gotoForgotPassword = () => navigate(routesPath.FORGOT_PASSWORD)
 
+	const handleOpentTab = () => {
+		Background.showTab(
+			`${window.location.origin}/accounts.html#${routesPath.FORGOT_PASSWORD}`,
+			'forgot-password'
+		)
+		navigate('/', { replace: true })
+	}
+
 	return (
 		<div className='w-[100%] h-[calc(100vh-160px)] flex items-center justify-center'>
 			<div className='ext:w-[100%] tablet:w-[400px] ext:px-[16px] tablet:px-[0px] flex flex-col items-center justify-center'>
@@ -81,7 +91,7 @@ export const Login: React.FC<LoginProps> = ({}) => {
 				/>
 				<p
 					className='text_button text-light_grey cursor-pointer hover:text-white'
-					onClick={gotoForgotPassword}
+					onClick={isDesktop ? gotoForgotPassword : handleOpentTab}
 				>
 					Forgot Password?
 				</p>
