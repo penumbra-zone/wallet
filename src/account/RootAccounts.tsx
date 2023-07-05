@@ -35,12 +35,14 @@ export const RootAccounts = () => {
 			if (pathname === routesPath.VALIDATORS) {
 				return navigate(routesPath.VALIDATORS)
 			}
+			if (pathname === routesPath.FORGOT_PASSWORD) {
+				return navigate(routesPath.FORGOT_PASSWORD)
+			}
 			return navigate(routesPath.HOME)
 		}
 
 		if (!state.isInitialized) return navigate(routesPath.WELCOME)
-		// if (state.isInitialized && !state.isLocked)
-		// 	return navigate(routesPath.SEED_PHRASE_RULES)
+
 		if (state.isInitialized && state.isLocked) return navigate(routesPath.LOGIN)
 	}, [state.isInitialized, state.isLocked, selectedAccount, isRedirect])
 

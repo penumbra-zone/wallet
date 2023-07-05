@@ -31,6 +31,9 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
 	//logic to show popup after create
 	useEffect(() => {
 		dispatch(accountsActions.setRedirectAccountPage(false))
+		return () => {
+			dispatch(accountsActions.setRedirectAccountPage(true))
+		}
 	}, [])
 
 	const handleBack = () => navigate(routesPath.LOGIN)
