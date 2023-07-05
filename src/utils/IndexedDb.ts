@@ -57,7 +57,7 @@ export class IndexedDb {
 
 	public async createObjectStore() {
 		try {
-			this.db = await openDB(this.database, 10, {
+			this.db = await openDB(this.database, 11, {
 				async upgrade(db: IDBPDatabase) {
 					for (const objectStoreName of db.objectStoreNames) {
 						db.deleteObjectStore(objectStoreName)
@@ -93,7 +93,9 @@ export class IndexedDb {
 
 					db.createObjectStore(NCT_POSITION_TABLE_NAME)
 
-					db.createObjectStore(SPENDABLE_NOTES_TABLE_NAME)
+					const notesStore = db.createObjectStore(SPENDABLE_NOTES_TABLE_NAME)
+
+					notesStore.createIndex("nullifier","nullifier.inner", {unique: true})
 
 					db.createObjectStore(TRANSACTION_BY_NULLIFIER_TABLE_NAME, {
 						autoIncrement: true,
