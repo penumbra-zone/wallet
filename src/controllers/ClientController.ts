@@ -21,7 +21,6 @@ import {
 import { CompactBlock } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import { ObliviousQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
 import { CurrentAccountController } from './CurrentAccountController'
-import { VaultController } from './VaultController'
 import EventEmitter from 'events'
 
 export type Transaction = {
@@ -171,60 +170,17 @@ export class ClientController extends EventEmitter {
 					response.compactBlock,
 					fvk
 				)
+				
 
 				if (Number(response.compactBlock.height) < lastBlock) {
 					if (Number(response.compactBlock.height) % 1000 === 0) {
-						const updates = await this.wasmViewConnector.loadUpdates()
-
-						Promise.all([
-							await this.indexedDb.putBulkValue(
-								NCT_COMMITMENTS_TABLE_NAME,
-								updates.storeCommitments
-							),
-							await this.indexedDb.putBulkValue(
-								NCT_HASHES_TABLE_NAME,
-								updates.storeHashes
-							),
-							await this.indexedDb.putValueWithId(
-								NCT_POSITION_TABLE_NAME,
-								updates.setPosition,
-								'position'
-							),
-							updates.setForgotten &&
-								(await this.indexedDb.putValueWithId(
-									NCT_FORGOTTEN_TABLE_NAME,
-									updates.setForgotten,
-									'forgotten'
-								)),
-						]).then(() => {
+						this.saveUpdates().then(() => {
 							this.saveLastBlock(Number(response.compactBlock.height))
 						})
 					}
 					height = Number(response.compactBlock.height)
 				} else {
-					const updates = await this.wasmViewConnector.loadUpdates()
-
-					Promise.all([
-						await this.indexedDb.putBulkValue(
-							NCT_COMMITMENTS_TABLE_NAME,
-							updates.storeCommitments
-						),
-						await this.indexedDb.putBulkValue(
-							NCT_HASHES_TABLE_NAME,
-							updates.storeHashes
-						),
-						await this.indexedDb.putValueWithId(
-							NCT_POSITION_TABLE_NAME,
-							updates.setPosition,
-							'position'
-						),
-						updates.setForgotten &&
-							(await this.indexedDb.putValueWithId(
-								NCT_FORGOTTEN_TABLE_NAME,
-								updates.setForgotten,
-								'forgotten'
-							)),
-					]).then(() => {
+					this.saveUpdates().then(() => {
 						const oldState = this.store.getState().lastSavedBlock
 						const lastSavedBlock = {
 							...oldState,
@@ -271,30 +227,7 @@ export class ClientController extends EventEmitter {
 						if (Number(height) % 1000 === 0) {
 							this.emit('abort without clear')
 						} else {
-							const updates = await this.wasmViewConnector.loadUpdates()
-							console.log(height)
-
-							Promise.all([
-								await this.indexedDb.putBulkValue(
-									NCT_COMMITMENTS_TABLE_NAME,
-									updates.storeCommitments
-								),
-								await this.indexedDb.putBulkValue(
-									NCT_HASHES_TABLE_NAME,
-									updates.storeHashes
-								),
-								await this.indexedDb.putValueWithId(
-									NCT_POSITION_TABLE_NAME,
-									updates.setPosition,
-									'position'
-								),
-								updates.setForgotten &&
-									(await this.indexedDb.putValueWithId(
-										NCT_FORGOTTEN_TABLE_NAME,
-										updates.setForgotten,
-										'forgotten'
-									)),
-							]).then(async () => {
+							this.saveUpdates().then(async () => {
 								this.saveLastBlock(Number(height))
 								this.emit('abort without clear')
 							})
@@ -304,6 +237,30 @@ export class ClientController extends EventEmitter {
 			}
 		}
 		this.abortController = new AbortController()
+	}
+
+	async saveUpdates() {
+		const updates = await this.wasmViewConnector.loadUpdates()
+
+		await this.indexedDb.putBulkValue(
+			NCT_COMMITMENTS_TABLE_NAME,
+			updates.storeCommitments
+		)
+		await this.indexedDb.putBulkValue(
+			NCT_HASHES_TABLE_NAME,
+			updates.storeHashes
+		)
+		await this.indexedDb.putValueWithId(
+			NCT_POSITION_TABLE_NAME,
+			updates.setPosition,
+			'position'
+		)
+		updates.setForgotten &&
+			(await this.indexedDb.putValueWithId(
+				NCT_FORGOTTEN_TABLE_NAME,
+				updates.setForgotten,
+				'forgotten'
+			))
 	}
 
 	saveLastBlock(height: number) {
