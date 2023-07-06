@@ -149,9 +149,7 @@ export class IndexedDb {
 	public async putBulkValue(tableName: TableName, values: object[]) {
 		const tx = this.db.transaction(tableName, 'readwrite')
 		const store = tx.objectStore(tableName)
-		// for (const value of values) {
-		// 	await store.put(value)
-		// }
+
 		for (let i = 0; i < values.length; i++) {
 			await store.put(values[i])
 		}
@@ -181,15 +179,17 @@ export class IndexedDb {
 		return this.db.transaction(storeName, 'readwrite').objectStore(storeName)
 	}
 
-	async clearAllTables(): Promise<void> {
+	async clearAllTables(notClearTable?: TableName): Promise<void> {
 		const db = await this.db
 		const objectStoreNames = db.objectStoreNames
 
 		// Iterate through each object store and clear it
 		for (let i = 0; i < objectStoreNames.length; i++) {
 			const objectStoreName = objectStoreNames[i]
-			const store = this.getObjectStore(objectStoreName)
-			await store.clear()
+			if (objectStoreName !== notClearTable) {
+				const store = this.getObjectStore(objectStoreName)
+				await store.clear()
+			}
 		}
 	}
 

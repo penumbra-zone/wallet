@@ -1,12 +1,9 @@
 import { ChainParametersRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import {
-	AddressByIndexRequest,
 	AssetsRequest,
 	BalanceByAddressRequest,
 	NotesRequest,
-	TransactionInfoByHashRequest,
 	TransactionInfoRequest,
-	TransactionPlannerRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 import pipe from 'callbag-pipe'
 import subscribe from 'callbag-subscribe'
@@ -37,6 +34,7 @@ import {
 	handleMethodCallRequests,
 	SPENDABLE_NOTES_TABLE_NAME,
 	TabsManager,
+	TESTNET_URL,
 	TRANSACTION_TABLE_NAME,
 	WindowManager,
 } from './lib'
@@ -61,7 +59,6 @@ extension.runtime.onConnect.addListener(async remotePort => {
 		bgService.setupUiConnection(remotePort)
 	}
 })
-
 
 async function setupBackgroundService() {
 	const extensionStorage = new ExtensionStorage()
@@ -110,10 +107,6 @@ async function setupBackgroundService() {
 		return tabsManager.getOrCreate(url, name)
 	})
 
-	backgroundService.walletController.on('wallet lock', async () => {
-		await backgroundService.clientController.abortGrpcRequest()
-	})
-
 	backgroundService.walletController.on('wallet create', async () => {
 		await backgroundService.clientController.saveChainParameters()
 		await backgroundService.clientController.getCompactBlockRange()
@@ -126,15 +119,38 @@ async function setupBackgroundService() {
 
 	backgroundService.walletController.on('reset wallet', async () => {
 		await backgroundService.clientController.abortGrpcRequest('reset wallet')
+	})
+
+	backgroundService.clientController.on('abort with clear', async () => {
+		await backgroundService.indexedDb.clearAllTables()
+		await backgroundService.currentAccountController.resetWallet()
 		await backgroundService.remoteConfigController.resetWallet()
 		await backgroundService.networkController.resetWallet()
+		await backgroundService.wasmViewConnector.resetWallet()
+		await backgroundService.clientController.resetWallet()
+		await backgroundService.vaultController.lock()
+	})
+
+	backgroundService.clientController.on(
+		'abort with balance and db clear',
+		async () => {
+			await backgroundService.indexedDb.clearAllTables()
+			await backgroundService.currentAccountController.resetWallet()
+			await backgroundService.remoteConfigController.resetWallet()
+			await backgroundService.clientController.resetWallet()
+			await backgroundService.networkController.resetWallet()
+			await backgroundService.clientController.saveChainParameters()
+			await backgroundService.clientController.getCompactBlockRange()
+		}
+	)
+
+	backgroundService.clientController.on('abort without clear', async () => {
+		await backgroundService.wasmViewConnector.resetWallet()
 		await backgroundService.vaultController.lock()
 	})
 
 	backgroundService.networkController.on('change grpc', async () => {
 		await backgroundService.clientController.abortGrpcRequest('change grpc')
-		await backgroundService.clientController.saveChainParameters()
-		await backgroundService.clientController.getCompactBlockRange()
 	})
 
 	return backgroundService
@@ -252,7 +268,7 @@ class BackgroundService extends EventEmitter {
 			wasmViewConnector: this.wasmViewConnector,
 			getCustomGRPC: () => this.networkController.getCustomGRPC(),
 			resetBalance: () => this.currentAccountController.resetWallet(),
-			deleteViewServer: () => this.wasmViewConnector.resetWallet()
+			deleteViewServer: () => this.wasmViewConnector.resetWallet(),
 		})
 
 		this.viewProtocolService = new ViewProtocolService({
@@ -328,7 +344,13 @@ class BackgroundService extends EventEmitter {
 			initVault: async (password: string) => {
 				this.vaultController.init(password)
 			},
-			lock: async () => this.vaultController.lock(),
+			lock: async () => {
+				const viewServer = this.wasmViewConnector.getViewServer()
+
+				viewServer
+					? await this.clientController.abortGrpcRequest()
+					: await this.vaultController.lock()
+			},
 			unlock: async (password: string) => this.vaultController.unlock(password),
 			addWallet: async (account: CreateWalletInput) =>
 				this.walletController.addWallet(account),
@@ -346,7 +368,20 @@ class BackgroundService extends EventEmitter {
 				this.clientController.getCompactBlockRange(),
 			saveChainParameters: async () =>
 				this.clientController.saveChainParameters(),
-			resetWallet: async () => this.walletController.resetWallet(),
+			resetWallet: async () => {
+				const viewServer = this.wasmViewConnector.getViewServer()
+				if (viewServer) {
+					this.walletController.resetWallet()
+				} else {
+					await this.indexedDb.clearAllTables()
+					await this.currentAccountController.resetWallet()
+					await this.remoteConfigController.resetWallet()
+					await this.networkController.resetWallet()
+					await this.wasmViewConnector.resetWallet()
+					await this.clientController.resetWallet()
+					await this.vaultController.lock()
+				}
+			},
 			setCustomGRPC: async (
 				url: string | null | undefined,
 				network: NetworkName

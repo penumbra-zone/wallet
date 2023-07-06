@@ -12,6 +12,8 @@ import {
 } from '../Svg'
 import { Button } from '../Button'
 import Background from '../../services/Background'
+import { useAccountsSelector } from '../../../account'
+import { selectCurNetwork, selectLastSavedBlock } from '../../redux'
 
 export const links = [
 	// {
@@ -57,6 +59,8 @@ export const links = [
 	},
 ]
 export const SettingSideBar = () => {
+	const lastSavedBlock = useAccountsSelector(selectLastSavedBlock)
+	const currentNetwork = useAccountsSelector(selectCurNetwork)
 	const { pathname } = useLocation()
 	const handleBlock = async () => await Background.lock()
 
@@ -91,6 +95,7 @@ export const SettingSideBar = () => {
 					mode='transparent'
 					onClick={handleBlock}
 					className='w-[100%] mt-[40px]'
+					disabled={!lastSavedBlock[currentNetwork]}
 				/>
 			</div>
 		</div>
