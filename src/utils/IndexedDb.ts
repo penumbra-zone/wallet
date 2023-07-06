@@ -181,15 +181,18 @@ export class IndexedDb {
 		return this.db.transaction(storeName, 'readwrite').objectStore(storeName)
 	}
 
-	async clearAllTables(): Promise<void> {
+	async clearAllTables(notClearTable?: TableName): Promise<void> {
 		const db = await this.db
 		const objectStoreNames = db.objectStoreNames
+		console.log({ objectStoreNames })
 
 		// Iterate through each object store and clear it
 		for (let i = 0; i < objectStoreNames.length; i++) {
 			const objectStoreName = objectStoreNames[i]
-			const store = this.getObjectStore(objectStoreName)
-			await store.clear()
+			if (objectStoreName !== notClearTable) {
+				const store = this.getObjectStore(objectStoreName)
+				await store.clear()
+			}
 		}
 	}
 

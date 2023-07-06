@@ -138,7 +138,39 @@ export class ClientController extends EventEmitter {
 		const lastSavedBlockHeight =
 			this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
 
+		console.log(lastSavedBlockHeight)
+
+		const isRigthSync = await this.wasmViewConnector.checkLastNctRoot(
+			lastSavedBlockHeight === undefined ? 0 : lastSavedBlockHeight 
+		)
 		const chainId = this.getChainId()
+
+		const compactBlockRangeRequest = new CompactBlockRangeRequest()
+
+		console.log({ isRigthSync })
+
+		if (isRigthSync) {
+			compactBlockRangeRequest.chainId = chainId
+			compactBlockRangeRequest.startHeight = BigInt(
+				lastSavedBlockHeight === undefined ? 0 : lastSavedBlockHeight + 1
+			)
+			compactBlockRangeRequest.keepAlive = true
+		} else {
+			compactBlockRangeRequest.chainId = chainId
+			compactBlockRangeRequest.startHeight = BigInt(0)
+			compactBlockRangeRequest.keepAlive = true
+			await this.indexedDb.clearAllTables(CHAIN_PARAMETERS_TABLE_NAME)
+			console.log(await this.indexedDb.getAllValue('nct_commitments'))
+			console.log(await this.indexedDb.getAllValue('nct_forgotten'))
+			console.log(await this.indexedDb.getAllValue('nct_hashes'))
+			console.log(await this.indexedDb.getAllValue('nct_position'))
+
+			console.log(await this.indexedDb.getAllValue('spendable_notes'))
+			await this.wasmViewConnector.setViewServer(fvk)
+		}
+
+		console.log({ compactBlockRangeRequest })
+
 		const baseUrl = this.getGRPC()
 		const lastBlock = await this.getLastExistBlock()
 
@@ -148,17 +180,11 @@ export class ClientController extends EventEmitter {
 
 		const client = createPromiseClient(ObliviousQueryService, transport)
 
-		const compactBlockRangeRequest = new CompactBlockRangeRequest()
-
-		compactBlockRangeRequest.chainId = chainId
-		compactBlockRangeRequest.startHeight = BigInt(
-			lastSavedBlockHeight === undefined ? 0 : lastSavedBlockHeight + 1
-		)
-		compactBlockRangeRequest.keepAlive = true
-
 		let height
 
 		this.abortController = new AbortController()
+		console.log(this.abortController);
+		
 
 		try {
 			for await (const response of client.compactBlockRange(
@@ -240,6 +266,8 @@ export class ClientController extends EventEmitter {
 
 	async saveUpdates() {
 		const updates = await this.wasmViewConnector.loadUpdates()
+
+		console.log({ updates })
 
 		await this.indexedDb.putBulkValue(
 			NCT_COMMITMENTS_TABLE_NAME,

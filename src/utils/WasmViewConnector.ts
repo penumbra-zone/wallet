@@ -116,10 +116,10 @@ export class WasmViewConnector {
 		}
 	}
 	async setViewServer(fvk: string) {
-		if (!this.viewServer) {
-			const storedTree = await this.indexedDb.loadStoredTree()
-			this.viewServer = new ViewServer(fvk, 719n, storedTree)
-		}
+		const storedTree = await this.indexedDb.loadStoredTree()
+		console.log({ storedTree })
+
+		this.viewServer = new ViewServer(fvk, 719n, storedTree)
 	}
 
 	async checkLastNctRoot(block: number) {
@@ -140,7 +140,7 @@ export class WasmViewConnector {
 
 			const nctRoot = this.viewServer.get_nct_root()
 
-			return decodeNctRoot.inner !== nctRoot.inner
+			return decodeNctRoot.inner === nctRoot.inner
 		} catch (error) {
 			console.log(error)
 		}
