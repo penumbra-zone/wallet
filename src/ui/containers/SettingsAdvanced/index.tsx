@@ -2,11 +2,18 @@ import { useEffect, useState } from 'react'
 import { useAccountsSelector } from '../../../account'
 import { useMediaQuery } from '../../../hooks'
 import { Button, Input, ResetWalletModal } from '../../components'
-import { selectIdleInterval } from '../../redux'
+import {
+	selectCurNetwork,
+	selectIdleInterval,
+	selectLastSavedBlock,
+} from '../../redux'
 import Background from '../../services/Background'
 
 export const SettingsAdvanced = () => {
 	const idleInterval = useAccountsSelector(selectIdleInterval)
+	const lastSavedBlock = useAccountsSelector(selectLastSavedBlock)
+	const currentNetwork = useAccountsSelector(selectCurNetwork)
+
 	const isDesktop = useMediaQuery()
 	const [isOpenResetWallet, setIsOpenResetWallet] = useState<boolean>(false)
 	const [timer, setTimer] = useState<string>('')
@@ -74,12 +81,19 @@ export const SettingsAdvanced = () => {
 							/>
 						</div>
 						<div className='flex flex-col'>
-							<p className={`${isDesktop ? 'h3' : 'h2_ext'} ext:mb-[8px] tablet:mb-[16px]`}>Clear cache</p>
+							<p
+								className={`${
+									isDesktop ? 'h3' : 'h2_ext'
+								} ext:mb-[8px] tablet:mb-[16px]`}
+							>
+								Clear cache
+							</p>
 							<Button
 								title='Clear cache'
 								mode='gradient'
 								onClick={toggleShowResetWalletModal(true)}
 								className='ext:w-[100%] tablet:w-[312px]'
+								disabled={!lastSavedBlock[currentNetwork]}
 							/>
 						</div>
 					</div>

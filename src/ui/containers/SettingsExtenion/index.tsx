@@ -2,10 +2,14 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { routesPath } from '../../../utils'
 import { Button, ChevronLeftIcon, CloseSvg } from '../../components'
 import Background from '../../services/Background'
+import { useAccountsSelector } from '../../../account'
+import { selectCurNetwork, selectLastSavedBlock } from '../../redux'
 
 export const SettingsExtenion = () => {
 	const navigate = useNavigate()
 	const { pathname } = useLocation()
+	const lastSavedBlock = useAccountsSelector(selectLastSavedBlock)
+	const currentNetwork = useAccountsSelector(selectCurNetwork)
 
 	const handleBack = () => navigate(routesPath.SETTINGS)
 
@@ -47,6 +51,7 @@ export const SettingsExtenion = () => {
 							title='Block account'
 							mode='gradient'
 							onClick={handleBlock}
+							disabled={!lastSavedBlock[currentNetwork]}
 						/>
 					</div>
 				)}

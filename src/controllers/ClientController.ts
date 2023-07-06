@@ -150,7 +150,6 @@ export class ClientController extends EventEmitter {
 
 		const compactBlockRangeRequest = new CompactBlockRangeRequest()
 
-
 		compactBlockRangeRequest.chainId = chainId
 		compactBlockRangeRequest.startHeight = BigInt(
 			lastSavedBlockHeight === undefined ? 0 : lastSavedBlockHeight + 1
@@ -160,7 +159,6 @@ export class ClientController extends EventEmitter {
 		let height
 
 		this.abortController = new AbortController()
-		console.log(this.abortController)
 
 		try {
 			for await (const response of client.compactBlockRange(
