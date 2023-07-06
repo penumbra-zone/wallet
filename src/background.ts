@@ -34,6 +34,7 @@ import {
 	handleMethodCallRequests,
 	SPENDABLE_NOTES_TABLE_NAME,
 	TabsManager,
+	TESTNET_URL,
 	TRANSACTION_TABLE_NAME,
 	WindowManager,
 } from './lib'
@@ -112,15 +113,6 @@ async function setupBackgroundService() {
 	})
 
 	backgroundService.walletController.on('wallet unlock', async () => {
-		console.log(
-			await backgroundService.indexedDb.getAllValue('nct_commitments')
-		)
-
-		console.log(await backgroundService.indexedDb.getAllValue('nct_forgotten'))
-
-		console.log(await backgroundService.indexedDb.getAllValue('nct_hashes'))
-
-		console.log(await backgroundService.indexedDb.getAllValue('nct_position'))
 		await backgroundService.clientController.saveChainParameters()
 		await backgroundService.clientController.getCompactBlockRange()
 	})

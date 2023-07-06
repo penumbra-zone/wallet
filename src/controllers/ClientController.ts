@@ -138,11 +138,10 @@ export class ClientController extends EventEmitter {
 		const lastSavedBlockHeight =
 			this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
 
-		console.log(lastSavedBlockHeight)
-
-		const isRigthSync = await this.wasmViewConnector.checkLastNctRoot(
-			lastSavedBlockHeight === undefined ? 0 : lastSavedBlockHeight 
-		)
+		const isRigthSync =
+			lastSavedBlockHeight === undefined
+				? false
+				: await this.wasmViewConnector.checkLastNctRoot(lastSavedBlockHeight)
 		const chainId = this.getChainId()
 
 		const compactBlockRangeRequest = new CompactBlockRangeRequest()
@@ -156,20 +155,13 @@ export class ClientController extends EventEmitter {
 			)
 			compactBlockRangeRequest.keepAlive = true
 		} else {
+			await this.resetWallet()
 			compactBlockRangeRequest.chainId = chainId
 			compactBlockRangeRequest.startHeight = BigInt(0)
 			compactBlockRangeRequest.keepAlive = true
 			await this.indexedDb.clearAllTables(CHAIN_PARAMETERS_TABLE_NAME)
-			console.log(await this.indexedDb.getAllValue('nct_commitments'))
-			console.log(await this.indexedDb.getAllValue('nct_forgotten'))
-			console.log(await this.indexedDb.getAllValue('nct_hashes'))
-			console.log(await this.indexedDb.getAllValue('nct_position'))
-
-			console.log(await this.indexedDb.getAllValue('spendable_notes'))
 			await this.wasmViewConnector.setViewServer(fvk)
 		}
-
-		console.log({ compactBlockRangeRequest })
 
 		const baseUrl = this.getGRPC()
 		const lastBlock = await this.getLastExistBlock()
@@ -183,8 +175,6 @@ export class ClientController extends EventEmitter {
 		let height
 
 		this.abortController = new AbortController()
-		console.log(this.abortController);
-		
 
 		try {
 			for await (const response of client.compactBlockRange(
@@ -195,18 +185,20 @@ export class ClientController extends EventEmitter {
 			)) {
 				await this.wasmViewConnector.handleNewCompactBlock(
 					response.compactBlock,
-					fvk
+					Number(response.compactBlock.height) >= lastBlock
 				)
 
 				if (Number(response.compactBlock.height) < lastBlock) {
 					if (Number(response.compactBlock.height) % 1000 === 0) {
-						this.saveUpdates().then(() => {
-							this.saveLastBlock(Number(response.compactBlock.height))
-						})
+						await this.saveUpdates(Number(response.compactBlock.height)).then(
+							() => {
+								this.saveLastBlock(Number(response.compactBlock.height))
+							}
+						)
 					}
 					height = Number(response.compactBlock.height)
 				} else {
-					this.saveUpdates().then(() => {
+					await this.saveUpdates().then(() => {
 						const oldState = this.store.getState().lastSavedBlock
 						const lastSavedBlock = {
 							...oldState,
@@ -226,15 +218,19 @@ export class ClientController extends EventEmitter {
 							lastBlockHeight,
 							lastSavedBlock,
 						})
+						console.log(Number(response.compactBlock.height))
+
+						height = undefined
 					})
 				}
 			}
 		} catch (error) {
 			console.log(error)
 			console.log(this.abortController.signal)
+			console.log(height)
 
 			if (error.message === '[unknown] network error' && error.code === 2) {
-				this.abortGrpcRequest()
+				this.abortGrpcRequest('network error')
 			}
 
 			if (this.abortController.signal.aborted) {
@@ -249,14 +245,10 @@ export class ClientController extends EventEmitter {
 					if (height === undefined) {
 						this.emit('abort without clear')
 					} else {
-						if (Number(height) % 1000 === 0) {
+						await this.saveUpdates().then(async () => {
+							await this.saveLastBlock(height)
 							this.emit('abort without clear')
-						} else {
-							this.saveUpdates().then(async () => {
-								this.saveLastBlock(Number(height))
-								this.emit('abort without clear')
-							})
-						}
+						})
 					}
 				}
 			}
@@ -264,10 +256,8 @@ export class ClientController extends EventEmitter {
 		// this.abortController = new AbortController()
 	}
 
-	async saveUpdates() {
+	async saveUpdates(last?: number) {
 		const updates = await this.wasmViewConnector.loadUpdates()
-
-		console.log({ updates })
 
 		await this.indexedDb.putBulkValue(
 			NCT_COMMITMENTS_TABLE_NAME,

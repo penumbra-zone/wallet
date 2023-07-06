@@ -46,6 +46,7 @@ import {
 import { SpecificQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
 import { PositionState } from '@buf/penumbra-zone_penumbra.grpc_web/penumbra/core/dex/v1alpha1/dex_pb'
 import PositionStateEnum = PositionState.PositionStateEnum
+import { PENUMBRAWALLET_DEBUG } from '../ui/appConfig'
 
 export type ScanResult = {
 	height
@@ -63,7 +64,7 @@ export type NctUpdates = {
 }
 
 export class WasmViewConnector {
-	private indexedDb
+	private indexedDb: IndexedDb
 	private viewServer: ViewServer
 	private configApi
 
@@ -117,7 +118,6 @@ export class WasmViewConnector {
 	}
 	async setViewServer(fvk: string) {
 		const storedTree = await this.indexedDb.loadStoredTree()
-		console.log({ storedTree })
 
 		this.viewServer = new ViewServer(fvk, 719n, storedTree)
 	}
@@ -146,7 +146,7 @@ export class WasmViewConnector {
 		}
 	}
 
-	async handleNewCompactBlock(block: CompactBlock, fvk: string) {
+	async handleNewCompactBlock(block: CompactBlock, isActiveSync: boolean) {
 		const result: ScanResult = await this.viewServer.scan_block_without_updates(
 			block.toJson()
 		)
@@ -163,7 +163,10 @@ export class WasmViewConnector {
 				JSON.parse(block.fmdParameters.toJsonString())
 			)
 
-		if (Number(block.height) % 1000 === 0 || Number(block.height) > 133917) {
+		if (
+			(!(Number(block.height) % 50000) || isActiveSync) &&
+			PENUMBRAWALLET_DEBUG
+		) {
 			try {
 				const transport = createGrpcWebTransport({
 					baseUrl: 'https://grpc.testnet.penumbra.zone',
@@ -182,7 +185,7 @@ export class WasmViewConnector {
 				const nctRoot = this.viewServer.get_nct_root()
 
 				if (decodeNctRoot.inner !== nctRoot.inner) {
-					console.log('bad', block.height)
+					console.log('unsync', block.height)
 				}
 			} catch (error) {
 				console.log(error)
@@ -348,7 +351,7 @@ export class WasmViewConnector {
 		} else {
 			await this.indexedDb.putValue(
 				ASSET_TABLE_NAME,
-				demomResponse.denomMetadata.toJson()
+				demomResponse.denomMetadata.toJson() as object
 			)
 		}
 	}
