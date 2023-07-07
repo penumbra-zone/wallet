@@ -225,9 +225,9 @@ export class ClientController extends EventEmitter {
 				}
 			}
 		} catch (error) {
-			console.log(error)
+			console.log(error.message)
 			console.log(this.abortController.signal)
-			console.log(height)
+			console.log(error.code)
 
 			if (error.message === '[unknown] network error' && error.code === 2) {
 				this.abortGrpcRequest('network error')
