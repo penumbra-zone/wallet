@@ -153,6 +153,10 @@ async function setupBackgroundService() {
 		await backgroundService.clientController.abortGrpcRequest('change grpc')
 	})
 
+	backgroundService.wasmViewConnector.on('update balance', async () => {
+		await backgroundService.currentAccountController.updateAssetBalance()
+	})
+
 	return backgroundService
 }
 
@@ -221,8 +225,6 @@ class BackgroundService extends EventEmitter {
 
 		this.wasmViewConnector = new WasmViewConnector({
 			indexedDb: this.indexedDb,
-			updateAssetBalance: (assetId: string, amount: number) =>
-				this.currentAccountController.updateAssetBalance(assetId, amount),
 			getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
 			getNetwork: () => this.networkController.getNetwork(),
 			getCustomGRPC: () => this.networkController.getCustomGRPC(),
@@ -251,6 +253,7 @@ class BackgroundService extends EventEmitter {
 		})
 
 		this.currentAccountController = new CurrentAccountController({
+			indexedDb: this.indexedDb,
 			extensionStorage: this.extensionStorage,
 		})
 

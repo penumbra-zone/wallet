@@ -16,7 +16,6 @@ import {
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import { base64ToBytes } from './base64'
 import {
-	CurrentAccountController,
 	NetworkController,
 	RemoteConfigController,
 	Transaction,
@@ -47,6 +46,7 @@ import { SpecificQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_conne
 import { PositionState } from '@buf/penumbra-zone_penumbra.grpc_web/penumbra/core/dex/v1alpha1/dex_pb'
 import PositionStateEnum = PositionState.PositionStateEnum
 import { PENUMBRAWALLET_DEBUG } from '../ui/appConfig'
+import EventEmitter from 'events'
 
 export type ScanResult = {
 	height: number
@@ -63,27 +63,25 @@ export type NctUpdates = {
 	store_hashes: []
 }
 
-export class WasmViewConnector {
+export class WasmViewConnector extends EventEmitter {
 	private indexedDb: IndexedDb
 	private viewServer: ViewServer
 	private configApi
 
 	constructor({
 		indexedDb,
-		updateAssetBalance,
 		getNetworkConfig,
 		getNetwork,
 		getCustomGRPC,
 	}: {
 		indexedDb: IndexedDb
-		updateAssetBalance: CurrentAccountController['updateAssetBalance']
 		getNetworkConfig: RemoteConfigController['getNetworkConfig']
 		getNetwork: NetworkController['getNetwork']
 		getCustomGRPC: NetworkController['getCustomGRPC']
 	}) {
+		super()
 		this.indexedDb = indexedDb
 		this.configApi = {
-			updateAssetBalance,
 			getNetworkConfig,
 			getNetwork,
 			getCustomGRPC,
@@ -108,10 +106,8 @@ export class WasmViewConnector {
 						note,
 						note.noteCommitment.inner
 					)
-					await this.configApi.updateAssetBalance(
-						note.note.value.assetId.inner,
-						Number(note.note.value.amount.lo) * -1
-					)
+
+					this.emit('update balance')
 				}
 			}
 		}
@@ -292,10 +288,7 @@ export class WasmViewConnector {
 				note.noteCommitment.inner
 			)
 
-			await this.configApi.updateAssetBalance(
-				note.note.value.assetId.inner,
-				Number(note.note.value.amount.lo)
-			)
+			this.emit('update balance')
 		} else {
 			console.debug('note already stored', note.noteCommitment.inner)
 		}

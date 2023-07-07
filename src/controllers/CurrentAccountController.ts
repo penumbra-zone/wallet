@@ -1,27 +1,46 @@
 import ObservableStore from 'obs-store'
 import { ExtensionStorage } from '../storage'
+import { IndexedDb } from '../utils'
+import { SPENDABLE_NOTES_TABLE_NAME } from '../lib'
 
 export class CurrentAccountController {
 	private store
-	constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
+	private indexedDb: IndexedDb
+	constructor({
+		extensionStorage,
+		indexedDb,
+	}: {
+		extensionStorage: ExtensionStorage
+		indexedDb: IndexedDb
+	}) {
 		this.store = new ObservableStore(
 			extensionStorage.getInitState({
 				balance: {},
 			})
 		)
 		extensionStorage.subscribe(this.store)
+		this.indexedDb = indexedDb
 	}
 
-	async updateAssetBalance(assetId: string, amount: number) {
-		const oldBalances = this.store.getState().balance
+	async updateAssetBalance() {
+		const notes = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
 
-		const balance = (oldBalances[assetId] || 0) + amount
-		const updatedBalances = {
-			...oldBalances,
-			[assetId]: balance,
-		}
+		const filteredNotes = notes.filter(i => !i.heightSpent)
 
-		this.store.updateState({ balance: updatedBalances })
+		const balance = filteredNotes.reduce((acc, i) => {
+			const assetId = i.note.value.assetId.inner
+			const assetAmount = Number(i.note.value.amount.lo)
+
+			if (!acc[assetId]) {
+				acc[assetId] = assetAmount
+			} else {
+				acc[assetId] = acc[assetId] + assetAmount
+			}
+
+			return acc
+		}, {})
+
+		this.store.updateState({ balance })
 	}
 
 	async resetWallet() {
