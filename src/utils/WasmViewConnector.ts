@@ -49,7 +49,7 @@ import PositionStateEnum = PositionState.PositionStateEnum
 import { PENUMBRAWALLET_DEBUG } from '../ui/appConfig'
 
 export type ScanResult = {
-	height
+	height: number
 	nct_updates: NctUpdates
 	new_notes: SpendableNoteRecord[]
 	new_swaps: SwapRecord[]
@@ -116,6 +116,7 @@ export class WasmViewConnector {
 			}
 		}
 	}
+
 	async setViewServer(fvk: string) {
 		const storedTree = await this.indexedDb.loadStoredTree()
 
@@ -142,26 +143,28 @@ export class WasmViewConnector {
 
 			return decodeNctRoot.inner === nctRoot.inner
 		} catch (error) {
-			console.log(error)
+			throw new Error('Sync error')
 		}
 	}
 
-	async handleNewCompactBlock(block: CompactBlock, isActiveSync: boolean) {
+	async handleNewCompactBlock(
+		block: CompactBlock,
+		abortController: AbortController,
+		isActiveSync: boolean
+	) {
 		const result: ScanResult = await this.viewServer.scan_block_without_updates(
 			block.toJson()
 		)
 
-		await this.handleScanResult(result)
+		await this.handleScanResult(result, abortController)
 
 		if (block.nullifiers.length) {
 			for (const nullifier of block.nullifiers) {
 				await this.updateNotes(nullifier, block.height)
 			}
 		}
-		if (block.fmdParameters)
-			await this.saveFmdParameters(
-				JSON.parse(block.fmdParameters.toJsonString())
-			)
+
+		if (block.fmdParameters) await this.saveFmdParameters(block.fmdParameters)
 
 		if (
 			(!(Number(block.height) % 50000) || isActiveSync) &&
@@ -188,7 +191,7 @@ export class WasmViewConnector {
 					console.log('unsync', block.height)
 				}
 			} catch (error) {
-				console.log(error)
+				throw new Error('Sync error')
 			}
 		}
 	}
@@ -199,40 +202,33 @@ export class WasmViewConnector {
 			return
 		}
 
-		try {
-			const lastPosition = await this.indexedDb.getValue(
-				NCT_POSITION_TABLE_NAME,
-				'position'
-			)
+		const lastPosition = await this.indexedDb.getValue(
+			NCT_POSITION_TABLE_NAME,
+			'position'
+		)
 
-			const lastForgotten = await this.indexedDb.getValue(
-				NCT_FORGOTTEN_TABLE_NAME,
-				'forgotten'
-			)
+		const lastForgotten = await this.indexedDb.getValue(
+			NCT_FORGOTTEN_TABLE_NAME,
+			'forgotten'
+		)
 
-			console.log({
-				lastPosition,
-				lastForgotten,
-				viewServer: this.viewServer,
-			})
+		const { nct_updates } = await this.viewServer.get_updates(
+			lastPosition,
+			lastForgotten
+		)
 
-			const { nct_updates } = await this.viewServer.get_updates(
-				lastPosition,
-				lastForgotten
-			)
-
-			return {
-				setForgotten: nct_updates.set_forgotten,
-				setPosition: nct_updates.set_position,
-				storeCommitments: nct_updates.store_commitments,
-				storeHashes: nct_updates.store_hashes,
-			}
-		} catch (error) {
-			console.log(error)
+		return {
+			setForgotten: nct_updates.set_forgotten,
+			setPosition: nct_updates.set_position,
+			storeCommitments: nct_updates.store_commitments,
+			storeHashes: nct_updates.store_hashes,
 		}
 	}
 
-	async handleScanResult(scanResult: ScanResult) {
+	async handleScanResult(
+		scanResult: ScanResult,
+		abortController: AbortController
+	) {
 		if (scanResult.new_notes.length) {
 			const uniqueTxs = new Set()
 
@@ -244,15 +240,14 @@ export class WasmViewConnector {
 				}
 			}
 
-			uniqueTxs.forEach(async i => {
-				try {
-					const tx = await this.getTransaction(base64ToBytes(i))
+			for (const tx of uniqueTxs) {
+				const response = await this.getTransaction(base64ToBytes(tx))
 
-					tx && (await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, tx))
-				} catch (e) {
-					// console.error('tx save failed ', e)
+				if (response) {
+					await this.storeLpnft(response.view)
+					await this.indexedDb.putValue(TRANSACTION_TABLE_NAME, response)
 				}
-			})
+			}
 		}
 
 		for (const swap of scanResult.new_swaps) {
@@ -297,15 +292,15 @@ export class WasmViewConnector {
 				note.noteCommitment.inner
 			)
 
-			await this.storeAsset(note.note.value.assetId)
-
 			await this.configApi.updateAssetBalance(
 				note.note.value.assetId.inner,
 				Number(note.note.value.amount.lo)
 			)
-
-			return note.source.inner
-		} else console.debug('note already stored', note.noteCommitment.inner)
+		} else {
+			console.debug('note already stored', note.noteCommitment.inner)
+		}
+		await this.storeAsset(note.note.value.assetId)
+		return note.source.inner
 	}
 
 	async storeAsset(assetId) {
@@ -323,36 +318,40 @@ export class WasmViewConnector {
 			baseUrl,
 		})
 
-		const client = createPromiseClient(SpecificQueryService, transport)
+		try {
+			const client = createPromiseClient(SpecificQueryService, transport)
 
-		const denomMetadataByIdRequest = new DenomMetadataByIdRequest()
-		denomMetadataByIdRequest.chainId = chainId
-		const asset = new AssetId()
-		asset.inner = base64ToBytes(assetId.inner)
-		denomMetadataByIdRequest.assetId = asset
+			const denomMetadataByIdRequest = new DenomMetadataByIdRequest()
+			denomMetadataByIdRequest.chainId = chainId
+			const asset = new AssetId()
+			asset.inner = base64ToBytes(assetId.inner)
+			denomMetadataByIdRequest.assetId = asset
 
-		const demomResponse = await client.denomMetadataById(
-			denomMetadataByIdRequest
-		)
-
-		if (!demomResponse.denomMetadata) {
-			const denom = base64_to_bech32('passet', assetId.inner)
-
-			await this.indexedDb.putValue(ASSET_TABLE_NAME, {
-				penumbraAssetId: asset.toJson(),
-				base: denom,
-				display: denom,
-				denomUnits: [
-					{
-						denom,
-					},
-				],
-			})
-		} else {
-			await this.indexedDb.putValue(
-				ASSET_TABLE_NAME,
-				demomResponse.denomMetadata.toJson() as object
+			const demomResponse = await client.denomMetadataById(
+				denomMetadataByIdRequest
 			)
+
+			if (!demomResponse.denomMetadata) {
+				const denom = base64_to_bech32('passet', assetId.inner)
+
+				await this.indexedDb.putValue(ASSET_TABLE_NAME, {
+					penumbraAssetId: asset.toJson(),
+					base: denom,
+					display: denom,
+					denomUnits: [
+						{
+							denom,
+						},
+					],
+				})
+			} else {
+				await this.indexedDb.putValue(
+					ASSET_TABLE_NAME,
+					demomResponse.denomMetadata.toJson() as object
+				)
+			}
+		} catch (error) {
+			throw new Error('Sync error')
 		}
 	}
 
@@ -361,6 +360,7 @@ export class WasmViewConnector {
 			this.configApi.getNetworkConfig()[this.configApi.getNetwork()]
 		return chainId
 	}
+
 	getGRPC() {
 		const customGrpc =
 			this.configApi.getCustomGRPC()[this.configApi.getNetwork()]
@@ -414,7 +414,7 @@ export class WasmViewConnector {
 				view: transactionInfo.txv,
 			}
 		} catch (e) {
-			// console.error('getTransaction from tendermint', e)
+			throw new Error('Sync error')
 		}
 	}
 
@@ -430,8 +430,14 @@ export class WasmViewConnector {
 		)
 			return
 
+		const currentTx = await this.indexedDb.getValue(
+			TRANSACTION_TABLE_NAME,
+			txHash
+		)
+
+		if (currentTx) return
+
 		const transaction = await this.getTransactionFromTendermint(txHash)
-		await this.storeLpnft(transaction.view)
 
 		return transaction
 	}
@@ -551,7 +557,7 @@ export class WasmViewConnector {
 	async saveFmdParameters(fmdParameters: FmdParameters) {
 		await this.indexedDb.putValueWithId(
 			FMD_PARAMETERS_TABLE_NAME,
-			fmdParameters,
+			JSON.parse(fmdParameters.toJsonString()),
 			'fmd'
 		)
 	}

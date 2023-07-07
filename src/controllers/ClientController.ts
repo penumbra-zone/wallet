@@ -185,16 +185,15 @@ export class ClientController extends EventEmitter {
 			)) {
 				await this.wasmViewConnector.handleNewCompactBlock(
 					response.compactBlock,
+					this.abortController,
 					Number(response.compactBlock.height) >= lastBlock
 				)
 
 				if (Number(response.compactBlock.height) < lastBlock) {
 					if (Number(response.compactBlock.height) % 1000 === 0) {
-						await this.saveUpdates(Number(response.compactBlock.height)).then(
-							() => {
-								this.saveLastBlock(Number(response.compactBlock.height))
-							}
-						)
+						await this.saveUpdates().then(() => {
+							this.saveLastBlock(Number(response.compactBlock.height))
+						})
 					}
 					height = Number(response.compactBlock.height)
 				} else {
@@ -218,7 +217,6 @@ export class ClientController extends EventEmitter {
 							lastBlockHeight,
 							lastSavedBlock,
 						})
-						console.log(Number(response.compactBlock.height))
 
 						height = undefined
 					})
@@ -226,11 +224,12 @@ export class ClientController extends EventEmitter {
 			}
 		} catch (error) {
 			console.log(error.message)
-			console.log(this.abortController.signal)
-			console.log(error.code)
 
-			if (error.message === '[unknown] network error' && error.code === 2) {
-				this.abortGrpcRequest('network error')
+			if (
+				error.message === 'Sync error' ||
+				error.message === '[unknown] network error'
+			) {
+				this.abortGrpcRequest('sync error')
 			}
 
 			if (this.abortController.signal.aborted) {
@@ -241,6 +240,8 @@ export class ClientController extends EventEmitter {
 					this.abortController.signal.reason === 'reset wallet'
 						? this.emit('abort with clear')
 						: this.emit('abort with balance and db clear')
+				} else if (this.abortController.signal.reason === 'sync error') {
+					this.emit('abort without clear')
 				} else {
 					if (height === undefined) {
 						this.emit('abort without clear')
@@ -253,10 +254,9 @@ export class ClientController extends EventEmitter {
 				}
 			}
 		}
-		// this.abortController = new AbortController()
 	}
 
-	async saveUpdates(last?: number) {
+	async saveUpdates() {
 		const updates = await this.wasmViewConnector.loadUpdates()
 
 		await this.indexedDb.putBulkValue(
