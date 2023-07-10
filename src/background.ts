@@ -227,6 +227,8 @@ class BackgroundService extends EventEmitter {
 			getNetworkConfig: () => this.remoteConfigController.getNetworkConfig(),
 			getNetwork: () => this.networkController.getNetwork(),
 			getCustomGRPC: () => this.networkController.getCustomGRPC(),
+			getAccountFullViewingKey: () =>
+				this.walletController.getAccountFullViewingKeyWithoutPassword(),
 		})
 
 		this.transactionController = new TransactionController({
@@ -277,8 +279,8 @@ class BackgroundService extends EventEmitter {
 			indexedDb: this.indexedDb,
 			extensionStorage: this.extensionStorage,
 			getLastExistBlock: () => this.clientController.getLastExistBlock(),
-			getTransactionFromTendermint: (txHash: string) =>
-				this.wasmViewConnector.getTransactionFromTendermint(txHash),
+			getTransaction: (txHash: string) =>
+				this.wasmViewConnector.getTransaction(txHash),
 			getAccountAddresByIndex: (index: number) =>
 				this.walletController.getAccountAddresByIndex(index),
 			getAccountFullViewingKey: () =>

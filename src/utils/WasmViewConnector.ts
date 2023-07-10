@@ -2,6 +2,7 @@ import {
 	base64_to_bech32,
 	decode_nct_root,
 	decode_transaction,
+	transaction_info,
 	ViewServer,
 } from 'penumbra-wasm'
 import { createGrpcWebTransport } from '@bufbuild/connect-web'
@@ -19,6 +20,7 @@ import {
 	NetworkController,
 	RemoteConfigController,
 	Transaction,
+	WalletController,
 } from '../controllers'
 import {
 	AssetId,
@@ -73,11 +75,13 @@ export class WasmViewConnector extends EventEmitter {
 		getNetworkConfig,
 		getNetwork,
 		getCustomGRPC,
+		getAccountFullViewingKey,
 	}: {
 		indexedDb: IndexedDb
 		getNetworkConfig: RemoteConfigController['getNetworkConfig']
 		getNetwork: NetworkController['getNetwork']
 		getCustomGRPC: NetworkController['getCustomGRPC']
+		getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword']
 	}) {
 		super()
 		this.indexedDb = indexedDb
@@ -85,6 +89,7 @@ export class WasmViewConnector extends EventEmitter {
 			getNetworkConfig,
 			getNetwork,
 			getCustomGRPC,
+			getAccountFullViewingKey,
 		}
 	}
 
@@ -230,7 +235,7 @@ export class WasmViewConnector extends EventEmitter {
 			}
 
 			for (const tx of uniqueTxs) {
-				const response = await this.getTransaction(base64ToBytes(tx))
+				const response = await this.handleNoteSource(base64ToBytes(tx))
 
 				if (response) {
 					await this.storeLpnft(response.view)
@@ -362,7 +367,7 @@ export class WasmViewConnector extends EventEmitter {
 		return tendermint
 	}
 
-	async getTransactionFromTendermint(txHash: string) {
+	async getTransaction(txHash: string) {
 		const tendermint = this.getTendermint()
 		try {
 			let response = await fetch(`${tendermint}/tx?hash=0x${txHash}`, {
@@ -389,8 +394,10 @@ export class WasmViewConnector extends EventEmitter {
 
 			const decodeTransaction = decode_transaction(transactionResponse.txBytes)
 
-			const transactionInfo =
-				this.viewServer.transaction_info(decodeTransaction)
+			const transactionInfo = await transaction_info(
+				this.configApi.getAccountFullViewingKey(),
+				decodeTransaction
+			)
 
 			return {
 				height: Number(transactionResponse.blockHeight),
@@ -404,7 +411,7 @@ export class WasmViewConnector extends EventEmitter {
 		}
 	}
 
-	async getTransaction(sourceHex: Uint8Array) {
+	async handleNoteSource(sourceHex: Uint8Array) {
 		const txHash = this.toHexString(sourceHex)
 
 		// check sourceHex is transaction
@@ -423,7 +430,7 @@ export class WasmViewConnector extends EventEmitter {
 
 		if (currentTx) return
 
-		const transaction = await this.getTransactionFromTendermint(txHash)
+		const transaction = await this.getTransaction(txHash)
 
 		return transaction
 	}
