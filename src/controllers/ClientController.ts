@@ -9,6 +9,7 @@ import {
 	NCT_FORGOTTEN_TABLE_NAME,
 	NCT_HASHES_TABLE_NAME,
 	NCT_POSITION_TABLE_NAME,
+	extension,
 } from '../lib'
 import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
@@ -88,6 +89,12 @@ export class ClientController extends EventEmitter {
 		extensionStorage.subscribe(this.store)
 		this.indexedDb = indexedDb
 		this.wasmViewConnector = wasmViewConnector
+
+		extension.alarms.onAlarm.addListener(({ name }) => {
+			if (name === 'connection') {
+				this.checkInternetConnection()
+			}
+		})
 	}
 
 	async saveChainParameters() {
@@ -227,7 +234,8 @@ export class ClientController extends EventEmitter {
 
 			if (
 				error.message === 'Sync error' ||
-				error.message === '[unknown] network error'
+				error.message === '[unknown] network error' ||
+				error.message === '[unknown] Failed to fetch'
 			) {
 				this.abortGrpcRequest('sync error')
 			}
@@ -241,7 +249,7 @@ export class ClientController extends EventEmitter {
 						? this.emit('abort with clear')
 						: this.emit('abort with balance and db clear')
 				} else if (this.abortController.signal.reason === 'sync error') {
-					this.emit('abort without clear')
+					this.checkInternetConnection()
 				} else {
 					if (height === undefined) {
 						this.emit('abort without clear')
@@ -314,26 +322,30 @@ export class ClientController extends EventEmitter {
 	}
 
 	async getLastExistBlock() {
-		const tendermint = this.getTendermint()
+		try {
+			const tendermint = this.getTendermint()
 
-		const response = await fetch(`${tendermint}/abci_info`, {
-			headers: {
-				'Cache-Control': 'no-cache',
-			},
-		})
-		const data = await response.json()
+			const response = await fetch(`${tendermint}/abci_info`, {
+				headers: {
+					'Cache-Control': 'no-cache',
+				},
+			})
+			const data = await response.json()
 
-		const lastBlock = Number(data.result.response.last_block_height)
-		const oldLastBlockHeight = this.store.getState().lastBlockHeight
+			const lastBlock = Number(data.result.response.last_block_height)
+			const oldLastBlockHeight = this.store.getState().lastBlockHeight
 
-		const lastBlockHeight = {
-			...oldLastBlockHeight,
-			[this.configApi.getNetwork()]: lastBlock,
+			const lastBlockHeight = {
+				...oldLastBlockHeight,
+				[this.configApi.getNetwork()]: lastBlock,
+			}
+
+			this.store.updateState({ lastBlockHeight })
+
+			return lastBlock
+		} catch (error) {
+			console.error(error.message)
 		}
-
-		this.store.updateState({ lastBlockHeight })
-
-		return lastBlock
 	}
 
 	byteArrayToLong = function (/*byte[]*/ byteArray) {
@@ -373,6 +385,8 @@ export class ClientController extends EventEmitter {
 	}
 
 	abortGrpcRequest(reason?: string) {
+		if (!this.abortController) return
+
 		this.abortController.abort(reason)
 	}
 
@@ -395,5 +409,24 @@ export class ClientController extends EventEmitter {
 		const { chainId } =
 			this.configApi.getNetworkConfig()[this.configApi.getNetwork()]
 		return chainId
+	}
+
+	async checkInternetConnection() {
+		extension.alarms.create('connection', {
+			delayInMinutes: 5 / 60,
+		})
+		try {
+			const response = await fetch(this.getGRPC(), { method: 'HEAD' })
+
+			if (response.ok) {
+				extension.alarms.clear('connection')
+				this.saveChainParameters()
+				this.getCompactBlockRange()
+			} else {
+				console.error('Internet connection is not available.')
+			}
+		} catch (error) {
+			return Promise.reject('No internet connection')
+		}
 	}
 }

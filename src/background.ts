@@ -146,7 +146,6 @@ async function setupBackgroundService() {
 
 	backgroundService.clientController.on('abort without clear', async () => {
 		await backgroundService.wasmViewConnector.resetWallet()
-		await backgroundService.vaultController.lock()
 	})
 
 	backgroundService.networkController.on('change grpc', async () => {
@@ -348,11 +347,9 @@ class BackgroundService extends EventEmitter {
 				this.vaultController.init(password)
 			},
 			lock: async () => {
-				const viewServer = this.wasmViewConnector.getViewServer()
-
-				viewServer
-					? await this.clientController.abortGrpcRequest()
-					: await this.vaultController.lock()
+				await this.vaultController.lock()
+				await this.clientController.abortGrpcRequest()
+				extension.alarms.clear('connection')
 			},
 			unlock: async (password: string) => this.vaultController.unlock(password),
 			addWallet: async (account: CreateWalletInput) =>
@@ -372,18 +369,15 @@ class BackgroundService extends EventEmitter {
 			saveChainParameters: async () =>
 				this.clientController.saveChainParameters(),
 			resetWallet: async () => {
-				const viewServer = this.wasmViewConnector.getViewServer()
-				if (viewServer) {
-					this.walletController.resetWallet()
-				} else {
-					await this.indexedDb.clearAllTables()
-					await this.currentAccountController.resetWallet()
-					await this.remoteConfigController.resetWallet()
-					await this.networkController.resetWallet()
-					await this.wasmViewConnector.resetWallet()
-					await this.clientController.resetWallet()
-					await this.vaultController.lock()
-				}
+				await this.walletController.resetWallet()
+				await this.indexedDb.clearAllTables()
+				await this.currentAccountController.resetWallet()
+				await this.remoteConfigController.resetWallet()
+				await this.networkController.resetWallet()
+				await this.wasmViewConnector.resetWallet()
+				await this.clientController.resetWallet()
+				await this.vaultController.lock()
+				extension.alarms.clear('connection')
 			},
 			setCustomGRPC: async (
 				url: string | null | undefined,
