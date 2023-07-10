@@ -157,6 +157,9 @@ export class ClientController extends EventEmitter {
 			return
 		}
 
+		console.log({isRigthSync});
+		
+
 		const chainId = this.getChainId()
 
 		const compactBlockRangeRequest = new CompactBlockRangeRequest()

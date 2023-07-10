@@ -11,9 +11,9 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@buf/penumbra-zone_penumbra.bufbuild_connect-es": "0.10.1-20230621005337-ae9571fec685.1",
-		"@buf/penumbra-zone_penumbra.bufbuild_es": "1.2.1-20230621005337-ae9571fec685.1",
-		"@buf/penumbra-zone_penumbra.grpc_web": "1.4.2-20230621005337-ae9571fec685.2",
+		"@buf/penumbra-zone_penumbra.bufbuild_connect-es": "^0.11.0-20230701001026-38a482841770.1",
+		"@buf/penumbra-zone_penumbra.bufbuild_es": "^1.2.1-20230701001026-38a482841770.1",
+		"@buf/penumbra-zone_penumbra.grpc_web": "^1.4.2-20230701001026-38a482841770.2",
 		"@bufbuild/connect-web": "^0.9.1",
 		"@reduxjs/toolkit": "^1.8.6",
 		"bip39": "^3.0.4",
