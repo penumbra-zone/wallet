@@ -3,12 +3,12 @@ import { AccountsState } from '../../../account/rootReducer'
 
 type Init = {
 	isInitialized: boolean | undefined
-	isLocked: boolean
+	isLocked: boolean | undefined
 }
 
 const init: Init = {
-	isInitialized: false,
-	isLocked: false,
+	isInitialized: undefined,
+	isLocked: undefined,
 }
 
 const state = createSlice({

@@ -19,7 +19,12 @@ export const RootAccounts = () => {
 	const isRedirect = useAccountsSelector(selectRedirectToAccountPage)
 
 	useEffect(() => {
-		if (!isRedirect) return
+		if (
+			!isRedirect ||
+			state.isInitialized === undefined ||
+			state.isLocked === undefined
+		)
+			return
 
 		if (
 			state.isInitialized &&
@@ -35,15 +40,17 @@ export const RootAccounts = () => {
 			if (pathname === routesPath.VALIDATORS) {
 				return navigate(routesPath.VALIDATORS)
 			}
-			if (pathname === routesPath.FORGOT_PASSWORD) {
-				return navigate(routesPath.FORGOT_PASSWORD)
-			}
 			return navigate(routesPath.HOME)
 		}
 
 		if (!state.isInitialized) return navigate(routesPath.WELCOME)
 
-		if (state.isInitialized && state.isLocked) return navigate(routesPath.LOGIN)
+		if (
+			state.isInitialized &&
+			state.isLocked &&
+			pathname !== routesPath.FORGOT_PASSWORD
+		)
+			return navigate(routesPath.LOGIN)
 	}, [state.isInitialized, state.isLocked, selectedAccount, isRedirect])
 
 	return (

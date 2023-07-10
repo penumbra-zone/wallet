@@ -30,10 +30,10 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
 
 	// //logic to show popup after create
 	useEffect(() => {
-		// dispatch(accountsActions.setRedirectAccountPage(true))
-		// return () => {
-		// 	dispatch(accountsActions.setRedirectAccountPage(true))
-		// }
+		dispatch(accountsActions.setRedirectAccountPage(false))
+		return () => {
+			dispatch(accountsActions.setRedirectAccountPage(true))
+		}
 	}, [])
 
 	const handleBack = () => navigate(routesPath.LOGIN)
@@ -97,13 +97,14 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
 			})
 		)
 
-		// setIsShowModal(true)
+		setIsShowModal(true)
 	}
 	// const handleCloseModal = () => {
 	// 	setIsShowModal(false)
 	// 	// navigate(routesPath.HOME)
 	// 	dispatch(accountsActions.setRedirectAccountPage(true))
 	// }
+	const handleCloseModal = () => setIsShowModal(false)
 
 	return (
 		<>
@@ -170,7 +171,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
 					</div>
 				</div>
 			</div>
-			{/* <SuccessCreateModal show={isShowModal} onClose={handleCloseModal} /> */}
+			<SuccessCreateModal show={isShowModal} onClose={handleCloseModal} />
 		</>
 	)
 }
