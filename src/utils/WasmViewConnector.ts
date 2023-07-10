@@ -122,7 +122,7 @@ export class WasmViewConnector extends EventEmitter {
 	async checkLastNctRoot(block: number) {
 		try {
 			const transport = createGrpcWebTransport({
-				baseUrl: 'https://grpc.testnet.penumbra.zone',
+				baseUrl: this.getGRPC(),
 			})
 
 			const client = createPromiseClient(SpecificQueryService, transport)
@@ -143,16 +143,12 @@ export class WasmViewConnector extends EventEmitter {
 		}
 	}
 
-	async handleNewCompactBlock(
-		block: CompactBlock,
-		abortController: AbortController,
-		isActiveSync: boolean
-	) {
+	async handleNewCompactBlock(block: CompactBlock, isActiveSync: boolean) {
 		const result: ScanResult = await this.viewServer.scan_block_without_updates(
 			block.toJson()
 		)
 
-		await this.handleScanResult(result, abortController)
+		await this.handleScanResult(result)
 
 		if (block.nullifiers.length) {
 			for (const nullifier of block.nullifiers) {
@@ -168,7 +164,7 @@ export class WasmViewConnector extends EventEmitter {
 		) {
 			try {
 				const transport = createGrpcWebTransport({
-					baseUrl: 'https://grpc.testnet.penumbra.zone',
+					baseUrl: this.getGRPC(),
 				})
 
 				const client = createPromiseClient(SpecificQueryService, transport)
@@ -221,10 +217,7 @@ export class WasmViewConnector extends EventEmitter {
 		}
 	}
 
-	async handleScanResult(
-		scanResult: ScanResult,
-		abortController: AbortController
-	) {
+	async handleScanResult(scanResult: ScanResult) {
 		if (scanResult.new_notes.length) {
 			const uniqueTxs = new Set()
 

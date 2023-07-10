@@ -145,15 +145,21 @@ export class ClientController extends EventEmitter {
 		const lastSavedBlockHeight =
 			this.store.getState().lastSavedBlock[this.configApi.getNetwork()]
 
-		const isRigthSync =
-			lastSavedBlockHeight === undefined
-				? false
-				: await this.wasmViewConnector.checkLastNctRoot(lastSavedBlockHeight)
+		let isRigthSync
+
+		try {
+			isRigthSync =
+				lastSavedBlockHeight === undefined
+					? false
+					: await this.wasmViewConnector.checkLastNctRoot(lastSavedBlockHeight)
+		} catch (error) {
+			this.checkInternetConnection()
+			return
+		}
+
 		const chainId = this.getChainId()
 
 		const compactBlockRangeRequest = new CompactBlockRangeRequest()
-
-		console.log({ isRigthSync })
 
 		if (isRigthSync) {
 			compactBlockRangeRequest.chainId = chainId
@@ -192,7 +198,6 @@ export class ClientController extends EventEmitter {
 			)) {
 				await this.wasmViewConnector.handleNewCompactBlock(
 					response.compactBlock,
-					this.abortController,
 					Number(response.compactBlock.height) >= lastBlock
 				)
 
@@ -385,9 +390,7 @@ export class ClientController extends EventEmitter {
 	}
 
 	abortGrpcRequest(reason?: string) {
-		if (!this.abortController) return
-
-		this.abortController.abort(reason)
+		if (this.abortController) this.abortController.abort(reason)
 	}
 
 	getGRPC() {
