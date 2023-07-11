@@ -238,7 +238,7 @@ export class ClientController extends EventEmitter {
 				}
 			}
 		} catch (error) {
-			console.log(error)
+			console.error(error)
 
 			if (
 				error.message === 'Sync error' ||
