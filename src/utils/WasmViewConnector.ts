@@ -443,8 +443,6 @@ export class WasmViewConnector extends EventEmitter {
 					{ state: PositionStateEnum.POSITION_STATE_ENUM_OPENED }
 				)
 
-				console.log(opened)
-
 				await this.indexedDb.putValue(
 					ASSET_TABLE_NAME,
 					opened)
