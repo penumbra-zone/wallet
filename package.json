@@ -16,6 +16,7 @@
 		"@buf/penumbra-zone_penumbra.grpc_web": "^1.4.2-20230701001026-38a482841770.2",
 		"@bufbuild/connect-web": "^0.9.1",
 		"@reduxjs/toolkit": "^1.8.6",
+		"bech32": "^2.0.0",
 		"bip39": "^3.0.4",
 		"bufbuild": "^0.2.0",
 		"callbag": "^1.5.1",

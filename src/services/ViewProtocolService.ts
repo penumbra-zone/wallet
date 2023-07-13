@@ -1,9 +1,10 @@
 import { ClientController, WalletController } from '../controllers'
 import { ExtensionStorage } from '../storage'
 import { IAsset } from '../types/asset'
-import { IndexedDb } from '../utils'
+import { IndexedDb, uint8ArrayToHexString } from '../utils'
 import {
 	AddressByIndexRequest,
+	AddressByIndexResponse,
 	AssetsRequest,
 	AssetsResponse,
 	BalanceByAddressRequest,
@@ -38,7 +39,9 @@ import {
 } from '../lib'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
 import * as wasm from 'penumbra-wasm'
-import { bytesToBase64 } from '../utils/base64'
+import { base64decode, bytesToBase64 } from '../utils/base64'
+import { bech32m } from 'bech32'
+import { Address } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -239,8 +242,6 @@ export class ViewProtocolService {
 	async getWitness(request?: WitnessRequest) {
 		return new WitnessResponse({}).toBinary()
 	}
-	
-	
 
 	async getTransactionPlanner(req?: string) {
 		try {
@@ -249,7 +250,7 @@ export class ViewProtocolService {
 			let transactionPlan
 			if (request.outputs.length) {
 				let notes = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
-				
+
 				notes = notes
 					.filter(note => note.heightSpent === undefined)
 					.filter(
@@ -296,9 +297,14 @@ export class ViewProtocolService {
 	async getAddressByIndex(request: string) {
 		const req = new AddressByIndexRequest().fromJsonString(request)
 		const address = await this.getAccountAddresByIndex(req.addressIndex.account)
+
+		const decodeAddress = bech32m.decode(address, 160)
+
 		return {
 			address: {
-				inner: address,
+				inner: bytesToBase64(
+					new Uint8Array(bech32m.fromWords(decodeAddress.words))
+				),
 				altBech32m: address,
 			},
 		}
