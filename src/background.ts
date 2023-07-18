@@ -28,14 +28,10 @@ import {
 } from './controllers'
 import { TransactionController } from './controllers/TransactionController'
 import {
-	ASSET_TABLE_NAME,
 	extension,
 	fromPort,
 	handleMethodCallRequests,
-	SPENDABLE_NOTES_TABLE_NAME,
 	TabsManager,
-	TESTNET_URL,
-	TRANSACTION_TABLE_NAME,
 	WindowManager,
 } from './lib'
 import { MessageInputOfType, MessageStatus } from './messages/types'
@@ -47,7 +43,7 @@ import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
 import { IndexedDb, TableName } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
 import { CreateWalletInput, ISeedWalletInput } from './wallets'
-import { decode_transaction, ViewServer } from 'penumbra-wasm'
+import { decode_transaction } from 'penumbra-wasm'
 
 const bgPromise = setupBackgroundService()
 
@@ -300,21 +296,7 @@ class BackgroundService extends EventEmitter {
 		const connectionId = nanoid()
 		const inpageApi = this.getInpageApi(origin, connectionId)
 
-		const actionObj = {
-			[ASSET_TABLE_NAME]: 'assets',
-			[SPENDABLE_NOTES_TABLE_NAME]: 'notes',
-			[TRANSACTION_TABLE_NAME]: 'transactions',
-		}
-
-		this.indexedDb.addObserver((action, data) => {
-			if (!port) return
-
-			return port.postMessage({
-				penumbraMethod: actionObj[action],
-				origin,
-				data,
-			})
-		})
+		this.indexedDb.addPort(port)
 
 		pipe(
 			fromPort(port),
@@ -323,6 +305,7 @@ class BackgroundService extends EventEmitter {
 			}),
 			subscribe({
 				complete: () => {
+					//TODO delete port from indexedDB
 					port = null
 				},
 			})

@@ -17,7 +17,9 @@ import {
 	TransactionInfoByHashRequest,
 	TransactionInfoByHashResponse,
 	TransactionInfoRequest,
-	TransactionInfoResponse, TransactionPlannerRequest, TransactionPlannerResponse,
+	TransactionInfoResponse,
+	TransactionPlannerRequest,
+	TransactionPlannerResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
 
 type Events =
@@ -161,12 +163,7 @@ globalThis.penumbra = {
 				if (event === 'status') {
 					const updatedValue = await proxy.getStatusStream()
 					cb(new StatusStreamResponse().fromJson(updatedValue as any))
-				}
-				//  else if (event === 'state') {
-				// 	const updatedValue = await penumbra.publicState()
-				// 	cb(updatedValue)
-				// }
-				else if (event === 'balance') {
+				} else if (event === 'balance') {
 					const data = await penumbra.getBalanceByAddress({} as any)
 
 					for (let i = 0; i < data.length; i++) {

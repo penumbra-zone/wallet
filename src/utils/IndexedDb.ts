@@ -1,4 +1,4 @@
-import { deleteDB, IDBPDatabase, openDB } from 'idb'
+import { IDBPDatabase, openDB } from 'idb'
 import {
 	ASSET_TABLE_NAME,
 	CHAIN_PARAMETERS_TABLE_NAME,
@@ -47,12 +47,12 @@ export type TableName =
 export class IndexedDb {
 	private database: string
 	private db: any
-	private observer
+	private ports: chrome.runtime.Port[]
 
 	constructor() {
 		this.database = 'penumbra'
 		this.createObjectStore()
-		this.observer = null
+		this.ports = []
 	}
 
 	public async createObjectStore() {
@@ -95,7 +95,9 @@ export class IndexedDb {
 
 					const notesStore = db.createObjectStore(SPENDABLE_NOTES_TABLE_NAME)
 
-					notesStore.createIndex("nullifier","nullifier.inner", {unique: true})
+					notesStore.createIndex('nullifier', 'nullifier.inner', {
+						unique: true,
+					})
 
 					db.createObjectStore(TRANSACTION_BY_NULLIFIER_TABLE_NAME, {
 						autoIncrement: true,
@@ -130,8 +132,25 @@ export class IndexedDb {
 		const store = tx.objectStore(tableName)
 		const result = await store.put(value)
 
-		if (this.observer) {
-			this.observer(tableName, value)
+		if (
+			tableName === TRANSACTION_TABLE_NAME ||
+			tableName === ASSET_TABLE_NAME ||
+			tableName === SPENDABLE_NOTES_TABLE_NAME
+		) {
+			//TODO handle ASSET_TABLE_NAME,SPENDABLE_NOTES_TABLE_NAME
+			const actionObj = {
+				[ASSET_TABLE_NAME]: 'assets',
+				[SPENDABLE_NOTES_TABLE_NAME]: 'notes',
+				[TRANSACTION_TABLE_NAME]: 'transactions',
+			}
+
+			for (const port of this.ports) {
+				port.postMessage({
+					penumbraMethod: 'transactions',
+					origin: port.sender.origin,
+					data: value,
+				})
+			}
 		}
 
 		return result
@@ -141,8 +160,25 @@ export class IndexedDb {
 		const tx = this.db.transaction(tableName, 'readwrite')
 		const store = tx.objectStore(tableName)
 		const result = await store.put(value, id)
-		if (this.observer) {
-			this.observer(tableName, value)
+
+		if (
+			tableName === TRANSACTION_TABLE_NAME ||
+			tableName === ASSET_TABLE_NAME ||
+			tableName === SPENDABLE_NOTES_TABLE_NAME
+		) {
+			//TODO handle ASSET_TABLE_NAME,SPENDABLE_NOTES_TABLE_NAME
+			const actionObj = {
+				[ASSET_TABLE_NAME]: 'assets',
+				[SPENDABLE_NOTES_TABLE_NAME]: 'notes',
+				[TRANSACTION_TABLE_NAME]: 'transactions',
+			}
+			for (const port of this.ports) {
+				port.postMessage({
+					penumbraMethod: 'transactions',
+					origin: port.sender.origin,
+					data: value,
+				})
+			}
 		}
 
 		return result
@@ -195,13 +231,11 @@ export class IndexedDb {
 		}
 	}
 
-	addObserver(callback) {
-		this.observer = callback
+	addPort(port: chrome.runtime.Port) {
+		this.ports.push(port)
 	}
 
-	removeObserver() {
-		this.observer = null
-	}
+	//TODO delete port
 
 	public async loadStoredTree(): Promise<StoredTree> {
 		// return result
