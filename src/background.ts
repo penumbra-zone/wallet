@@ -9,6 +9,7 @@ import pipe from 'callbag-pipe'
 import subscribe from 'callbag-subscribe'
 import EventEmitter from 'events'
 import { nanoid } from 'nanoid'
+import { decode_transaction } from 'penumbra-wasm'
 import {
 	ClientController,
 	Contact,
@@ -18,8 +19,8 @@ import {
 	MessageController,
 	NetworkController,
 	NetworkName,
-	PermissionController,
 	PERMISSIONS,
+	PermissionController,
 	PermissionType,
 	PreferencesController,
 	RemoteConfigController,
@@ -28,11 +29,11 @@ import {
 } from './controllers'
 import { TransactionController } from './controllers/TransactionController'
 import {
+	TabsManager,
+	WindowManager,
 	extension,
 	fromPort,
 	handleMethodCallRequests,
-	TabsManager,
-	WindowManager,
 } from './lib'
 import { MessageInputOfType, MessageStatus } from './messages/types'
 import { PreferencesAccount } from './preferences'
@@ -43,7 +44,6 @@ import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
 import { IndexedDb, TableName } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
 import { CreateWalletInput, ISeedWalletInput } from './wallets'
-import { decode_transaction } from 'penumbra-wasm'
 
 const bgPromise = setupBackgroundService()
 
@@ -296,7 +296,7 @@ class BackgroundService extends EventEmitter {
 		const connectionId = nanoid()
 		const inpageApi = this.getInpageApi(origin, connectionId)
 
-		this.indexedDb.addPort(port)
+		this.indexedDb.addConnectedPagePort({ port, connectionId })
 
 		pipe(
 			fromPort(port),
@@ -305,7 +305,8 @@ class BackgroundService extends EventEmitter {
 			}),
 			subscribe({
 				complete: () => {
-					//TODO delete port from indexedDB
+					this.indexedDb.deleteConnectedPagePort(connectionId)
+
 					port = null
 				},
 			})

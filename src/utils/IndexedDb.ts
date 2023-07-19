@@ -47,12 +47,15 @@ export type TableName =
 export class IndexedDb {
 	private database: string
 	private db: any
-	private ports: chrome.runtime.Port[]
+	private connectedPagesPorts: {
+		port: chrome.runtime.Port
+		connectionId: string
+	}[]
 
 	constructor() {
 		this.database = 'penumbra'
 		this.createObjectStore()
-		this.ports = []
+		this.connectedPagesPorts = []
 	}
 
 	public async createObjectStore() {
@@ -132,26 +135,7 @@ export class IndexedDb {
 		const store = tx.objectStore(tableName)
 		const result = await store.put(value)
 
-		if (
-			tableName === TRANSACTION_TABLE_NAME ||
-			tableName === ASSET_TABLE_NAME ||
-			tableName === SPENDABLE_NOTES_TABLE_NAME
-		) {
-			//TODO handle ASSET_TABLE_NAME,SPENDABLE_NOTES_TABLE_NAME
-			const actionObj = {
-				[ASSET_TABLE_NAME]: 'assets',
-				[SPENDABLE_NOTES_TABLE_NAME]: 'notes',
-				[TRANSACTION_TABLE_NAME]: 'transactions',
-			}
-
-			for (const port of this.ports) {
-				port.postMessage({
-					penumbraMethod: 'transactions',
-					origin: port.sender.origin,
-					data: value,
-				})
-			}
-		}
+		this.sendChangesToDapp(tableName, value)
 
 		return result
 	}
@@ -161,25 +145,7 @@ export class IndexedDb {
 		const store = tx.objectStore(tableName)
 		const result = await store.put(value, id)
 
-		if (
-			tableName === TRANSACTION_TABLE_NAME ||
-			tableName === ASSET_TABLE_NAME ||
-			tableName === SPENDABLE_NOTES_TABLE_NAME
-		) {
-			//TODO handle ASSET_TABLE_NAME,SPENDABLE_NOTES_TABLE_NAME
-			const actionObj = {
-				[ASSET_TABLE_NAME]: 'assets',
-				[SPENDABLE_NOTES_TABLE_NAME]: 'notes',
-				[TRANSACTION_TABLE_NAME]: 'transactions',
-			}
-			for (const port of this.ports) {
-				port.postMessage({
-					penumbraMethod: 'transactions',
-					origin: port.sender.origin,
-					data: value,
-				})
-			}
-		}
+		this.sendChangesToDapp(tableName, value)
 
 		return result
 	}
@@ -231,11 +197,21 @@ export class IndexedDb {
 		}
 	}
 
-	addPort(port: chrome.runtime.Port) {
-		this.ports.push(port)
+	addConnectedPagePort(value: {
+		port: chrome.runtime.Port
+		connectionId: string
+	}) {
+		this.connectedPagesPorts.push(value)
+		console.log({ add: this.connectedPagesPorts })
 	}
 
-	//TODO delete port
+	deleteConnectedPagePort(connectionId: string) {
+		this.connectedPagesPorts = this.connectedPagesPorts.filter(
+			i => i.connectionId !== connectionId
+		)
+
+		console.log({ delete: this.connectedPagesPorts })
+	}
 
 	public async loadStoredTree(): Promise<StoredTree> {
 		// return result
@@ -259,6 +235,28 @@ export class IndexedDb {
 			hashes: nctHashes,
 			last_forgotten: nctForgotten,
 			last_position: nctPosition,
+		}
+	}
+
+	public sendChangesToDapp(tableName: TableName, data: object) {
+		if (
+			tableName === TRANSACTION_TABLE_NAME ||
+			tableName === ASSET_TABLE_NAME ||
+			tableName === SPENDABLE_NOTES_TABLE_NAME
+		) {
+			const replaceObject = {
+				[ASSET_TABLE_NAME]: 'assets',
+				[SPENDABLE_NOTES_TABLE_NAME]: 'notes',
+				[TRANSACTION_TABLE_NAME]: 'transactions',
+			}
+
+			for (const { port } of this.connectedPagesPorts) {
+				port.postMessage({
+					penumbraMethod: replaceObject[tableName],
+					origin: port.sender.origin,
+					data,
+				})
+			}
 		}
 	}
 }
