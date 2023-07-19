@@ -120,7 +120,7 @@ export class ViewProtocolService {
 		const lasBlock = await this.getLastExistBlock()
 
 		return new StatusStreamResponse().fromJson({
-			syncHeight: lastSavedBlock.testnet,
+			syncHeight: lastSavedBlock.testnet || 0,
 			latestKnownBlockHeight: lasBlock,
 		})
 	}
