@@ -278,7 +278,7 @@ export class WasmViewConnector extends EventEmitter {
 			SPENDABLE_NOTES_TABLE_NAME,
 			note.noteCommitment.inner
 		)
-
+		await this.storeAsset(note.note.value.assetId)
 		if (!storedNote) {
 			await this.indexedDb.putValueWithId(
 				SPENDABLE_NOTES_TABLE_NAME,
@@ -290,7 +290,7 @@ export class WasmViewConnector extends EventEmitter {
 		} else {
 			console.debug('note already stored', note.noteCommitment.inner)
 		}
-		await this.storeAsset(note.note.value.assetId)
+	
 		return note.source.inner
 	}
 
