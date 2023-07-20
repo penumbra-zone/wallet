@@ -635,7 +635,7 @@ const tx = await window.penumbra.signTransaction(transactionPlan?.toJson())
 ### 1. Add the full path to the wasm artifacts directory to .env
 
  ```bash
-  LOCAL_PACKAGES_PATH= <full_path>
+  WASM_ARTIFACTS_DIRECTORY_PATH= <full_path>
   ```
 
 ### 2. Run command
