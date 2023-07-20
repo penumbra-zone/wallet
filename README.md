@@ -1,8 +1,8 @@
 ### Local installation of wallet extension in chrome
-1. `   npm install
+1. `npm install
 `
 
-2. `npm run start
+2. `npm run dev
 `
 3. Go to extensions management page in chrome [chrome://extensions/
 ](chrome://extensions/)
