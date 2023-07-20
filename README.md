@@ -632,7 +632,7 @@ const tx = await window.penumbra.signTransaction(transactionPlan?.toJson())
 
 ## Testing local wasm artifacts directory
 
-### 1. Add full path to wasm artifacts directory to .env
+### 1. Add the full path to the wasm artifacts directory to .env
 
  ```bash
   LOCAL_PACKAGES_PATH= <full_path>
