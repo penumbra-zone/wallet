@@ -1,16 +1,11 @@
-import {
-	base64_to_bech32,
-	build_tx,
-	encode_tx,
-	is_controlled_address,
-} from 'penumbra-wasm'
+
 import {
 	ActionArrayType,
 	ActionType,
 	TransactionMessageData,
 	TransactionPlan,
 } from '../types/transaction'
-import { IndexedDb } from '../utils'
+import { IndexedDb, penumbraWasm } from '../utils'
 import { bytesToBase64 } from '../utils/base64'
 import { NetworkController } from './NetworkController'
 import { RemoteConfigController } from './RemoteConfigController'
@@ -85,13 +80,13 @@ export class TransactionController {
 
 				//encode recipinet address
 				const encodeRecipientAddress = destAddress
-					? base64_to_bech32('penumbrav2t', destAddress)
+					? penumbraWasm.base64_to_bech32('penumbrav2t', destAddress)
 					: ''
 				//check is recipient address is exist for current user
 				let isOwnAddress: undefined | { inner: string }
 				try {
 					if (key !== 'spend')
-						isOwnAddress = is_controlled_address(fvk, encodeRecipientAddress)
+						isOwnAddress = penumbraWasm.is_controlled_address(fvk, encodeRecipientAddress)
 				} catch (error) {
 					console.error('is_controlled_address', error)
 				}
@@ -129,9 +124,9 @@ export class TransactionController {
 
 		const storedTree = await this.indexedDb.loadStoredTree()
 
-		const buildTx = build_tx(spendingKey, fvk, sendPlan, storedTree)
+		const buildTx = penumbraWasm.build_tx(spendingKey, fvk, sendPlan, storedTree)
 
-		const encodeTx = await encode_tx(buildTx)
+		const encodeTx = await penumbraWasm.encode_tx(buildTx)
 
 		const resp = await this.broadcastTx(bytesToBase64(encodeTx))
 

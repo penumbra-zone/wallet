@@ -1,10 +1,8 @@
 import { ClientController, WalletController } from '../controllers'
 import { ExtensionStorage } from '../storage'
-import { IAsset } from '../types/asset'
-import { IndexedDb, uint8ArrayToHexString } from '../utils'
+import { IndexedDb, penumbraWasm } from '../utils'
 import {
 	AddressByIndexRequest,
-	AddressByIndexResponse,
 	AssetsRequest,
 	AssetsResponse,
 	BalanceByAddressRequest,
@@ -22,11 +20,9 @@ import {
 	StatusStreamRequest,
 	StatusStreamResponse,
 	TransactionInfoByHashRequest,
-	TransactionInfoByHashResponse,
 	TransactionInfoRequest,
 	TransactionInfoResponse,
 	TransactionPlannerRequest,
-	TransactionPlannerResponse,
 	WitnessRequest,
 	WitnessResponse,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
@@ -38,10 +34,8 @@ import {
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
-import * as wasm from 'penumbra-wasm'
-import { base64decode, bytesToBase64 } from '../utils/base64'
+import { bytesToBase64 } from '../utils/base64'
 import { bech32m } from 'bech32'
-import { Address } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -278,7 +272,7 @@ export class ViewProtocolService {
 					fmd_parameters: fmdParameters,
 				}
 
-				transactionPlan = await wasm.send_plan(
+				transactionPlan = await penumbraWasm.send_plan(
 					this.getAccountFullViewingKey(),
 					request.outputs[0].value.toJson(),
 					request.outputs[0].address.altBech32m,

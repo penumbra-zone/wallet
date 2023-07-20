@@ -1,9 +1,4 @@
-import {
-	generate_spend_key,
-	get_address_by_index,
-	get_full_viewing_key,
-	get_short_address_by_index,
-} from 'penumbra-wasm'
+import { penumbraWasm } from '../utils'
 import { WalletPrivateDataOfType } from './types'
 import { Wallet } from './wallet'
 
@@ -31,11 +26,14 @@ export class SeedWallet extends Wallet<WalletPrivateDataOfType<'seed'>> {
 	}
 
 	getAddressByIndex(index: number) {
-		return get_address_by_index(this.getFullViewingKey(), index)
+		return penumbraWasm.get_address_by_index(this.getFullViewingKey(), index)
 	}
 
 	getShortAddressByIndex(index: number) {
-		return get_short_address_by_index(this.getFullViewingKey(), index)
+		return penumbraWasm.get_short_address_by_index(
+			this.getFullViewingKey(),
+			index
+		)
 	}
 
 	getSeed() {
@@ -43,10 +41,10 @@ export class SeedWallet extends Wallet<WalletPrivateDataOfType<'seed'>> {
 	}
 
 	getSpendKey() {
-		return generate_spend_key(this.getSeed())
+		return penumbraWasm.generate_spend_key(this.getSeed())
 	}
 
 	getFullViewingKey() {
-		return get_full_viewing_key(this.getSpendKey())
+		return penumbraWasm.get_full_viewing_key(this.getSpendKey())
 	}
 }

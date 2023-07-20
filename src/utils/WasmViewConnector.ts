@@ -1,10 +1,3 @@
-import {
-	base64_to_bech32,
-	decode_nct_root,
-	decode_transaction,
-	transaction_info,
-	ViewServer,
-} from 'penumbra-wasm'
 import { createGrpcWebTransport } from '@bufbuild/connect-web'
 import { createPromiseClient } from '@bufbuild/connect'
 import {
@@ -24,8 +17,6 @@ import {
 } from '../controllers'
 import {
 	AssetId,
-	DenomMetadata,
-	DenomUnit,
 	Nullifier,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { IndexedDb } from './IndexedDb'
@@ -49,6 +40,7 @@ import { PositionState } from '@buf/penumbra-zone_penumbra.grpc_web/penumbra/cor
 import PositionStateEnum = PositionState.PositionStateEnum
 import { PENUMBRAWALLET_DEBUG } from '../ui/appConfig'
 import EventEmitter from 'events'
+import { penumbraWasm } from './wrapperPenumbraWasmLibrary'
 
 export type ScanResult = {
 	height: number
@@ -67,7 +59,7 @@ export type NctUpdates = {
 
 export class WasmViewConnector extends EventEmitter {
 	private indexedDb: IndexedDb
-	private viewServer: ViewServer
+	private viewServer
 	private configApi
 
 	constructor({
@@ -121,7 +113,7 @@ export class WasmViewConnector extends EventEmitter {
 	async setViewServer(fvk: string) {
 		const storedTree = await this.indexedDb.loadStoredTree()
 
-		this.viewServer = new ViewServer(fvk, 719n, storedTree)
+		this.viewServer = new penumbraWasm.ViewServer(fvk, 719n, storedTree)
 	}
 
 	async checkLastNctRoot(block: number) {
@@ -136,7 +128,7 @@ export class WasmViewConnector extends EventEmitter {
 			keyValueRequest.key = `sct/anchor/${String(block)}`
 			let keyValue = await client.keyValue(keyValueRequest)
 
-			let decodeNctRoot = decode_nct_root(
+			let decodeNctRoot = penumbraWasm.decode_nct_root(
 				this.toHexString(keyValue.value.value)
 			)
 
@@ -178,7 +170,7 @@ export class WasmViewConnector extends EventEmitter {
 				keyValueRequest.key = `sct/anchor/${String(block.height)}`
 				let keyValue = await client.keyValue(keyValueRequest)
 
-				let decodeNctRoot = decode_nct_root(
+				let decodeNctRoot = penumbraWasm.decode_nct_root(
 					this.toHexString(keyValue.value.value)
 				)
 
@@ -290,7 +282,7 @@ export class WasmViewConnector extends EventEmitter {
 		} else {
 			console.debug('note already stored', note.noteCommitment.inner)
 		}
-	
+
 		return note.source.inner
 	}
 
@@ -323,7 +315,7 @@ export class WasmViewConnector extends EventEmitter {
 			)
 
 			if (!demomResponse.denomMetadata) {
-				const denom = base64_to_bech32('passet', assetId.inner)
+				const denom = penumbraWasm.base64_to_bech32('passet', assetId.inner)
 
 				await this.indexedDb.putValue(ASSET_TABLE_NAME, {
 					penumbraAssetId: asset.toJson(),
@@ -392,9 +384,11 @@ export class WasmViewConnector extends EventEmitter {
 				blockHeight: data.result.height,
 			}
 
-			const decodeTransaction = decode_transaction(transactionResponse.txBytes)
+			const decodeTransaction = penumbraWasm.decode_transaction(
+				transactionResponse.txBytes
+			)
 
-			const transactionInfo = await transaction_info(
+			const transactionInfo = await penumbraWasm.transaction_info(
 				this.configApi.getAccountFullViewingKey(),
 				decodeTransaction
 			)
@@ -443,36 +437,24 @@ export class WasmViewConnector extends EventEmitter {
 					{ state: PositionStateEnum.POSITION_STATE_ENUM_OPENED }
 				)
 
-				await this.indexedDb.putValue(
-					ASSET_TABLE_NAME,
-					opened)
-
+				await this.indexedDb.putValue(ASSET_TABLE_NAME, opened)
 
 				let closed = this.viewServer.get_lpnft_asset(
 					actionView.positionOpen.position,
 					{ state: PositionStateEnum.POSITION_STATE_ENUM_CLOSED }
 				)
 
-				await this.indexedDb.putValue(
-					ASSET_TABLE_NAME,
-					closed
-				)
+				await this.indexedDb.putValue(ASSET_TABLE_NAME, closed)
 				let withdrawn = this.viewServer.get_lpnft_asset(
 					actionView.positionOpen.position,
 					{ state: PositionStateEnum.POSITION_STATE_ENUM_WITHDRAWN }
 				)
-				await this.indexedDb.putValue(
-					ASSET_TABLE_NAME,
-					withdrawn
-				)
+				await this.indexedDb.putValue(ASSET_TABLE_NAME, withdrawn)
 				let claimed = this.viewServer.get_lpnft_asset(
 					actionView.positionOpen.position,
 					{ state: PositionStateEnum.POSITION_STATE_ENUM_CLAIMED }
 				)
-				await this.indexedDb.putValue(
-					ASSET_TABLE_NAME,
-					 claimed
-				)
+				await this.indexedDb.putValue(ASSET_TABLE_NAME, claimed)
 			}
 		}
 	}

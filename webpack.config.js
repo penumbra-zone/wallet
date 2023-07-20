@@ -7,10 +7,11 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-const PlatformPlugin = require('./scripts/PlatformPlugin');
+const PlatformPlugin = require('./scripts/PlatformPlugin')
 
 async function makeConfig({
 	entry,
+	goal,
 	hmr,
 	mode,
 	name,
@@ -21,9 +22,26 @@ async function makeConfig({
 }) {
 	const dev = mode === 'development'
 
+	const local = goal === 'local'
+
 	const { TinyBrowserHmrWebpackPlugin } = await import(
 		'@faergeek/tiny-browser-hmr-webpack-plugin'
 	)
+
+	const resolveConfig = {
+		// modules: [path.resolve(__dirname, 'src'), 'node_modules'],
+		extensions: ['.ts', '.tsx', '.js'],
+		fallback: {
+			stream: 'stream-browserify',
+		},
+	}
+
+	if (local) {
+		// Use local package aliases
+		resolveConfig.alias = {
+			'penumbra-wasm': path.resolve(__dirname, 'src/penumbra-wasm'),
+		}
+	}
 
 	return {
 		name,
@@ -45,13 +63,7 @@ async function makeConfig({
 				config: [__filename],
 			},
 		},
-		resolve: {
-			modules: [path.resolve(__dirname, 'src'), 'node_modules'],
-			extensions: ['.ts', '.tsx', '.js'],
-			fallback: {
-				stream: 'stream-browserify',
-			},
-		},
+		resolve: resolveConfig,
 		ignoreWarnings: [/Failed to parse source map/],
 		output: {
 			assetModuleFilename: 'assets/[hash][ext]',
@@ -145,6 +157,7 @@ async function makeConfig({
 			new webpack.DefinePlugin({
 				'process.env.NODE_DEBUG': 'undefined',
 				'process.env.NODE_ENV': JSON.stringify(mode),
+				'process.env.NODE_GOAL': JSON.stringify(goal),
 			}),
 			new MiniCssExtractPlugin({ ignoreOrder: true }),
 			new PlatformPlugin({ clear: !dev }),
@@ -163,79 +176,84 @@ async function makeConfig({
 	}
 }
 
-module.exports = async (_, { mode }) => [
-	await makeConfig({
-		mode,
-		name: 'background',
-		target: 'webworker',
-		entry: {
-			background: './src/background',
-		},
-		plugins: [
-			new CopyWebpackPlugin({
-				patterns: [
-					{
-						from: path.resolve(__dirname, 'src/copied'),
-						to: path.resolve(__dirname, 'dist/build'),
-					},
-				],
-			}),
-		],
-	}),
-	await makeConfig({
-		mode,
-		name: 'contentscript',
-		entry: {
-			contentscript: './src/contentscript',
-			inpage: './src/inpage',
-		},
-	}),
-	await makeConfig({
-		mode,
-		name: 'ui',
-		hmr: true,
-		reactRefresh: true,
-		entry: {
-			accounts: './src/accounts',
-			popup: './src/popup',
-		},
-		plugins: [
-			new HtmlWebpackPlugin({
-				filename: 'popup.html',
-				chunks: ['vendors', 'popup'],
-				hash: true,
-			}),
-			new HtmlWebpackPlugin({
-				filename: 'notification.html',
-				chunks: ['vendors', 'popup'],
-				hash: true,
-			}),
-			new HtmlWebpackPlugin({
-				filename: 'accounts.html',
-				chunks: ['vendors', 'accounts'],
-				hash: true,
-			}),
-		],
-		optimization: {
-			splitChunks: {
-				cacheGroups: {
-					defaultVendors: false,
-					default: false,
-					vendors: {
-						priority: 10,
-						test: /[\\/]node_modules[\\/]/,
-						chunks: 'initial',
-						name: (_module, chunks, cacheGroupKey) =>
-							`${cacheGroupKey}-${chunks.map(chunk => chunk.name).join('&')}`,
-					},
-					common: {
-						chunks: 'initial',
-						minChunks: 2,
-						name: (_module, chunks, cacheGroupKey) =>
-							`${cacheGroupKey}-${chunks.map(chunk => chunk.name).join('&')}`,
+module.exports = async ({ goal }, { mode }) => {
+	return [
+		await makeConfig({
+			goal,
+			mode,
+			name: 'background',
+			target: 'webworker',
+			entry: {
+				background: './src/background',
+			},
+			plugins: [
+				new CopyWebpackPlugin({
+					patterns: [
+						{
+							from: path.resolve(__dirname, 'src/copied'),
+							to: path.resolve(__dirname, 'dist/build'),
+						},
+					],
+				}),
+			],
+		}),
+		await makeConfig({
+			goal,
+			mode,
+			name: 'contentscript',
+			entry: {
+				contentscript: './src/contentscript',
+				inpage: './src/inpage',
+			},
+		}),
+		await makeConfig({
+			goal,
+			mode,
+			name: 'ui',
+			hmr: true,
+			reactRefresh: true,
+			entry: {
+				accounts: './src/accounts',
+				popup: './src/popup',
+			},
+			plugins: [
+				new HtmlWebpackPlugin({
+					filename: 'popup.html',
+					chunks: ['vendors', 'popup'],
+					hash: true,
+				}),
+				new HtmlWebpackPlugin({
+					filename: 'notification.html',
+					chunks: ['vendors', 'popup'],
+					hash: true,
+				}),
+				new HtmlWebpackPlugin({
+					filename: 'accounts.html',
+					chunks: ['vendors', 'accounts'],
+					hash: true,
+				}),
+			],
+			optimization: {
+				splitChunks: {
+					cacheGroups: {
+						defaultVendors: false,
+						default: false,
+						vendors: {
+							priority: 10,
+							test: /[\\/]node_modules[\\/]/,
+							chunks: 'initial',
+							name: (_module, chunks, cacheGroupKey) =>
+								`${cacheGroupKey}-${chunks.map(chunk => chunk.name).join('&')}`,
+						},
+						common: {
+							chunks: 'initial',
+							minChunks: 2,
+							name: (_module, chunks, cacheGroupKey) =>
+								`${cacheGroupKey}-${chunks.map(chunk => chunk.name).join('&')}`,
+						},
 					},
 				},
 			},
-		},
-	}),
-]
+		}),
+	]
+}

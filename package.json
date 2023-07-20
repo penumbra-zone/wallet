@@ -3,17 +3,18 @@
 	"version": "0.1.9",
 	"description": "",
 	"main": "index.js",
-	"scripts": {
+	"scripts": {	
 		"dev": "webpack --watch --mode development",
+		"dev:local": "webpack --watch --mode development --env goal=local",
 		"build": "webpack --mode production",
 		"zip": "node scripts/zip.js"
 	},
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@buf/penumbra-zone_penumbra.bufbuild_connect-es": "^0.11.0-20230701001026-38a482841770.1",
-		"@buf/penumbra-zone_penumbra.bufbuild_es": "^1.2.1-20230701001026-38a482841770.1",
-		"@buf/penumbra-zone_penumbra.grpc_web": "^1.4.2-20230701001026-38a482841770.2",
+		"@buf/penumbra-zone_penumbra.bufbuild_connect-es": "0.11.0-20230701001026-38a482841770.1",
+		"@buf/penumbra-zone_penumbra.bufbuild_es": "1.2.1-20230701001026-38a482841770.1",
+		"@buf/penumbra-zone_penumbra.grpc_web": "1.4.2-20230701001026-38a482841770.2",
 		"@bufbuild/connect-web": "^0.9.1",
 		"@reduxjs/toolkit": "^1.8.6",
 		"bech32": "^2.0.0",

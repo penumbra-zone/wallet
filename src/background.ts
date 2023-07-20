@@ -9,7 +9,7 @@ import pipe from 'callbag-pipe'
 import subscribe from 'callbag-subscribe'
 import EventEmitter from 'events'
 import { nanoid } from 'nanoid'
-import { decode_transaction } from 'penumbra-wasm'
+
 import {
 	ClientController,
 	Contact,
@@ -41,7 +41,7 @@ import { ViewProtocolService } from './services'
 import { ExtensionStorage, StorageLocalState } from './storage'
 import { TransactionPlan } from './types/transaction'
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
-import { IndexedDb, TableName } from './utils'
+import { IndexedDb, TableName, penumbraWasm } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
 import { CreateWalletInput, ISeedWalletInput } from './wallets'
 
@@ -411,7 +411,7 @@ class BackgroundService extends EventEmitter {
 					this.permissionsController.clearStore()
 			},
 			decryptTx: async bytes => {
-				return decode_transaction(bytes)
+				return penumbraWasm.decode_transaction(bytes)
 			},
 			deleteVault: async () => {
 				await this.messageController.clearMessages()

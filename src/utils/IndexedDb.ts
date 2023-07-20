@@ -202,15 +202,12 @@ export class IndexedDb {
 		connectionId: string
 	}) {
 		this.connectedPagesPorts.push(value)
-		console.log({ add: this.connectedPagesPorts })
 	}
 
 	deleteConnectedPagePort(connectionId: string) {
 		this.connectedPagesPorts = this.connectedPagesPorts.filter(
 			i => i.connectionId !== connectionId
 		)
-
-		console.log({ delete: this.connectedPagesPorts })
 	}
 
 	public async loadStoredTree(): Promise<StoredTree> {
