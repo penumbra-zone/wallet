@@ -22,8 +22,6 @@ async function makeConfig({
 }) {
 	const dev = mode === 'development'
 
-	const local = goal === 'local'
-
 	const { TinyBrowserHmrWebpackPlugin } = await import(
 		'@faergeek/tiny-browser-hmr-webpack-plugin'
 	)
@@ -34,13 +32,6 @@ async function makeConfig({
 		fallback: {
 			stream: 'stream-browserify',
 		},
-	}
-
-	if (local) {
-		// Use local package aliases
-		resolveConfig.alias = {
-			'penumbra-wasm': path.resolve(__dirname, 'src/penumbra-wasm'),
-		}
 	}
 
 	return {
@@ -132,6 +123,7 @@ async function makeConfig({
 		},
 
 		plugins: [
+			new Dotenv(),
 			process.stdout.isTTY && new webpack.ProgressPlugin(),
 			dev && hmr && new webpack.HotModuleReplacementPlugin(),
 			dev && hmr && new TinyBrowserHmrWebpackPlugin({ hostname: 'localhost' }),

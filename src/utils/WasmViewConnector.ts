@@ -1,25 +1,30 @@
-import { createGrpcWebTransport } from '@bufbuild/connect-web'
-import { createPromiseClient } from '@bufbuild/connect'
+import { SpecificQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
 import {
-	SpendableNoteRecord,
-	SwapRecord,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+	DenomMetadataByIdRequest,
+	KeyValueRequest,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import {
 	CompactBlock,
 	FmdParameters,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
-import { base64ToBytes } from './base64'
+import {
+	AssetId,
+	Nullifier,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
+import {
+	SpendableNoteRecord,
+	SwapRecord,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
+import { PositionState } from '@buf/penumbra-zone_penumbra.grpc_web/penumbra/core/dex/v1alpha1/dex_pb'
+import { createPromiseClient } from '@bufbuild/connect'
+import { createGrpcWebTransport } from '@bufbuild/connect-web'
+import EventEmitter from 'events'
 import {
 	NetworkController,
 	RemoteConfigController,
 	Transaction,
 	WalletController,
 } from '../controllers'
-import {
-	AssetId,
-	Nullifier,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
-import { IndexedDb } from './IndexedDb'
 import {
 	ASSET_TABLE_NAME,
 	FMD_PARAMETERS_TABLE_NAME,
@@ -31,16 +36,11 @@ import {
 	SWAP_TABLE_NAME,
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
-import {
-	DenomMetadataByIdRequest,
-	KeyValueRequest,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
-import { SpecificQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
-import { PositionState } from '@buf/penumbra-zone_penumbra.grpc_web/penumbra/core/dex/v1alpha1/dex_pb'
-import PositionStateEnum = PositionState.PositionStateEnum
 import { PENUMBRAWALLET_DEBUG } from '../ui/appConfig'
-import EventEmitter from 'events'
-import { penumbraWasm } from './wrapperPenumbraWasmLibrary'
+import { IndexedDb } from './IndexedDb'
+import { base64ToBytes } from './base64'
+import { penumbraWasm } from './wrapperPenumbraWasm'
+import PositionStateEnum = PositionState.PositionStateEnum
 
 export type ScanResult = {
 	height: number
