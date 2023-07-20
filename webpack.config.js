@@ -8,6 +8,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const PlatformPlugin = require('./scripts/PlatformPlugin')
+const Dotenv = require('dotenv-webpack')
 
 async function makeConfig({
 	entry,
