@@ -7,8 +7,8 @@ import {
 	AddressByIndexRequest,
 	AddressByIndexResponse,
 	AssetsResponse,
-	BalanceByAddressRequest,
-	BalanceByAddressResponse,
+	BalancesRequest,
+	BalancesResponse,
 	ChainParametersResponse,
 	FMDParametersResponse,
 	NotesResponse,
@@ -48,14 +48,14 @@ declare global {
 			cb: (
 				state:
 					| Awaited<
-							ReturnType<
-								| __BackgroundPageApiDirect['requestAccounts']
-								| __BackgroundPageApiDirect['getStatusStream']
-								| __BackgroundPageApiDirect['getTransactionInfo']
-							>
-					  >
+						ReturnType<
+							| __BackgroundPageApiDirect['requestAccounts']
+							| __BackgroundPageApiDirect['getStatusStream']
+							| __BackgroundPageApiDirect['getTransactionInfo']
+						>
+					>
 					| AssetsResponse
-					| BalanceByAddressResponse
+					| BalancesResponse
 					| NotesResponse
 					| TransactionInfoResponse
 					| string[]
@@ -80,8 +80,8 @@ globalThis.penumbra = {
 	signTransaction: proxy.signTransaction,
 	requestAccounts: proxy.requestAccounts,
 	getFullViewingKey: proxy.getFullViewingKey,
-	getBalanceByAddress: (arg: BalanceByAddressRequest) =>
-		proxy.getBalanceByAddress(arg),
+	getBalances: (arg: BalancesRequest) =>
+		proxy.getBalances(arg),
 	getChainParameters: async () =>
 		new ChainParametersResponse().fromJson(
 			(await proxy.getChainParameters()) as any
@@ -125,9 +125,9 @@ globalThis.penumbra = {
 				await timer(100)
 			}
 		} else if (event === 'balance') {
-			const data = await penumbra.getBalanceByAddress({} as any)
+			const data = await penumbra.getBalances({} as any)
 			for (let i = 0; i < data.length; i++) {
-				cb(new BalanceByAddressResponse().fromJson(data[i] as any))
+				cb(new BalancesResponse().fromJson(data[i] as any))
 				await timer(100)
 			}
 		} else if (event === 'status') {
@@ -164,10 +164,10 @@ globalThis.penumbra = {
 					const updatedValue = await proxy.getStatusStream()
 					cb(new StatusStreamResponse().fromJson(updatedValue as any))
 				} else if (event === 'balance') {
-					const data = await penumbra.getBalanceByAddress({} as any)
+					const data = await penumbra.getBalances({} as any)
 
 					for (let i = 0; i < data.length; i++) {
-						cb(new BalanceByAddressResponse().fromJson(data[i] as any))
+						cb(new BalancesResponse().fromJson(data[i] as any))
 						await timer(100)
 					}
 				} else if (event === 'assets') {

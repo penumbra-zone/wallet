@@ -5,8 +5,8 @@ import {
 	AddressByIndexRequest,
 	AssetsRequest,
 	AssetsResponse,
-	BalanceByAddressRequest,
-	BalanceByAddressResponse,
+	BalancesRequest,
+	BalancesResponse,
 	ChainParametersRequest,
 	ChainParametersResponse,
 	FMDParametersRequest,
@@ -72,14 +72,14 @@ export class ViewProtocolService {
 		this.getAccountFullViewingKey = getAccountFullViewingKey
 	}
 
-	async getBalanceByAddress(
-		request?: BalanceByAddressRequest
-	): Promise<BalanceByAddressResponse[]> {
+	async getBalances(
+		request?: BalancesRequest
+	): Promise<BalancesResponse[]> {
 		const { balance } = await this.extensionStorage.getState('balance')
 		const assets = await this.indexedDb.getAllValue(ASSET_TABLE_NAME)
 
 		const res = Object.entries(balance).map((i: [string, number]) => {
-			return new BalanceByAddressResponse().fromJson({
+			return new BalancesResponse().fromJson({
 				amount: {
 					lo: i[1],
 					//TODO add hi
