@@ -72,25 +72,39 @@ export class ViewProtocolService {
 		this.getAccountFullViewingKey = getAccountFullViewingKey
 	}
 
-	async getBalances(
-		request?: BalancesRequest
-	): Promise<BalancesResponse[]> {
+	async getBalances(request?: BalancesRequest): Promise<BalancesResponse[]> {
 		const { balance } = await this.extensionStorage.getState('balance')
-		const assets = await this.indexedDb.getAllValue(ASSET_TABLE_NAME)
 
-		const res = Object.entries(balance).map((i: [string, number]) => {
+		let assets
+		if (request.assetIdFilter) {
+			assets = [
+				await this.indexedDb.getValue(
+					ASSET_TABLE_NAME,
+					request.assetIdFilter.inner
+				),
+			]
+		} else {
+			assets = await this.indexedDb.getAllValue(ASSET_TABLE_NAME)
+		}
+
+		const res = assets.map(asset => {
+			const balanceDetail: number = balance[asset.penumbraAssetId.inner] || 0
 			return new BalancesResponse().fromJson({
-				amount: {
-					lo: i[1],
-					//TODO add hi
-					// hi:
-				},
-				asset: {
-					inner: assets.find(asset => asset.penumbraAssetId.inner === i[0])
-						.penumbraAssetId.inner,
+				//TODO add account
+				balance: {
+					amount: {
+						lo: balanceDetail,
+						//TODO add hi
+					},
+					assetId: {
+						inner: asset.penumbraAssetId.inner,
+						altBech32m: asset.display,
+						altBaseDenom: asset.base,
+					},
 				},
 			})
 		})
+
 		return res
 	}
 

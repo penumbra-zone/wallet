@@ -44,6 +44,7 @@ import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
 import { IndexedDb, TableName, penumbraWasm } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
 import { CreateWalletInput, ISeedWalletInput } from './wallets'
+import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 
 const bgPromise = setupBackgroundService()
 
@@ -148,10 +149,6 @@ async function setupBackgroundService() {
 		await backgroundService.clientController.abortGrpcRequest('change grpc')
 	})
 
-	backgroundService.wasmViewConnector.on('update balance', async () => {
-		await backgroundService.currentAccountController.updateAssetBalance()
-	})
-
 	return backgroundService
 }
 
@@ -184,6 +181,11 @@ class BackgroundService extends EventEmitter {
 		})
 
 		this.remoteConfigController = new RemoteConfigController({
+			extensionStorage: this.extensionStorage,
+		})
+
+		this.currentAccountController = new CurrentAccountController({
+			indexedDb: this.indexedDb,
 			extensionStorage: this.extensionStorage,
 		})
 
@@ -225,6 +227,9 @@ class BackgroundService extends EventEmitter {
 			getCustomGRPC: () => this.networkController.getCustomGRPC(),
 			getAccountFullViewingKey: () =>
 				this.walletController.getAccountFullViewingKeyWithoutPassword(),
+			updateAssetBalance: () =>
+				this.currentAccountController.updateAssetBalance(),
+			addTokenBalance: (assetId: AssetId, amount:number) => this.currentAccountController.addTokenBalance(assetId, amount),
 		})
 
 		this.transactionController = new TransactionController({
@@ -247,11 +252,6 @@ class BackgroundService extends EventEmitter {
 				this.permissionsController.setPermission(origin, permission),
 			getTransactionMessageData: async (data: TransactionPlan) =>
 				this.transactionController.getTransactionMessageData(data),
-		})
-
-		this.currentAccountController = new CurrentAccountController({
-			indexedDb: this.indexedDb,
-			extensionStorage: this.extensionStorage,
 		})
 
 		this.clientController = new ClientController({
@@ -628,8 +628,9 @@ class BackgroundService extends EventEmitter {
 				// }
 				return this.viewProtocolService.getFMDParameters()
 			},
-			getBalances: async (arg: BalancesRequest) =>
-				this.viewProtocolService.getBalances(arg),
+			getBalances: async (arg: BalancesRequest) => {
+				return this.viewProtocolService.getBalances(arg)
+			},
 			getAddressByIndexProxy: async (request: string) =>
 				this.viewProtocolService.getAddressByIndex(request),
 			getTransactionPlannerProxy: async (request: string) =>

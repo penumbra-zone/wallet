@@ -48,12 +48,12 @@ declare global {
 			cb: (
 				state:
 					| Awaited<
-						ReturnType<
-							| __BackgroundPageApiDirect['requestAccounts']
-							| __BackgroundPageApiDirect['getStatusStream']
-							| __BackgroundPageApiDirect['getTransactionInfo']
-						>
-					>
+							ReturnType<
+								| __BackgroundPageApiDirect['requestAccounts']
+								| __BackgroundPageApiDirect['getStatusStream']
+								| __BackgroundPageApiDirect['getTransactionInfo']
+							>
+					  >
 					| AssetsResponse
 					| BalancesResponse
 					| NotesResponse
@@ -80,8 +80,7 @@ globalThis.penumbra = {
 	signTransaction: proxy.signTransaction,
 	requestAccounts: proxy.requestAccounts,
 	getFullViewingKey: proxy.getFullViewingKey,
-	getBalances: (arg: BalancesRequest) =>
-		proxy.getBalances(arg),
+	getBalances: (arg: BalancesRequest) => proxy.getBalances(arg),
 	getChainParameters: async () =>
 		new ChainParametersResponse().fromJson(
 			(await proxy.getChainParameters()) as any
@@ -125,7 +124,8 @@ globalThis.penumbra = {
 				await timer(100)
 			}
 		} else if (event === 'balance') {
-			const data = await penumbra.getBalances({} as any)
+			const data = await penumbra.getBalances(new BalancesRequest(args))
+
 			for (let i = 0; i < data.length; i++) {
 				cb(new BalancesResponse().fromJson(data[i] as any))
 				await timer(100)
@@ -163,17 +163,23 @@ globalThis.penumbra = {
 				if (event === 'status') {
 					const updatedValue = await proxy.getStatusStream()
 					cb(new StatusStreamResponse().fromJson(updatedValue as any))
-				}
-				//  else if (event === 'state') {
-				// 	const updatedValue = await penumbra.publicState()
-				// 	cb(updatedValue)
-				// }
-				else if (event === 'balance') {
-					const data = await penumbra.getBalances({} as any)
+				} else if (event === 'balance' && data.penumbraMethod === 'balance') {
+					if (
+						!args.assetIdFilter ||
+						(args.assetIdFilter &&
+							args.assetIdFilter.inner === Object.keys((data as any).data)[0])
+					) {
+						const balance = await penumbra.getBalances(
+							new BalancesRequest({
+								assetIdFilter: {
+									inner: Object.keys((data as any).data)[0] as any,
+								},
+							})
+						)
 
-					for (let i = 0; i < data.length; i++) {
-						cb(new BalancesResponse().fromJson(data[i] as any))
-						await timer(100)
+						for (let i = 0; i < balance.length; i++) {
+							cb(new BalancesResponse().fromJson(balance[i] as any))
+						}
 					}
 				} else if (event === 'assets') {
 					cb(

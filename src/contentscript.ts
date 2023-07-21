@@ -34,6 +34,21 @@ if (document.documentElement.tagName === 'HTML') {
 		}
 	})()
 
+	function getObjectChanges(
+		obj1: Record<string, number>,
+		obj2: Record<string, number>
+	): Record<string, number> {
+		const changes: Record<string, number> = {}
+
+		for (const key in obj2) {
+			if (obj1[key] !== obj2[key]) {
+				changes[key] = obj2[key]
+			}
+		}
+
+		return changes
+	}
+
 	const container = document.head || document.documentElement
 	container.appendChild(
 		Object.assign(document.createElement('script'), {
@@ -51,9 +66,16 @@ if (document.documentElement.tagName === 'HTML') {
 					if (data.lastBlockHeight || data.lastSavedBlock) {
 						postMessage({ penumbraMethod: STATUS }, location.origin)
 					} else if (data.balance) {
-						//TODO find asset as changed
-
-						postMessage({ penumbraMethod: BALANCE }, location.origin)
+						postMessage(
+							{
+								penumbraMethod: BALANCE,
+								data: getObjectChanges(
+									data.balance.oldValue,
+									data.balance.newValue
+								),
+							},
+							location.origin
+						)
 					} else if (data.isLocked) {
 						postMessage({ penumbraMethod: ACCOUNTS_CHANGED }, location.origin)
 					} else if (data.origins) {

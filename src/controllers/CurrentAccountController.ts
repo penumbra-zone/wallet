@@ -2,6 +2,7 @@ import ObservableStore from 'obs-store'
 import { ExtensionStorage } from '../storage'
 import { IndexedDb } from '../utils'
 import { ASSET_TABLE_NAME, SPENDABLE_NOTES_TABLE_NAME } from '../lib'
+import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 
 export class CurrentAccountController {
 	private store
@@ -20,6 +21,13 @@ export class CurrentAccountController {
 		)
 		extensionStorage.subscribe(this.store)
 		this.indexedDb = indexedDb
+	}
+
+	addTokenBalance(tokenId: AssetId, amount: number) {
+		const id = tokenId.toJson() as { inner: string }
+
+		const balance = this.store.getState().balance || {}
+		this.store.updateState({ balance: { ...balance, [id.inner]: amount } })
 	}
 
 	async updateAssetBalance() {

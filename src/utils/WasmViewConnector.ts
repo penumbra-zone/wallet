@@ -8,6 +8,7 @@ import {
 	FmdParameters,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import {
+	Amount,
 	AssetId,
 	Nullifier,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
@@ -20,7 +21,9 @@ import { createPromiseClient } from '@bufbuild/connect'
 import { createGrpcWebTransport } from '@bufbuild/connect-web'
 import EventEmitter from 'events'
 import {
+	CurrentAccountController,
 	NetworkController,
+	PreferencesController,
 	RemoteConfigController,
 	Transaction,
 	WalletController,
@@ -68,12 +71,16 @@ export class WasmViewConnector extends EventEmitter {
 		getNetwork,
 		getCustomGRPC,
 		getAccountFullViewingKey,
+		updateAssetBalance,
+		addTokenBalance
 	}: {
 		indexedDb: IndexedDb
 		getNetworkConfig: RemoteConfigController['getNetworkConfig']
 		getNetwork: NetworkController['getNetwork']
 		getCustomGRPC: NetworkController['getCustomGRPC']
 		getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword']
+		updateAssetBalance: CurrentAccountController['updateAssetBalance']
+		addTokenBalance: CurrentAccountController['addTokenBalance']
 	}) {
 		super()
 		this.indexedDb = indexedDb
@@ -82,6 +89,8 @@ export class WasmViewConnector extends EventEmitter {
 			getNetwork,
 			getCustomGRPC,
 			getAccountFullViewingKey,
+			updateAssetBalance,
+			addTokenBalance
 		}
 	}
 
@@ -104,7 +113,7 @@ export class WasmViewConnector extends EventEmitter {
 						note.noteCommitment.inner
 					)
 
-					this.emit('update balance')
+					await this.configApi.updateAssetBalance()
 				}
 			}
 		}
@@ -270,7 +279,7 @@ export class WasmViewConnector extends EventEmitter {
 			SPENDABLE_NOTES_TABLE_NAME,
 			note.noteCommitment.inner
 		)
-		await this.storeAsset(note.note.value.assetId)
+		await this.storeAsset(note.note.value.assetId, note.note.value.amount)
 		if (!storedNote) {
 			await this.indexedDb.putValueWithId(
 				SPENDABLE_NOTES_TABLE_NAME,
@@ -278,7 +287,7 @@ export class WasmViewConnector extends EventEmitter {
 				note.noteCommitment.inner
 			)
 
-			this.emit('update balance')
+			await this.configApi.updateAssetBalance()
 		} else {
 			console.debug('note already stored', note.noteCommitment.inner)
 		}
@@ -286,7 +295,7 @@ export class WasmViewConnector extends EventEmitter {
 		return note.source.inner
 	}
 
-	async storeAsset(assetId) {
+	async storeAsset(assetId: AssetId, amount: Amount) {
 		const currentAsset = await this.indexedDb.getValue(
 			ASSET_TABLE_NAME,
 			assetId.inner
@@ -333,6 +342,8 @@ export class WasmViewConnector extends EventEmitter {
 					demomResponse.denomMetadata.toJson() as object
 				)
 			}
+
+			this.configApi.addTokenBalance(asset, Number(amount.lo))
 		} catch (error) {
 			throw new Error('Sync error')
 		}
