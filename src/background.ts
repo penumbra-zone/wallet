@@ -1,7 +1,7 @@
 import { ChainParametersRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
 import {
 	AssetsRequest,
-	BalanceByAddressRequest,
+	BalancesRequest,
 	NotesRequest,
 	TransactionInfoRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/view/v1alpha1/view_pb'
@@ -644,8 +644,8 @@ class BackgroundService extends EventEmitter {
 				// }
 				return this.viewProtocolService.getFMDParameters()
 			},
-			getBalanceByAddress: async (arg: BalanceByAddressRequest) =>
-				this.viewProtocolService.getBalanceByAddress(arg),
+			getBalances: async (arg: BalancesRequest) =>
+				this.viewProtocolService.getBalances(arg),
 			getAddressByIndexProxy: async (request: string) =>
 				this.viewProtocolService.getAddressByIndex(request),
 			getTransactionPlannerProxy: async (request: string) =>
