@@ -150,8 +150,8 @@ import {
 	AddressByIndexRequest,
 	AssetsRequest,
 	AssetsResponse,
-	BalanceByAddressRequest,
-	BalanceByAddressResponse,
+	BalancesRequest,
+	BalancesResponse,
 	ChainParametersRequest,
 	ChainParametersResponse,
 	FMDParametersRequest,
@@ -228,11 +228,11 @@ export const extensionTransport = (s: typeof ViewProtocolService) =>
 					yield new AssetsResponse(res)
 				}
 			},
-			async *balanceByAddress(message: BalanceByAddressRequest) {
+			async *balances(message: BalancesRequest) {
 				window.penumbra.on('balance', balance => receiveMessage(balance))
 
 				for await (const res of createMessageStream()) {
-					yield new BalanceByAddressResponse(res)
+					yield new BalancesResponse(res)
 				}
 			},
 			async *notes(message: NotesRequest) {
@@ -286,7 +286,7 @@ const client = createPromiseClient(
   - [ChainParameters](#chain_parameters)
   - [FMDParameters](#fmd_parameters)
   - [AddressByIndex](#address_by_index)
-  - [BalanceByAddress](#balance_by_address)
+  - [Balances](#balances)
   - [TransactionInfoByHash](#tx_by_hash)
   - [TransactionInfo](#tx_info)
   - [TransactionPlanner](#tx_planner)
@@ -396,7 +396,7 @@ View protocol requests optionally include the account group ID, used to identify
 - [ChainParameters](#chain_parameters)
 - [FMDParameters](#fmd_parameters)
 - [AddressByIndex](#address_by_index)
-- [BalanceByAddress](#balance_by_address)
+- [Balances](#balances)
 - [TransactionInfoByHash](#tx_by_hash)
 - [TransactionInfo](#tx_info)
 - [TransactionPlanner](#tx_planner)
@@ -529,22 +529,22 @@ const response = await client.addressByIndex(request)
 
 [**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.AddressByIndexResponse)
 
-<a id="balance_by_address"></a>
+<a id="balances"></a>
 
-## BalanceByAddress
+## Balances
 
-Query for balance of a given address
+Query for balance of all addresses or an optional given address
 
 ```js
-const request = new BalanceByAddressRequest({})
-for await (const balance of client.balanceByAddress(request)) {
+const request = new BalancesRequest({})
+for await (const balance of client.balances(request)) {
 	console.log(balance)
 }
 ```
 
-[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.BalanceByAddressRequest)
+[**Parameters**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.BalancesRequest)
 
-[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.BalanceByAddressResponse)
+[**Response**](https://buf.build/penumbra-zone/penumbra/docs/main:penumbra.view.v1alpha1#penumbra.view.v1alpha1.BalancesResponse)
 
 <a id="tx_by_hash"></a>
 
@@ -553,7 +553,7 @@ for await (const balance of client.balanceByAddress(request)) {
 Query for a given transaction by its hash.
 
 ```js
-const request = new BalanceByAddressRequest({})
+const request = new BalancesRequest({})
 const response = await client.transactionInfoByHash(request)
 ```
 

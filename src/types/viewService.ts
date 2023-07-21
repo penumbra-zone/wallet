@@ -1,8 +1,8 @@
-export type BalanceByAddressReq = {
+export type BalancesReq = {
 	address: { inner: string }
 }
 
-export type BalanceByAddressRes = {
+export type BalancesRes = {
 	amount: { lo: number }
 	asset: { inner: string }
 }
