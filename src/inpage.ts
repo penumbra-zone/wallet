@@ -7,8 +7,8 @@ import {
 	AddressByIndexRequest,
 	AddressByIndexResponse,
 	AssetsResponse,
-	BalancesRequest,
-	BalancesResponse,
+	BalanceByAddressRequest,
+	BalanceByAddressResponse,
 	ChainParametersResponse,
 	FMDParametersResponse,
 	NotesResponse,
@@ -46,14 +46,14 @@ declare global {
 			cb: (
 				state:
 					| Awaited<
-						ReturnType<
-							| __BackgroundPageApiDirect['requestAccounts']
-							| __BackgroundPageApiDirect['getStatusStream']
-							| __BackgroundPageApiDirect['getTransactionInfo']
-						>
-					>
+							ReturnType<
+								| __BackgroundPageApiDirect['requestAccounts']
+								| __BackgroundPageApiDirect['getStatusStream']
+								| __BackgroundPageApiDirect['getTransactionInfo']
+							>
+					  >
 					| AssetsResponse
-					| BalancesResponse
+					| BalanceByAddressResponse
 					| NotesResponse
 					| TransactionInfoResponse
 					| string[]
@@ -78,8 +78,8 @@ globalThis.penumbra = {
 	signTransaction: proxy.signTransaction,
 	requestAccounts: proxy.requestAccounts,
 	getFullViewingKey: proxy.getFullViewingKey,
-	getBalances: (arg: BalancesRequest) =>
-		proxy.getBalances(arg),
+	getBalanceByAddress: (arg: BalanceByAddressRequest) =>
+		proxy.getBalanceByAddress(arg),
 	getChainParameters: async () =>
 		new ChainParametersResponse().fromJson(
 			(await proxy.getChainParameters()) as any
@@ -123,9 +123,9 @@ globalThis.penumbra = {
 				await timer(100)
 			}
 		} else if (event === 'balance') {
-			const data = await penumbra.getBalances({} as any)
+			const data = await penumbra.getBalanceByAddress({} as any)
 			for (let i = 0; i < data.length; i++) {
-				cb(new BalancesResponse().fromJson(data[i] as any))
+				cb(new BalanceByAddressResponse().fromJson(data[i] as any))
 				await timer(100)
 			}
 		} else if (event === 'status') {
@@ -167,10 +167,10 @@ globalThis.penumbra = {
 				// 	cb(updatedValue)
 				// }
 				else if (event === 'balance') {
-					const data = await penumbra.getBalances({} as any)
+					const data = await penumbra.getBalanceByAddress({} as any)
 
 					for (let i = 0; i < data.length; i++) {
-						cb(new BalancesResponse().fromJson(data[i] as any))
+						cb(new BalanceByAddressResponse().fromJson(data[i] as any))
 						await timer(100)
 					}
 				} else if (event === 'assets') {

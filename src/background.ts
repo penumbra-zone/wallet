@@ -2,7 +2,7 @@ import { ChainParametersRequest } from '@buf/penumbra-zone_penumbra.bufbuild_es/
 import {
 	AddressByIndexRequest,
 	AssetsRequest,
-	BalancesRequest,
+	BalanceByAddressRequest,
 	NotesRequest,
 	TransactionInfoByHashRequest,
 	TransactionInfoRequest, TransactionPlannerRequest,
@@ -601,12 +601,12 @@ class BackgroundService extends EventEmitter {
 				// }
 				return this.viewProtocolService.getFMDParameters()
 			},
-			getBalances: async (arg: BalancesRequest) =>
-				this.viewProtocolService.getBalances(arg),
+			getBalanceByAddress: async (arg: BalanceByAddressRequest) =>
+				this.viewProtocolService.getBalanceByAddress(arg),
 			getAddressByIndexProxy: async (request: string) =>
 				this.viewProtocolService.getAddressByIndex(request),
 			getTransactionPlannerProxy: async (request: string) =>
-				this.viewProtocolService.getTransactionPlanner(request),
+				 this.viewProtocolService.getTransactionPlanner(request),
 		}
 	}
 
