@@ -166,8 +166,7 @@ globalThis.penumbra = {
 				} else if (event === 'balance' && data.penumbraMethod === 'balance') {
 					if (
 						!args.assetIdFilter ||
-						(args.assetIdFilter &&
-							args.assetIdFilter.inner === Object.keys((data as any).data)[0])
+						args.assetIdFilter.inner === Object.keys((data as any).data)[0]
 					) {
 						const balance = await penumbra.getBalances(
 							new BalancesRequest({
