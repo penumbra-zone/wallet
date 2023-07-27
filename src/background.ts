@@ -230,7 +230,8 @@ class BackgroundService extends EventEmitter {
 				this.walletController.getAccountFullViewingKeyWithoutPassword(),
 			updateAssetBalance: () =>
 				this.currentAccountController.updateAssetBalance(),
-			addTokenBalance: (assetId: AssetId, amount:number) => this.currentAccountController.addTokenBalance(assetId, amount),
+			addTokenBalance: (assetId: AssetId, amount: number) =>
+				this.currentAccountController.addTokenBalance(assetId, amount),
 		})
 
 		this.transactionController = new TransactionController({
