@@ -1,6 +1,6 @@
 import { ClientController, WalletController } from '../controllers'
 import { ExtensionStorage } from '../storage'
-import { IndexedDb, penumbraWasm } from '../utils'
+import { IndexedDb } from '../utils'
 import {
 	AddressByIndexRequest,
 	AssetsRequest,
@@ -36,6 +36,7 @@ import {
 import { WasmViewConnector } from '../utils/WasmViewConnector'
 import { bytesToBase64 } from '../utils/base64'
 import { bech32m } from 'bech32'
+import { penumbraWasm } from '../utils/wrapperPenumbraWasm'
 
 const areEqual = (first, second) =>
 	first.length === second.length &&

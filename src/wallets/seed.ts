@@ -1,4 +1,4 @@
-import { penumbraWasm } from '../utils'
+import { penumbraWasm } from '../utils/wrapperPenumbraWasm'
 import { WalletPrivateDataOfType } from './types'
 import { Wallet } from './wallet'
 

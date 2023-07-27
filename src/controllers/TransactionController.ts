@@ -5,12 +5,13 @@ import {
 	TransactionMessageData,
 	TransactionPlan,
 } from '../types/transaction'
-import { IndexedDb, penumbraWasm } from '../utils'
+import { IndexedDb } from '../utils'
 import { bytesToBase64 } from '../utils/base64'
 import { NetworkController } from './NetworkController'
 import { RemoteConfigController } from './RemoteConfigController'
 import { WalletController } from './WalletController'
 import { TransactionResponse } from '../messages/types'
+import { penumbraWasm } from '../utils/wrapperPenumbraWasm'
 
 export class TransactionController {
 	private indexedDb: IndexedDb

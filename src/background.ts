@@ -41,10 +41,11 @@ import { ViewProtocolService } from './services'
 import { ExtensionStorage, StorageLocalState } from './storage'
 import { TransactionPlan } from './types/transaction'
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
-import { IndexedDb, TableName, penumbraWasm } from './utils'
+import { IndexedDb, TableName } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
 import { CreateWalletInput, ISeedWalletInput } from './wallets'
 import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
+import { penumbraWasm } from './utils/wrapperPenumbraWasm'
 
 const bgPromise = setupBackgroundService()
 
