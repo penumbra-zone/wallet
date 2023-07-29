@@ -12,6 +12,7 @@ import { getShortKey, routesPath } from '../../../../utils'
 import { Button, ModalWrapper } from '../../../components'
 import Background from '../../../services/Background'
 import { TransactionResponse } from '../../../../messages/types'
+import { penumbraWasm } from '../../../../utils/wrapperPenumbraWasm'
 
 type DetailTxBeforeSendProps = {
 	sendPlan: TransactionMessageData
@@ -63,22 +64,44 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 	}, [txResponse])
 
 	const handleEdit = () => {
+		console.log('asdasd')
+
 		if (handleCancel) handleCancel()
 		else setSendPlan(null)
 	}
 
 	const handleConfirm = async () => {
-		setLoading(true)
-		const txResponse = await Background.sendTransaction(
-			sendPlan.transactionPlan
+		const fvk = await Background.getAccountFullViewingKey('1qazXsw@')
+		const spendingKey = await Background.getAccountSpendingKey('1qazXsw@')
+		const loadStoredTree = await Background.loadStoredTree()
+
+		const hashes = loadStoredTree.hashes.map(hash => {
+			return {
+				...hash,
+				hash: new Uint8Array(Object.values(hash.hash)),
+			}
+		})
+
+		const buildTx = penumbraWasm.build_tx(
+			spendingKey,
+			fvk,
+			sendPlan.transactionPlan,
+			{ ...loadStoredTree, hashes }
 		)
 
-		await Background.approve(messageId, txResponse)
-		if (window.location.pathname === '/notification.html') {
-			await Background.closeNotificationWindow()
-		}
+		console.log({ buildTx })
 
-		setTxResponse(txResponse)
+		// setLoading(true)
+		// const txResponse = await Background.sendTransaction(
+		// 	sendPlan.transactionPlan
+		// )
+
+		// await Background.approve(messageId, txResponse)
+		// if (window.location.pathname === '/notification.html') {
+		// 	await Background.closeNotificationWindow()
+		// }
+
+		// setTxResponse(txResponse)
 	}
 
 	return (

@@ -427,6 +427,9 @@ class BackgroundService extends EventEmitter {
 				await this.permissionsController.clearStore()
 				await this.indexedDb.clearAllTables()
 			},
+			loadStoredTree: async () => {
+				return await this.indexedDb.loadStoredTree()
+			},
 		}
 	}
 
