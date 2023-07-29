@@ -61,7 +61,7 @@ export const SettingsAdvanced = () => {
 								Auto-lock timer (minutes)
 							</p>
 							<p className='text_body text-light_grey ext:mt-[8px] ext:mb-[8px] tablet:mt-[8px] tablet:mb-[16px]'>
-								Set the inactivity time in the coming days before Penumbra is
+								Set the inactivity time in the coming minutes before Penumbra is
 								blocked.
 							</p>
 							<Input
