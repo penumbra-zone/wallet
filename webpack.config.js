@@ -120,6 +120,10 @@ async function makeConfig({
 					test: /\.(gif|png|jpe?g|svg|webp|woff2)$/,
 					type: 'asset/resource',
 				},
+				{
+					test: /\.worker\.js$/,
+					use: { loader: 'worker-loader' }
+				}
 			],
 		},
 

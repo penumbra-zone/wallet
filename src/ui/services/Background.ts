@@ -683,6 +683,18 @@ class Background {
 		}
 	}
 
+	async broadcastTx(tx_bytes_hex: string) {
+		try {
+			await this.initPromise
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			await this._connect!()
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			return await this.background!.broadcastTx(tx_bytes_hex)
+		} catch (err) {
+			throw new Error(prepareErrorMessage(err))
+		}
+	}
+
 	//   async toggleAssetFavorite(assetId: string): Promise<void> {
 	//     try {
 	//       await this.initPromise;

@@ -12,7 +12,10 @@ import { getShortKey, routesPath } from '../../../../utils'
 import { Button, ModalWrapper } from '../../../components'
 import Background from '../../../services/Background'
 import { TransactionResponse } from '../../../../messages/types'
-import { penumbraWasm } from '../../../../utils/wrapperPenumbraWasm'
+import Worker from './fibo.worker.js'
+import { bytesToBase64 } from '../../../../utils/base64'
+
+const worker = new Worker()
 
 type DetailTxBeforeSendProps = {
 	sendPlan: TransactionMessageData
@@ -37,6 +40,24 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 	const [txResponse, setTxResponse] = useState<null | TransactionResponse>(null)
 	const [loading, setLoading] = useState<boolean>(false)
 	const navigate = useNavigate()
+
+	useEffect(() => {
+		worker.onmessage = async message => {
+			if (message) {
+				const txResponse = await Background.broadcastTx(
+					bytesToBase64(message.data)
+				)
+
+				await Background.approve(messageId, txResponse)
+
+				if (window.location.pathname === '/notification.html') {
+					await Background.closeNotificationWindow()
+				}
+
+				setTxResponse(txResponse)
+			}
+		}
+	})
 
 	useEffect(() => {
 		if (!txResponse) return
@@ -64,13 +85,13 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 	}, [txResponse])
 
 	const handleEdit = () => {
-		console.log('asdasd')
-
 		if (handleCancel) handleCancel()
 		else setSendPlan(null)
 	}
 
 	const handleConfirm = async () => {
+		setLoading(true)
+
 		const fvk = await Background.getAccountFullViewingKey('1qazXsw@')
 		const spendingKey = await Background.getAccountSpendingKey('1qazXsw@')
 		const loadStoredTree = await Background.loadStoredTree()
@@ -82,26 +103,12 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 			}
 		})
 
-		const buildTx = penumbraWasm.build_tx(
-			spendingKey,
+		worker.postMessage({
 			fvk,
-			sendPlan.transactionPlan,
-			{ ...loadStoredTree, hashes }
-		)
-
-		console.log({ buildTx })
-
-		// setLoading(true)
-		// const txResponse = await Background.sendTransaction(
-		// 	sendPlan.transactionPlan
-		// )
-
-		// await Background.approve(messageId, txResponse)
-		// if (window.location.pathname === '/notification.html') {
-		// 	await Background.closeNotificationWindow()
-		// }
-
-		// setTxResponse(txResponse)
+			spendingKey,
+			sendPlan: sendPlan.transactionPlan,
+			loadStoredTree: { ...loadStoredTree, hashes },
+		})
 	}
 
 	return (

@@ -430,6 +430,9 @@ class BackgroundService extends EventEmitter {
 			loadStoredTree: async () => {
 				return await this.indexedDb.loadStoredTree()
 			},
+			broadcastTx: async (tx_bytes_hex: string) => {
+				return await this.transactionController.broadcastTx(tx_bytes_hex)
+			},
 		}
 	}
 
