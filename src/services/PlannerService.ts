@@ -1,4 +1,3 @@
-import { ViewProtocolService } from './ViewProtocolService'
 import { TransactionPlanner } from './TransactionPlanner'
 import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 

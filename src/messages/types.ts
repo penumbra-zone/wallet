@@ -1,5 +1,5 @@
+import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 import { PreferencesAccount } from '../preferences'
-import { TransactionMessageData, TransactionPlan } from '../types/transaction'
 
 export type MessageInput = {
 	account: PreferencesAccount
@@ -20,9 +20,8 @@ export type MessageInputOfType<T extends MessageInput['type']> = Extract<
 	{ type: T }
 >
 
-
 export type MessageOfType<T extends Message['type']> = Extract<
-Message,
+	Message,
 	{ type: T }
 >
 
@@ -65,7 +64,7 @@ export type Message = {
 		| {
 				type: 'transaction'
 				broadcast: boolean
-				data: TransactionMessageData
+				data: TransactionPlan
 				input: MessageInputOfType<'transaction'>
 				result?: TransactionResponse
 				successPath?: string | null

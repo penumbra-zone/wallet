@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useAccountsSelector } from '../../../account'
-import { Button, CheckBox, PlusSvg } from '../../components'
+import { Button, CheckBox } from '../../components'
 import { selectMessages, selectSelectedAccount } from '../../redux'
 import Background from '../../services/Background'
 import { DetailTxBeforeSend } from '../Send/DetailTxBeforeSend'
+import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 
 export const ActiveMessage = () => {
 	const messages = useAccountsSelector(selectMessages)
@@ -33,7 +34,9 @@ export const ActiveMessage = () => {
 	) {
 		return (
 			<DetailTxBeforeSend
-				sendPlan={messages.unapprovedMessages[0].data}
+				transactionPlan={new TransactionPlan().fromJson(
+					messages.unapprovedMessages[0].data as any
+				)}
 				handleCancel={handleCancel}
 				handleApprove={handleConfirm}
 				messageId={messages.unapprovedMessages[0].id}

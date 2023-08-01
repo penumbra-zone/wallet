@@ -41,3 +41,8 @@ export * from './forms/CreateContactForm'
 
 //tables
 export * from './tables/ValidatorTable'
+
+//views
+export * from './OutputView'
+export * from './SpendView'
+export * from './SwapView'

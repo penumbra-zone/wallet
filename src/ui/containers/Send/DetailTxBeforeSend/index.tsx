@@ -1,34 +1,25 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import loader from '../../../../assets/gif/loader.gif'
 import { TRANSACTION_TABLE_NAME } from '../../../../lib'
-import {
-	ParsedActions,
-	TransactionMessageData,
-	TransactionPlan,
-} from '../../../../types/transaction'
-import { getShortKey, routesPath } from '../../../../utils'
+import { routesPath } from '../../../../utils'
 import { Button, ModalWrapper } from '../../../components'
 import Background from '../../../services/Background'
 import { TransactionResponse } from '../../../../messages/types'
+import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
+import { ActionView } from '../../../components/ActionView'
 
 type DetailTxBeforeSendProps = {
-	sendPlan: TransactionMessageData
+	transactionPlan: TransactionPlan
 	messageId: string
-	setSendPlan?: Dispatch<
-		SetStateAction<{
-			transactionPlan: TransactionPlan
-			actions: ParsedActions[]
-		} | null>
-	>
 	handleCancel?: () => Promise<void>
 	handleApprove?: () => Promise<void>
 }
 
 export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
-	sendPlan,
-	setSendPlan,
+	transactionPlan,
+
 	handleCancel,
 	handleApprove,
 	messageId,
@@ -64,20 +55,15 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 
 	const handleEdit = () => {
 		if (handleCancel) handleCancel()
-		else setSendPlan(null)
 	}
 
 	const handleConfirm = async () => {
 		setLoading(true)
-		const txResponse = await Background.sendTransaction(
-			sendPlan.transactionPlan
-		)
-
+		const txResponse = await Background.sendTransaction(transactionPlan)
 		await Background.approve(messageId, txResponse)
 		if (window.location.pathname === '/notification.html') {
 			await Background.closeNotificationWindow()
 		}
-
 		setTxResponse(txResponse)
 	}
 
@@ -86,22 +72,9 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 			<div className='w-[100%] min-h-[100vh] flex justify-center items-center px-[40px] py-[24px]'>
 				<div className='w-[100%] min-h-[calc(100vh-48px)] flex flex-col justify-between bg-brown rounded-[10px] p-[16px]'>
 					<div className='flex flex-col gap-y-[16px]'>
-						{sendPlan.actions.map((i, index) => {
-							let text
-							if (i.type === 'send') {
-								text = `${i.amount} ${i.asset} to ${getShortKey(i.destAddress)}`
-							} else {
-								text = `${i.amount} ${i.asset}`
-							}
-							return (
-								<div key={index} className='w-[100%] flex flex-col'>
-									<p className='h2 mb-[8px] capitalize'>{i.type}</p>
-									<p className='py-[8px] px-[16px] bg-dark_grey rounded-[10px] text_numbers_s text-light_grey break-all'>
-										{text}
-									</p>
-								</div>
-							)
-						})}
+						{transactionPlan.actions.map((action, index) => (
+							<ActionView key={index} action={action} />
+						))}
 					</div>
 					<div className='w-[100%] flex gap-x-[16px] mt-[24px]'>
 						<Button

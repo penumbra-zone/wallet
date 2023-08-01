@@ -37,9 +37,12 @@ import { WasmViewConnector } from '../utils/WasmViewConnector'
 import { bytesToBase64 } from '../utils/base64'
 import { bech32m } from 'bech32'
 import { penumbraWasm } from '../utils/wrapperPenumbraWasm'
-import {WasmPlanner} from "penumbra-wasm";
-import {Address, DenomMetadata} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb";
-import {MemoPlaintext} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb";
+import { WasmPlanner } from 'penumbra-wasm'
+import {
+	Address,
+	DenomMetadata,
+} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
+import { MemoPlaintext } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -257,56 +260,53 @@ export class ViewProtocolService {
 
 	async getTransactionPlanner(req?: string) {
 		try {
-
 			const request = new TransactionPlannerRequest().fromJsonString(req)
 
-			console.log(request)
+			let wasmPlanner = new WasmPlanner()
 
-			let wasmPlanner = new WasmPlanner();
-
-			let accountAddressByIndex = await this.getAccountAddresByIndex(0);
+			let accountAddressByIndex = await this.getAccountAddresByIndex(0)
 
 			let address = {
 				altBech32m: accountAddressByIndex,
 			}
 
-
 			if (request.fee) {
-				wasmPlanner.fee(request.fee);
+				wasmPlanner.fee(request.fee)
 			}
 
 			if (request.memo) {
 				let memoPlaintext = new MemoPlaintext({
 					text: request.memo,
-					sender: address
-				});
-				wasmPlanner.memo(memoPlaintext.toJson());
+					sender: address,
+				})
+				wasmPlanner.memo(memoPlaintext.toJson())
 			}
 			for (const output of request.outputs) {
-				output.address.inner = undefined;
-				wasmPlanner.output(output.value.toJson(), output.address.toJson());
+				output.address.inner = undefined
+				wasmPlanner.output(output.value.toJson(), output.address.toJson())
 			}
 
-
 			for (const swap of request.swaps) {
+				const asset = await this.indexedDb.getValue(
+					ASSET_TABLE_NAME,
+					bytesToBase64(swap.targetAsset.inner)
+				)
 
-				const asset = await this.indexedDb.getValue(ASSET_TABLE_NAME, bytesToBase64(swap.targetAsset.inner))
-
-
-				 let accountAddressByIndex = await this.getAccountAddresByIndex(0);
-
+				let accountAddressByIndex = await this.getAccountAddresByIndex(0)
 
 				let address = new Address({
 					altBech32m: accountAddressByIndex,
-				});
+				})
 
-
-
-				wasmPlanner.swap(swap.value.toJson(), asset, swap.fee.toJson(), address.toJson());
+				wasmPlanner.swap(
+					swap.value.toJson(),
+					asset,
+					swap.fee.toJson(),
+					address.toJson()
+				)
 			}
 
-
-			let transactionPlan = await wasmPlanner.plan(address);
+			let transactionPlan = await wasmPlanner.plan(address)
 
 			return {
 				plan: transactionPlan,
@@ -321,7 +321,6 @@ export class ViewProtocolService {
 		const address = await this.getAccountAddresByIndex(req.addressIndex.account)
 
 		const decodeAddress = bech32m.decode(address, 160)
-
 
 		return {
 			address: {
