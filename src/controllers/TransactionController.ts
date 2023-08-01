@@ -46,7 +46,7 @@ export class TransactionController {
 	}
 
 
-	// TODO
+	// TODO refactor for other actions
 	async getTransactionMessageData(
 		transactionPlan: TransactionPlan
 	): Promise<TransactionMessageData> {
