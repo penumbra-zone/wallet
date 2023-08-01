@@ -1,9 +1,8 @@
+import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 import { __BackgroundUiApiDirect } from '../../background'
 import { Contact, NetworkName, PermissionType } from '../../controllers'
 import { TransactionResponse } from '../../messages/types'
-import { PreferencesAccount } from '../../preferences'
 import { StorageLocalState } from '../../storage'
-import { ParsedActions, TransactionPlan } from '../../types/transaction'
 import { TableName } from '../../utils'
 import { CreateWalletInput, ISeedWalletInput } from '../../wallets'
 import { PENUMBRAWALLET_DEBUG } from '../appConfig'
@@ -414,23 +413,6 @@ class Background {
 			throw new Error(prepareErrorMessage(err))
 		}
 	}
-
-	async parseActions(transactionPlan: TransactionPlan): Promise<{
-		transactionPlan: TransactionPlan
-		actions: ParsedActions[]
-	}> {
-		try {
-			await this.initPromise
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			await this._connect!()
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			return await this.background!.parseActions(transactionPlan)
-		} catch (err) {
-			throw new Error(prepareErrorMessage(err))
-		}
-	}
-
-	//parseActions
 
 	async sendTransaction(
 		sendPlan: TransactionPlan

@@ -39,13 +39,13 @@ import { MessageInputOfType, MessageStatus } from './messages/types'
 import { PreferencesAccount } from './preferences'
 import { ViewProtocolService } from './services'
 import { ExtensionStorage, StorageLocalState } from './storage'
-import { TransactionPlan } from './types/transaction'
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
 import { IndexedDb, TableName } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
 import { CreateWalletInput, ISeedWalletInput } from './wallets'
 import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { penumbraWasm } from './utils/wrapperPenumbraWasm'
+import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 
 const bgPromise = setupBackgroundService()
 
@@ -252,8 +252,6 @@ class BackgroundService extends EventEmitter {
 			getMessagesConfig: () => this.remoteConfigController.getMessagesConfig(),
 			setPermission: (origin: string, permission: PermissionType) =>
 				this.permissionsController.setPermission(origin, permission),
-			getTransactionMessageData: async (data: TransactionPlan) =>
-				this.transactionController.getTransactionMessageData(data),
 		})
 
 		this.clientController = new ClientController({
@@ -403,9 +401,6 @@ class BackgroundService extends EventEmitter {
 				this.permissionsController.setPermission(origin, permission),
 			deletePermission: async (origin: string, permission: PermissionType) =>
 				this.permissionsController.deletePermission(origin, permission),
-
-			parseActions: async (transactionPlan: TransactionPlan) =>
-				this.transactionController.getTransactionMessageData(transactionPlan),
 			sendTransaction: async (sendPlan: TransactionPlan) =>
 				this.transactionController.sendTransaction(sendPlan),
 			clearMessages: async () => {

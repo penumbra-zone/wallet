@@ -17,17 +17,14 @@ export class MessageController extends EventEmitter {
 	private store
 	private getMessagesConfig
 	public setPermission
-	private getTransactionMessageData
 	constructor({
 		extensionStorage,
 		getMessagesConfig,
 		setPermission,
-		getTransactionMessageData,
 	}: {
 		extensionStorage: ExtensionStorage
 		getMessagesConfig: RemoteConfigController['getMessagesConfig']
 		setPermission: PermissionController['setPermission']
-		getTransactionMessageData: TransactionController['getTransactionMessageData']
 	}) {
 		super()
 
@@ -40,7 +37,6 @@ export class MessageController extends EventEmitter {
 
 		this.getMessagesConfig = getMessagesConfig
 		this.setPermission = setPermission
-		this.getTransactionMessageData = getTransactionMessageData
 
 		this._rejectAllByTime()
 
@@ -256,13 +252,10 @@ export class MessageController extends EventEmitter {
 					timestamp: Date.now(),
 				}
 			case 'transaction': {
-				const messageTx = await this.getTransactionMessageData(
-					messageInput.data
-				)
 				return {
 					...messageInput,
 					extUuid: messageInput.options ? messageInput.options.uid : undefined,
-					data: messageTx,
+					data: messageInput.data,
 					id: nanoid(),
 					input: messageInput,
 					status: MessageStatus.UnApproved,

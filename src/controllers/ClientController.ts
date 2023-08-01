@@ -119,11 +119,11 @@ export class ClientController extends EventEmitter {
 				chainParametersRequest
 			)
 
-			await this.indexedDb.putValue(
+			await this.indexedDb.putValueWithId(
 				CHAIN_PARAMETERS_TABLE_NAME,
-				JSON.parse(chainParameters.chainParameters.toJsonString())
+				JSON.parse(chainParameters.chainParameters.toJsonString()),
+				'chain_parameters'
 			)
-
 			await this.configApi.setNetworks(
 				chainParameters.chainParameters.chainId,
 				this.configApi.getNetwork()
@@ -157,8 +157,7 @@ export class ClientController extends EventEmitter {
 			return
 		}
 
-		console.log({isRigthSync});
-		
+		console.log({ isRigthSync })
 
 		const chainId = this.getChainId()
 

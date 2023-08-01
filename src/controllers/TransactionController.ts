@@ -1,10 +1,3 @@
-
-import {
-	ActionArrayType,
-	ActionType,
-	TransactionMessageData,
-	TransactionPlan,
-} from '../types/transaction'
 import { IndexedDb } from '../utils'
 import { bytesToBase64 } from '../utils/base64'
 import { NetworkController } from './NetworkController'
@@ -12,6 +5,7 @@ import { RemoteConfigController } from './RemoteConfigController'
 import { WalletController } from './WalletController'
 import { TransactionResponse } from '../messages/types'
 import { penumbraWasm } from '../utils/wrapperPenumbraWasm'
+import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 
 export class TransactionController {
 	private indexedDb: IndexedDb
@@ -45,72 +39,84 @@ export class TransactionController {
 		this.indexedDb = indexedDb
 	}
 
-	async getTransactionMessageData(
-		transactionPlan: TransactionPlan
-	): Promise<TransactionMessageData> {
-		let fvk
-		try {
-			fvk = this.configApi.getAccountFullViewingKey()
-		} catch {}
-		if (!fvk) return
-		let actions
-		await Promise.all(
-			transactionPlan.actions.map(async (i: ActionArrayType) => {
-				const key = Object.keys(i)[0]
-				const value = Object.values(i)[0]
+	// TODO refactor for other actions
+	// async getTransactionMessageData(
+	// 	transactionPlan: TransactionPlan
+	// ): Promise<TransactionMessageData> {
+	// 	let fvk
+	// 	try {
+	// 		fvk = this.configApi.getAccountFullViewingKey()
+	// 	} catch {}
+	// 	if (!fvk) return
+	// 	let actions
+	// 	await Promise.all(
+	// 		transactionPlan.actions.map(async (i: ActionArrayType) => {
 
-				const assetId =
-					key === 'spend'
-						? value.note.value.assetId.inner
-						: value.value.assetId.inner
+	// 			const key = Object.keys(i)[0]
+	// 			const value = Object.values(i)[0]
 
-				const detailAsset = await this.indexedDb.getValue('assets', assetId)
+	// 			if (key === 'swap') {
+	// 				return {
+	// 					type: 'swap',
+	// 					amount: value,
+	// 					asset: "",
+	// 					isOwnAddress: false,
+	// 					destAddress: "",
+	// 				}
+	// 			}
 
-				const asset = detailAsset.display
+	// 			const assetId =
+	// 				key === 'spend'
+	// 					? value.note.value.assetId.inner
+	// 					: value.value.assetId.inner
 
-				const exponent = Number(
-					detailAsset?.denomUnits.find(i => i.denom === asset)?.exponent
-				)
+	// 			const detailAsset = await this.indexedDb.getValue('assets', assetId)
 
-				const amount =
-					Number(
-						key === 'spend' ? value.note.value.amount.lo : value.value.amount.lo
-					) / (exponent ? 10 ** exponent : 1)
+	// 			const asset = detailAsset.display
 
-				const destAddress = key === 'spend' ? '' : value.destAddress.inner
+	// 			const exponent = Number(
+	// 				detailAsset?.denomUnits.find(i => i.denom === asset)?.exponent
+	// 			)
 
-				//encode recipinet address
-				const encodeRecipientAddress = destAddress
-					? penumbraWasm.base64_to_bech32('penumbrav2t', destAddress)
-					: ''
-				//check is recipient address is exist for current user
-				let isOwnAddress: undefined | { inner: string }
-				try {
-					if (key !== 'spend')
-						isOwnAddress = penumbraWasm.is_controlled_address(fvk, encodeRecipientAddress)
-				} catch (error) {
-					console.error('is_controlled_address', error)
-				}
+	// 			const amount =
+	// 				Number(
+	// 					key === 'spend' ? value.note.value.amount.lo : value.value.amount.lo
+	// 				) / (exponent ? 10 ** exponent : 1)
 
-				const type =
-					key === 'output'
-						? isOwnAddress
-							? 'receive'
-							: 'send'
-						: (key as ActionType)
+	// 			const destAddress = key === 'spend' ? '' : value.destAddress.inner
 
-				return {
-					type,
-					amount,
-					asset,
-					isOwnAddress: key === 'spend' ? undefined : Boolean(isOwnAddress),
-					destAddress: encodeRecipientAddress,
-				}
-			})
-		).then(act => (actions = act))
+	// 			//encode recipinet address
+	// 			const encodeRecipientAddress = destAddress
+	// 				? penumbraWasm.base64_to_bech32('penumbrav2t', destAddress)
+	// 				: ''
+	// 			//check is recipient address is exist for current user
+	// 			let isOwnAddress: undefined | { inner: string }
+	// 			try {
+	// 				if (key !== 'spend')
+	// 					isOwnAddress = penumbraWasm.is_controlled_address(fvk, encodeRecipientAddress)
+	// 			} catch (error) {
+	// 				console.error('is_controlled_address', error)
+	// 			}
 
-		return { transactionPlan, actions }
-	}
+	// 			const type =
+	// 				key === 'output'
+	// 					? isOwnAddress
+	// 						? 'receive'
+	// 						: 'send'
+	// 					: (key as ActionType)
+
+	// 			return {
+	// 				type,
+	// 				amount,
+	// 				asset,
+	// 				isOwnAddress: key === 'spend' ? undefined : Boolean(isOwnAddress),
+	// 				destAddress: encodeRecipientAddress,
+	// 			}
+	// 		})
+	// 	).then(act => (actions = act))
+
+	// 	return { transactionPlan, actions }
+	// }
 
 	async sendTransaction(
 		sendPlan: TransactionPlan
@@ -125,7 +131,12 @@ export class TransactionController {
 
 		const storedTree = await this.indexedDb.loadStoredTree()
 
-		const buildTx = penumbraWasm.build_tx(spendingKey, fvk, sendPlan, storedTree)
+		const buildTx = penumbraWasm.build_tx(
+			spendingKey,
+			fvk,
+			sendPlan,
+			storedTree
+		)
 
 		const encodeTx = await penumbraWasm.encode_tx(buildTx)
 

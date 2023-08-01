@@ -23,7 +23,6 @@ import EventEmitter from 'events'
 import {
 	CurrentAccountController,
 	NetworkController,
-	PreferencesController,
 	RemoteConfigController,
 	Transaction,
 	WalletController,
@@ -72,7 +71,7 @@ export class WasmViewConnector extends EventEmitter {
 		getCustomGRPC,
 		getAccountFullViewingKey,
 		updateAssetBalance,
-		addTokenBalance
+		addTokenBalance,
 	}: {
 		indexedDb: IndexedDb
 		getNetworkConfig: RemoteConfigController['getNetworkConfig']
@@ -90,7 +89,7 @@ export class WasmViewConnector extends EventEmitter {
 			getCustomGRPC,
 			getAccountFullViewingKey,
 			updateAssetBalance,
-			addTokenBalance
+			addTokenBalance,
 		}
 	}
 
