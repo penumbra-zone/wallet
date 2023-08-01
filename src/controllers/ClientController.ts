@@ -9,7 +9,7 @@ import {
 	NCT_FORGOTTEN_TABLE_NAME,
 	NCT_HASHES_TABLE_NAME,
 	NCT_POSITION_TABLE_NAME,
-	extension,
+	extension, FMD_PARAMETERS_TABLE_NAME,
 } from '../lib'
 import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
@@ -119,11 +119,12 @@ export class ClientController extends EventEmitter {
 				chainParametersRequest
 			)
 
-			await this.indexedDb.putValue(
-				CHAIN_PARAMETERS_TABLE_NAME,
-				JSON.parse(chainParameters.chainParameters.toJsonString())
-			)
 
+			await this.indexedDb.putValueWithId(
+				CHAIN_PARAMETERS_TABLE_NAME,
+				JSON.parse(chainParameters.chainParameters.toJsonString()),
+				'chain_parameters'
+			)
 			await this.configApi.setNetworks(
 				chainParameters.chainParameters.chainId,
 				this.configApi.getNetwork()

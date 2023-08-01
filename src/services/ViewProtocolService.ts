@@ -37,6 +37,9 @@ import { WasmViewConnector } from '../utils/WasmViewConnector'
 import { bytesToBase64 } from '../utils/base64'
 import { bech32m } from 'bech32'
 import { penumbraWasm } from '../utils/wrapperPenumbraWasm'
+import {WasmPlanner} from "penumbra-wasm";
+import {Address, DenomMetadata} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb";
+import {MemoPlaintext} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb";
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -254,46 +257,56 @@ export class ViewProtocolService {
 
 	async getTransactionPlanner(req?: string) {
 		try {
+
 			const request = new TransactionPlannerRequest().fromJsonString(req)
 
-			let transactionPlan
-			if (request.outputs.length) {
-				let notes = await this.indexedDb.getAllValue(SPENDABLE_NOTES_TABLE_NAME)
+			console.log(request)
 
-				notes = notes
-					.filter(note => note.heightSpent === undefined)
-					.filter(
-						note =>
-							note.note.value.assetId.inner ===
-							bytesToBase64(request.outputs[0].value.assetId.inner)
-					)
-				if (!notes.length) console.error('No notes found to spend')
+			let wasmPlanner = new WasmPlanner();
 
-				const fmdParameters = await this.indexedDb.getValue(
-					FMD_PARAMETERS_TABLE_NAME,
-					`fmd`
-				)
-				if (!fmdParameters) console.error('No found FmdParameters')
+			let accountAddressByIndex = await this.getAccountAddresByIndex(0);
 
-				const chainParamsRecords = await this.indexedDb.getAllValue(
-					CHAIN_PARAMETERS_TABLE_NAME
-				)
-				const chainParameters = await chainParamsRecords[0]
-				if (!fmdParameters) console.error('No found chain parameters')
-
-				const viewServiceData = {
-					notes,
-					chain_parameters: chainParameters,
-					fmd_parameters: fmdParameters,
-				}
-
-				transactionPlan = await penumbraWasm.send_plan(
-					this.getAccountFullViewingKey(),
-					request.outputs[0].value.toJson(),
-					request.outputs[0].address.altBech32m,
-					viewServiceData
-				)
+			let address = {
+				altBech32m: accountAddressByIndex,
 			}
+
+
+			if (request.fee) {
+				wasmPlanner.fee(request.fee);
+			}
+
+			if (request.memo) {
+				let memoPlaintext = new MemoPlaintext({
+					text: request.memo,
+					sender: address
+				});
+				wasmPlanner.memo(memoPlaintext.toJson());
+			}
+			for (const output of request.outputs) {
+				output.address.inner = undefined;
+				wasmPlanner.output(output.value.toJson(), output.address.toJson());
+			}
+
+
+			for (const swap of request.swaps) {
+
+				const asset = await this.indexedDb.getValue(ASSET_TABLE_NAME, bytesToBase64(swap.targetAsset.inner))
+
+
+				 let accountAddressByIndex = await this.getAccountAddresByIndex(0);
+
+
+				let address = new Address({
+					altBech32m: accountAddressByIndex,
+				});
+
+
+
+				wasmPlanner.swap(swap.value.toJson(), asset, swap.fee.toJson(), address.toJson());
+			}
+
+
+			let transactionPlan = await wasmPlanner.plan(address);
 
 			return {
 				plan: transactionPlan,
@@ -308,6 +321,7 @@ export class ViewProtocolService {
 		const address = await this.getAccountAddresByIndex(req.addressIndex.account)
 
 		const decodeAddress = bech32m.decode(address, 160)
+
 
 		return {
 			address: {

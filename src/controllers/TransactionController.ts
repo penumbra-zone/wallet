@@ -45,6 +45,8 @@ export class TransactionController {
 		this.indexedDb = indexedDb
 	}
 
+
+	// TODO
 	async getTransactionMessageData(
 		transactionPlan: TransactionPlan
 	): Promise<TransactionMessageData> {
@@ -56,8 +58,19 @@ export class TransactionController {
 		let actions
 		await Promise.all(
 			transactionPlan.actions.map(async (i: ActionArrayType) => {
+
 				const key = Object.keys(i)[0]
 				const value = Object.values(i)[0]
+
+				if (key === 'swap') {
+					return {
+						type: 'swap',
+						amount: value,
+						asset: "",
+						isOwnAddress: false,
+						destAddress: "",
+					}
+				}
 
 				const assetId =
 					key === 'spend'

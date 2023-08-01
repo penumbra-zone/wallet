@@ -60,7 +60,7 @@ export class IndexedDb {
 
 	public async createObjectStore() {
 		try {
-			this.db = await openDB(this.database, 11, {
+			this.db = await openDB(this.database, 12, {
 				async upgrade(db: IDBPDatabase) {
 					for (const objectStoreName of db.objectStoreNames) {
 						db.deleteObjectStore(objectStoreName)
@@ -71,10 +71,7 @@ export class IndexedDb {
 						keyPath: 'penumbraAssetId.inner',
 					})
 
-					db.createObjectStore(CHAIN_PARAMETERS_TABLE_NAME, {
-						autoIncrement: true,
-						keyPath: 'chainId',
-					})
+					db.createObjectStore(CHAIN_PARAMETERS_TABLE_NAME, )
 
 					db.createObjectStore(TRANSACTION_TABLE_NAME, {
 						keyPath: 'id.hash',

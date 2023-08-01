@@ -50,7 +50,7 @@ export type TransactionPlan = {
 	actions: ActionArrayType[]
 }
 
-export type ActionType = 'receive' | 'send' | 'spend'
+export type ActionType = 'receive' | 'send' | 'spend' | 'swap'
 
 export type ParsedActions = {
 	type: ActionType
