@@ -47,7 +47,6 @@ if (document.documentElement.tagName === 'HTML') {
 						getPort().postMessage(data)
 					})
 				)
-
 				storage.onChanged.addListener(data => {
 					if (data.lastBlockHeight || data.lastSavedBlock) {
 						postMessage({ penumbraMethod: STATUS }, location.origin)

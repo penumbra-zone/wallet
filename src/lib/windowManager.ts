@@ -110,18 +110,10 @@ export class WindowManager {
 	}
 
 	async _getNotificationWindow() {
-		// get all extension windows
-		const windows = await new Promise<Windows.Static[]>(resolve =>
-			windows.getAll({}, windows => {
-				resolve(windows || [])
-			})
-		)
+		const allWindows = (await windows.getAll({ windowTypes: ['popup'] })) ?? []
 
 		const { notificationWindowId } = this.store.getState()
 
-		// find our ui window
-		return windows.find(
-			window => window.type === 'popup' && window.id === notificationWindowId
-		)
+		return allWindows.find(window => window.id === notificationWindowId)
 	}
 }

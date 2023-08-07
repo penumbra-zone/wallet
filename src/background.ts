@@ -28,12 +28,7 @@ import {
 	WalletController,
 } from './controllers'
 import { TransactionController } from './controllers/TransactionController'
-import {
-	TabsManager,
-	WindowManager,
-	fromPort,
-	handleMethodCallRequests,
-} from './lib'
+import { fromPort, handleMethodCallRequests } from './lib'
 import { MessageInputOfType, MessageStatus } from './messages/types'
 import { PreferencesAccount } from './preferences'
 import { ViewProtocolService } from './services'
@@ -52,6 +47,8 @@ import {
 	browserAction,
 	runtime,
 } from 'webextension-polyfill'
+import { TabsManager } from './lib/tabsManager'
+import { WindowManager } from './lib/windowManager'
 
 const bgPromise = setupBackgroundService()
 

@@ -21,9 +21,12 @@ export class TabsManager {
 			tabProps.url = url
 		}
 
+		console.log({ tabProps })
+
 		return new Promise<void>((resolve, reject) => {
 			try {
-				tabs.get(currentTab?.id!)
+				const a = tabs.get(currentTab?.id!)
+				console.log({ a })
 
 				tabs.update(currentTab!.id!, tabProps)
 			} catch (err) {
