@@ -31,7 +31,6 @@ import { TransactionController } from './controllers/TransactionController'
 import {
 	TabsManager,
 	WindowManager,
-	extension,
 	fromPort,
 	handleMethodCallRequests,
 } from './lib'
@@ -46,10 +45,17 @@ import { CreateWalletInput, ISeedWalletInput } from './wallets'
 import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { penumbraWasm } from './utils/wrapperPenumbraWasm'
 import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
+import {
+	Runtime,
+	action,
+	alarms,
+	browserAction,
+	runtime,
+} from 'webextension-polyfill'
 
 const bgPromise = setupBackgroundService()
 
-extension.runtime.onConnect.addListener(async remotePort => {
+runtime.onConnect.addListener(async remotePort => {
 	const bgService = await bgPromise
 	if (remotePort.name === 'contentscript') {
 		bgService.setupPageConnection(remotePort)
@@ -76,9 +82,9 @@ async function setupBackgroundService() {
 		const msg = messages.length
 		const text = msg ? String(msg) : ''
 
-		const action = extension.action || extension.browserAction
-		action.setBadgeText({ text })
-		action.setBadgeBackgroundColor({ color: '#037DD6' })
+		const actions = action || browserAction
+		actions.setBadgeText({ text })
+		actions.setBadgeBackgroundColor({ color: '#037DD6' })
 	}
 
 	backgroundService.messageController.on('Update badge', updateBadge)
@@ -284,8 +290,8 @@ class BackgroundService extends EventEmitter {
 		})
 	}
 
-	setupPageConnection(sourcePort: chrome.runtime.Port) {
-		let port: chrome.runtime.Port | null = sourcePort
+	setupPageConnection(sourcePort: Runtime.Port) {
+		let port: Runtime.Port | null = sourcePort
 
 		const { sender } = port
 
@@ -335,7 +341,7 @@ class BackgroundService extends EventEmitter {
 			lock: async () => {
 				await this.vaultController.lock()
 				await this.clientController.abortGrpcRequest()
-				extension.alarms.clear('connection')
+				alarms.clear('connection')
 			},
 			unlock: async (password: string) => this.vaultController.unlock(password),
 			addWallet: async (account: CreateWalletInput) =>
@@ -363,7 +369,7 @@ class BackgroundService extends EventEmitter {
 				await this.wasmViewConnector.resetWallet()
 				await this.clientController.resetWallet()
 				await this.vaultController.lock()
-				extension.alarms.clear('connection')
+				alarms.clear('connection')
 			},
 			setCustomGRPC: async (
 				url: string | null | undefined,
@@ -635,8 +641,8 @@ class BackgroundService extends EventEmitter {
 		}
 	}
 
-	setupUiConnection(sourcePort: chrome.runtime.Port) {
-		let port: chrome.runtime.Port | null = sourcePort
+	setupUiConnection(sourcePort: Runtime.Port) {
+		let port: Runtime.Port | null = sourcePort
 		const api = this.getApi()
 
 		pipe(

@@ -1,6 +1,6 @@
+import { Tabs, tabs } from 'webextension-polyfill'
 import { ExtensionStorage } from '../storage/storage'
 import ObservableStore from 'obs-store'
-import { extension } from './extension'
 
 export class TabsManager {
 	private store
@@ -13,40 +13,34 @@ export class TabsManager {
 	}
 
 	async getOrCreate(url: string, key: string) {
-		const { tabs } = this.store.getState()
+		const { tabs: tabsFromState } = this.store.getState()
 
-		const currentTab = tabs[key]
-		const tabProps: chrome.tabs.UpdateProperties = { active: true }
+		const currentTab = tabsFromState[key]
+		const tabProps: Tabs.UpdateUpdatePropertiesType = { active: true }
 		if (url != currentTab?.url) {
 			tabProps.url = url
 		}
 
 		return new Promise<void>((resolve, reject) => {
 			try {
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
-				extension.tabs.get(currentTab?.id!, tab => {
-					if (!tab) {
-						reject(new Error("Tab doesn't exists"))
-					}
-				})
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				extension.tabs.update(currentTab!.id!, tabProps, () => resolve())
+				tabs.get(currentTab?.id!)
+
+				tabs.update(currentTab!.id!, tabProps)
 			} catch (err) {
 				reject(err)
 			}
 		}).catch(() =>
-			extension.tabs.create({ url: url }, tab => {
-				this.store.updateState({ tabs: { ...tabs, [key]: { ...tab, url } } })
-			})
+			tabs.create({ url }).then(tab =>
+				this.store.updateState({
+					tabs: { ...tabsFromState, [key]: { ...tab, url } },
+				})
+			)
 		)
 	}
 
 	async closeCurrentTab() {
-		extension.tabs.query(
-			{ active: true, lastFocusedWindow: true },
-			tab =>
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				tab[0] && extension.tabs.remove([tab[0].id!])
-		)
+		tabs
+			.query({ active: true, lastFocusedWindow: true })
+			.then(tab => tab[0] && tabs.remove([tab[0].id!]))
 	}
 }

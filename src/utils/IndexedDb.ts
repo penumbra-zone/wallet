@@ -12,6 +12,7 @@ import {
 	TRANSACTION_BY_NULLIFIER_TABLE_NAME,
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
+import { Runtime } from 'webextension-polyfill'
 
 export type StoredTree = {
 	last_position: number
@@ -48,7 +49,7 @@ export class IndexedDb {
 	private database: string
 	private db: any
 	private connectedPagesPorts: {
-		port: chrome.runtime.Port
+		port: Runtime.Port
 		connectionId: string
 	}[]
 
@@ -71,7 +72,7 @@ export class IndexedDb {
 						keyPath: 'penumbraAssetId.inner',
 					})
 
-					db.createObjectStore(CHAIN_PARAMETERS_TABLE_NAME, )
+					db.createObjectStore(CHAIN_PARAMETERS_TABLE_NAME)
 
 					db.createObjectStore(TRANSACTION_TABLE_NAME, {
 						keyPath: 'id.hash',
@@ -194,10 +195,7 @@ export class IndexedDb {
 		}
 	}
 
-	addConnectedPagePort(value: {
-		port: chrome.runtime.Port
-		connectionId: string
-	}) {
+	addConnectedPagePort(value: { port: Runtime.Port; connectionId: string }) {
 		this.connectedPagesPorts.push(value)
 	}
 
@@ -247,7 +245,7 @@ export class IndexedDb {
 			for (const { port } of this.connectedPagesPorts) {
 				port.postMessage({
 					penumbraMethod: replaceObject[tableName],
-					origin: port.sender.origin,
+					origin: port.sender.url,
 					data,
 				})
 			}

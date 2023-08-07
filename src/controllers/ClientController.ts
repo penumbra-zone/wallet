@@ -9,7 +9,6 @@ import {
 	NCT_FORGOTTEN_TABLE_NAME,
 	NCT_HASHES_TABLE_NAME,
 	NCT_POSITION_TABLE_NAME,
-	extension,
 } from '../lib'
 import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
@@ -23,6 +22,7 @@ import { CompactBlock } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/c
 import { ObliviousQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
 import { CurrentAccountController } from './CurrentAccountController'
 import EventEmitter from 'events'
+import { alarms } from 'webextension-polyfill'
 
 export type Transaction = {
 	blockHeight: bigint
@@ -90,7 +90,7 @@ export class ClientController extends EventEmitter {
 		this.indexedDb = indexedDb
 		this.wasmViewConnector = wasmViewConnector
 
-		extension.alarms.onAlarm.addListener(({ name }) => {
+		alarms.onAlarm.addListener(({ name }) => {
 			if (name === 'connection') {
 				this.checkInternetConnection()
 			}
@@ -417,14 +417,14 @@ export class ClientController extends EventEmitter {
 	}
 
 	async checkInternetConnection() {
-		extension.alarms.create('connection', {
+		alarms.create('connection', {
 			delayInMinutes: 5 / 60,
 		})
 		try {
 			const response = await fetch(this.getGRPC(), { method: 'HEAD' })
 
 			if (response.ok) {
-				extension.alarms.clear('connection')
+				alarms.clear('connection')
 				this.saveChainParameters()
 				this.getCompactBlockRange()
 			} else {

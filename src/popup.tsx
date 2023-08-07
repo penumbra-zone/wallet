@@ -5,18 +5,14 @@ import { Provider } from 'react-redux'
 import { RouterProvider, createMemoryRouter } from 'react-router-dom'
 import invariant from 'tiny-invariant'
 import { createAccountsStore, createUpdateState } from './account'
-import {
-	createIpcCallProxy,
-	extension,
-	fromPort,
-	handleMethodCallRequests,
-} from './lib'
+import { createIpcCallProxy, fromPort, handleMethodCallRequests } from './lib'
 import './ui/main.css'
 import { routesUi } from './ui/routesUi'
 import backgroundService, {
 	BackgroundGetStateResult,
 	BackgroundUiApi,
 } from './ui/services/Background'
+import { Runtime, extension, runtime, storage } from 'webextension-polyfill'
 
 const isNotificationWindow = window.location.pathname === '/notification.html'
 
@@ -36,7 +32,7 @@ async function startPopup() {
 
 	const updateState = createUpdateState(store)
 
-	extension.storage.onChanged.addListener(async (changes, area) => {
+	storage.onChanged.addListener(async (changes, area) => {
 		if (area !== 'local') return
 
 		const stateChanges: Partial<Record<string, unknown>> &
@@ -54,7 +50,7 @@ async function startPopup() {
 	const connect = () => {
 		const uiApi = {
 			closePopupWindow: async () => {
-				const popup = extension.extension
+				const popup = extension
 					.getViews({ type: 'popup' })
 					.find(w => w.location.pathname === '/popup.html')
 				if (popup) {
@@ -62,7 +58,7 @@ async function startPopup() {
 				}
 			},
 		}
-		let port: chrome.runtime.Port | null = extension.runtime.connect()
+		let port: Runtime.Port | null = runtime.connect()
 		pipe(
 			fromPort(port),
 			handleMethodCallRequests(uiApi, res => port.postMessage(res)),
@@ -83,7 +79,7 @@ async function startPopup() {
 	const background = connect()
 
 	// If popup is opened close notification window
-	if (extension.extension.getViews({ type: 'popup' }).length > 0) {
+	if (extension.getViews({ type: 'popup' }).length > 0) {
 		await background.closeNotificationWindow()
 	}
 

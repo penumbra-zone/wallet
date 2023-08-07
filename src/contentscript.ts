@@ -3,7 +3,6 @@ import subscribe from 'callbag-subscribe'
 import {
 	ACCOUNTS_CHANGED,
 	BALANCE,
-	extension,
 	filterIpcRequests,
 	fromPort,
 	fromPostMessage,
@@ -11,13 +10,14 @@ import {
 	STATUS,
 } from './lib'
 import { getObjectChanges } from './utils'
+import { runtime, storage } from 'webextension-polyfill'
 
 if (document.documentElement.tagName === 'HTML') {
 	const getPort = (() => {
 		let port
 		return () => {
 			if (!port) {
-				port = extension.runtime.connect({ name: 'contentscript' })
+				port = runtime.connect({ name: 'contentscript' })
 
 				pipe(
 					fromPort(port),
@@ -38,7 +38,7 @@ if (document.documentElement.tagName === 'HTML') {
 	const container = document.head || document.documentElement
 	container.appendChild(
 		Object.assign(document.createElement('script'), {
-			src: extension.runtime.getURL('inpage.js'),
+			src: runtime.getURL('inpage.js'),
 			onload: () => {
 				pipe(
 					fromPostMessage(),
@@ -48,7 +48,7 @@ if (document.documentElement.tagName === 'HTML') {
 					})
 				)
 
-				extension.storage.onChanged.addListener(data => {
+				storage.onChanged.addListener(data => {
 					if (data.lastBlockHeight || data.lastSavedBlock) {
 						postMessage({ penumbraMethod: STATUS }, location.origin)
 					} else if (data.balance) {
