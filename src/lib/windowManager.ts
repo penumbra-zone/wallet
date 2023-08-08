@@ -7,14 +7,10 @@ const NOTIFICATION_WIDTH = 400
 
 function checkForError() {
 	const { lastError } = runtime
-	if (!lastError) {
-		return undefined
-	}
-	// if it quacks like an Error, its an Error
-	if (lastError.message) {
-		return lastError
-	}
-	// repair incomplete error object (eg chromium v77)
+	if (!lastError) return undefined
+
+	if (lastError.message) return lastError
+
 	return new Error(lastError.message)
 }
 

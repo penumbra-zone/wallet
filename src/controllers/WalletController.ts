@@ -155,7 +155,6 @@ export class WalletController extends EventEmitter {
 	_saveWallets() {
 		const walletsData = this.wallets.map(wallet => wallet.serialize())
 		this.store.updateState({
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			WalletController: { vault: encrypt(walletsData, this.password!) },
 		})
 	}

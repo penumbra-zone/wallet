@@ -29,7 +29,7 @@ export const PERMISSIONS = {
 	GET_TRANSACTION_PERSPECTIVE: 'getTransactionPerspective',
 } as const
 
-export type PermissionType = typeof PERMISSIONS[keyof typeof PERMISSIONS]
+export type PermissionType = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]
 
 type PermissionsStoreState = Pick<
 	StorageLocalState,
@@ -39,18 +39,13 @@ type PermissionsStoreState = Pick<
 export class PermissionController {
 	private store
 	private remoteConfig
-	private getSelectedAccount
 
 	constructor({
 		extensionStorage,
 		remoteConfig,
-		getSelectedAccount,
-	}: // identity,
-	{
+	}: {
 		extensionStorage: ExtensionStorage
 		remoteConfig: RemoteConfigController
-		getSelectedAccount: PreferencesController['getSelectedAccount']
-		// identity: Identity;
 	}) {
 		this.store = new ObservableStore(
 			extensionStorage.getInitState({
@@ -62,7 +57,6 @@ export class PermissionController {
 		extensionStorage.subscribe(this.store)
 		this.remoteConfig = remoteConfig
 		this._updateByConfig()
-		this.getSelectedAccount = getSelectedAccount
 	}
 
 	getMessageIdAccess(origin: string) {
@@ -182,9 +176,8 @@ export class PermissionController {
 				if (!permissions.includes(permission)) {
 					permissions.push(permission)
 				}
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 				if (!permissions.includes(type as any)) {
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 					permissions.push(type as any)
 				}
 				acc[origin] = permissions

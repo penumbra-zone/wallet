@@ -80,8 +80,7 @@ export class ExtensionStorage {
 		const defaultsInitState = Object.keys(defaults).reduce(
 			(acc, key) =>
 				Object.prototype.hasOwnProperty.call(this._localState, key)
-					? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-					  { ...acc, [key]: (this._localState as any)[key] }
+					? { ...acc, [key]: (this._localState as any)[key] }
 					: acc,
 			{}
 		)

@@ -103,6 +103,7 @@ async function setupBackgroundService() {
 	})
 
 	const tabsManager = new TabsManager({ extensionStorage })
+
 	backgroundService.on('Show tab', async (url, name) => {
 		backgroundService.emit('closePopupWindow')
 		return tabsManager.getOrCreate(url, name)
@@ -196,7 +197,6 @@ class BackgroundService extends EventEmitter {
 		this.permissionsController = new PermissionController({
 			extensionStorage: this.extensionStorage,
 			remoteConfig: this.remoteConfigController,
-			getSelectedAccount: () => this.preferencesController.getSelectedAccount(),
 		})
 
 		this.networkController = new NetworkController({
@@ -282,8 +282,6 @@ class BackgroundService extends EventEmitter {
 				this.wasmViewConnector.getTransaction(txHash),
 			getAccountAddresByIndex: (index: number) =>
 				this.walletController.getAccountAddresByIndex(index),
-			getAccountFullViewingKey: () =>
-				this.walletController.getAccountFullViewingKeyWithoutPassword(),
 		})
 	}
 

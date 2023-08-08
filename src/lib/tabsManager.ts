@@ -21,8 +21,6 @@ export class TabsManager {
 			tabProps.url = url
 		}
 
-		console.log({ tabProps })
-
 		return new Promise<void>((resolve, reject) => {
 			try {
 				const a = tabs.get(currentTab?.id!)
@@ -39,11 +37,5 @@ export class TabsManager {
 				})
 			)
 		)
-	}
-
-	async closeCurrentTab() {
-		tabs
-			.query({ active: true, lastFocusedWindow: true })
-			.then(tab => tab[0] && tabs.remove([tab[0].id!]))
 	}
 }
