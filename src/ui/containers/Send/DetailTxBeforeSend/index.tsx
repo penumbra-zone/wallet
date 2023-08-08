@@ -9,6 +9,7 @@ import Background from '../../../services/Background'
 import { TransactionResponse } from '../../../../messages/types'
 import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 import { ActionView } from '../../../components/ActionView'
+import { ActionCell } from '../../../components/ActionCell'
 
 type DetailTxBeforeSendProps = {
 	transactionPlan: TransactionPlan
@@ -75,6 +76,11 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 						{transactionPlan.actions.map((action, index) => (
 							<ActionView key={index} action={action} />
 						))}
+						{transactionPlan.memoPlan.plaintext.text && (
+							<ActionCell title='Memo'>
+								{transactionPlan.memoPlan.plaintext.text}
+							</ActionCell>
+						)}
 					</div>
 					<div className='w-[100%] flex gap-x-[16px] mt-[24px]'>
 						<Button
