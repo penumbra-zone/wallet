@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import loader from '../../../../assets/gif/loader.gif'
 import { TRANSACTION_TABLE_NAME } from '../../../../lib'
 import { routesPath } from '../../../../utils'
-import { Button, ModalWrapper } from '../../../components'
+import { Button, MemoView, ModalWrapper } from '../../../components'
 import Background from '../../../services/Background'
 import { TransactionResponse } from '../../../../messages/types'
 import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
@@ -76,11 +76,16 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 						{transactionPlan.actions.map((action, index) => (
 							<ActionView key={index} action={action} />
 						))}
-						{transactionPlan.memoPlan.plaintext.text && (
+						<p className='h2 mb-[12px] mt-[16px]'>Memo</p>
+
+						<MemoView
+							memoView={transactionPlan.memoPlan}
+						/>
+						{/* {transactionPlan.memoPlan.plaintext.text && (
 							<ActionCell title='Memo'>
 								{transactionPlan.memoPlan.plaintext.text}
 							</ActionCell>
-						)}
+						)} */}
 					</div>
 					<div className='w-[100%] flex gap-x-[16px] mt-[24px]'>
 						<Button
