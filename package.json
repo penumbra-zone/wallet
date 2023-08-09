@@ -37,7 +37,7 @@
 		"nanoid": "^4.0.1",
 		"npm": "^9.8.1",
 		"obs-store": "^4.0.3",
-		"penumbra-wasm": "0.57.2-planner",
+		"penumbra-wasm": "0.58.0",
 		"ramda": "^0.28.0",
 		"react": "^18.2.0",
 		"react-circular-progressbar": "^2.1.0",
