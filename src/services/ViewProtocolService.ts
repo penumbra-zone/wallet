@@ -275,11 +275,7 @@ export class ViewProtocolService {
 			}
 
 			if (request.memo) {
-				let memoPlaintext = new MemoPlaintext({
-					text: request.memo,
-					sender: address,
-				})
-				wasmPlanner.memo(memoPlaintext.toJson())
+				wasmPlanner.memo(request.memo.toJson())
 			}
 			for (const output of request.outputs) {
 				output.address.inner = undefined
