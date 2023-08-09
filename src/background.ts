@@ -10,6 +10,15 @@ import subscribe from 'callbag-subscribe'
 import EventEmitter from 'events'
 import { nanoid } from 'nanoid'
 
+import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
+import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
+import {
+	Runtime,
+	action,
+	alarms,
+	browserAction,
+	runtime,
+} from 'webextension-polyfill'
 import {
 	ClientController,
 	Contact,
@@ -29,6 +38,8 @@ import {
 } from './controllers'
 import { TransactionController } from './controllers/TransactionController'
 import { fromPort, handleMethodCallRequests } from './lib'
+import { TabsManager } from './lib/tabsManager'
+import { WindowManager } from './lib/windowManager'
 import { MessageInputOfType, MessageStatus } from './messages/types'
 import { PreferencesAccount } from './preferences'
 import { ViewProtocolService } from './services'
@@ -36,19 +47,8 @@ import { ExtensionStorage, StorageLocalState } from './storage'
 import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
 import { IndexedDb, TableName } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
-import { CreateWalletInput, ISeedWalletInput } from './wallets'
-import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { penumbraWasm } from './utils/wrapperPenumbraWasm'
-import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
-import {
-	Runtime,
-	action,
-	alarms,
-	browserAction,
-	runtime,
-} from 'webextension-polyfill'
-import { TabsManager } from './lib/tabsManager'
-import { WindowManager } from './lib/windowManager'
+import { CreateWalletInput, ISeedWalletInput } from './wallets'
 
 const bgPromise = setupBackgroundService()
 
@@ -106,7 +106,7 @@ async function setupBackgroundService() {
 
 	backgroundService.on('Show tab', async (url, name) => {
 		backgroundService.emit('closePopupWindow')
-		return tabsManager.getOrCreate(url, name)
+		return tabsManager.getOrCreateTab(url, name)
 	})
 
 	backgroundService.walletController.on('wallet create', async () => {
@@ -423,6 +423,7 @@ class BackgroundService extends EventEmitter {
 				await this.permissionsController.clearStore()
 				await this.indexedDb.clearAllTables()
 			},
+			
 		}
 	}
 

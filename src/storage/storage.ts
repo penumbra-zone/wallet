@@ -11,9 +11,10 @@ import { Message } from '../messages/types'
 import pipe from 'callbag-pipe'
 import create from 'callbag-create'
 import subscribe from 'callbag-subscribe'
-import { Storage, runtime, storage } from 'webextension-polyfill'
+import { Storage, Tabs, runtime, storage } from 'webextension-polyfill'
 
 export type StorageLocalState = {
+	tabs: Record<string, Tabs.Tab>
 	contacts: Contact[]
 	selectedAccount: PreferencesAccount | undefined
 	isInitialized: boolean | null
@@ -44,8 +45,8 @@ export type StorageLocalState = {
 	whitelist: string[]
 	inPending: Record<string, string | null>
 	messages: Message[]
-	notificationWindowId: number | undefined
-	inShowMode: boolean | undefined
+	notificationWindowId?: number
+	inShowMode?: boolean
 	idleInterval: number
 	balance: Record<string, number>
 }

@@ -1,5 +1,5 @@
 import ObservableStore from 'obs-store'
-import { ExtensionStorage } from '../storage'
+import { ExtensionStorage, StorageLocalState } from '../storage'
 import { Windows, runtime, windows } from 'webextension-polyfill'
 
 const NOTIFICATION_HEIGHT = 600
@@ -15,15 +15,12 @@ function checkForError() {
 }
 
 export class WindowManager {
-	private store
+	private store: ObservableStore<
+		Pick<StorageLocalState, 'notificationWindowId' | 'inShowMode'>
+	>
 
 	constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
-		this.store = new ObservableStore(
-			extensionStorage.getInitState({
-				notificationWindowId: undefined,
-				inShowMode: undefined,
-			})
-		)
+		this.store = new ObservableStore(extensionStorage.getInitState({}))
 
 		extensionStorage.subscribe(this.store)
 	}

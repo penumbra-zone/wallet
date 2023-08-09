@@ -1,9 +1,9 @@
-import { Tabs, tabs } from 'webextension-polyfill'
-import { ExtensionStorage } from '../storage/storage'
 import ObservableStore from 'obs-store'
+import { Tabs, tabs } from 'webextension-polyfill'
+import { ExtensionStorage, StorageLocalState } from '../storage/storage'
 
 export class TabsManager {
-	private store
+	private store: ObservableStore<Pick<StorageLocalState, 'tabs'>>
 
 	constructor({ extensionStorage }: { extensionStorage: ExtensionStorage }) {
 		this.store = new ObservableStore(
@@ -12,30 +12,31 @@ export class TabsManager {
 		extensionStorage.subscribe(this.store)
 	}
 
-	async getOrCreate(url: string, key: string) {
-		const { tabs: tabsFromState } = this.store.getState()
+	async getOrCreateTab(url: string, key: string) {
+		const { tabs: savedTabs } = this.store.getState()
 
-		const currentTab = tabsFromState[key]
-		const tabProps: Tabs.UpdateUpdatePropertiesType = { active: true }
-		if (url != currentTab?.url) {
-			tabProps.url = url
-		}
+		const currentTab: Tabs.Tab | undefined = savedTabs[key]
 
-		return new Promise<void>((resolve, reject) => {
-			try {
-				const a = tabs.get(currentTab?.id!)
-				console.log({ a })
+		if (!currentTab) return await this.createTab(url, key)
 
-				tabs.update(currentTab!.id!, tabProps)
-			} catch (err) {
-				reject(err)
+		try {
+			await tabs.get(currentTab.id)
+			const tabProps = {
+				active: true,
+				url: url !== currentTab.url ? url : currentTab.url,
 			}
-		}).catch(() =>
-			tabs.create({ url }).then(tab =>
-				this.store.updateState({
-					tabs: { ...tabsFromState, [key]: { ...tab, url } },
-				})
-			)
-		)
+			await tabs.update(currentTab.id, tabProps)
+		} catch (error) {
+			await this.createTab(url, key)
+		}
+	}
+
+	async createTab(url: string, key: string) {
+		const { tabs: savedTabs } = this.store.getState()
+		const newtab = await tabs.create({ url })
+
+		this.store.updateState({
+			tabs: { ...savedTabs, [key]: { ...newtab, url } },
+		})
 	}
 }
