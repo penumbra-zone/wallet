@@ -9,6 +9,7 @@ import {
 	BalancesResponse,
 	ChainParametersRequest,
 	ChainParametersResponse,
+	EphemeralAddressRequest,
 	FMDParametersRequest,
 	FMDParametersResponse,
 	NoteByCommitmentRequest,
@@ -36,13 +37,9 @@ import {
 import { WasmViewConnector } from '../utils/WasmViewConnector'
 import { bytesToBase64 } from '../utils/base64'
 import { bech32m } from 'bech32'
+
+import { Address } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { penumbraWasm } from '../utils/wrapperPenumbraWasm'
-import { WasmPlanner } from 'penumbra-wasm'
-import {
-	Address,
-	DenomMetadata,
-} from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
-import { MemoPlaintext } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -262,7 +259,7 @@ export class ViewProtocolService {
 		try {
 			const request = new TransactionPlannerRequest().fromJsonString(req)
 
-			let wasmPlanner = new WasmPlanner()
+			let wasmPlanner = new penumbraWasm.WasmPlanner()
 
 			let accountAddressByIndex = await this.getAccountAddresByIndex(0)
 
@@ -315,6 +312,24 @@ export class ViewProtocolService {
 	async getAddressByIndex(request: string) {
 		const req = new AddressByIndexRequest().fromJsonString(request)
 		const address = await this.getAccountAddresByIndex(req.addressIndex.account)
+
+		const decodeAddress = bech32m.decode(address, 160)
+
+		return {
+			address: {
+				inner: bytesToBase64(
+					new Uint8Array(bech32m.fromWords(decodeAddress.words))
+				),
+				altBech32m: address,
+			},
+		}
+	}
+
+	async getEphemeralAddress(request: string) {
+		const req = new EphemeralAddressRequest().fromJsonString(request)
+		const address = penumbraWasm.get_ephemeral_address(req.addressIndex.account)
+		console.log({address});
+		
 
 		const decodeAddress = bech32m.decode(address, 160)
 

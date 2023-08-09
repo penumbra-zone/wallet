@@ -10,6 +10,8 @@ import {
 	BalancesRequest,
 	BalancesResponse,
 	ChainParametersResponse,
+	EphemeralAddressRequest,
+	EphemeralAddressResponse,
 	FMDParametersResponse,
 	NotesResponse,
 	StatusResponse,
@@ -43,6 +45,9 @@ declare global {
 		getTransactionPlanner: (
 			request: TransactionPlannerRequest
 		) => Promise<TransactionPlannerResponse>
+		getEphemeralAddress: (
+			request: EphemeralAddressRequest
+		) => Promise<EphemeralAddressResponse>
 		on(
 			event: Events,
 			cb: (
@@ -107,6 +112,11 @@ globalThis.penumbra = {
 	getTransactionPlanner: async request => {
 		return new TransactionPlannerResponse().fromJson(
 			await proxy.getTransactionPlannerProxy(request.toJsonString())
+		)
+	},
+	getEphemeralAddress: async request => {
+		return new EphemeralAddressResponse().fromJson(
+			await proxy.getEphemeralAddressProxy(request.toJsonString())
 		)
 	},
 	get initialPromise() {

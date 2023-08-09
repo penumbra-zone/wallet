@@ -46,6 +46,7 @@ import { CreateWalletInput, ISeedWalletInput } from './wallets'
 import { AssetId } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { penumbraWasm } from './utils/wrapperPenumbraWasm'
 import { TransactionPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/transaction/v1alpha1/transaction_pb'
+import { request } from 'http'
 
 const bgPromise = setupBackgroundService()
 
@@ -632,6 +633,8 @@ class BackgroundService extends EventEmitter {
 				this.viewProtocolService.getAddressByIndex(request),
 			getTransactionPlannerProxy: async (request: string) =>
 				this.viewProtocolService.getTransactionPlanner(request),
+			getEphemeralAddressProxy: async (request: string) =>
+				this.viewProtocolService.getEphemeralAddress(request),
 		}
 	}
 
