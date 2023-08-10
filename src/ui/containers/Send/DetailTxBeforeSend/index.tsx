@@ -67,14 +67,14 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 		setTxResponse(txResponse)
 	}
 
-	console.log(transactionPlan)
-
 	return (
 		<>
 			<div className='w-[100%] min-h-[100vh] flex justify-center items-center px-[40px] py-[24px]'>
 				<div className='w-[100%] min-h-[calc(100vh-48px)] flex flex-col justify-between bg-brown rounded-[10px] p-[16px]'>
 					<div className='flex flex-col gap-y-[16px]'>
-						<MemoView memoView={transactionPlan.memoPlan} />
+						{transactionPlan.memoPlan && (
+							<MemoView memoView={transactionPlan.memoPlan} />
+						)}
 						{transactionPlan.actions.map((action, index) => (
 							<ActionView key={index} action={action} />
 						))}

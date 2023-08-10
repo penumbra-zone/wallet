@@ -327,18 +327,22 @@ export class ViewProtocolService {
 
 	async getEphemeralAddress(request: string) {
 		const req = new EphemeralAddressRequest().fromJsonString(request)
-		const address = penumbraWasm.get_ephemeral_address(req.addressIndex.account)
-		console.log({address});
-		
 
-		const decodeAddress = bech32m.decode(address, 160)
+		const address: { inner: string } = penumbraWasm.get_ephemeral_address(
+			await this.getAccountFullViewingKey(),
+			Number(req.addressIndex.account)
+		)
+
+		const altBech32m = bech32m.encode(
+			'penumbrav2t',
+			bech32m.toWords(new Address().fromJson(address).inner),
+			160
+		)
 
 		return {
 			address: {
-				inner: bytesToBase64(
-					new Uint8Array(bech32m.fromWords(decodeAddress.words))
-				),
-				altBech32m: address,
+				...address,
+				altBech32m,
 			},
 		}
 	}

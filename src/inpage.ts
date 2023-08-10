@@ -115,6 +115,8 @@ globalThis.penumbra = {
 		)
 	},
 	getEphemeralAddress: async request => {
+		console.log({ request: request.toJsonString(), request1: request })
+
 		return new EphemeralAddressResponse().fromJson(
 			await proxy.getEphemeralAddressProxy(request.toJsonString())
 		)
