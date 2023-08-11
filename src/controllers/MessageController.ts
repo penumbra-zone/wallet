@@ -1,7 +1,6 @@
 import EventEmitter from 'events'
 import { nanoid } from 'nanoid'
 import ObservableStore from 'obs-store'
-import { extension } from '../lib'
 import {
 	Message,
 	MessageInput,
@@ -11,7 +10,7 @@ import {
 import { ExtensionStorage } from '../storage'
 import { PermissionController, PERMISSIONS } from './PermissionController'
 import { RemoteConfigController } from './RemoteConfigController'
-import { TransactionController } from './TransactionController'
+import { alarms } from 'webextension-polyfill'
 
 export class MessageController extends EventEmitter {
 	private store
@@ -40,7 +39,7 @@ export class MessageController extends EventEmitter {
 
 		this._rejectAllByTime()
 
-		extension.alarms.onAlarm.addListener(({ name }) => {
+		alarms.onAlarm.addListener(({ name }) => {
 			if (name === 'rejectMessages') {
 				this._rejectAllByTime()
 			}
@@ -217,7 +216,7 @@ export class MessageController extends EventEmitter {
 
 	_updateMessagesByTimeout() {
 		const { update_messages_ms } = this.getMessagesConfig()
-		extension.alarms.create('rejectMessages', {
+		alarms.create('rejectMessages', {
 			delayInMinutes: update_messages_ms / 1000 / 60,
 		})
 	}

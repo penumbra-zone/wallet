@@ -51,7 +51,6 @@ export class ViewProtocolService {
 	private getLastExistBlock
 	private getTransaction
 	private getAccountAddresByIndex
-	private getAccountFullViewingKey
 
 	constructor({
 		indexedDb,
@@ -59,21 +58,18 @@ export class ViewProtocolService {
 		getLastExistBlock,
 		getTransaction,
 		getAccountAddresByIndex,
-		getAccountFullViewingKey,
 	}: {
 		indexedDb: IndexedDb
 		extensionStorage: ExtensionStorage
 		getLastExistBlock: ClientController['getLastExistBlock']
 		getTransaction: WasmViewConnector['getTransaction']
 		getAccountAddresByIndex: WalletController['getAccountAddresByIndex']
-		getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword']
 	}) {
 		this.indexedDb = indexedDb
 		this.extensionStorage = extensionStorage
 		this.getLastExistBlock = getLastExistBlock
 		this.getTransaction = getTransaction
 		this.getAccountAddresByIndex = getAccountAddresByIndex
-		this.getAccountFullViewingKey = getAccountFullViewingKey
 	}
 
 	async getBalances(request?: BalancesRequest): Promise<BalancesResponse[]> {
@@ -94,7 +90,7 @@ export class ViewProtocolService {
 		const res = assets.map(asset => {
 			const balanceDetail: number = balance[asset.penumbraAssetId.inner] || 0
 			return new BalancesResponse().fromJson({
-				//TODO add account
+				//TODO add account fields
 				balance: {
 					amount: {
 						lo: balanceDetail,
@@ -203,25 +199,7 @@ export class ViewProtocolService {
 				})
 			})
 
-		// if (request.startHeight && request.endHeight) {
-		// 	return response.filter(
-		// 		tx =>
-		// 			Number(tx.txInfo.height) >= Number(request.startHeight) &&
-		// 			Number(tx.txInfo.height) <= Number(request.endHeight)
-		// 	)
-		// }
-
-		// if (request.startHeight && !request.endHeight) {
-		// 	return response.filter(
-		// 		tx => Number(tx.txInfo.height) >= Number(request.startHeight)
-		// 	)
-		// }
-
-		// if (!request.startHeight && request.endHeight) {
-		// 	return response.filter(
-		// 		tx => Number(tx.txInfo.height) <= Number(request.endHeight)
-		// 	)
-		// }
+		//TODO filter by request.startHeight and request.endHeight
 
 		return response
 	}
@@ -343,88 +321,6 @@ export class ViewProtocolService {
 			address: {
 				...address,
 				altBech32m,
-			},
-		}
-	}
-
-	mapTransaction(decodeTransaction) {
-		return {
-			bindingSig: new TextEncoder().encode(decodeTransaction.binding_sig),
-			anchor: {
-				inner: new TextEncoder().encode(decodeTransaction.anchor),
-			},
-			body: {
-				actions: decodeTransaction.body.actions.map(i => {
-					return {
-						action: {
-							case: Object.keys(i.action)[0].toLowerCase(),
-							value: {
-								authSig: {
-									inner: new TextEncoder().encode(
-										(Object.values(i.action)[0] as any).auth_sig
-									),
-								},
-								proof: new TextEncoder().encode(
-									(Object.values(i.action)[0] as any).proof
-								),
-								body: {
-									balanceCommitment: {
-										inner: new TextEncoder().encode(
-											(Object.values(i.action)[0] as any).body
-												.balance_commitment
-										),
-									},
-									nullifier: new TextEncoder().encode(
-										(Object.values(i.action)[0] as any).body.nullifier
-									),
-									rk: new TextEncoder().encode(
-										(Object.values(i.action)[0] as any).body.rk
-									),
-									wrappedMemoKey: new TextEncoder().encode(
-										(Object.values(i.action)[0] as any).body.wrapped_memo_key
-									),
-									ovkWrappedKey: new TextEncoder().encode(
-										(Object.values(i.action)[0] as any).body.ovk_wrapped_key
-									),
-									notePayload: {
-										ephemeralKey: new TextEncoder().encode(
-											(Object.values(i.action)[0] as any).body.note_payload
-												?.ephemeral_key
-										),
-										encryptedNote: new TextEncoder().encode(
-											(Object.values(i.action)[0] as any).body.note_payload
-												?.encrypted_note
-										),
-										noteCommitment: {
-											inner: new TextEncoder().encode(
-												(Object.values(i.action)[0] as any).body.note_payload
-													?.note_commitment
-											),
-										},
-									},
-								},
-							},
-						},
-					}
-				}),
-				expiryHeight: BigInt(decodeTransaction.body.expiry_height),
-				chainId: decodeTransaction.body.chain_id,
-				fee: {
-					assetId: {
-						inner: new TextEncoder().encode(
-							decodeTransaction.body.fee.asset_id
-						),
-					},
-					amount: {
-						lo: BigInt(decodeTransaction.body.fee.amount.lo),
-						hi: BigInt(decodeTransaction.body.fee.amount.hi),
-					},
-				},
-				fmdClues: decodeTransaction.body.fmd_clues.map(i => ({
-					inner: new TextEncoder().encode(i),
-				})),
-				//wtf
-				// encryptedMemo: decodeTransaction.body.encrypted_memo,
 			},
 		}
 	}

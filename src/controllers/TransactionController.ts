@@ -39,85 +39,6 @@ export class TransactionController {
 		this.indexedDb = indexedDb
 	}
 
-	// TODO refactor for other actions
-	// async getTransactionMessageData(
-	// 	transactionPlan: TransactionPlan
-	// ): Promise<TransactionMessageData> {
-	// 	let fvk
-	// 	try {
-	// 		fvk = this.configApi.getAccountFullViewingKey()
-	// 	} catch {}
-	// 	if (!fvk) return
-	// 	let actions
-	// 	await Promise.all(
-	// 		transactionPlan.actions.map(async (i: ActionArrayType) => {
-
-	// 			const key = Object.keys(i)[0]
-	// 			const value = Object.values(i)[0]
-
-	// 			if (key === 'swap') {
-	// 				return {
-	// 					type: 'swap',
-	// 					amount: value,
-	// 					asset: "",
-	// 					isOwnAddress: false,
-	// 					destAddress: "",
-	// 				}
-	// 			}
-
-	// 			const assetId =
-	// 				key === 'spend'
-	// 					? value.note.value.assetId.inner
-	// 					: value.value.assetId.inner
-
-	// 			const detailAsset = await this.indexedDb.getValue('assets', assetId)
-
-	// 			const asset = detailAsset.display
-
-	// 			const exponent = Number(
-	// 				detailAsset?.denomUnits.find(i => i.denom === asset)?.exponent
-	// 			)
-
-	// 			const amount =
-	// 				Number(
-	// 					key === 'spend' ? value.note.value.amount.lo : value.value.amount.lo
-	// 				) / (exponent ? 10 ** exponent : 1)
-
-	// 			const destAddress = key === 'spend' ? '' : value.destAddress.inner
-
-	// 			//encode recipinet address
-	// 			const encodeRecipientAddress = destAddress
-	// 				? penumbraWasm.base64_to_bech32('penumbrav2t', destAddress)
-	// 				: ''
-	// 			//check is recipient address is exist for current user
-	// 			let isOwnAddress: undefined | { inner: string }
-	// 			try {
-	// 				if (key !== 'spend')
-	// 					isOwnAddress = penumbraWasm.is_controlled_address(fvk, encodeRecipientAddress)
-	// 			} catch (error) {
-	// 				console.error('is_controlled_address', error)
-	// 			}
-
-	// 			const type =
-	// 				key === 'output'
-	// 					? isOwnAddress
-	// 						? 'receive'
-	// 						: 'send'
-	// 					: (key as ActionType)
-
-	// 			return {
-	// 				type,
-	// 				amount,
-	// 				asset,
-	// 				isOwnAddress: key === 'spend' ? undefined : Boolean(isOwnAddress),
-	// 				destAddress: encodeRecipientAddress,
-	// 			}
-	// 		})
-	// 	).then(act => (actions = act))
-
-	// 	return { transactionPlan, actions }
-	// }
-
 	async sendTransaction(
 		sendPlan: TransactionPlan
 	): Promise<TransactionResponse> {
@@ -147,13 +68,6 @@ export class TransactionController {
 
 	getRandomInt() {
 		return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
-	}
-
-	toHexString(bytes: Uint8Array) {
-		return bytes.reduce(
-			(str: string, byte: number) => str + byte.toString(16).padStart(2, '0'),
-			''
-		)
 	}
 
 	async broadcastTx(tx_bytes_hex: string): Promise<TransactionResponse> {

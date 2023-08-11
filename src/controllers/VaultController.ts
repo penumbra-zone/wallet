@@ -5,7 +5,6 @@ import { WalletController } from './WalletController'
 export class VaultController {
 	store
 	private wallet: WalletController
-	private identity
 
 	constructor({
 		extensionStorage,
@@ -59,7 +58,6 @@ export class VaultController {
 
 	lock() {
 		this.wallet.lock()
-		// this.identity.lock();
 
 		this.isLocked = true
 	}
@@ -72,7 +70,6 @@ export class VaultController {
 
 	async clear() {
 		await this.wallet.deleteVault()
-		// this.#identity.deleteVault()
 		this.store.updateState({ isInitialized: false, isLocked: true })
 	}
 }

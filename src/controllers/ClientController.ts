@@ -9,7 +9,6 @@ import {
 	NCT_FORGOTTEN_TABLE_NAME,
 	NCT_HASHES_TABLE_NAME,
 	NCT_POSITION_TABLE_NAME,
-	extension,
 } from '../lib'
 import { RemoteConfigController } from './RemoteConfigController'
 import { NetworkController } from './NetworkController'
@@ -19,10 +18,10 @@ import {
 	ChainParametersRequest,
 	CompactBlockRangeRequest,
 } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/client/v1alpha1/client_pb'
-import { CompactBlock } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/chain/v1alpha1/chain_pb'
 import { ObliviousQueryService } from '@buf/penumbra-zone_penumbra.bufbuild_connect-es/penumbra/client/v1alpha1/client_connect'
 import { CurrentAccountController } from './CurrentAccountController'
 import EventEmitter from 'events'
+import { alarms } from 'webextension-polyfill'
 
 export type Transaction = {
 	blockHeight: bigint
@@ -35,7 +34,6 @@ export class ClientController extends EventEmitter {
 	private indexedDb: IndexedDb
 	private configApi
 	private wasmViewConnector: WasmViewConnector
-	//abort all grpc request
 	private abortController: AbortController
 
 	constructor({
@@ -90,7 +88,7 @@ export class ClientController extends EventEmitter {
 		this.indexedDb = indexedDb
 		this.wasmViewConnector = wasmViewConnector
 
-		extension.alarms.onAlarm.addListener(({ name }) => {
+		alarms.onAlarm.addListener(({ name }) => {
 			if (name === 'connection') {
 				this.checkInternetConnection()
 			}
@@ -135,6 +133,7 @@ export class ClientController extends EventEmitter {
 
 	async getCompactBlockRange() {
 		let fvk
+		// TODO delete getAccountFullViewingKey, should find better way how to export fvk
 		try {
 			fvk = this.configApi.getAccountFullViewingKey()
 		} catch {}
@@ -308,26 +307,6 @@ export class ClientController extends EventEmitter {
 		})
 	}
 
-	async broadcastTx(tx_bytes_hex: string) {
-		const tendermint = this.getTendermint()
-
-		const broadcastResponse = await fetch(tendermint, {
-			method: 'POST',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				method: 'broadcast_tx_sync',
-				params: [tx_bytes_hex],
-				id: 31221,
-			}),
-		})
-		const content = await broadcastResponse.json()
-
-		return content
-	}
-
 	async getLastExistBlock() {
 		try {
 			const tendermint = this.getTendermint()
@@ -355,15 +334,6 @@ export class ClientController extends EventEmitter {
 		}
 	}
 
-	byteArrayToLong = function (/*byte[]*/ byteArray) {
-		var value = 0
-		for (var i = byteArray.length - 1; i >= 0; i--) {
-			value = value * 256 + byteArray[i]
-		}
-
-		return value
-	}
-
 	async resetWallet() {
 		this.store.updateState({
 			lastSavedBlock: {
@@ -375,20 +345,6 @@ export class ClientController extends EventEmitter {
 				testnet: 0,
 			},
 		})
-	}
-
-	requireScanning(compactBlock: CompactBlock) {
-		return (
-			compactBlock.statePayloads != null &&
-			compactBlock.statePayloads.length != 0
-		)
-	}
-
-	toHexString(bytes: any) {
-		return bytes.reduce(
-			(str: any, byte: any) => str + byte.toString(16).padStart(2, '0'),
-			''
-		)
 	}
 
 	abortGrpcRequest(reason?: string) {
@@ -417,14 +373,15 @@ export class ClientController extends EventEmitter {
 	}
 
 	async checkInternetConnection() {
-		extension.alarms.create('connection', {
+		alarms.create('connection', {
 			delayInMinutes: 5 / 60,
 		})
 		try {
 			const response = await fetch(this.getGRPC(), { method: 'HEAD' })
+			console.log({ response })
 
 			if (response.ok) {
-				extension.alarms.clear('connection')
+				alarms.clear('connection')
 				this.saveChainParameters()
 				this.getCompactBlockRange()
 			} else {

@@ -3,25 +3,17 @@ import subscribe from 'callbag-subscribe'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { RouterProvider, createMemoryRouter } from 'react-router-dom'
+import { Runtime, extension, runtime, storage } from 'webextension-polyfill'
 import invariant from 'tiny-invariant'
 import { routes } from './account/routes'
 import { createAccountsStore } from './account/store'
 import { createUpdateState } from './account/updateState'
-import {
-	createIpcCallProxy,
-	extension,
-	fromPort,
-	handleMethodCallRequests,
-} from './lib'
+import { createIpcCallProxy, fromPort, handleMethodCallRequests } from './lib'
 import './ui/account.css'
 import backgroundService, {
 	BackgroundGetStateResult,
 	BackgroundUiApi,
 } from './ui/services/Background'
-
-// startAccounts()
-
-// async function startAccounts() {
 
 const store = createAccountsStore()
 
@@ -40,7 +32,7 @@ createRoot(root).render(
 
 const updateState = createUpdateState(store)
 
-extension.storage.onChanged.addListener(async (changes, area) => {
+storage.onChanged.addListener(async (changes, area) => {
 	if (area !== 'local') {
 		return
 	}
@@ -61,7 +53,7 @@ extension.storage.onChanged.addListener(async (changes, area) => {
 const connect = () => {
 	const uiApi = {
 		closePopupWindow: async () => {
-			const popup = extension.extension
+			const popup = extension
 				.getViews({ type: 'popup' })
 				.find(w => w.location.pathname === '/popup.html')
 
@@ -70,7 +62,8 @@ const connect = () => {
 			}
 		},
 	}
-	let port: chrome.runtime.Port | null = extension.runtime.connect()
+	let port: Runtime.Port | null = runtime.connect()
+
 	pipe(
 		fromPort(port),
 		handleMethodCallRequests(uiApi, res => port.postMessage(res)),
@@ -103,5 +96,3 @@ Promise.all([background.getState(), background.getNetworks()]).then(data => {
 	document.addEventListener('mousedown', () => backgroundService.updateIdle())
 	document.addEventListener('focus', () => backgroundService.updateIdle())
 })
-
-// }

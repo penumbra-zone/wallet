@@ -1,8 +1,8 @@
 import ObservableStore from 'obs-store'
-import { extension } from '../lib'
 import { ExtensionStorage } from '../storage'
 import { PreferencesController } from './PreferencesController'
 import { VaultController } from './VaultController'
+import { alarms } from 'webextension-polyfill'
 
 export class IdleController {
 	private idleInterval
@@ -30,7 +30,7 @@ export class IdleController {
 		extensionStorage.subscribe(this.store)
 		this.start()
 
-		extension.alarms.onAlarm.addListener(({ name }) => {
+		alarms.onAlarm.addListener(({ name }) => {
 			if (name === 'idle') {
 				this.start()
 			}
@@ -63,7 +63,7 @@ export class IdleController {
 		if (time > 0) {
 			this._lock()
 		} else {
-			extension.alarms.create('idle', {
+			alarms.create('idle', {
 				delayInMinutes: 5 / 60,
 			})
 		}
