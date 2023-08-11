@@ -378,7 +378,6 @@ export class ClientController extends EventEmitter {
 		})
 		try {
 			const response = await fetch(this.getGRPC(), { method: 'HEAD' })
-			console.log({ response })
 
 			if (response.ok) {
 				alarms.clear('connection')

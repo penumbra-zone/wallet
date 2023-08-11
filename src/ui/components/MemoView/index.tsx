@@ -27,8 +27,6 @@ export const MemoView: React.FC<MemoViewProps> = ({ memoView }) => {
 		}
 	}, [memoView])
 
-	console.log(memoText, memoSender, memoReturnAddress)
-
 	return (
 		<div className='flex flex-col gap-y-[16px]'>
 			{memoText && (

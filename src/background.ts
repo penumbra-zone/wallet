@@ -48,6 +48,7 @@ import { PENUMBRAWALLET_DEBUG } from './ui/appConfig'
 import { IndexedDb, TableName } from './utils'
 import { WasmViewConnector } from './utils/WasmViewConnector'
 import { penumbraWasm } from './utils/wrapperPenumbraWasm'
+import { CreateWalletInput, ISeedWalletInput } from './wallets'
 
 const bgPromise = setupBackgroundService()
 
@@ -281,6 +282,7 @@ class BackgroundService extends EventEmitter {
 				this.wasmViewConnector.getTransaction(txHash),
 			getAccountAddresByIndex: (index: number) =>
 				this.walletController.getAccountAddresByIndex(index),
+			getAccountFullViewingKey: () => this.walletController.getAccountFullViewingKeyWithoutPassword()
 		})
 	}
 

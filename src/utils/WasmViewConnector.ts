@@ -119,9 +119,13 @@ export class WasmViewConnector extends EventEmitter {
 	}
 
 	async setViewServer(fvk: string) {
-		const storedTree = await this.indexedDb.loadStoredTree()
+		try {
+			const storedTree = await this.indexedDb.loadStoredTree()
 
-		this.viewServer = new penumbraWasm.ViewServer(fvk, 719n, storedTree)
+			this.viewServer = new penumbraWasm.ViewServer(fvk, 719n, storedTree)
+		} catch (error) {
+			console.log('setViewServer:', error)
+		}
 	}
 
 	async checkLastNctRoot(block: number) {

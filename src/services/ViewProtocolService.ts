@@ -51,6 +51,7 @@ export class ViewProtocolService {
 	private getLastExistBlock
 	private getTransaction
 	private getAccountAddresByIndex
+	private getAccountFullViewingKey
 
 	constructor({
 		indexedDb,
@@ -58,18 +59,21 @@ export class ViewProtocolService {
 		getLastExistBlock,
 		getTransaction,
 		getAccountAddresByIndex,
+		getAccountFullViewingKey,
 	}: {
 		indexedDb: IndexedDb
 		extensionStorage: ExtensionStorage
 		getLastExistBlock: ClientController['getLastExistBlock']
 		getTransaction: WasmViewConnector['getTransaction']
 		getAccountAddresByIndex: WalletController['getAccountAddresByIndex']
+		getAccountFullViewingKey: WalletController['getAccountFullViewingKeyWithoutPassword']
 	}) {
 		this.indexedDb = indexedDb
 		this.extensionStorage = extensionStorage
 		this.getLastExistBlock = getLastExistBlock
 		this.getTransaction = getTransaction
 		this.getAccountAddresByIndex = getAccountAddresByIndex
+		this.getAccountFullViewingKey = getAccountFullViewingKey
 	}
 
 	async getBalances(request?: BalancesRequest): Promise<BalancesResponse[]> {

@@ -59,6 +59,14 @@ async function startPopup() {
 			},
 		}
 		let port: Runtime.Port | null = runtime.connect()
+		const onDisconnectListener = () => {
+			const lastError = chrome.runtime.lastError
+
+			port.onDisconnect.removeListener(onDisconnectListener)
+
+			console.log('disconnect', lastError)
+		}
+		port.onDisconnect.addListener(onDisconnectListener)
 		pipe(
 			fromPort(port),
 			handleMethodCallRequests(uiApi, res => port.postMessage(res)),

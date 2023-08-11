@@ -114,18 +114,26 @@ export class IndexedDb {
 	}
 
 	public async getValue(tableName: TableName, id) {
-		const tx = this.db.transaction(tableName, 'readonly')
-		const store = tx.objectStore(tableName)
-		const result = await store.get(id)
-		return result
+		try {
+			const tx = this.db.transaction(tableName, 'readonly')
+			const store = tx.objectStore(tableName)
+			const result = await store.get(id)
+			return result
+		} catch (error) {
+			throw new Error('Sync error')
+		}
 	}
 
 	public async getAllValue(tableName: TableName) {
-		const tx = this.db.transaction(tableName, 'readonly')
-		const store = tx.objectStore(tableName)
-		const result = await store.getAll()
+		try {
+			const tx = this.db.transaction(tableName, 'readonly')
+			const store = tx.objectStore(tableName)
+			const result = await store.getAll()
 
-		return result
+			return result
+		} catch (error) {
+			throw new Error('Sync error')
+		}
 	}
 
 	public async putValue(tableName: TableName, value: object) {

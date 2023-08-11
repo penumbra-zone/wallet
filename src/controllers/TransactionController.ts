@@ -50,20 +50,24 @@ export class TransactionController {
 		} catch {}
 		if (!fvk || !spendingKey) return
 
-		const storedTree = await this.indexedDb.loadStoredTree()
+		try {
+			const storedTree = await this.indexedDb.loadStoredTree()
 
-		const buildTx = penumbraWasm.build_tx(
-			spendingKey,
-			fvk,
-			sendPlan,
-			storedTree
-		)
+			const buildTx = penumbraWasm.build_tx(
+				spendingKey,
+				fvk,
+				sendPlan,
+				storedTree
+			)
 
-		const encodeTx = await penumbraWasm.encode_tx(buildTx)
+			const encodeTx = await penumbraWasm.encode_tx(buildTx)
 
-		const resp = await this.broadcastTx(bytesToBase64(encodeTx))
+			const resp = await this.broadcastTx(bytesToBase64(encodeTx))
 
-		return resp
+			return resp
+		} catch (error) {
+			console.log('sendTransaction:', error)
+		}
 	}
 
 	getRandomInt() {

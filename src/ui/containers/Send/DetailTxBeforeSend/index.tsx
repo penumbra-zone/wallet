@@ -64,6 +64,7 @@ export const DetailTxBeforeSend: React.FC<DetailTxBeforeSendProps> = ({
 		if (window.location.pathname === '/notification.html') {
 			await Background.closeNotificationWindow()
 		}
+
 		setTxResponse(txResponse)
 	}
 

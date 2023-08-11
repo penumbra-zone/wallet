@@ -63,6 +63,14 @@ const connect = () => {
 		},
 	}
 	let port: Runtime.Port | null = runtime.connect()
+	const onDisconnectListener = () => {
+		const lastError = chrome.runtime.lastError
+
+		port.onDisconnect.removeListener(onDisconnectListener)
+
+		console.log('disconnect', lastError)
+	}
+	port.onDisconnect.addListener(onDisconnectListener)
 
 	pipe(
 		fromPort(port),
@@ -81,6 +89,40 @@ const connect = () => {
 		fromPort(port)
 	)
 }
+
+// const connect = () => {
+// 	const uiApi = {
+// 		closePopupWindow: async () => {
+// 			const popup = extension.extension
+// 				.getViews({ type: 'popup' })
+// 				.find(w => w.location.pathname === '/popup.html')
+
+// 			if (popup) {
+// 				popup.close()
+// 			}
+// 		},
+// 	}
+// 	let port: chrome.runtime.Port | null = extension.runtime.connect()
+
+// 	port.onDisconnect.addListener(onDisconnectListener)
+
+// 	pipe(
+// 		fromPort(port),
+// 		handleMethodCallRequests(uiApi, res => port.postMessage(res)),
+// 		subscribe({
+// 			complete: () => {
+// 				backgroundService.setConnect(() => {
+// 					port = null
+// 					backgroundService.init(connect())
+// 				})
+// 			},
+// 		})
+// 	)
+// 	return createIpcCallProxy<keyof BackgroundUiApi, BackgroundUiApi>(
+// 		request => port?.postMessage(request),
+// 		fromPort(port)
+// 	)
+// }
 
 const background = connect()
 
