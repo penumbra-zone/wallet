@@ -109,7 +109,7 @@ export const ImportSeed: React.FC<ImportSeedProps> = ({}) => {
 			createAccount({
 				seed: seedStr,
 				type: 'seed',
-				name: 'Wallet 1',
+				name: 'Account 1',
 				addressByIndex: '',
 				shortAddressByIndex: '',
 			})

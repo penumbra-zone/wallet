@@ -137,6 +137,7 @@ export class ClientController extends EventEmitter {
 		try {
 			fvk = this.configApi.getAccountFullViewingKey()
 		} catch {}
+
 		if (!fvk) return
 
 		await this.wasmViewConnector.setViewServer(fvk)
@@ -268,6 +269,8 @@ export class ClientController extends EventEmitter {
 				}
 			}
 		}
+
+		if (!this.abortController.signal.aborted) await this.getCompactBlockRange()
 	}
 
 	async saveUpdates() {

@@ -132,7 +132,7 @@ export const SeedPhrase: React.FC<SeedPhraseProps> = ({}) => {
 			createAccount({
 				seed,
 				type: 'seed',
-				name: 'Wallet 1',
+				name: 'Account 1',
 			} as any)
 		)
 		setIsShowModal(true)
