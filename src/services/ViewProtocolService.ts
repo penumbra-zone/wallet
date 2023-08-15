@@ -284,7 +284,7 @@ export class ViewProtocolService {
 
 			if (request.swapClaims) {
 				for (const swapClaim of request.swapClaims) {
-					wasmPlanner.swap_claim(swapClaim.swapCommitment);
+					await wasmPlanner.swap_claim(swapClaim.swapCommitment.toJson());
 				}
 			}
 
