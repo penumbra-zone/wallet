@@ -166,35 +166,35 @@ export class WasmViewConnector extends EventEmitter {
 		}
 
 		if (block.fmdParameters) await this.saveFmdParameters(block.fmdParameters)
+		//TODO when we should check is right sync progress
+		// if (
+		// 	(!(Number(block.height) % 50000) || isActiveSync) &&
+		// 	PENUMBRAWALLET_DEBUG
+		// ) {
+		// 	try {
+		// 		const transport = createGrpcWebTransport({
+		// 			baseUrl: this.getGRPC(),
+		// 		})
 
-		if (
-			(!(Number(block.height) % 50000) || isActiveSync) &&
-			PENUMBRAWALLET_DEBUG
-		) {
-			try {
-				const transport = createGrpcWebTransport({
-					baseUrl: this.getGRPC(),
-				})
+		// 		const client = createPromiseClient(SpecificQueryService, transport)
 
-				const client = createPromiseClient(SpecificQueryService, transport)
+		// 		const keyValueRequest = new KeyValueRequest()
+		// 		keyValueRequest.key = `sct/anchor/${String(block.height)}`
+		// 		let keyValue = await client.keyValue(keyValueRequest)
 
-				const keyValueRequest = new KeyValueRequest()
-				keyValueRequest.key = `sct/anchor/${String(block.height)}`
-				let keyValue = await client.keyValue(keyValueRequest)
+		// 		let decodeNctRoot = penumbraWasm.decode_nct_root(
+		// 			this.toHexString(keyValue.value.value)
+		// 		)
 
-				let decodeNctRoot = penumbraWasm.decode_nct_root(
-					this.toHexString(keyValue.value.value)
-				)
+		// 		const nctRoot = this.viewServer.get_nct_root()
 
-				const nctRoot = this.viewServer.get_nct_root()
-
-				if (decodeNctRoot.inner !== nctRoot.inner) {
-					console.log('unsync', block.height)
-				}
-			} catch (error) {
-				throw new Error('Sync error')
-			}
-		}
+		// 		if (decodeNctRoot.inner !== nctRoot.inner) {
+		// 			console.log('unsync', block.height)
+		// 		}
+		// 	} catch (error) {
+		// 		throw new Error('Sync error')
+		// 	}
+		// }
 	}
 
 	public async loadUpdates() {

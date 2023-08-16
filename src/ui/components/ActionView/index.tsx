@@ -11,7 +11,9 @@ export const ActionView: React.FC<{ action: ActionPlan }> = ({ action }) => {
 		case 'output':
 			return <OutputView view={action.action.value} />
 		case 'swap':
-			return <SwapView view={action.action.value} />
+			return <SwapView swapPlaintext={action.action.value.swapPlaintext} title='Swap' />
+		case 'swapClaim':
+			return <SwapView swapPlaintext={action.action.value.swapPlaintext} title='Swap Claim'  />
 		default:
 			return <></>
 	}
