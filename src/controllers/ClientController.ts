@@ -101,7 +101,7 @@ export class ClientController extends EventEmitter {
 				CHAIN_PARAMETERS_TABLE_NAME
 			)
 
-			if (savedChainParameters.length) return
+			// if (savedChainParameters.length) return
 
 			const baseUrl = this.getGRPC()
 
@@ -111,21 +111,27 @@ export class ClientController extends EventEmitter {
 
 			const client = createPromiseClient(ObliviousQueryService, transport)
 
-			const chainParametersRequest = new ChainParametersRequest()
-
 			const chainParameters = await client.chainParameters(
-				chainParametersRequest
+				new ChainParametersRequest()
 			)
 
-			await this.indexedDb.putValueWithId(
-				CHAIN_PARAMETERS_TABLE_NAME,
-				JSON.parse(chainParameters.chainParameters.toJsonString()),
-				'chain_parameters'
-			)
-			await this.configApi.setNetworks(
-				chainParameters.chainParameters.chainId,
-				this.configApi.getNetwork()
-			)
+			if (!savedChainParameters.length) {
+				await this.indexedDb.putValueWithId(
+					CHAIN_PARAMETERS_TABLE_NAME,
+					JSON.parse(chainParameters.chainParameters.toJsonString()),
+					'chain_parameters'
+				)
+
+				await this.configApi.setNetworks(
+					chainParameters.chainParameters.chainId,
+					this.configApi.getNetwork()
+				)
+			} else if (
+				savedChainParameters[0].chainId !==
+				chainParameters.chainParameters.chainId
+			) {
+			} else {
+			}
 		} catch (error) {
 			console.error(error.message)
 		}
@@ -137,6 +143,7 @@ export class ClientController extends EventEmitter {
 		try {
 			fvk = this.configApi.getAccountFullViewingKey()
 		} catch {}
+
 		if (!fvk) return
 
 		await this.wasmViewConnector.setViewServer(fvk)
@@ -268,6 +275,8 @@ export class ClientController extends EventEmitter {
 				}
 			}
 		}
+
+		if (!this.abortController.signal.aborted) await this.getCompactBlockRange()
 	}
 
 	async saveUpdates() {

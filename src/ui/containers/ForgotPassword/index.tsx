@@ -91,7 +91,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
 			createAccount({
 				seed: seedStr,
 				type: 'seed',
-				name: 'Wallet 1',
+				name: 'Account 1',
 				addressByIndex: '',
 				shortAddressByIndex: '',
 			})

@@ -31,7 +31,8 @@ import {
 	ASSET_TABLE_NAME,
 	CHAIN_PARAMETERS_TABLE_NAME,
 	FMD_PARAMETERS_TABLE_NAME,
-	SPENDABLE_NOTES_TABLE_NAME, SWAP_TABLE_NAME,
+	SPENDABLE_NOTES_TABLE_NAME,
+	SWAP_TABLE_NAME,
 	TRANSACTION_TABLE_NAME,
 } from '../lib'
 import { WasmViewConnector } from '../utils/WasmViewConnector'
@@ -40,7 +41,7 @@ import { bech32m } from 'bech32'
 
 import { Address } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/crypto/v1alpha1/crypto_pb'
 import { penumbraWasm } from '../utils/wrapperPenumbraWasm'
-import {SwapClaimPlan} from "@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/dex/v1alpha1/dex_pb";
+import { SwapClaimPlan } from '@buf/penumbra-zone_penumbra.bufbuild_es/penumbra/core/dex/v1alpha1/dex_pb'
 
 const areEqual = (first, second) =>
 	first.length === second.length &&
@@ -284,7 +285,7 @@ export class ViewProtocolService {
 
 			if (request.swapClaims) {
 				for (const swapClaim of request.swapClaims) {
-					await wasmPlanner.swap_claim(swapClaim.swapCommitment.toJson());
+					await wasmPlanner.swap_claim(swapClaim.swapCommitment.toJson())
 				}
 			}
 
