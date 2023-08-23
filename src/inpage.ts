@@ -151,7 +151,7 @@ globalThis.penumbra = {
 			}
 		} else if (event === 'transactions') {
 			const data = await proxy.getTransactionInfo(
-				new TransactionInfoRequest(args)
+				new TransactionInfoRequest(args).toJsonString()
 			)
 
 			for (let i = 0; i < data.length; i++) {

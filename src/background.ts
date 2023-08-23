@@ -602,7 +602,7 @@ class BackgroundService extends EventEmitter {
 				return this.viewProtocolService.getStatus()
 			},
 			getStatusStream: async () => this.viewProtocolService.getStatusStream(),
-			getTransactionInfo: async (request?: TransactionInfoRequest) => {
+			getTransactionInfo: async (request: string) => {
 				// const canIUse = this.permissionsController.hasPermission(
 				// 	origin,
 				// 	PERMISSIONS.GET_TRANSACTIONS
@@ -611,7 +611,7 @@ class BackgroundService extends EventEmitter {
 				// 	throw new Error('Access denied')
 				// }
 				return this.viewProtocolService.getTransactionInfo(
-					new TransactionInfoRequest(request)
+					request
 				)
 			},
 			getTransactionInfoByHashProxy: async (request: string) => {

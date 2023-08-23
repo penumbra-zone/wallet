@@ -189,8 +189,9 @@ export class ViewProtocolService {
 	}
 
 	async getTransactionInfo(
-		request?: TransactionInfoRequest
+		request: string
 	): Promise<TransactionInfoResponse[]> {
+		const req = new TransactionInfoRequest().fromJsonString(request)
 		const transactions = await this.indexedDb.getAllValue(
 			TRANSACTION_TABLE_NAME
 		)

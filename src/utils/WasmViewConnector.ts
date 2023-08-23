@@ -166,7 +166,7 @@ export class WasmViewConnector extends EventEmitter {
 		}
 
 		if (block.fmdParameters) await this.saveFmdParameters(block.fmdParameters)
-		//TODO when we should check is right sync progress
+		//TODO when we should check is right sync progress (sometimes this request return empty response)
 		// if (
 		// 	(!(Number(block.height) % 50000) || isActiveSync) &&
 		// 	PENUMBRAWALLET_DEBUG
